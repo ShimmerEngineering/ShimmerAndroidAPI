@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.shimmerresearch.multishimmertemplate"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="17" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
+	<uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/shimmer_icon"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.shimmerresearch.multishimmertemplate.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+      <!--    <activity
+            android:name="com.shimmerresearch.multishimmertemplate.ItemDetailActivity"
+            android:label="@string/main"
+            android:parentActivityName="com.shimmerresearch.multishimmertemplate.ItemListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ItemListActivity" />
+        </activity>  -->
+        
+        <activity android:name="com.shimmerresearch.multishimmertemplate.DeviceListActivity" android:label="Select Device" android:theme="@android:style/Theme.Holo.Light.Dialog"></activity>
+        <service android:enabled="true" android:name="com.shimmerresearch.service.MultiShimmerTemplateService" />
+    
+    </application>
+    
+
+</manifest>

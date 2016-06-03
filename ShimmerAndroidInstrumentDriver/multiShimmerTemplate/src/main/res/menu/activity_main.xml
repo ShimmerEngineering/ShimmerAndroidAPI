@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+   
+    
+     <item android:id="@+id/write"
+        android:showAsAction="always|withText"
+        android:title="Write"
+          android:icon="@drawable/ic_action_write"/>
+    
+<!--     <item android:id="@+id/settings"
+        android:showAsAction="always|withText"
+        android:title="Settings"
+          android:icon="@drawable/ic_settings"/> -->
+
+      <item android:id="@+id/help"
+        android:showAsAction="always|withText"
+        android:title="Help"
+          android:icon="@android:drawable/ic_menu_help"/>
+      
+</menu>

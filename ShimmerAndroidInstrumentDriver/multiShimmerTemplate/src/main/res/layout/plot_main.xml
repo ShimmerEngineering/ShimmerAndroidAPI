@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:background="#FFFFFF">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.88" >
+        
+        <LinearLayout 
+            android:id="@+id/heart_rate_layout"
+            android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_marginTop="5dp"
+        	android:layout_marginRight="10dp"
+        	android:layout_gravity="right|top"
+        	android:orientation="horizontal">
+            
+            <ImageButton
+	          android:id="@+id/floating_heart"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_margin="5dip"
+	          android:padding="5dip"
+	          android:visibility="gone"
+	          android:background="@null"
+	          android:src="@drawable/ic_heart"
+	          android:text="Heart Rate" />
+            
+            <TextView 
+                android:id="@+id/floating_text"
+          		android:layout_width="wrap_content"
+          		android:layout_height="wrap_content"
+	        	android:visibility="gone"
+          		android:layout_gravity="center_vertical"
+          		android:text = "0 BMP"
+          		android:textSize="@dimen/medium"/>
+            
+        </LinearLayout>
+        
+
+       <com.androidplot.xy.XYPlot
+	        android:id="@+id/dynamicPlot"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:layout_marginLeft="10dp"
+	        android:layout_marginRight="10dp"
+	        android:layout_marginTop="10dp"
+	        title="Shimmer Data Plot" 
+	        android:background="#FFFFFF" />
+            
+
+    </FrameLayout>
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.12">
+       
+        <Button 
+            android:id="@+id/buttonSelectSensor"
+       	    android:layout_width="match_parent"
+       	    android:layout_height="match_parent"
+       	    android:layout_margin="5dp"
+
+       	    android:background="@drawable/selector_grey"
+       	    android:text="Select Plot Signals"/>
+
+        
+    </LinearLayout>
+
+    
+
+    
+
+</LinearLayout>

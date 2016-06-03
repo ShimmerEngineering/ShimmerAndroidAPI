@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:minHeight="?android:attr/listPreferredItemHeight" 
+    android:layout_height="wrap_content">
+    
+    <CheckBox
+        android:id="@+id/checkBoxSignal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_marginRight="5dp" >
+    </CheckBox>
+    
+    <TextView
+        android:id="@+id/textSignal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall" 
+        android:text="Low noise Accelerometer">
+    </TextView>
+
+</LinearLayout> 

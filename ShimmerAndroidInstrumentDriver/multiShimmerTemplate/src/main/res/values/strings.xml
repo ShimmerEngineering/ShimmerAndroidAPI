@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MultiShimmerTemplate</string>
+    <string name="main">Main</string>
+   	<string name="title_paired_devices">Paired Devices</string>
+    <string name="enable_sensors_done">Done</string>
+    <string name="configure_device">Configure Shimmer</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">SCAN FOR DEVICES</string>
+    <item type="id" name="PARENT_ID"/>
+    <item type="id" name="CHILD_ID"/>
+    
+    <string-array name="options_menu">
+        <item>Devices</item>
+        <item>Plot</item>
+        <item>Blank</item>
+    </string-array>
+    
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_shimmer</item>
+        <item>@drawable/ic_plot</item>
+        <item>@drawable/ic_blank</item>
+    </array>
+    
+    <!-- Spinner with the sensors for calculating the hear rate -->
+    <string name="sensor_prompt">Choose a sensor</string>
+    <string-array name="sensors_to_heart_rate">
+        <item>A1</item>
+        <item>A12</item>
+        <item>A13</item>
+        <item>A14</item>
+    </string-array>
+
+        <string-array name="sensors_to_heart_rate_ecg">
+        <item>A1</item>
+        <item>A12</item>
+        <item>A13</item>
+        <item>A14</item>
+    </string-array>
+    
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    
+</resources>

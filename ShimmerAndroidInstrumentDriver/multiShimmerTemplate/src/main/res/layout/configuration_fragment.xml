@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightgrey2"
+    android:orientation="vertical" >
+        
+     
+    <LinearLayout 
+         android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:paddingLeft="5dp"
+
+        android:paddingRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+              
+        <TextView
+            android:id="@+id/textViewSensorsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enable sensors" />
+        
+        <View 
+            android:layout_width="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_height="1dp"/>
+        
+     </LinearLayout>
+    
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1" >
+        
+        
+        <Button
+       	     android:id="@+id/buttonEnableSensorsConfiguration"
+       	     android:layout_width="match_parent"
+       	     android:layout_height="wrap_content"
+       	     android:background="@drawable/selector_grey"
+             android:layout_margin="3dp"
+             android:layout_gravity="top"
+       	     android:text="Enable Sensors" />       
+        
+    </LinearLayout>
+     
+      
+     <LinearLayout 
+         android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical">
+              
+        <TextView
+            android:id="@+id/textViewConfigurationTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configuration options" />
+        
+        <View 
+            android:layout_width="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_height="1dp"/>
+        
+     </LinearLayout>
+      
+     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp" 
+        android:layout_weight="0.45" 
+        android:orientation="horizontal">
+
+         
+     	<LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="match_parent" 
+             android:layout_weight="0.5" 
+             android:orientation="vertical">
+        
+     	<Button
+       	     android:id="@+id/buttonDeviceName"
+       	     android:layout_width="match_parent"
+       	     android:layout_height="0dp"
+       	     android:layout_weight="1"
+       	     android:background="@drawable/selector_grey"
+             android:layout_margin="3dp"
+             android:textSize="@dimen/medium"
+             android:layout_gravity="center_vertical"
+       	     android:text="Device Name" />
+        
+     	 
+
+        <Button
+            android:id="@+id/buttonAccel"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_grey"
+            android:layout_margin="3dp"
+            android:textSize="@dimen/medium"
+            android:layout_gravity="center_vertical"
+            android:text="Accel Range" />
+        
+        
+        <Button
+            android:id="@+id/buttonMagRange"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_grey"
+            android:layout_margin="3dp"
+            android:textSize="@dimen/medium"
+            android:layout_gravity="center_vertical"
+            android:text="Mag Range" />
+        
+        
+        
+        <Button
+       	     android:id="@+id/buttonBattLimit"
+       	     android:layout_width="match_parent"
+       	     android:layout_height="0dp"
+       	     android:layout_weight="1"
+       	     android:background="@drawable/selector_grey"
+             android:layout_margin="3dp"
+             android:textSize="@dimen/medium"
+             android:layout_gravity="center_vertical"
+       	     android:text="Set Batt Limit(V)" />
+        
+        <Button
+       	     android:id="@+id/buttonExgGain"
+       	     android:layout_width="match_parent"
+       	     android:layout_height="0dp"
+       	     android:layout_weight="1"
+       	     android:background="@drawable/selector_grey"
+             android:layout_margin="3dp"
+             android:textSize="@dimen/medium"
+             android:layout_gravity="center_vertical"
+       	     android:text="Exg Gain" />   		
+        
+        </LinearLayout>
+        
+     	<LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="match_parent" 
+             android:layout_weight="0.5"
+             android:orientation="vertical">
+        
+     	    
+     	  <Button
+            android:id="@+id/buttonRate"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_grey"
+            android:layout_margin="3dp"
+            android:textSize="@dimen/medium"
+            android:layout_gravity="center_vertical"
+            android:text="Sampling Rate (Hz)" />
+        
+     	  <Button
+            android:id="@+id/buttonGyroRange"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_grey"
+            android:layout_margin="3dp"
+            android:textSize="@dimen/medium"
+            android:layout_gravity="center_vertical"
+            android:text="Gyro Range" />
+
+
+        <Button
+            android:id="@+id/buttonGSR"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_grey"
+            android:layout_margin="3dp"
+            android:textSize="@dimen/medium"
+            android:layout_gravity="center_vertical"
+            android:text="GSR Range" />
+
+        
+        <Button
+            android:id="@+id/buttonPressureAccuracy"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_grey"
+            android:layout_margin="3dp"
+            android:textSize="@dimen/medium"
+            android:layout_gravity="center_vertical"
+            android:text="Pressure Res" />
+        
+
+       
+       <Button
+       	     android:id="@+id/buttonExgRes"
+       	     android:layout_width="match_parent"
+       	     android:layout_height="0dp"
+       	     android:layout_weight="1"
+       	     android:background="@drawable/selector_grey"
+             android:layout_margin="3dp"
+             android:textSize="@dimen/medium"
+             android:layout_gravity="center_vertical"
+       	     android:text="Exg Res" />
+        
+        
+        </LinearLayout>
+        
+     	
+     
+     </LinearLayout>
+     
+     
+         <LinearLayout 
+         android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+              
+        <TextView
+            android:id="@+id/textViewEnableTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Other Settings" />
+        
+        <View 
+            android:layout_width="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_height="1dp"/>
+        
+     </LinearLayout>
+     
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp" 
+        android:layout_weight="0.15" 
+        android:orientation="horizontal">
+       	 
+         <LinearLayout 
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_weight="0.5" 
+             android:background="@android:color/background_light"
+             android:orientation="vertical">
+             
+	        <CheckBox
+	            android:id="@+id/checkBox5VReg"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical"
+	            android:layout_weight="1"
+	            android:text="5VReg" />
+
+	        <CheckBox
+	            android:id="@+id/CheckBoxIntExpPow"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:layout_gravity="center_vertical"
+	            android:text="IntExpPow" />
+	        
+	        <CheckBox
+	            android:id="@+id/CheckBoxPPGToHeartRate"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:layout_gravity="center_vertical"
+	            android:text="Heart Rate" />
+        
+             
+         </LinearLayout>
+       	 
+         <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="wrap_content" 
+             android:layout_weight="0.55" 
+             android:background="@android:color/background_light"
+             android:orientation="vertical">
+             
+             <CheckBox
+            android:id="@+id/checkBoxLowPowerMag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:text="Low Power Mag" />
+        
+        <CheckBox
+            android:id="@+id/checkBoxLowPowerAccel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:text="Low Power Acc" />
+        
+        <CheckBox
+            android:id="@+id/checkBoxLowPowerGyro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:text="Low Power Gyro" />
+             
+         </LinearLayout>
+       	 
+      </LinearLayout>
+      
+
+     
+     <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="0dp" 
+        android:layout_weight="0.10" 
+        >
+         
+         <Button
+       	     android:id="@+id/buttonDone"
+       	     android:layout_width="match_parent"
+       	     android:layout_height="match_parent"
+       	     android:layout_margin="3dp"
+       	     android:background="@drawable/selector_orange"
+       	     android:text="Done" />
+         
+     </LinearLayout>
+     
+      
+
+
+</LinearLayout>

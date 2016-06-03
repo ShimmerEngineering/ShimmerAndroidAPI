@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+<!--     <TextView 
+        android:paddingTop="15dp"
+        android:id="@+id/textWriteMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Please, select one option"/> -->
+    
+    
+    <LinearLayout 
+        android:paddingTop="15dp"
+        android:paddingBottom="5dp"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="horizontal" >
+	    
+	    <Button 
+	        android:id="@+id/buttonStartWriteData"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"
+	        android:layout_weight="0.5"
+	        android:background="@drawable/selector_grey"
+	        android:text="Start Write"
+	        android:layout_margin="5dp"
+	     />
+	    
+	    <Button 
+	        android:id="@+id/buttonSetFileName"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"
+	        android:layout_weight="0.5"
+	        android:layout_margin="5dp"
+	        android:background="@drawable/selector_grey"
+	        android:text="Set File Name"
+	     />
+    
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal" >
+    
+    <LinearLayout 
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.60"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+        
+        <TextView 
+            android:id="@+id/device_name"
+            android:layout_marginLeft="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/shimmer_grey"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:text="Shimmer x"/>
+        
+        <LinearLayout 
+            android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:orientation="horizontal">
+            
+            <TextView 
+            android:id="@+id/bluetooth_address"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:layout_height="wrap_content"
+            android:textColor="@color/shimmer_grey"
+            android:text="00:00:00:00:00:00"/>
+            
+            <ImageView
+            android:id="@+id/image_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="bottom" />
+            
+        </LinearLayout>
+        
+        
+    </LinearLayout>
+    
+    
+
+    
+    <LinearLayout 
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:layout_weight="0.20">
+        
+        <ImageView
+            android:id="@+id/image_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="false"
+            android:paddingRight="15dp"
+            android:background="@drawable/selector_image_menu"
+            android:src="@drawable/ic_action_overflow"
+            android:scaleType="fitCenter" />
+        
+    </LinearLayout>
+
+</LinearLayout>

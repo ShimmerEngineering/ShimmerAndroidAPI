@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="list_item_title">#848484</color>
+    <color name="list_background">#FFFFFF</color>
+    <color name="list_background_pressed">#992416</color>
+    <color name="list_background_disabled">#D6D6D6</color>
+    <color name="list_divider">#272727</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="counter_text_color">#c5c4c4</color>
+    <color name="app_background_color">#EAEAEA</color>
+    <color name="dialog_background_color">#666666</color>
+    <color name="text_color">#848484</color>
+    <color name="text_color_light">#CECECE</color>
+    <color name="shimmer_blue">#3399FF</color>
+    <color name="shimmer_orange">#F5926B</color>
+    <color name="shimmer_grey">#969696</color>
+    <color name="red_circle">#FF0000</color> 
+    <color name="yellow_circle">#FFFF00</color>
+    <color name="green_circle">#008000</color>
+    <color name="edit_text_color">#BEBEBE</color>
+    <color name="lightgrey">#D3D3D3</color>
+    <color name="lightgrey2">#F0F0F0</color>
+    <color name="lightgrey3">#F8F8F8</color>
+    
+<!-- list fo color for ploting signals -->
+
+	<color name="red">#FF0000</color>
+	<color name="dark_red">#8B0000</color>
+	<color name="pink">#FFC0CB</color>
+	<color name="violet">#C71585</color>
+	<color name="orange">#FFA500</color>
+	<color name="dark_orange">#FF8C00</color>
+	<color name="yellow">#FFFF00</color>
+	<color name="gold">#FFD700</color>
+	<color name="purple">#800080</color>
+	<color name="indigo">#4B0082</color>
+	<color name="green">#008000</color>
+	<color name="lime">#00FF00</color>
+	<color name="dark_green">#006400</color>
+	<color name="turquoise">#40E0D0</color>
+	<color name="blue">#0000FF</color>
+	<color name="dark_blue">#00008B</color>
+	<color name="brown">#8B4513</color>
+	<color name="gray">#808080</color>
+	<color name="dark_gray">#A9A9A9</color>
+	<color name="black">#000000</color>
+	
+	<array name="plotColor">
+        <item>@color/red</item>
+        <item>@color/green</item>
+        <item>@color/blue</item>
+        <item>@color/yellow</item>
+        <item>@color/orange</item>
+        <item>@color/violet</item>
+        <item>@color/turquoise</item>
+        <item>@color/brown</item>
+        <item>@color/pink</item>
+        <item>@color/lime</item>
+        <item>@color/gray</item>
+        <item>@color/gold</item>
+        <item>@color/purple</item>
+        <item>@color/black</item>
+        <item>@color/indigo</item>
+        <item>@color/dark_red</item>
+        <item>@color/dark_green</item>
+        <item>@color/dark_blue</item>
+        <item>@color/dark_orange</item>
+        <item>@color/dark_gray</item>
+    </array>
+	
+</resources>

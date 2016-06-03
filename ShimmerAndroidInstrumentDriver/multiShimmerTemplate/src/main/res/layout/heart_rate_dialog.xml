@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_heart_rate"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7dp"
+        android:orientation="horizontal">
+        
+        <TextView 
+            android:id="@+id/textSelectSensors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Select Sensor"/>
+        
+        <Spinner 
+            android:id="@+id/spinnerSensors"
+            android:layout_width="match_parent"
+            android:paddingLeft="30dp"
+            android:entries="@array/sensors_to_heart_rate"
+            android:prompt="@string/sensor_prompt"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    
+     <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="7dp"
+        android:orientation="vertical">
+        
+        <TextView 
+            android:id="@+id/textNumberOfBeats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Set number of beats to average"/>
+        
+        <EditText 
+            android:id="@+id/editTextNumberOfBeats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:layout_marginRight="7dp"/>
+    </LinearLayout>
+    
+     <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+        
+	     <Button 
+	         android:id="@+id/buttonDoneHearRate"
+	         android:layout_width="0dp"
+	         android:layout_weight="0.5"
+	         android:layout_height="wrap_content"
+	         android:layout_margin="5dp"
+	         android:background="@drawable/selector_orange"
+	         android:text="Done"/>
+	     
+	     <Button 
+	         android:id="@+id/buttonCancelHearRate"
+	         android:layout_width="0dp"
+	         android:layout_weight="0.5"
+	         android:layout_height="wrap_content"
+	         android:layout_margin="5dp"
+	         android:background="@drawable/selector_orange"
+	         android:text="Cancel"/>
+	     
+     </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.85"
+        android:orientation="horizontal">
+        
+        <ListView 
+            android:id="@+id/listPlotDevices"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.4"
+            android:choiceMode="singleChoice">
+        </ListView>
+        
+        <View 
+            android:id="@+id/lateral_bar"
+            android:layout_width="1dp"
+            android:background="@color/lightgrey"
+            android:layout_height="match_parent"
+            android:visibility="visible"/>
+        
+        <ListView 
+            android:id="@+id/listPlotSensors"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.60"
+            android:choiceMode="multipleChoice">
+        </ListView>
+        
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:id="@+id/layoutButtonPlotDone"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:padding="4dp"
+        android:orientation="vertical">
+        
+        <Button 
+            android:id="@+id/buttonPlotDone"
+            android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:background="@drawable/selector_orange"
+	        android:text="Done"/>
+        
+    </LinearLayout>
+
+</LinearLayout>
