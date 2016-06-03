@@ -1,0 +1,3 @@
+include ':ShimmerAndroidInstrumentDriver'
+include ':shimmerCapture'
+include ':multiShimmerTemplate'
