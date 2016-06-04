@@ -29,12 +29,13 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/INDEX.LIST'
     }
 
 }
 
 dependencies {
-    compile 'org.apache.commons:commons-math:2.2'
     compile project(':ShimmerAndroidInstrumentDriver')
+    compile 'org.apache.commons:commons-math:2.2'
     compile 'org.apache.commons:commons-lang3:3.4'
 }
