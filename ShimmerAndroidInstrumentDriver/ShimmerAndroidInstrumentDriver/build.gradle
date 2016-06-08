@@ -7,8 +7,8 @@ android {
     defaultConfig {
         // Enabling multidex support.
         multiDexEnabled true
-        minSdkVersion 11
-        targetSdkVersion 13
+        minSdkVersion 14
+        targetSdkVersion 14
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
             targetCompatibility JavaVersion.VERSION_1_7
@@ -42,5 +42,5 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'java3d:vecmath:1.3.1'
     compile 'com.google.protobuf:protobuf-java:3.0.0-beta-2'
-    compile files('libs/shimmercoreapi.jar')
+    compile files('libs/ShimmerDriver-1.0.jar')
 }
