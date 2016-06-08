@@ -9,8 +9,8 @@ android {
     defaultConfig {
         multiDexEnabled true
         applicationId "com.shimmersensing.shimmerconnect"
-        minSdkVersion 14
-        targetSdkVersion 14
+        minSdkVersion 11
+        targetSdkVersion 13
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
             targetCompatibility JavaVersion.VERSION_1_7
@@ -38,8 +38,4 @@ dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
     compile 'org.apache.commons:commons-math:2.2'
     compile 'org.apache.commons:commons-lang3:3.4'
-    provided files('libs/ShimmerDriver-1.0.jar')
-    provided files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
-    provided files('libs/androidplot-core-0.5.0-release.jar')
-    provided 'com.google.guava:guava:19.0'
 }
