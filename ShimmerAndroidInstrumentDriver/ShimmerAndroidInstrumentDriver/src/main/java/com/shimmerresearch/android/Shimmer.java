@@ -185,18 +185,28 @@ public class Shimmer extends ShimmerBluetooth{
 	//generic UUID for serial port protocol
 	private UUID mSPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	// Message types sent from the Shimmer Handler
-	public static final int MESSAGE_STATE_CHANGE = 1;
+
+	/**
+	 *
+	 * @deprecated This MSG are now in ShimmerBluetooth, the values have been changed to match those in ShimmerBluetooth
+	 */
+	@Deprecated
+	public static final int MESSAGE_STATE_CHANGE = 0; //changed to 0 to match Shimmer Bluetooth, this messages should no longer be used but kept for backward compatibility
+	@Deprecated
 	public static final int MESSAGE_READ = 2;
-	public static final int MESSAGE_WRITE = 3;
+	@Deprecated
 	public static final int MESSAGE_ACK_RECEIVED = 4;
+	@Deprecated
 	public static final int MESSAGE_DEVICE_NAME = 5;
+	@Deprecated
 	public static final int MESSAGE_TOAST = 6;
-	public static final int MESSAGE_SAMPLING_RATE_RECEIVED = 7;
-	public static final int MESSAGE_INQUIRY_RESPONSE = 8;
+	@Deprecated
 	public static final int MESSAGE_STOP_STREAMING_COMPLETE = 9;
+	@Deprecated
 	public static final int MESSAGE_PACKET_LOSS_DETECTED = 11;
-	public static final int MESSAGE_NOT_SYNC = 12;
+	@Deprecated
 	public static final int MESSAGE_LOG_AND_STREAM_STATUS_CHANGED = 13;
+	@Deprecated
 	public static final int MESSAGE_PROGRESS_REPORT = 14;
 	
 	// Key names received from the Shimmer Handler 
@@ -228,10 +238,9 @@ public class Shimmer extends ShimmerBluetooth{
 	
 	/**
 	 * Constructor. Prepares a new Bluetooth session.
-	 * @param context  The UI Activity Context
 	 * @param handler  A Handler to send messages back to the UI Activity
-	 * @param myname  To allow the user to set a unique identifier for each Shimmer device
-	 * @param countiousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
+	 * @param myName  To allow the user to set a unique identifier for each Shimmer device
+	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
 	public Shimmer(Handler handler, String myName, Boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -256,12 +265,12 @@ public class Shimmer extends ShimmerBluetooth{
 	 * Constructor. Prepares a new Bluetooth session. Additional fields allows the device to be set up immediately.
 	 * @param context  The UI Activity Context
 	 * @param handler  A Handler to send messages back to the UI Activity
-	 * @param myname  To allow the user to set a unique identifier for each Shimmer device
+	 * @param myName  To allow the user to set a unique identifier for each Shimmer device
 	 * @param samplingRate Defines the sampling rate
 	 * @param accelRange Defines the Acceleration range. Valid range setting values for the Shimmer 2 are 0 (+/- 1.5g), 1 (+/- 2g), 2 (+/- 4g) and 3 (+/- 6g). Valid range setting values for the Shimmer 2r are 0 (+/- 1.5g) and 3 (+/- 6g).
 	 * @param gsrRange Numeric value defining the desired gsr range. Valid range settings are 0 (10kOhm to 56kOhm),  1 (56kOhm to 220kOhm), 2 (220kOhm to 680kOhm), 3 (680kOhm to 4.7MOhm) and 4 (Auto Range).
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
-	 * @param countiousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
+	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -280,12 +289,12 @@ public class Shimmer extends ShimmerBluetooth{
 	 * Constructor. Prepares a new Bluetooth session. Additional fields allows the device to be set up immediately.
 	 * @param context  The UI Activity Context
 	 * @param handler  A Handler to send messages back to the UI Activity
-	 * @param myname  To allow the user to set a unique identifier for each Shimmer device
+	 * @param myName  To allow the user to set a unique identifier for each Shimmer device
 	 * @param samplingRate Defines the sampling rate
 	 * @param accelRange Defines the Acceleration range. Valid range setting values for the Shimmer 2 are 0 (+/- 1.5g), 1 (+/- 2g), 2 (+/- 4g) and 3 (+/- 6g). Valid range setting values for the Shimmer 2r are 0 (+/- 1.5g) and 3 (+/- 6g).
 	 * @param gsrRange Numeric value defining the desired gsr range. Valid range settings are 0 (10kOhm to 56kOhm),  1 (56kOhm to 220kOhm), 2 (220kOhm to 680kOhm), 3 (680kOhm to 4.7MOhm) and 4 (Auto Range).
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
-	 * @param countiousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
+	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, int magGain) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -306,12 +315,12 @@ public class Shimmer extends ShimmerBluetooth{
 	 * Constructor. Prepares a new Bluetooth session. Additional fields allows the device to be set up immediately.
 	 * @param context  The UI Activity Context
 	 * @param handler  A Handler to send messages back to the UI Activity
-	 * @param myname  To allow the user to set a unique identifier for each Shimmer device
+	 * @param myName  To allow the user to set a unique identifier for each Shimmer device
 	 * @param samplingRate Defines the sampling rate
 	 * @param accelRange Defines the Acceleration range. Valid range setting values for the Shimmer 2 are 0 (+/- 1.5g), 1 (+/- 2g), 2 (+/- 4g) and 3 (+/- 6g). Valid range setting values for the Shimmer 2r are 0 (+/- 1.5g) and 3 (+/- 6g).
 	 * @param gsrRange Numeric value defining the desired gsr range. Valid range settings are 0 (10kOhm to 56kOhm),  1 (56kOhm to 220kOhm), 2 (220kOhm to 680kOhm), 3 (680kOhm to 4.7MOhm) and 4 (Auto Range).
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
-	 * @param countiousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
+	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -336,12 +345,12 @@ public class Shimmer extends ShimmerBluetooth{
 	 * Constructor. Prepares a new Bluetooth session. Additional fields allows the device to be set up immediately.
 	 * @param context  The UI Activity Context
 	 * @param handler  A Handler to send messages back to the UI Activity
-	 * @param myname  To allow the user to set a unique identifier for each Shimmer device
+	 * @param myName  To allow the user to set a unique identifier for each Shimmer device
 	 * @param samplingRate Defines the sampling rate
 	 * @param accelRange Defines the Acceleration range. Valid range setting values for the Shimmer 2 are 0 (+/- 1.5g), 1 (+/- 2g), 2 (+/- 4g) and 3 (+/- 6g). Valid range setting values for the Shimmer 2r are 0 (+/- 1.5g) and 3 (+/- 6g).
 	 * @param gsrRange Numeric value defining the desired gsr range. Valid range settings are 0 (10kOhm to 56kOhm),  1 (56kOhm to 220kOhm), 2 (220kOhm to 680kOhm), 3 (680kOhm to 4.7MOhm) and 4 (Auto Range).
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
-	 * @param countiousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
+	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange,byte[] exg1,byte[] exg2) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -441,9 +450,8 @@ public class Shimmer extends ShimmerBluetooth{
 	/**
 	 * Start the ConnectedThread to begin managing a Bluetooth connection
 	 * @param socket  The BluetoothSocket on which the connection was made
-	 * @param device  The BluetoothDevice that has been connected
 	 */
-	public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
+	public synchronized void connected(BluetoothSocket socket) {
 		// Cancel the thread that completed the connection
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 		// Cancel any thread currently running a connection
@@ -456,8 +464,7 @@ public class Shimmer extends ShimmerBluetooth{
 			mPThread = new ProcessingThread();
 			mPThread.start();
 		}
-				
-		mMyBluetoothAddress = device.getAddress();
+
 		// Send the name of the connected device back to the UI Activity
 		Message msg = mHandler.obtainMessage(Shimmer.MESSAGE_DEVICE_NAME);
 		mHandler.sendMessage(msg);
@@ -614,7 +621,7 @@ public class Shimmer extends ShimmerBluetooth{
 				mConnectThread = null;
 			}
 			// Start the connected thread
-			connected(mmSocket, mmDevice);
+			connected(mmSocket);
 		}
 
 		public void cancel() {
@@ -862,7 +869,7 @@ public class Shimmer extends ShimmerBluetooth{
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
-		mHandler.obtainMessage(Shimmer.MESSAGE_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
 	}
 
@@ -881,7 +888,7 @@ public class Shimmer extends ShimmerBluetooth{
 			setBluetoothRadioState(BT_STATE.STREAMING);
 				
 		}
-		mHandler.obtainMessage(Shimmer.MESSAGE_STATE_CHANGE, MSG_STATE_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		
 	}
 
@@ -1043,7 +1050,7 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	protected void dataHandler(ObjectCluster ojc) {
 		// TODO Auto-generated method stub
-		mHandler.obtainMessage(MESSAGE_READ, ojc).sendToTarget();
+		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc).sendToTarget();
 	}
 
 	@Override
@@ -1075,7 +1082,7 @@ public class Shimmer extends ShimmerBluetooth{
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
 		mHandler.sendMessage(msg);
-		mHandler.obtainMessage(Shimmer.MESSAGE_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		
 	}
 
@@ -1117,7 +1124,7 @@ public class Shimmer extends ShimmerBluetooth{
 //					setState(BT_STATE.CONNECTED);
 //				}
 				setBluetoothRadioState(BT_STATE.CONNECTED);
-				mHandler.obtainMessage(MESSAGE_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),getBluetoothRadioState())).sendToTarget();
+				mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),getBluetoothRadioState())).sendToTarget();
 				
 			}
 		}
@@ -1187,7 +1194,7 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		
 		// Give the new state to the Handler so the UI Activity can update
-		mHandler.obtainMessage(Shimmer.MESSAGE_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),state)).sendToTarget();
+		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),state)).sendToTarget();
 	}
 
 	public boolean isConnected(){
@@ -1302,7 +1309,16 @@ public class Shimmer extends ShimmerBluetooth{
 //			}
 //		}
 //	}
+public void setRadio(BluetoothSocket socket){
 
+	if (socket.isConnected()){
+		setBluetoothRadioState(BT_STATE.CONNECTING);
+		connected(socket);
+	}
+
+
+
+}
 
 	
 }

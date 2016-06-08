@@ -30,8 +30,8 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 	public String mBluetoothAddress = "";
 	private BluetoothAdapter mBluetoothAdapter = null;
 	public BT_STATE mState = BT_STATE.DISCONNECTED;
-	private ConnectThread mConnectThread;
-	private ConnectedThread mConnectedThread;
+	public ConnectThread mConnectThread;
+	public ConnectedThread mConnectedThread;
 	private final BluetoothAdapter mAdapter;
 	private DataInputStream mInStream;
 	private OutputStream mOutStream=null;
@@ -57,10 +57,6 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 			// Start the thread to connect with the given device
 			mConnectThread = new ConnectThread(device);
 			mConnectThread.start();
-			 
-		
-	
-		
 	}
 
 	@Override
@@ -177,8 +173,8 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 
 	@Override
 	public boolean isConnected() {
-		if (mConnectThread!=null){
-			return mConnectThread.isConnected();
+		if (mConnectedThread!=null){
+			return mConnectedThread.mSocket.isConnected();
 		}
 		return false;
 	}
@@ -190,8 +186,8 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 	 * with a device. It runs straight through; the connection either
 	 * succeeds or fails.
 	 */
-	private class ConnectThread extends Thread {
-		private final BluetoothSocket mSocket;
+	public class ConnectThread extends Thread {
+		public final BluetoothSocket mSocket;
 		private final BluetoothDevice mDevice;
 
 		public ConnectThread(BluetoothDevice device) {
@@ -238,24 +234,25 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 			if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
 			// Start the thread to manage the connection and perform transmissions
 			mConnectedThread = new ConnectedThread(mSocket);
+			if (mState==BT_STATE.CONNECTED) {
+				eventDeviceConnected();
+			}
 		}
-		
+
 		public void cancel() {
 			try {
 				mSocket.close();
 			} catch (IOException e) { }
 		}
-		
-		public boolean isConnected(){
-			return mSocket.isConnected();
-		}
+
+
 	}
 	/**
 	 * This thread runs during a connection with a remote device.
 	 * It handles all incoming and outgoing transmissions.
 	 */
-	private class ConnectedThread{
-		private BluetoothSocket mSocket=null;
+	public class ConnectedThread{
+		public BluetoothSocket mSocket=null;
 		public ConnectedThread(BluetoothSocket socket) {
 
 			mSocket = socket;
@@ -274,7 +271,6 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 			mInStream = new DataInputStream(tmpIn);
 			mOutStream = tmpOut;
 			mState = BT_STATE.CONNECTED;
-			eventDeviceConnected();
 		}
 		/**
 		 * Write to the connected OutStream.
@@ -322,7 +318,39 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 
 	public ShimmerVerObject getShimmerVerObject() {
 		// TODO Auto-generated method stub
+
+		// TODO Auto-generated method stub
+		byte[] instruction = {GET_SHIMMER_VERSION_COMMAND}; //every radio should have a method to get the version object, the command value should be the same across all byte radios
+		byte[] response;
+		try {
+			txBytes(instruction);
+			Thread.sleep(200);
+			response = rxBytes(3);
+			int hardwareVersion = response[2];
+			instruction[0] = GET_FW_VERSION_COMMAND;
+			txBytes(instruction);
+			byte[] bufferInquiry = new byte[6];
+			Thread.sleep(200);
+			rxBytes(1);
+			rxBytes(1);
+			bufferInquiry = rxBytes(6);
+			int firmwareIdentifier=(int)((bufferInquiry[1]&0xFF)<<8)+(int)(bufferInquiry[0]&0xFF);
+			int firmwareVersionMajor = (int)((bufferInquiry[3]&0xFF)<<8)+(int)(bufferInquiry[2]&0xFF);
+			int firmwareVersionMinor = ((int)((bufferInquiry[4]&0xFF)));
+			int firmwareVersionInternal=(int)(bufferInquiry[5]&0xFF);
+			ShimmerVerObject sVOHw = new ShimmerVerObject(hardwareVersion, firmwareIdentifier, firmwareVersionMajor, firmwareVersionMinor, firmwareVersionInternal);
+			return sVOHw;
+		} catch (DeviceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		return null;
+
 	}
 	
 }
