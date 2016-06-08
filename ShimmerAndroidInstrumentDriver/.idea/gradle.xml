@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ShimmerAndroidInstrumentDriver" />
             <option value="$PROJECT_DIR$/multiShimmerTemplate" />
+            <option value="$PROJECT_DIR$/shimmerAndroidMSSDynamicPlotExample" />
             <option value="$PROJECT_DIR$/shimmerCapture" />
           </set>
         </option>

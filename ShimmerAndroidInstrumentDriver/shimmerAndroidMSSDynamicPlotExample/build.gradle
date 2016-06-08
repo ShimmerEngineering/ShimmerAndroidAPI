@@ -1,0 +1,30 @@
+apply plugin: 'com.android.application'
+android {
+    compileSdkVersion 21
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        multiDexEnabled true
+        applicationId "com.shimmerresearch.shimmergraphandlogservice"
+        minSdkVersion 14
+        targetSdkVersion 14
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile project(':ShimmerAndroidInstrumentDriver')
+    provided files('libs/ShimmerDriver-1.0.jar')
+    provided files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
+    provided files('libs/androidplot-core-0.5.0-release.jar')
+    compile files('libs/shimmeradvanceapi.jar')
+    provided 'com.google.guava:guava:19.0'
+    compile 'org.apache.commons:commons-math:2.2'
+    compile 'org.apache.commons:commons-lang3:3.4'
+}
