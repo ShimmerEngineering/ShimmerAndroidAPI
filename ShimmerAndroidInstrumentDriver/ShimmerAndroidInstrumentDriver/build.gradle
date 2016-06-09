@@ -7,7 +7,7 @@ android {
     defaultConfig {
         // Enabling multidex support.
         multiDexEnabled true
-        minSdkVersion 14
+        minSdkVersion 11
         targetSdkVersion 14
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
