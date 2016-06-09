@@ -67,16 +67,10 @@ public class ShimmerSerialPortAndroid extends SerialPortComm {
 			mConnectThread = null;
 		}
 		if (mConnectedThread != null) {
-			try {
-				wait(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			mConnectedThread.cancel(); 
+			mConnectedThread.cancel();
 			mConnectedThread = null;
 		}
-
-	
+		eventDeviceDisconnected();
 	}
 
 	@Override

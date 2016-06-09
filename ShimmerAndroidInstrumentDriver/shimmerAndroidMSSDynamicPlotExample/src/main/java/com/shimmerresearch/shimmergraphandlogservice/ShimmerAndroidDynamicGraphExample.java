@@ -92,7 +92,7 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 import com.androidplot.xy.YLayoutStyle;
 import com.google.common.collect.BiMap;
-import com.shimmerresearch.service.PlotManagerAndroid;
+import com.shimmerresearch.tools.PlotManagerAndroid;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;

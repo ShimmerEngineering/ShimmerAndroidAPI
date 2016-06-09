@@ -44,7 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.shimmerresearch.service.PlotManagerAndroid;
+import com.shimmerresearch.tools.PlotManagerAndroid;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
 import com.shimmerresearch.driver.*;

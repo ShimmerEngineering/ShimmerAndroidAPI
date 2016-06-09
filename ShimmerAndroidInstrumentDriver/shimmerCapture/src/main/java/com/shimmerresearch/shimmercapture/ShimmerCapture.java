@@ -54,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.CallbackObject;
 import com.shimmersensing.shimmerconnect.R;
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
@@ -549,12 +551,21 @@ public class ShimmerCapture extends ServiceActivity {
 			switch (msg.what) {
             
             case Shimmer.MESSAGE_STATE_CHANGE:
-
-                switch (((ObjectCluster)msg.obj).mState) {
+				ShimmerBluetooth.BT_STATE state=null;
+				String shimmerName = "";
+				if (msg.obj instanceof ObjectCluster){
+					state = ((ObjectCluster)msg.obj).mState;
+					mBluetoothAddress = ((ObjectCluster)msg.obj).getMacAddress();
+					shimmerName = ((ObjectCluster) msg.obj).getShimmerName();
+				} else if(msg.obj instanceof CallbackObject){
+					state = ((CallbackObject)msg.obj).mState;
+					mBluetoothAddress = ((CallbackObject)msg.obj).mBluetoothAddress;
+					shimmerName = "";
+				}
+                switch (state) {
                 case CONNECTED:
 
                 	Log.d("ShimmerActivity","Message Fully Initialized Received from Shimmer driver");
-                    mBluetoothAddress=((ObjectCluster)msg.obj).getMacAddress(); 
                     mService.enableGraphingHandler(true);
                     deviceState = "Connected";
                     textDeviceName.setText(mBluetoothAddress);
@@ -584,7 +595,6 @@ public class ShimmerCapture extends ServiceActivity {
                 case SDLOGGING:
 
                 	Log.d("ShimmerActivity","Message Fully Initialized Received from Shimmer driver");
-                    mBluetoothAddress=((ObjectCluster)msg.obj).getMacAddress(); 
                     mService.enableGraphingHandler(true);
                     deviceState = "Connected";
                     textDeviceName.setText(mBluetoothAddress);

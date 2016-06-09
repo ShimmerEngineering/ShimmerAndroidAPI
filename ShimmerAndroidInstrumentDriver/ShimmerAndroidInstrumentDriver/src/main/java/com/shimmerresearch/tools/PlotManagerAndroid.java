@@ -3,13 +3,8 @@
  * - Added removeSignalFromDevice function
  */
 
-package com.shimmerresearch.service;
+package com.shimmerresearch.tools;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import pl.flex_it.androidplot.XYSeriesShimmer;
 import android.graphics.Color;
 
 import com.androidplot.xy.LineAndPointFormatter;
@@ -17,6 +12,11 @@ import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.advance.AbstractPlotManager;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import pl.flex_it.androidplot.XYSeriesShimmer;
 
 public class PlotManagerAndroid extends AbstractPlotManager {
 	
@@ -51,7 +51,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	 * @param limit Sets the X axis limit for the series
 	 * @param clearGraphatLimit Clears the graph once the X Axis limit is reached for the series
 	 */
-	public PlotManagerAndroid(int limit,boolean clearGraphatLimit){
+	public PlotManagerAndroid(int limit, boolean clearGraphatLimit){
 		mClearGraphatLimit=clearGraphatLimit;
 		mXAxisLimit = limit;
 	}
@@ -92,7 +92,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	 * @param chart the XYPlot in main UI thread so the series can be added
 	 * @throws Exception if the list of signals have duplicates
 	 */
-	public PlotManagerAndroid(List<String[]> propertiestoPlot,List<int[]> listofColors, int limit, XYPlot chart) throws Exception {
+	public PlotManagerAndroid(List<String[]> propertiestoPlot, List<int[]> listofColors, int limit, XYPlot chart) throws Exception {
 		mXAxisLimit = limit;
 		for (int i=0;i<propertiestoPlot.size();i++){
 			addSignal(propertiestoPlot.get(i),chart,listofColors.get(i));
@@ -107,7 +107,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	 * @param clearGraphatLimit Clears the graph once the X Axis limit is reached for the series
 	 * @throws Exception if the list of signals have duplicates
 	 */
-	public PlotManagerAndroid(List<String[]> propertiestoPlot,List<int[]> listofColors, int limit, XYPlot chart, boolean clearGraphatLimit) throws Exception {
+	public PlotManagerAndroid(List<String[]> propertiestoPlot, List<int[]> listofColors, int limit, XYPlot chart, boolean clearGraphatLimit) throws Exception {
 		mXAxisLimit = limit;
 		mClearGraphatLimit=clearGraphatLimit;
 		for (int i=0;i<propertiestoPlot.size();i++){
