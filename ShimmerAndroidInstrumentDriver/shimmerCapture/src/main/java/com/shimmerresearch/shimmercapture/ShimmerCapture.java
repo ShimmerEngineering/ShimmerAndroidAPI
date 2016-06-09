@@ -56,6 +56,7 @@ import java.util.Set;
 
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
+import com.shimmerresearch.tools.PlotManagerAndroid;
 import com.shimmersensing.shimmerconnect.R;
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
@@ -94,6 +95,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -198,11 +200,17 @@ public class ShimmerCapture extends ServiceActivity {
 	EditText mEditFileName, mEditXAxisLimit;
 	static boolean mValueConstant = true;
 	static int mValueConstantTimes = 0;
-    
+
+	List<String[]> mListofChannels;
+
+	Button mButtonSetPlotSignalFilter;
+	Button mButtonResetPlotSignalFilter;
+	EditText mEditTextSignalFilter;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	Configuration.setTooLegacyObjectClusterSensorNames();
+
     	super.onCreate(savedInstanceState);
         Log.d("ShimmerActivity","On Create");
         super.onCreate(savedInstanceState);
@@ -534,7 +542,10 @@ public class ShimmerCapture extends ServiceActivity {
 	      		mService = binder.getService();
 	      		mServiceBind = true;
 	      		mService.setGraphHandler(mHandler);
-	      		
+				if (mService.mPlotManager==null){
+					mService.mPlotManager = new PlotManagerAndroid(false);
+				}
+				mService.mPlotManager.updateDynamicPlot(dynamicPlot);
 	      	}
 	      	public void onServiceDisconnected(ComponentName arg0) {
 	      		// TODO Auto-generated method stub
@@ -684,11 +695,13 @@ public class ShimmerCapture extends ServiceActivity {
     	            					sensorList.add("ExG Test Signal 16Bit");
     	            			}
     	            		}
+
+							sensorList.add("Timestamp");
+
+							mSensorView = sensorList.get(0);
+							setLegend();
                     	}
-                			
-                		sensorList.add("Timestamp");
-                    	mSensorView = sensorList.get(0);
-                    	setLegend();
+
                     }
                 	break;
                 case STREAMING_AND_SDLOGGING:
@@ -774,459 +787,13 @@ public class ShimmerCapture extends ServiceActivity {
             case Shimmer.MESSAGE_READ:
 
             	    if ((msg.obj instanceof ObjectCluster)){
-            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj;             	                	    
-            	    
-            		double[] calibratedDataArray = new double[0];
-            		String[] sensorName = new String[0];
-            		String calibratedUnits="";
-            		String calibratedUnits2="";
-            		//mSensorView determines which sensor to graph
-            		if (mSensorView.equals("Accelerometer")){
-            			sensorName = new String[3]; // for x y and z axis
-            			calibratedDataArray = new double[3];
-            			sensorName[0] = "Accelerometer X";
-            			sensorName[1] = "Accelerometer Y";
-            			sensorName[2] = "Accelerometer Z";
-            		}
-            		if (mSensorView.equals("Low Noise Accelerometer")){
-            			sensorName = new String[3]; // for x y and z axis
-            			calibratedDataArray = new double[3];
-            			sensorName[0] = "Low Noise Accelerometer X";
-            			sensorName[1] = "Low Noise Accelerometer Y";
-            			sensorName[2] = "Low Noise Accelerometer Z";
-            			
-            		}
-            		if (mSensorView.equals("Wide Range Accelerometer")){
-            			sensorName = new String[3]; // for x y and z axis
-            			calibratedDataArray = new double[3];
-            			sensorName[0] = "Wide Range Accelerometer X";
-            			sensorName[1] = "Wide Range Accelerometer Y";
-            			sensorName[2] = "Wide Range Accelerometer Z";
-            		}
-            		if (mSensorView.equals("Gyroscope")){
-            			sensorName = new String[3]; // for x y and z axis
-            			calibratedDataArray = new double[3];
-            			sensorName[0] = "Gyroscope X";
-            			sensorName[1] = "Gyroscope Y";
-            			sensorName[2] = "Gyroscope Z";
-            		}
-            		if (mSensorView.equals("Magnetometer")){
-            			sensorName = new String[3]; // for x y and z axis
-            			calibratedDataArray = new double[3];
-            			sensorName[0] = "Magnetometer X";
-            			sensorName[1] = "Magnetometer Y";
-            			sensorName[2] = "Magnetometer Z";
-            		}
-            		if (mSensorView.equals("GSR")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "GSR";
-            		}
-            		if (mSensorView.equals("EMG") && mService.getShimmerVersion(mBluetoothAddress)!=ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "EMG";
-            		}
-            		if (mSensorView.equals("ECG") && mService.getShimmerVersion(mBluetoothAddress)!=ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[2]; 
-            			calibratedDataArray = new double[2];
-            			sensorName[0] = "ECG RA-LL";
-            			sensorName[1] = "ECG LA-LL";
-            		}
-            		if (mSensorView.equals("Bridge Amplifier")){
-            			sensorName = new String[2]; 
-            			calibratedDataArray = new double[2];
-            			sensorName[0] = "Bridge Amplifier High";
-            			sensorName[1] = "Bridge Amplifier Low";
-            		}
-            		if (mSensorView.equals("Heart Rate")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "Heart Rate";
-            		}
-            		if (mSensorView.equals("ExpBoard A0")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "ExpBoard A0";
-            		}
-            		if (mSensorView.equals("ExpBoard A7")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "ExpBoard A7";
-            		}
-            		if (mSensorView.equals("Battery Voltage") && mService.getShimmerVersion(mBluetoothAddress)!=ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[2]; 
-            			calibratedDataArray = new double[2];
-            			sensorName[0] = "VSenseReg";
-            			sensorName[1] = "VSenseBatt";
-            		}
-            		if (mSensorView.equals("Battery Voltage") && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "VSenseBatt";
-            		}
-            		if (mSensorView.equals("Timestamp")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "Timestamp";
-            		}
-            		if (mSensorView.equals("External ADC A7")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			if( mService.getShimmer(mBluetoothAddress).getShimmerVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3){
-            				sensorName[0] = Shimmer3.ObjectClusterSensorName.EXT_EXP_ADC_A7;
-	            		} else {
-	            			sensorName[0] = Shimmer2.ObjectClusterSensorName.EXT_EXP_A7;
-	            		}
-            		}
-            		if (mSensorView.equals("External ADC A6")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			if( mService.getShimmer(mBluetoothAddress).getShimmerVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3){
-            				sensorName[0] = Shimmer3.ObjectClusterSensorName.EXT_EXP_ADC_A6;
-	            		} else {
-	            			sensorName[0] = Shimmer2.ObjectClusterSensorName.EXT_EXP_A6;
-	            		}
-            		}
-            		if (mSensorView.equals("External ADC A15")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "External ADC A15";
-            		}
-            		if (mSensorView.equals("Internal ADC A1")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "Internal ADC A1";
-            		}
-            		if (mSensorView.equals("Internal ADC A12")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "Internal ADC A12";
-            		}
-            		if (mSensorView.equals("Internal ADC A13")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "Internal ADC A13";
-            		}
-            		if (mSensorView.equals("Internal ADC A14")){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = "Internal ADC A14";
-            		}
-            		if (mSensorView.equals("Pressure")){
-            			sensorName = new String[2]; 
-            			calibratedDataArray = new double[2];
-            			sensorName[0] = "Pressure";
-            			sensorName[1] = "Temperature";
-            		}
-            		if (mSensorView.equals("ECG") && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[4]; 
-            			calibratedDataArray = new double[4];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT;
-            			sensorName[1] = Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
-            			sensorName[2] = Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT;
-            			sensorName[3] = Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT;
-            		}
-            		
-            		if (mSensorView.equals("EMG") && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[2]; 
-            			calibratedDataArray = new double[2];
-            			sensorName[0] = "EMG CH1";
-            			sensorName[1] = "EMG CH2";
-//            			sensorName[2] = "EXG2 CH1";
-//            			sensorName[3] = "EXG2 CH2";
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT;
-            		}
-            		if (mSensorView.equals("ExG Test Signal")){
-            			sensorName = new String[4]; 
-            			calibratedDataArray = new double[4];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP1_CH1_24BIT;
-            			sensorName[1] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP1_CH2_24BIT;
-            			sensorName[2] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP2_CH1_24BIT;
-            			sensorName[3] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP2_CH2_24BIT;
-            		}
-            		if (mSensorView.equals("ECG 16Bit")){
-            			sensorName = new String[4]; 
-            			calibratedDataArray = new double[4];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT;
-            			sensorName[1] = Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT;
-            			sensorName[2] = Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT;
-            			sensorName[3] = Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT;
-            		}
-            		if (mSensorView.equals("EMG 16Bit")){
-            			sensorName = new String[2]; 
-            			calibratedDataArray = new double[2];
-            			sensorName[0] = "EMG CH1";
-            			sensorName[1] = "EMG CH2";
-//            			sensorName[2] = "EXG2 CH1";
-//            			sensorName[3] = "EXG2 CH2";
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT;
-            		}
-            		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT) && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT;
-            		}
-            		if (mSensorView.equals("ExG Test Signal 16Bit")){
-            			sensorName = new String[4]; 
-            			calibratedDataArray = new double[4];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP1_CH1_16BIT;
-            			sensorName[1] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP1_CH2_16BIT;
-            			sensorName[2] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP2_CH1_16BIT;
-            			sensorName[3] = Shimmer3.ObjectClusterSensorName.EXG_TEST_CHIP2_CH2_16BIT;
-            		}
-            		if (mSensorView.equals(Configuration.Shimmer3.GuiLabelSensors.PPG_TO_HR)){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.PPG_TO_HR;
-            		}
-            		if (mSensorView.equals(Configuration.Shimmer3.GuiLabelSensors.ECG_TO_HR)){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.ECG_TO_HR;
-            		}
-            		if (mSensorView.equals(Configuration.Shimmer3.ObjectClusterSensorName.GSR_CONDUCTANCE)){
-            			sensorName = new String[1]; 
-            			calibratedDataArray = new double[1];
-            			sensorName[0] = Shimmer3.ObjectClusterSensorName.GSR_CONDUCTANCE;
-            		}
-            		
-            		if (sensorName.length!=0){  // Device 1 is the assigned user id, see constructor of the Shimmer
-				 	    if (sensorName.length>0){
-//				 	    	
-				 	    	Collection<FormatCluster> ofFormats = objectCluster.getCollectionOfFormatClusters(sensorName[0]);  // first retrieve all the possible formats for the current sensor device
-				 	    	FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(ofFormats,"CAL")); 
-				 	    	if (formatCluster != null) {
-//				 	    		//Obtain data for text view
-				 	    		calibratedDataArray[0] = formatCluster.mData;
-				 	    		calibratedUnits = formatCluster.mUnits;
-
-						 	 	//first check if there is data       		 	    		
-        		 	    		List<Number> data;
-    		 	    			if (mPlotDataMap.get("serie 1")!=null){
-    		 	    				data = mPlotDataMap.get("serie 1");
-    		 	    			} else {
-    		 	    				data = new ArrayList<Number>();
-    		 	    			}
-    		 	    			if (data.size()>X_AXIS_LENGTH){
-    		 	    				data.clear();
-    		 	    			}
-    		 	    			/*
-    		 	    			if (sensorName[0].equals(Shimmer3.ObjectClusterSensorName.PPG_TO_HR)){
-    		 	    				if (formatCluster.mData==-1){
-    		 	    					data.add(formatCluster.mData + Math.random()/1000);
-    		 	    				} else {
-    		 	    					data.add(formatCluster.mData);
-    		 	    				}
-    		 	    			} else {
-    		 	    				data.add(formatCluster.mData);
-        		 	    			
-    		 	    			}
-    		 	    			*/
-    		 	    			
-    		 	    			if (mValueConstant || mValueConstantTimes>499){
-    		 	    				dynamicPlot.setRangeBoundaries(formatCluster.mData-10, formatCluster.mData+10, BoundaryMode.FIXED); // freeze the range boundary:	
-    		 	    			} else {
-    		 	    				dynamicPlot.setRangeBoundaries(formatCluster.mData-10, formatCluster.mData+10, BoundaryMode.AUTO); // freeze the range boundary:
-    		 	    			}
-    		 	    			
-    		 	    			if (data.size()>1){
-    		 	    				double lastValue = data.get(data.size()-1).doubleValue();
-    		 	    				if (lastValue==formatCluster.mData){
-    		 	    					mValueConstantTimes++;
-    		 	    				} else {
-    		 	    					mValueConstantTimes=0;
-    		 	    					mValueConstant = false;
-    		 	    				}
-    		 	    			}
-    		 	    			data.add(formatCluster.mData);
-    		 	    			
-    		 	    			
-    		 	    			Log.d("ShimmerActivity", "Graph data length "+ data.size());
-    		 	    			mPlotDataMap.put("serie 1", data);
-    		 	    			
-    		 	    			//next check if the series exist 
-    		 	    			LineAndPointFormatter lapf = new LineAndPointFormatter(Color.rgb(51, 153, 255), null, null);
-    		 	    			LPFpaint = lapf.getLinePaint();
-    		 	    	        LPFpaint.setStrokeWidth(3);
-    		 	    			if (mPlotSeriesMap.get("serie 1")!=null){
-    		 	    				//if the series exist get the line format
-    		 	    				mPlotSeriesMap.get("serie 1").updateData(data);
-        		 	    		} else {
-        		 	    			XYSeriesShimmer series = new XYSeriesShimmer(data, 0, "serie 1");
-        		 	    			series.setXAxisLimit(X_AXIS_LENGTH);
-        		 	    			series.setClearGraphatLimit(clearGraph);
-            		 	    		mPlotSeriesMap.put("serie 1", series);
-        		 	    			dynamicPlot.addSeries(mPlotSeriesMap.get("serie 1"), lapf);
-        		 	    			
-            		 	    	}
-				 	    	}
-//					 	    	
-					 	  }
-				 	   	}
-				 	    if (sensorName.length>1) {
-				 	    	Collection<FormatCluster> ofFormats = objectCluster.getCollectionOfFormatClusters(sensorName[1]);  // first retrieve all the possible formats for the current sensor device
-				 	    	FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(ofFormats,"CAL"));
-				 	    	if (formatCluster != null ) {
-					 	    	calibratedDataArray[1] = formatCluster.mData;
-					 	    	//Obtain data for text view
-					 	    	calibratedUnits2 = formatCluster.mUnits;
-					 	    	
-					 	    	List<Number> data;
-    		 	    			if (mPlotDataMap.get("serie 2")!=null){
-    		 	    				data = mPlotDataMap.get("serie 2");
-    		 	    			} else {
-    		 	    				data = new ArrayList<Number>();
-    		 	    			}
-    		 	    			if (data.size()>X_AXIS_LENGTH){
-    		 	    				data.clear();
-    		 	    			}
-    		 	    			data.add(formatCluster.mData);
-    		 	    			mPlotDataMap.put("serie 2", data);
-    		 	    			
-    		 	    			//next check if the series exist 
-    		 	    			LineAndPointFormatter lapf = new LineAndPointFormatter(Color.rgb(245, 146, 107), null, null);
-    		 	    			LPFpaint = lapf.getLinePaint();
-    		 	    	        LPFpaint.setStrokeWidth(3); 
-    		 	    			if (mPlotSeriesMap.get("serie 2")!=null){
-    		 	    				//if the series exist get the line format
-    		 	    				mPlotSeriesMap.get("serie 2").updateData(data);
-        		 	    		} else {
-        		 	    			XYSeriesShimmer series = new XYSeriesShimmer(data, 0, "serie 2");
-        		 	    			series.setXAxisLimit(X_AXIS_LENGTH);
-        		 	    			series.setClearGraphatLimit(clearGraph);
-            		 	    		mPlotSeriesMap.put("serie 2", series);
-        		 	    			dynamicPlot.addSeries(mPlotSeriesMap.get("serie 2"), lapf);
-        		 	    			
-            		 	    	}
-
-				 	    	}
-				 	    }
-				 	    if (sensorName.length>2){
-				 	    
-				 	    	Collection<FormatCluster> ofFormats = objectCluster.getCollectionOfFormatClusters(sensorName[2]);  // first retrieve all the possible formats for the current sensor device
-				 	    	FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(ofFormats,"CAL")); 
-				 	    	if (formatCluster != null) {
-				 	    		calibratedDataArray[2] = formatCluster.mData;
-					 	    						 	   	  
-					 	    	
-				 	    		List<Number> data;
-    		 	    			if (mPlotDataMap.get("serie 3")!=null){
-    		 	    				data = mPlotDataMap.get("serie 3");
-    		 	    			} else {
-    		 	    				data = new ArrayList<Number>();
-    		 	    			}
-    		 	    			if (data.size()>X_AXIS_LENGTH){
-    		 	    				data.clear();
-    		 	    			}
-    		 	    			data.add(formatCluster.mData);
-    		 	    			mPlotDataMap.put("serie 3", data);
-    		 	    			
-    		 	    			//next check if the series exist 
-    		 	    			LineAndPointFormatter lapf = new LineAndPointFormatter(Color.rgb(150, 150, 150), null, null);
-    		 	    			LPFpaint = lapf.getLinePaint();
-    		 	    	        LPFpaint.setStrokeWidth(3);
-    		 	    			if (mPlotSeriesMap.get("serie 3")!=null){
-    		 	    				//if the series exist get the line format
-    		 	    				mPlotSeriesMap.get("serie 3").updateData(data);
-        		 	    		} else {        		 	    			
-        		 	    			XYSeriesShimmer series = new XYSeriesShimmer(data, 0, "serie 3");
-        		 	    			series.setXAxisLimit(X_AXIS_LENGTH);
-        		 	    			series.setClearGraphatLimit(clearGraph);
-            		 	    		mPlotSeriesMap.put("serie 3", series);
-        		 	    			dynamicPlot.addSeries(mPlotSeriesMap.get("serie 3"), lapf);
-        		 	    			
-            		 	    	}
-				 	    	}
-				 	    	
-			            }
-				 	   if (sensorName.length>3){
-					 	    
-				 	    	Collection<FormatCluster> ofFormats = objectCluster.getCollectionOfFormatClusters(sensorName[3]);  // first retrieve all the possible formats for the current sensor device
-				 	    	FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(ofFormats,"CAL")); 
-				 	    	if (formatCluster != null) {
-				 	    		calibratedDataArray[3] = formatCluster.mData;					 	    	
-				 	    		List<Number> data;
-	   		 	    			if (mPlotDataMap.get("serie 4")!=null){
-	   		 	    				data = mPlotDataMap.get("serie 4");
-	   		 	    			} else {
-	   		 	    				data = new ArrayList<Number>();
-	   		 	    			}
-	   		 	    			if (data.size()>X_AXIS_LENGTH){
-	   		 	    				data.clear();
-	   		 	    			}
-	   		 	    			data.add(formatCluster.mData);
-	   		 	    			mPlotDataMap.put("serie 4", data);
-	   		 	    			
-	   		 	    			//next check if the series exist 
-	   		 	    			LineAndPointFormatter lapf = new LineAndPointFormatter(Color.rgb(0, 100, 0), null, null);
-	   		 	    			LPFpaint = lapf.getLinePaint();
-	   		 	    	        LPFpaint.setStrokeWidth(3);
-	   		 	    			if (mPlotSeriesMap.get("serie 4")!=null){
-	   		 	    				//if the series exist get the line format
-	   		 	    				mPlotSeriesMap.get("serie 4").updateData(data);
-	       		 	    		} else {        		 	    			
-	       		 	    			XYSeriesShimmer series = new XYSeriesShimmer(data, 0, "serie 4");
-	       		 	    			series.setXAxisLimit(X_AXIS_LENGTH);
-	       		 	    			series.setClearGraphatLimit(clearGraph);
-	           		 	    		mPlotSeriesMap.put("serie 4", series);
-	       		 	    			dynamicPlot.addSeries(mPlotSeriesMap.get("serie 4"), lapf);
-	       		 	    			
-	           		 	    	}
-				 	    	}
-				 	    	
-			            }
-				 	   dynamicPlot.redraw();    
-            	    
-            	}
+						try {
+							mService.mPlotManager.filterDataAndPlot((ObjectCluster)msg.obj);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 				
                 break;
             case Shimmer.MESSAGE_ACK_RECEIVED:
@@ -1626,95 +1193,165 @@ public class ShimmerCapture extends ServiceActivity {
 	public void showSelectSensorPlot(){
 
 		mDialog.setContentView(R.layout.dialog_sensor_view);
+		mDialog.setCanceledOnTouchOutside(true);
 		TextView title = (TextView) mDialog.findViewById(android.R.id.title);
- 		title.setText("Signals To Graph");
- 		final ListView listView = (ListView) mDialog.findViewById(android.R.id.list);
+		title.setText("Select Signal");
+		final ListView listView = (ListView) mDialog.findViewById(android.R.id.list);
+		mButtonSetPlotSignalFilter = (Button) mDialog.findViewById(R.id.ButtonFilterPlotSignal);
+		mButtonResetPlotSignalFilter = (Button) mDialog.findViewById(R.id.buttonResetFilterPlotSignal);
+		mEditTextSignalFilter = (EditText) mDialog.findViewById(R.id.editTextFilterPlotSignal);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		List<String> sensorList = mService.getListofEnabledSensors(mBluetoothAddress);
-		if(sensorList!=null){
-			if(mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-				sensorList.remove("ECG");
-				sensorList.remove("EMG");
-				if(sensorList.contains("EXG1")){
-					sensorList.remove("EXG1");
-					sensorList.remove("EXG2");
-					if(mService.isEXGUsingECG24Configuration(mBluetoothAddress)){
-						sensorList.add("ECG");
-						sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
-					}
-					else if(mService.isEXGUsingEMG24Configuration(mBluetoothAddress)){
-						sensorList.add("EMG");
-						sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT);
-					}
-					else if(mService.isEXGUsingTestSignal24Configuration(mBluetoothAddress))
-						sensorList.add("ExG Test Signal");
-				}
-				if(sensorList.contains("EXG1 16Bit")){
-					sensorList.remove("EXG1 16Bit");
-					sensorList.remove("EXG2 16Bit");
-					if(mService.isEXGUsingECG16Configuration(mBluetoothAddress)){
-						sensorList.add("ECG 16Bit");
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT);
-					}
-					else if(mService.isEXGUsingEMG16Configuration(mBluetoothAddress)){
-						sensorList.add("EMG 16Bit");
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT);
-    					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT);
-					}
-					else if(mService.isEXGUsingTestSignal16Configuration(mBluetoothAddress))
-						sensorList.add("ExG Test Signal 16Bit");
-				}
-				if (sensorList.contains(Configuration.Shimmer3.ObjectClusterSensorName.GSR) && mService.isGSRtoSiemensEnabled()){
-					sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.GSR_CONDUCTANCE);
-				}
-				//add ppg to hr
-				Shimmer shimmer = mService.getShimmer(mBluetoothAddress);
-				if (mService.isPPGtoHREnabled()){
-					sensorList.add(Configuration.Shimmer3.GuiLabelSensors.PPG_TO_HR);
-				}
-				if (mService.isECGtoHREnabled()){
-					sensorList.add(Configuration.Shimmer3.GuiLabelSensors.ECG_TO_HR);
-				}
-				
+
+		mListofChannels = mService.getListofEnabledSensorSignals(mBluetoothAddress);
+		List<String> sensorList = new ArrayList<String>();
+		for(int i=0;i<mListofChannels.size();i++) {
+			sensorList.add(joinStrings(mListofChannels.get(i)));
+		}
+
+		final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+
+		final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+		listView.setAdapter(adapterSensorNames);
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		//listView.setItemChecked(position, value);
+
+		for (int p=0;p<mListofChannels.size();p++){
+			if (mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(p))){
+				listView.setItemChecked(p, true);
 			}
 		}
-			
-		sensorList.add("Timestamp");
-		final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
-		ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, android.R.id.text1, sensorNames);
-		listView.setAdapter(adapterSensorNames);
-		
-		for(int i=0; i<sensorNames.length; i++){
-			if(sensorNames[i].equals(mSensorView))
-				listView.setItemChecked(i, true);
-		}
-		
+
+		mButtonSetPlotSignalFilter.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				List<String> sensorList = new ArrayList<String>();
+				String plotSignaltoFilter  = mEditTextSignalFilter.getText().toString();
+
+				for (int i=mListofChannels.size()-1;i>-1;i--){
+					String signal = joinStrings(mListofChannels.get(i));
+					if (!signal.toLowerCase().contains(plotSignaltoFilter.toLowerCase())){
+
+						mListofChannels.remove(i);
+					}
+
+				}
+
+				for(int i=0;i<mListofChannels.size();i++) {
+					sensorList.add(joinStrings(mListofChannels.get(i)));
+				}
+
+				final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+				ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(mDialog.getContext(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+				listView.setAdapter(adapterSensorNames);
+				listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+				for (int p=0;p<mListofChannels.size();p++){
+					if (mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(p))){
+						listView.setItemChecked(p, true);
+					}
+				}
+
+				listView.setOnItemClickListener(new OnItemClickListener(){
+
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+											long arg3) {
+						CheckedTextView cb = (CheckedTextView) arg1;
+						if (cb.isChecked()){
+
+							try {
+								mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+
+							mService.mPlotManager.removeSignal(mListofChannels.get(index));
+						}
+					}
+
+				});
+
+			}
+		});
+
+		mButtonResetPlotSignalFilter.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mListofChannels = mService.getListofEnabledSensorSignals(mBluetoothAddress);
+				List<String> sensorList = new ArrayList<String>();
+				for(int i=0;i<mListofChannels.size();i++) {
+					sensorList.add(joinStrings(mListofChannels.get(i)));
+				}
+
+				final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+
+				final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(mDialog.getContext(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+				listView.setAdapter(adapterSensorNames);
+				listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+				//listView.setItemChecked(position, value);
+
+				for (int p=0;p<mListofChannels.size();p++){
+					if (mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(p))){
+						listView.setItemChecked(p, true);
+					}
+				}
+
+				listView.setOnItemClickListener(new OnItemClickListener(){
+
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+											long arg3) {
+						CheckedTextView cb = (CheckedTextView) arg1;
+						if (!cb.isChecked()){
+
+							try {
+								mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+
+							mService.mPlotManager.removeSignal(mListofChannels.get(index));
+						}
+					}
+
+				});
+
+
+			}
+		});
+
 		listView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				 mPlotSeriesMap.clear();
-		    	 mPlotDataMap.clear();
-		    	 dynamicPlot.clear();
-				// TODO Auto-generated method stub
-    			mSensorView=sensorNames[arg2];      
-    			mValueConstant = true;
-        		setLegend();
-    			mDialog.dismiss();
+			public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+									long arg3) {
+				CheckedTextView cb = (CheckedTextView) arg1;
+				if (!cb.isChecked()){
+
+					try {
+						mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+
+					mService.mPlotManager.removeSignal(mListofChannels.get(index));
+				}
 			}
-			
+
 		});
-		
+
 		mDialog.show();
- 		
+
 	}
 	
 	public static void setLegend(){
@@ -2516,6 +2153,16 @@ public class ShimmerCapture extends ServiceActivity {
 		mDialog.show();
  		
 	}
-	
-	
+
+	public String joinStrings(String[] a){
+		String js="";
+		for (int i=0;i<a.length;i++){
+			if (i==0){
+				js = a[i];
+			} else{
+				js = js + " " + a[i];
+			}
+		}
+		return js;
+	}
 }

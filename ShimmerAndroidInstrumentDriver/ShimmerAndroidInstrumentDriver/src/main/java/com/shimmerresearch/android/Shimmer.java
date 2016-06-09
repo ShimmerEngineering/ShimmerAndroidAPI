@@ -163,6 +163,7 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
+import com.shimmerresearch.driver.InfoMemLayoutShimmer3;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerMsg;
@@ -400,6 +401,8 @@ public class Shimmer extends ShimmerBluetooth{
 		mIamAlive = false;
 		mListofInstructions.clear();
 		mFirstTime=true;
+
+
 		if (bluetoothLibrary=="default"){
 			mMyBluetoothAddress=address;
 			mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -1245,7 +1248,7 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void createInfoMemLayout() {
 		// TODO Auto-generated method stub
-		
+		mInfoMemLayout = new InfoMemLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
 	}
 
 	@Override
@@ -1313,6 +1316,7 @@ public void setRadio(BluetoothSocket socket){
 
 	if (socket.isConnected()){
 		setBluetoothRadioState(BT_STATE.CONNECTING);
+		mMyBluetoothAddress = socket.getRemoteDevice().getAddress();
 		connected(socket);
 	}
 

@@ -74,10 +74,13 @@ import com.shimmerresearch.comms.radioProtocol.LiteProtocol;
 import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataComm;
 import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataCommListener;
 import com.shimmerresearch.driver.*;
+import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
+import com.shimmerresearch.driverUtilities.SensorDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerObject;
 import com.shimmerresearch.tools.Logging;
+import com.shimmerresearch.tools.PlotManagerAndroid;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -117,6 +120,7 @@ public class ShimmerService extends Service {
 	private boolean mConvertGSRtoSiemens = true;
 	private String mPPGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.INT_EXP_ADC_A13;
 	private String mECGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
+	public PlotManagerAndroid mPlotManager;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -285,6 +289,8 @@ public class ShimmerService extends Service {
 	private Shimmer initializeNewShimmer3(ByteLevelDataComm bldc,String selectedDevice) {
 		ShimmerSerialPortAndroid ssjc = (ShimmerSerialPortAndroid) bldc;
 		Shimmer shimmer = new Shimmer(this, mHandler,selectedDevice,true);
+		shimmer.createInfoMemLayoutObjectIfNeeded();
+		shimmer.setUseInfoMemConfigMethod(true);
 		return initializeShimmer3(ssjc, shimmer);
 	}
 
@@ -691,8 +697,37 @@ public class ShimmerService extends Service {
 			}
 		}
 	}
-	
 
+
+	public List<String[]> getListofEnabledSensorSignals(String bluetoothAddress) {
+		// TODO Auto-generated method stub
+		List<String[]> listofSensors = new ArrayList<String[]>();
+		Collection<Object> colS=mMultiShimmer.values();
+		Iterator<Object> iterator = colS.iterator();
+		while (iterator.hasNext()) {
+			Shimmer stemp=(Shimmer) iterator.next();
+			if (stemp.isConnected() && stemp.getBluetoothAddress().equals(bluetoothAddress)){
+				List<SensorDetails> listOfEnabledSensorDetails= stemp.getListOfEnabledSensors();
+				for (SensorDetails sd:listOfEnabledSensorDetails){
+					for (ChannelDetails cd : sd.mListOfChannels){
+						for (CHANNEL_TYPE ct:cd.mListOfChannelTypes) {
+							String[] sensor = new String[4];
+							sensor[0] = stemp.getShimmerUserAssignedName();
+							sensor[1] = cd.mObjectClusterName;
+							sensor[2] = ct.toString();
+							if (ct.equals(CHANNEL_TYPE.UNCAL)) {
+								sensor[3] = cd.mDefaultUnit;
+							} else if (ct.equals(CHANNEL_TYPE.CAL)) {
+								sensor[3] = cd.mDefaultCalibratedUnits;
+							}
+							listofSensors.add(sensor);
+						}
+					}
+				}
+			}
+		}
+		return listofSensors;
+	}
 	
 	
 	public long getEnabledSensors(String bluetoothAddress) {
@@ -915,7 +950,9 @@ public class ShimmerService extends Service {
 				Iterator<Object> iterator = colS.iterator();
 				while (iterator.hasNext()) {
 					ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-					if ((stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING) && stemp.getMacId().equals(bluetoothAddress)){
+					String address = stemp.getMacId();
+					bluetoothAddress = bluetoothAddress.replace(":","");
+					if ((stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING) && address.equals(bluetoothAddress)){
 						if (mPPGtoHREnabled){
 							enablePPGtoHR(stemp.getMacId(),true);
 						}
@@ -1007,7 +1044,9 @@ public class ShimmerService extends Service {
 				Iterator<Object> iterator = colS.iterator();
 				while (iterator.hasNext()) {
 					ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-					if ((stemp.getBluetoothRadioState()==BT_STATE.STREAMING || stemp.getBluetoothRadioState()==BT_STATE.STREAMING_AND_SDLOGGING) && stemp.getMacId().equals(bluetoothAddress)){
+					String address = stemp.getMacId();
+					bluetoothAddress = bluetoothAddress.replace(":","");
+					if ((stemp.getBluetoothRadioState()==BT_STATE.STREAMING || stemp.getBluetoothRadioState()==BT_STATE.STREAMING_AND_SDLOGGING) && address.equals(bluetoothAddress)){
 						if (stemp instanceof Shimmer){
 							((Shimmer)stemp).stopStreaming();
 						} else if (stemp instanceof Shimmer4Android){
@@ -1114,7 +1153,9 @@ public class ShimmerService extends Service {
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
 			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-			if (stemp.getBluetoothRadioState()!=BT_STATE.DISCONNECTED && stemp.getMacId().equals(bluetoothAddress)){
+			String address = stemp.getMacId();
+			bluetoothAddress = bluetoothAddress.replace(":","");
+			if (stemp.getBluetoothRadioState()!=BT_STATE.DISCONNECTED && address.equals(bluetoothAddress)){
 				deviceConnected=true;
 			}
 		}
@@ -1140,7 +1181,9 @@ public class ShimmerService extends Service {
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
 			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-			if ((stemp.getBluetoothRadioState()== BT_STATE.STREAMING)  && stemp.getMacId().equals(bluetoothAddress)){
+			String address = stemp.getMacId();
+			bluetoothAddress = bluetoothAddress.replace(":","");
+			if ((stemp.getBluetoothRadioState()== BT_STATE.STREAMING)  && address.equals(bluetoothAddress)){
 				deviceStreaming=true;
 			}
 		}
