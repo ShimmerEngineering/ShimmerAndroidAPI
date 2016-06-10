@@ -197,7 +197,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	}
 	
 	/** Removes all signals
-	 * @param signal
+	 *
 	 */
 	public void removeAllSignals(){
 		super.removeAllSignals();

@@ -56,6 +56,7 @@ import java.util.Set;
 
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
+import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.tools.PlotManagerAndroid;
 import com.shimmersensing.shimmerconnect.R;
 
@@ -206,6 +207,9 @@ public class ShimmerCapture extends ServiceActivity {
 	Button mButtonSetPlotSignalFilter;
 	Button mButtonResetPlotSignalFilter;
 	EditText mEditTextSignalFilter;
+
+	static int mPlotLimit = 1;
+
 
     /** Called when the activity is first created. */
     @Override
@@ -788,7 +792,10 @@ public class ShimmerCapture extends ServiceActivity {
 
             	    if ((msg.obj instanceof ObjectCluster)){
 						try {
-							mService.mPlotManager.filterDataAndPlot((ObjectCluster)msg.obj);
+							mGraphSubSamplingCount++;
+							if (mGraphSubSamplingCount%mPlotLimit==0) {
+								mService.mPlotManager.filterDataAndPlot((ObjectCluster) msg.obj);
+							}
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -865,6 +872,8 @@ public class ShimmerCapture extends ServiceActivity {
 				
 			} else if(optionSelected.equals(START_STREAMING)){
 				mValueConstant = true;
+				double samplingRate = mService.getSamplingRate(mBluetoothAddress);
+				mPlotLimit = (int)(samplingRate/10.0);
 				mService.startStreaming(mBluetoothAddress);
 //				deviceState="Streaming";
 //                textDeviceName.setText(mBluetoothAddress);

@@ -850,9 +850,12 @@ public class ShimmerService extends Service {
 		Iterator<Object> iterator = colS.iterator();
 		double SRate=-1;
 		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				SRate= stemp.getSamplingRateShimmer();
+			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
+			String address = stemp.getMacId();
+			address = address.replace(":","");
+			bluetoothAddress = bluetoothAddress.replace(":","");
+			if (address.equals(bluetoothAddress)){
+				SRate= stemp.getSamplingRateShimmer(Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 			}
 		}
 		return SRate;
