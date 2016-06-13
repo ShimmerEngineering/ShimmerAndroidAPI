@@ -273,8 +273,8 @@ public class ShimmerService extends Service {
 
 				@Override
 				public void eventDisconnected() {
-					// TODO Auto-generated method stub
-
+					System.out.println("Shimmer Disconnected");
+					mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(selectedDevice,bluetoothAddress,BT_STATE.DISCONNECTED)).sendToTarget();
 				}
 			});
 			try {

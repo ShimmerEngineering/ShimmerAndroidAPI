@@ -793,9 +793,9 @@ public class ShimmerCapture extends ServiceActivity {
             	    if ((msg.obj instanceof ObjectCluster)){
 						try {
 							mGraphSubSamplingCount++;
-							if (mGraphSubSamplingCount%mPlotLimit==0) {
+							//if (mGraphSubSamplingCount%mPlotLimit==0) {
 								mService.mPlotManager.filterDataAndPlot((ObjectCluster) msg.obj);
-							}
+							//}
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -1208,6 +1208,7 @@ public class ShimmerCapture extends ServiceActivity {
 		final ListView listView = (ListView) mDialog.findViewById(android.R.id.list);
 		mButtonSetPlotSignalFilter = (Button) mDialog.findViewById(R.id.ButtonFilterPlotSignal);
 		mButtonResetPlotSignalFilter = (Button) mDialog.findViewById(R.id.buttonResetFilterPlotSignal);
+		Button mButtonDone = (Button) mDialog.findViewById(R.id.button_done);
 		mEditTextSignalFilter = (EditText) mDialog.findViewById(R.id.editTextFilterPlotSignal);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
@@ -1229,6 +1230,13 @@ public class ShimmerCapture extends ServiceActivity {
 				listView.setItemChecked(p, true);
 			}
 		}
+
+		mButtonDone.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mDialog.hide();
+			}
+		});
 
 		mButtonSetPlotSignalFilter.setOnClickListener(new OnClickListener(){
 
@@ -1343,8 +1351,7 @@ public class ShimmerCapture extends ServiceActivity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index,
 									long arg3) {
 				CheckedTextView cb = (CheckedTextView) arg1;
-				if (!cb.isChecked()){
-
+				if (!mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(index))){
 					try {
 						mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
 					} catch (Exception e) {
@@ -1352,7 +1359,6 @@ public class ShimmerCapture extends ServiceActivity {
 						e.printStackTrace();
 					}
 				} else {
-
 					mService.mPlotManager.removeSignal(mListofChannels.get(index));
 				}
 			}

@@ -14,6 +14,12 @@
     </EditText>
 
     <Button
+        android:text="Done"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_done" />
+
+    <Button
         android:id="@+id/ButtonFilterPlotSignal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
