@@ -233,9 +233,11 @@ public class Shimmer extends ShimmerBluetooth{
 	
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
 	private BluetoothAdapter mBluetoothAdapter = null;
-		
-	
 
+
+	{
+		setUseInfoMemConfigMethod(true);
+	}
 	
 	/**
 	 * Constructor. Prepares a new Bluetooth session.

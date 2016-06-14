@@ -289,8 +289,6 @@ public class ShimmerService extends Service {
 	private Shimmer initializeNewShimmer3(ByteLevelDataComm bldc,String selectedDevice) {
 		ShimmerSerialPortAndroid ssjc = (ShimmerSerialPortAndroid) bldc;
 		Shimmer shimmer = new Shimmer(this, mHandler,selectedDevice,true);
-		shimmer.createInfoMemLayoutObjectIfNeeded();
-		shimmer.setUseInfoMemConfigMethod(true);
 		return initializeShimmer3(ssjc, shimmer);
 	}
 
