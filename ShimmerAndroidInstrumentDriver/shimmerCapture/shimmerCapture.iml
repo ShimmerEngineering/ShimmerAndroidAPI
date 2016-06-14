@@ -111,8 +111,7 @@
     <orderEntry type="library" exported="" name="commons-math-2.2" level="project" />
     <orderEntry type="library" exported="" name="androidplot-core-0.5.0-release" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-1.0" level="project" />
-    <orderEntry type="library" exported="" name="shimmeradvanceapi" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.1" level="project" />
     <orderEntry type="module" module-name="ShimmerAndroidInstrumentDriver-ShimmerAndroidInstrumentDriver" exported="" />
   </component>
 </module>

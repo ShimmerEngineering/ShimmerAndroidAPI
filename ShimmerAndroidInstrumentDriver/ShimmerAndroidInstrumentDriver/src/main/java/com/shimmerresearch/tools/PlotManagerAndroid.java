@@ -9,9 +9,10 @@ import android.graphics.Color;
 
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.XYPlot;
-import com.shimmerresearch.advance.AbstractPlotManager;
+
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.guiUtilities.AbstractPlotManager;
 
 import java.util.ArrayList;
 import java.util.List;

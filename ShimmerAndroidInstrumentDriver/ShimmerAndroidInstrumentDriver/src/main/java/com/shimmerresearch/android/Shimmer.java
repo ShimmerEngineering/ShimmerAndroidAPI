@@ -1258,12 +1258,6 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	@Override
-	public boolean isChannelEnabled(int sensorKey) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public String getChannelLabel(int sensorKey) {
 		// TODO Auto-generated method stub
 		return null;
