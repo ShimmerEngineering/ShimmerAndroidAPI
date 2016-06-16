@@ -28,7 +28,7 @@
     <activity android:name="com.shimmerresearch.shimmercapture.SensorViewActivity" android:theme="@android:style/Theme.Holo.Light.Dialog" android:label="@string/configure_device"></activity>
      <activity android:name="com.shimmerresearch.shimmercapture.CommandsActivity" android:label="@string/commands"></activity>
     <activity android:name="com.shimmerresearch.shimmercapture.LogFileActivity"  android:label="@string/logfile"></activity>
-   <service android:enabled="true" android:name="com.shimmerresearch.service.ShimmerService" />
+   <service android:enabled="true" android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
         
     </application>
 

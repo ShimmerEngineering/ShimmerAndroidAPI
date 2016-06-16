@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.driver.Configuration;
+import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerObject;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
-import com.shimmerresearch.service.ShimmerService;
-import com.shimmerresearch.service.ShimmerService.LocalBinder;
+
 import com.shimmersensing.shimmerconnect.R;
 
 import android.app.AlertDialog;
@@ -486,7 +487,7 @@ public class CommandsActivity extends ServiceActivity {
       	public void onServiceConnected(ComponentName arg0, IBinder service) {
       		// TODO Auto-generated method stub
       		Log.d("ShimmerService", "service connected");
-      		LocalBinder binder = (ShimmerService.LocalBinder) service;
+      		ShimmerService.LocalBinder binder = (ShimmerService.LocalBinder) service;
       		mService = binder.getService();
       		cBox5VReg = (CheckBox) findViewById(R.id.checkBox5VReg);
     		cBoxLowPowerMag = (CheckBox) findViewById(R.id.checkBoxLowPowerMag);
@@ -501,249 +502,250 @@ public class CommandsActivity extends ServiceActivity {
     		cBoxLowPowerGyro.setTextColor(getResources().getColor(R.color.black));
     		cBoxInternalExpPower.setTextColor(getResources().getColor(R.color.black));
     		
-      		final Shimmer shimmer = mService.getShimmer(mBluetoothAddress);
-        	
-      		if (shimmer.getInternalExpPower()==1){
-      			cBoxInternalExpPower.setChecked(true);
-      		} else {
-      			cBoxInternalExpPower.setChecked(false);
-      		}
-      		
-      		if (mService.isPPGtoHREnabled()){
-      			cBoxPPGtoHR.setChecked(true);	
-      		}else {
-      			cBoxPPGtoHR.setChecked(false);
-      		}
-      		
-      		if (mService.isECGtoHREnabled()){
-      			cBoxECGtoHR.setChecked(true);	
-      		}else {
-      			cBoxECGtoHR.setChecked(false);
-      		}
-      		
-      		
-      		if (shimmer.isLowPowerMagEnabled()){
-        		cBoxLowPowerMag.setChecked(true);
-        	}
-        	
-        	if (shimmer.isLowPowerAccelEnabled()){
-        		cBoxLowPowerAccel.setChecked(true);
-        	}
-        	
-        	if (shimmer.isLowPowerGyroEnabled()){
-        		cBoxLowPowerGyro.setChecked(true);
-        	}
-        	
-        	
-        	cBox5VReg.setChecked(false);
-        	if (mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-            	buttonGsr.setVisibility(View.VISIBLE);
-            	cBox5VReg.setEnabled(false);
-            	cBox5VReg.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
-            	String currentGyroRange = "("+Configuration.Shimmer3.ListofGyroRange[shimmer.getGyroRange()]+")";
-            	buttonGyroRange.setText("GYRO RANGE"+"\n"+currentGyroRange);
-            	String currentMagRange = "("+Configuration.Shimmer3.ListofMagRange[shimmer.getMagRange()-1]+")";
-        		buttonMagRange.setText("MAG RANGE"+"\n"+currentMagRange);
-        		String currentPressureResolution = "("+ListofPressureResolution[shimmer.getPressureResolution()]+")";
-        		buttonPressureResolution.setText("PRESSURE RES"+"\n"+currentPressureResolution);
-            	
-            	if (shimmer.getAccelRange()==0){
-            		cBoxLowPowerAccel.setEnabled(false);
-            		cBoxLowPowerAccel.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
-            	}
-            	
-            	//currently not supported for the moment 
-        		buttonPressureResolution.setEnabled(true);
+      		final ShimmerDevice shimmerDevice = mService.getShimmer(mBluetoothAddress);
 
-        		
-        	} else {
-        		cBoxInternalExpPower.setEnabled(false);
-        		cBoxInternalExpPower.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
-        		buttonPressureResolution.setEnabled(false);
-        		buttonGyroRange.setEnabled(false);
-        		cBoxLowPowerAccel.setEnabled(false);
-        		cBoxLowPowerAccel.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
-        		cBoxLowPowerGyro.setEnabled(false);
-        		cBoxLowPowerGyro.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
-        		String currentMagRange = "("+Configuration.Shimmer2.ListofMagRange[shimmer.getMagRange()]+")";
-        		buttonMagRange.setText("Mag Range"+"\n"+currentMagRange);
-        	}
-        	
-      		
-      		mServiceBind = true;
-      		//update the view
-      		
-      		if (mService.get5VReg(mBluetoothAddress)==1){
-      			cBox5VReg.setChecked(true);
-      		}
-      		
-      		cBox5VReg.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+			if(shimmerDevice instanceof Shimmer) {
+				final Shimmer shimmer = (Shimmer) shimmerDevice;
+				if (shimmer.getInternalExpPower() == 1) {
+					cBoxInternalExpPower.setChecked(true);
+				} else {
+					cBoxInternalExpPower.setChecked(false);
+				}
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				if (checked){
-    					mService.write5VReg(mBluetoothAddress, 1);
-    				} else {
-    					mService.write5VReg(mBluetoothAddress, 0);
-    				}
-    			}
-        		
-        	});
-        	
-      		
-      		cBoxLowPowerAccel.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+				if (mService.isPPGtoHREnabled()) {
+					cBoxPPGtoHR.setChecked(true);
+				} else {
+					cBoxPPGtoHR.setChecked(false);
+				}
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				if (checked){
-    					shimmer.enableLowPowerAccel(true);
-    				} else {
-    					shimmer.enableLowPowerAccel(false);
-    				}
-    			}
-        		
-        	});
-      		
-      		cBoxLowPowerGyro.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+				if (mService.isECGtoHREnabled()) {
+					cBoxECGtoHR.setChecked(true);
+				} else {
+					cBoxECGtoHR.setChecked(false);
+				}
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				if (checked){
-    					shimmer.enableLowPowerGyro(true);
-    				} else {
-    					shimmer.enableLowPowerGyro(false);
-    				}
-    			}
-        		
-        	});
-      		
-      		cBoxInternalExpPower.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				if (checked){
-    					shimmer.writeInternalExpPower(1);
-    				} else {
-    					shimmer.writeInternalExpPower(0);
-    				}
-    			}
-        		
-        	});
-  
-            
-      		
-      		cBoxPPGtoHR.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+				if (shimmer.isLowPowerMagEnabled()) {
+					cBoxLowPowerMag.setChecked(true);
+				}
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				mService.enablePPGtoHR(mBluetoothAddress, checked);
-    				if (checked){
-    					if (cBoxECGtoHR.isChecked()){
-							cBoxECGtoHR.setChecked(false);
-    					}
-    					if (cBoxInternalExpPower.isChecked()) {
-    					} else {
-    						Toast.makeText(getApplicationContext(), "Enabling Int Exp Power", Toast.LENGTH_LONG).show();
-    						cBoxInternalExpPower.setChecked(true);
-    					}
-						long enabledSensors = mService.getEnabledSensors(mBluetoothAddress); 
-						if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A13) > 0){
-							Toast.makeText(getApplicationContext(), "Int ADC A13 is Enabled", Toast.LENGTH_LONG).show();
+				if (shimmer.isLowPowerAccelEnabled()) {
+					cBoxLowPowerAccel.setChecked(true);
+				}
+
+				if (shimmer.isLowPowerGyroEnabled()) {
+					cBoxLowPowerGyro.setChecked(true);
+				}
+
+
+				cBox5VReg.setChecked(false);
+				if (mService.getShimmerVersion(mBluetoothAddress) == ShimmerVerDetails.HW_ID.SHIMMER_3) {
+					buttonGsr.setVisibility(View.VISIBLE);
+					cBox5VReg.setEnabled(false);
+					cBox5VReg.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
+					String currentGyroRange = "(" + Configuration.Shimmer3.ListofGyroRange[shimmer.getGyroRange()] + ")";
+					buttonGyroRange.setText("GYRO RANGE" + "\n" + currentGyroRange);
+					String currentMagRange = "(" + Configuration.Shimmer3.ListofMagRange[shimmer.getMagRange() - 1] + ")";
+					buttonMagRange.setText("MAG RANGE" + "\n" + currentMagRange);
+					String currentPressureResolution = "(" + ListofPressureResolution[shimmer.getPressureResolution()] + ")";
+					buttonPressureResolution.setText("PRESSURE RES" + "\n" + currentPressureResolution);
+
+					if (shimmer.getAccelRange() == 0) {
+						cBoxLowPowerAccel.setEnabled(false);
+						cBoxLowPowerAccel.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
+					}
+
+					//currently not supported for the moment
+					buttonPressureResolution.setEnabled(true);
+
+
+				} else {
+					cBoxInternalExpPower.setEnabled(false);
+					cBoxInternalExpPower.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
+					buttonPressureResolution.setEnabled(false);
+					buttonGyroRange.setEnabled(false);
+					cBoxLowPowerAccel.setEnabled(false);
+					cBoxLowPowerAccel.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
+					cBoxLowPowerGyro.setEnabled(false);
+					cBoxLowPowerGyro.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
+					String currentMagRange = "(" + Configuration.Shimmer2.ListofMagRange[shimmer.getMagRange()] + ")";
+					buttonMagRange.setText("Mag Range" + "\n" + currentMagRange);
+				}
+
+
+				mServiceBind = true;
+				//update the view
+
+				if (mService.get5VReg(mBluetoothAddress) == 1) {
+					cBox5VReg.setChecked(true);
+				}
+
+				cBox5VReg.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
+						if (checked) {
+							mService.write5VReg(mBluetoothAddress, 1);
+						} else {
+							mService.write5VReg(mBluetoothAddress, 0);
 						}
-						if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A1) > 0){
-							Toast.makeText(getApplicationContext(), "Int ADC A1 is Enabled", Toast.LENGTH_LONG).show();
+					}
+
+				});
+
+
+				cBoxLowPowerAccel.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
+						if (checked) {
+							shimmer.enableLowPowerAccel(true);
+						} else {
+							shimmer.enableLowPowerAccel(false);
 						}
-						if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A12) > 0){
-							Toast.makeText(getApplicationContext(), "Int ADC A12 is Enabled", Toast.LENGTH_LONG).show();
+					}
+
+				});
+
+				cBoxLowPowerGyro.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
+						if (checked) {
+							shimmer.enableLowPowerGyro(true);
+						} else {
+							shimmer.enableLowPowerGyro(false);
 						}
-						if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A14) > 0){
-							Toast.makeText(getApplicationContext(), "Int ADC A14 is Enabled", Toast.LENGTH_LONG).show();
-						} 
-						if (((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A13) == 0) &&
-								((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A1) == 0) &&
-								((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A12) == 0) &&
-								((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A14) == 0)) {
-							 
-							Toast.makeText(getApplicationContext(), "Enabling Int ADC A13, please attach PPG sensor to Int ADC A13", Toast.LENGTH_LONG).show();
-							long newES = mService.sensorConflictCheckandCorrection(mBluetoothAddress,enabledSensors,ShimmerObject.SENSOR_INT_ADC_A13);
-							mService.setEnabledSensors(newES, mBluetoothAddress);
+					}
+
+				});
+
+				cBoxInternalExpPower.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
+						if (checked) {
+							shimmer.writeInternalExpPower(1);
+						} else {
+							shimmer.writeInternalExpPower(0);
 						}
-						dialogPPGtoHR.show();
-    				}
-    			}
-        		
-        	});
-      		
-      		cBoxECGtoHR.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+					}
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				
-    				if (checked){
-    					if (mService.getSamplingRate(mBluetoothAddress)>=128){
-    						long enabledSensors = mService.getEnabledSensors(mBluetoothAddress); 
-    						if (mService.isEXGUsingECG24Configuration(mBluetoothAddress) || mService.isEXGUsingECG16Configuration(mBluetoothAddress)){
-    							mService.enableECGtoHR(mBluetoothAddress, checked);
-    							if (cBoxPPGtoHR.isChecked()){
-    								cBoxPPGtoHR.setChecked(false);
-    							}
-    							final String[] arrayECG = {Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT,Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT,Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT};
-    							final String[] arrayECG16 = {Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT,Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT,Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT};
-    							if (mService.isEXGUsingECG16Configuration(mBluetoothAddress)){
-    								dialogECGtoHR.setTitle("ECG to HR : Select ECG signal source").setItems(arrayECG16, new DialogInterface.OnClickListener() {
-    									public void onClick(DialogInterface dialog, int item) {
+				});
 
-    										mService.setECGtoHRSignal(arrayECG16[item]);
 
-    									}
-    								});
-    								dialogECGtoHR.show();
+				cBoxPPGtoHR.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-    							} else {
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
+						mService.enablePPGtoHR(mBluetoothAddress, checked);
+						if (checked) {
+							if (cBoxECGtoHR.isChecked()) {
+								cBoxECGtoHR.setChecked(false);
+							}
+							if (cBoxInternalExpPower.isChecked()) {
+							} else {
+								Toast.makeText(getApplicationContext(), "Enabling Int Exp Power", Toast.LENGTH_LONG).show();
+								cBoxInternalExpPower.setChecked(true);
+							}
+							long enabledSensors = mService.getEnabledSensors(mBluetoothAddress);
+							if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A13) > 0) {
+								Toast.makeText(getApplicationContext(), "Int ADC A13 is Enabled", Toast.LENGTH_LONG).show();
+							}
+							if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A1) > 0) {
+								Toast.makeText(getApplicationContext(), "Int ADC A1 is Enabled", Toast.LENGTH_LONG).show();
+							}
+							if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A12) > 0) {
+								Toast.makeText(getApplicationContext(), "Int ADC A12 is Enabled", Toast.LENGTH_LONG).show();
+							}
+							if ((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A14) > 0) {
+								Toast.makeText(getApplicationContext(), "Int ADC A14 is Enabled", Toast.LENGTH_LONG).show();
+							}
+							if (((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A13) == 0) &&
+									((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A1) == 0) &&
+									((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A12) == 0) &&
+									((enabledSensors & ShimmerObject.SENSOR_INT_ADC_A14) == 0)) {
 
-    								dialogECGtoHR.setTitle("ECG to HR : Select ECG signal source").setItems(arrayECG, new DialogInterface.OnClickListener() {
-    									public void onClick(DialogInterface dialog, int item) {
+								Toast.makeText(getApplicationContext(), "Enabling Int ADC A13, please attach PPG sensor to Int ADC A13", Toast.LENGTH_LONG).show();
+								long newES = mService.sensorConflictCheckandCorrection(mBluetoothAddress, enabledSensors, ShimmerObject.SENSOR_INT_ADC_A13);
+								mService.setEnabledSensors(newES, mBluetoothAddress);
+							}
+							dialogPPGtoHR.show();
+						}
+					}
 
-    										mService.setECGtoHRSignal(arrayECG[item]);
+				});
 
-    									}
-    								});
-    								dialogECGtoHR.show();
+				cBoxECGtoHR.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-    							}
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
 
-    						} else {
-    							Toast.makeText(getApplicationContext(), "Please enable ECG", Toast.LENGTH_LONG).show();
-    							cBoxECGtoHR.setChecked(false);
+						if (checked) {
+							if (mService.getSamplingRate(mBluetoothAddress) >= 128) {
+								long enabledSensors = mService.getEnabledSensors(mBluetoothAddress);
+								if (mService.isEXGUsingECG24Configuration(mBluetoothAddress) || mService.isEXGUsingECG16Configuration(mBluetoothAddress)) {
+									mService.enableECGtoHR(mBluetoothAddress, checked);
+									if (cBoxPPGtoHR.isChecked()) {
+										cBoxPPGtoHR.setChecked(false);
+									}
+									final String[] arrayECG = {Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT, Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT, Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT};
+									final String[] arrayECG16 = {Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT, Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT, Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT};
+									if (mService.isEXGUsingECG16Configuration(mBluetoothAddress)) {
+										dialogECGtoHR.setTitle("ECG to HR : Select ECG signal source").setItems(arrayECG16, new DialogInterface.OnClickListener() {
+											public void onClick(DialogInterface dialog, int item) {
 
-    						}
+												mService.setECGtoHRSignal(arrayECG16[item]);
 
-    					} else {
-    						Toast.makeText(getApplicationContext(), "Please use a sampling rate of 128Hz or higher", Toast.LENGTH_LONG).show();
-							cBoxECGtoHR.setChecked(false);
-    					}
-    				} else {
-    					mService.enableECGtoHR(mBluetoothAddress, checked);
-    				}
-    			}
-        		
-        	});
-      		
-      		cBoxLowPowerMag.setChecked(mService.isLowPowerMagEnabled(mBluetoothAddress));
-      		
-      		cBoxLowPowerMag.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+											}
+										});
+										dialogECGtoHR.show();
 
-    			public void onCheckedChanged(CompoundButton arg0, boolean checked) {
-    				// TODO Auto-generated method stub
-    				if (checked){
-    					mService.enableLowPowerMag(mBluetoothAddress, true);
-    				} else {
-    					mService.enableLowPowerMag(mBluetoothAddress, false);
-    				}
-    			}
-        		
-        	});
-      		
+									} else {
+
+										dialogECGtoHR.setTitle("ECG to HR : Select ECG signal source").setItems(arrayECG, new DialogInterface.OnClickListener() {
+											public void onClick(DialogInterface dialog, int item) {
+
+												mService.setECGtoHRSignal(arrayECG[item]);
+
+											}
+										});
+										dialogECGtoHR.show();
+
+									}
+
+								} else {
+									Toast.makeText(getApplicationContext(), "Please enable ECG", Toast.LENGTH_LONG).show();
+									cBoxECGtoHR.setChecked(false);
+
+								}
+
+							} else {
+								Toast.makeText(getApplicationContext(), "Please use a sampling rate of 128Hz or higher", Toast.LENGTH_LONG).show();
+								cBoxECGtoHR.setChecked(false);
+							}
+						} else {
+							mService.enableECGtoHR(mBluetoothAddress, checked);
+						}
+					}
+
+				});
+
+				cBoxLowPowerMag.setChecked(mService.isLowPowerMagEnabled(mBluetoothAddress));
+
+				cBoxLowPowerMag.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					public void onCheckedChanged(CompoundButton arg0, boolean checked) {
+						// TODO Auto-generated method stub
+						if (checked) {
+							mService.enableLowPowerMag(mBluetoothAddress, true);
+						} else {
+							mService.enableLowPowerMag(mBluetoothAddress, false);
+						}
+					}
+
+				});
+			}
       		}
 
       	public void onServiceDisconnected(ComponentName arg0) {

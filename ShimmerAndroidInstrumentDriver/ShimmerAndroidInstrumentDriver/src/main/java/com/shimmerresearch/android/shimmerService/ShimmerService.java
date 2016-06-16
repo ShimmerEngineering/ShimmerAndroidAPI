@@ -37,50 +37,7 @@
 //Future updates needed
 //- the handler should be converted to static 
 
-package com.shimmerresearch.service;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.shimmerresearch.algorithms.Filter;
-import com.shimmerresearch.android.Shimmer;
-import com.shimmerresearch.android.Shimmer4Android;
-import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
-import com.shimmerresearch.biophysicalprocessing.ECGtoHRAdaptive;
-import com.shimmerresearch.biophysicalprocessing.ECGtoHRAlgorithm;
-import com.shimmerresearch.biophysicalprocessing.PPGtoHRAlgorithm;
-import com.shimmerresearch.bluetooth.ShimmerBluetooth;
-import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
-import com.shimmerresearch.bluetooth.ShimmerRadioProtocol;
-import com.shimmerresearch.comms.radioProtocol.LiteProtocol;
-import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataComm;
-import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataCommListener;
-import com.shimmerresearch.driver.*;
-import com.shimmerresearch.driverUtilities.ChannelDetails;
-import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
-import com.shimmerresearch.driverUtilities.SensorDetails;
-import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
-import com.shimmerresearch.driverUtilities.ShimmerVerObject;
-import com.shimmerresearch.tools.Logging;
-import com.shimmerresearch.tools.PlotManagerAndroid;
+package com.shimmerresearch.android.shimmerService;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -92,6 +49,41 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.shimmerresearch.algorithms.Filter;
+import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
+import com.shimmerresearch.biophysicalprocessing.ECGtoHRAdaptive;
+import com.shimmerresearch.biophysicalprocessing.PPGtoHRAlgorithm;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
+import com.shimmerresearch.bluetooth.ShimmerRadioProtocol;
+import com.shimmerresearch.comms.radioProtocol.LiteProtocol;
+import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataComm;
+import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataCommListener;
+import com.shimmerresearch.driver.CallbackObject;
+import com.shimmerresearch.driver.Configuration;
+import com.shimmerresearch.driver.DeviceException;
+import com.shimmerresearch.driver.FormatCluster;
+import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.driver.Shimmer4;
+import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.ChannelDetails;
+import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
+import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerObject;
+import com.shimmerresearch.tools.Logging;
+import com.shimmerresearch.tools.PlotManagerAndroid;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class ShimmerService extends Service {
 	private static final String TAG = "MyService";
@@ -1234,15 +1226,18 @@ public class ShimmerService extends Service {
 	
 
 	
-	public Shimmer getShimmer(String bluetoothAddress){
+	public ShimmerDevice getShimmer(String bluetoothAddress){
 		// TODO Auto-generated method stub
-		Shimmer shimmer = null;
+		ShimmerDevice shimmer = null;
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				return stemp;
+			shimmer=(ShimmerDevice) iterator.next();
+			String address = shimmer.getMacId();
+			address = address.replace(":","");
+			bluetoothAddress = bluetoothAddress.replace(":","");
+			if (address.equals(bluetoothAddress)){
+				return shimmer;
 			}
 		}
 		return shimmer;

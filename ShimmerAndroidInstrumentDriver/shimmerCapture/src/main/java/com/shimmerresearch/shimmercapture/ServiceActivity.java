@@ -2,8 +2,8 @@
 
 package com.shimmerresearch.shimmercapture;
 
-import com.shimmerresearch.service.ShimmerService;
-import com.shimmerresearch.service.ShimmerService.LocalBinder;
+import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.android.shimmerService.ShimmerService.LocalBinder;
 
 
 

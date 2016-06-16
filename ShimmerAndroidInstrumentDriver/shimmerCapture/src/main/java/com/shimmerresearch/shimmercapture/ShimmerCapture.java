@@ -49,21 +49,26 @@ import im.delight.apprater.AppRater;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.ConfigOptionDetails;
+import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
+import com.shimmerresearch.driverUtilities.SensorDetails;
 import com.shimmerresearch.tools.PlotManagerAndroid;
 import com.shimmersensing.shimmerconnect.R;
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
@@ -78,18 +83,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.Settings.System;
-import android.text.Layout;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -97,7 +94,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -108,7 +104,6 @@ import android.widget.Toast;
 import com.androidplot.Plot;
 import com.androidplot.ui.SizeLayoutType;
 import com.androidplot.ui.SizeMetrics;
-import com.androidplot.ui.widget.TextLabelWidget;
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.XYPlot;
@@ -116,14 +111,10 @@ import com.androidplot.xy.XYStepMode;
 import com.google.common.collect.BiMap;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.driver.Configuration;
-import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
-import com.shimmerresearch.driver.Configuration.Shimmer2;
 import com.shimmerresearch.driver.Configuration.Shimmer3;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
-import com.shimmerresearch.service.ShimmerService;
-import com.shimmerresearch.service.ShimmerService.LocalBinder;
-import com.shimmerresearch.tools.Logging;
+import com.shimmerresearch.android.shimmerService.ShimmerService;
 
 
 public class ShimmerCapture extends ServiceActivity {
@@ -140,6 +131,9 @@ public class ShimmerCapture extends ServiceActivity {
 	private String START_STREAMING = "Start Streaming";
 	private String START_LOGGING = "Start Logging";
 	private String STOP_LOGGING = "Stop Logging";
+	private String NEW_SHIMMER_CONFIGURATION = "New Shimmer Configuration";
+	private String NEW_ENABLE_SENSOR = "New Enable Sensors";
+
 	//private String START_STREAMING_AND_LOGGING = "Start Streaming+Logging";
 	private String STOP_STREAMING = "Stop Streaming";
 	//private String STOP_STRAMING_AND_LOGGING = "Stop Streaming+Logging";
@@ -210,7 +204,8 @@ public class ShimmerCapture extends ServiceActivity {
 
 	static int mPlotLimit = 1;
 
-
+	Map<String, ConfigOptionDetailsSensor> mConfigOptionsMap;
+	ShimmerDevice mShimmerDeviceClone;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -373,7 +368,9 @@ public class ShimmerCapture extends ServiceActivity {
 							}
 						}
 						arrayAdapter.add(ENABLE_SENSOR);
+						arrayAdapter.add(NEW_ENABLE_SENSOR);
 						arrayAdapter.add(SHIMMER_CONFIGURATION);
+						arrayAdapter.add(NEW_SHIMMER_CONFIGURATION);
 						arrayAdapter.add(GRAPH_CONFIGURATION);
 						arrayAdapter.add(DEVICE_INFO);
 					}
@@ -542,7 +539,7 @@ public class ShimmerCapture extends ServiceActivity {
 	      	public void onServiceConnected(ComponentName arg0, IBinder service) {
 	      		// TODO Auto-generated method stub
 	      		Log.d("ShimmerService", "service connected from main activity");
-	      		LocalBinder binder = (LocalBinder) service;
+	      		ShimmerService.LocalBinder binder = (ShimmerService.LocalBinder) service;
 	      		mService = binder.getService();
 	      		mServiceBind = true;
 	      		mService.setGraphHandler(mHandler);
@@ -1006,7 +1003,7 @@ public class ShimmerCapture extends ServiceActivity {
 			}			 
 			 else if(optionSelected.equals(ENABLE_SENSOR)){
 				
-				Shimmer shimmer = mService.getShimmer(mBluetoothAddress);
+				Shimmer shimmer = (Shimmer)mService.getShimmer(mBluetoothAddress);
 				String[] sensors = shimmer.getListofSupportedSensors();
 				String[] enableSensorsForListView = new String[sensors.length+2]; 
 				
@@ -1033,6 +1030,8 @@ public class ShimmerCapture extends ServiceActivity {
 				
 				showSelectSensorPlot();
 				
+			} else if (optionSelected.equals(NEW_ENABLE_SENSOR)){
+				ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(mService.getShimmer(mBluetoothAddress),ShimmerCapture.this);
 			} else if(optionSelected.equals(SHIMMER_CONFIGURATION)){
 				
 				Intent commandIntent=new Intent(getApplicationContext(), CommandsActivity.class);
@@ -1043,6 +1042,10 @@ public class ShimmerCapture extends ServiceActivity {
 				commandIntent.putExtra("BatteryLimit",mService.getBattLimitWarning(mBluetoothAddress));
 				startActivityForResult(commandIntent, REQUEST_COMMAND_SHIMMER);
 				
+			} else if(optionSelected.equals(NEW_SHIMMER_CONFIGURATION)){
+				//buildShimmerConfigOptions(mService.getShimmer(mBluetoothAddress));
+				ShimmerDialogConfigurations.buildShimmerConfigOptions(mService.getShimmer(mBluetoothAddress),ShimmerCapture.this);
+
 			} else if(optionSelected.equals(GRAPH_CONFIGURATION)){
 				
 				mEditXAxisLimit.setText(""+X_AXIS_LENGTH);
@@ -1054,9 +1057,9 @@ public class ShimmerCapture extends ServiceActivity {
 				writeToFileDialog.show();			
 			} else if(optionSelected.equals(DEVICE_INFO)){
 				
-				Shimmer shimmerTemp = mService.getShimmer(mBluetoothAddress);
+				ShimmerDevice shimmerTemp = mService.getShimmer(mBluetoothAddress);
 				String shimmerVersion="";
-				switch(shimmerTemp.getShimmerVersion()){
+				switch(shimmerTemp.getShimmerVerObject().getHardwareVersion()){
 					case ShimmerVerDetails.HW_ID.SHIMMER_2:
 						shimmerVersion = "Shimmer 2";
 					break;
@@ -1082,7 +1085,9 @@ public class ShimmerCapture extends ServiceActivity {
 		}
     	
     }
-    
+
+
+
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
     	switch (requestCode) {
@@ -1179,6 +1184,7 @@ public class ShimmerCapture extends ServiceActivity {
 					arrayAdapter.add(ENABLE_SENSOR);
 					arrayAdapter.add(SHIMMER_CONFIGURATION);
 					arrayAdapter.add(GRAPH_CONFIGURATION);
+					arrayAdapter.add(NEW_SHIMMER_CONFIGURATION);
 				}
 				arrayAdapter.add(EDIT_GRAPH);
 			}

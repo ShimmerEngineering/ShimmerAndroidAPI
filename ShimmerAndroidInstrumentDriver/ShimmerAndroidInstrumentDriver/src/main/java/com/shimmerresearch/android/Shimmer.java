@@ -137,10 +137,13 @@ import it.gerdavax.easybluetooth.LocalDevice;
 import it.gerdavax.easybluetooth.RemoteDevice;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -212,18 +215,18 @@ public class Shimmer extends ShimmerBluetooth{
 	
 	// Key names received from the Shimmer Handler 
 	public static final String TOAST = "toast";
-	private final BluetoothAdapter mAdapter;
-	public final Handler mHandler;
+	transient private final BluetoothAdapter mAdapter;
+	transient public final Handler mHandler;
 
-	private ConnectThread mConnectThread;
-	private ConnectedThread mConnectedThread;
+	transient private ConnectThread mConnectThread;
+	transient private ConnectedThread mConnectedThread;
 	private boolean mDummy=false;
-	private LocalDevice localDevice;
+	transient private LocalDevice localDevice;
 	//private InputStream mInputStream=null;
 	//private DataInputStream mInStream=null;
-	private DataInputStream mInStream;
+	transient private DataInputStream mInStream;
 	//private BufferedInputStream mInStream=null;
-	private OutputStream mmOutStream=null;
+	transient private OutputStream mmOutStream=null;
 
 	public static final int MSG_STATE_FULLY_INITIALIZED = 3;  // This is the connected state, indicating the device has establish a connection + tx/rx commands and reponses (Initialized)
 	public static final int MSG_STATE_STREAMING = 4;
@@ -232,7 +235,7 @@ public class Shimmer extends ShimmerBluetooth{
 	protected String mClassName="Shimmer";
 	
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
-	private BluetoothAdapter mBluetoothAdapter = null;
+	transient private BluetoothAdapter mBluetoothAdapter = null;
 
 
 	{
@@ -1227,8 +1230,22 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 
 	public ShimmerDevice deepClone() {
-		// TODO Auto-generated method stub
-		return null;
+
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(this);
+
+			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			return (Shimmer) ois.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
