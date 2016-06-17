@@ -31,12 +31,25 @@ public class ShimmerDialogConfigurations {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         Map<Integer,SensorDetails> sensorMap = shimmerDevice.getSensorMap();
         int count = 0;
-        String[] arraySensors = new String[sensorMap.size()];
-        boolean[] listEnabled = new boolean[sensorMap.size()];
         for (SensorDetails sd:sensorMap.values()){
-            arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
-            listEnabled[count] = sd.isEnabled();
-            count++;
+            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+                count++;
+            }
+
+        }
+        String[] arraySensors = new String[count];
+        final boolean[] listEnabled = new boolean[count];
+        final int[] sensorKeys = new int[count];
+        count = 0;
+
+        for (int key:sensorMap.keySet()){
+            SensorDetails sd = sensorMap.get(key);
+            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+                arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
+                listEnabled[count] = sd.isEnabled();
+                sensorKeys[count] = key;
+                count++;
+            }
         }
         // Set the dialog title
         builder.setTitle("Sensors")
@@ -47,13 +60,13 @@ public class ShimmerDialogConfigurations {
                             @Override
                             public void onClick(DialogInterface dialog, int which,
                                                 boolean isChecked) {
-                                if (isChecked) {
-                                    // If the user checked the item, add it to the selected items
-                                    mSelectedItems.add(which);
-                                } else if (mSelectedItems.contains(which)) {
-                                    // Else, if the item is already in the array, remove it
+                                if (mSelectedItems.contains(which)){
                                     mSelectedItems.remove(Integer.valueOf(which));
+                                } else{
+                                    mSelectedItems.add(which);
                                 }
+
+
                             }
                         })
                 // Set the action buttons
@@ -62,17 +75,33 @@ public class ShimmerDialogConfigurations {
                     public void onClick(DialogInterface dialog, int id) {
                         // User clicked OK, so save the mSelectedItems results somewhere
                         // or return them to the component that opened the dialog
-
+                        ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
+                        for (int selected:mSelectedItems) {
+                            shimmerDeviceClone.setSensorEnabledState((int)sensorKeys[selected],listEnabled[selected]);
+                        }
+                        shimmerDeviceClone.infoMemByteArrayGenerate(true);
+                        if (shimmerDevice instanceof Shimmer) {
+                            ((Shimmer)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            ((Shimmer)shimmerDevice).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
+                        } else if (shimmerDevice instanceof Shimmer4Android){
+                            ((Shimmer4Android)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
+                        }
                     }
                 })
-                .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
+                       dialog.cancel();
                     }
                 });
 
-        builder.create().show();
+        AlertDialog ad = builder.create();
+        ad.show();
     }
 
     public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context){
