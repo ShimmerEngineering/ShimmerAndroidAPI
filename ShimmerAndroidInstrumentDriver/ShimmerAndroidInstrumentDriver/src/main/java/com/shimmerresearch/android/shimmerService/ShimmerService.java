@@ -253,7 +253,7 @@ public class ShimmerService extends Service {
 				public void eventConnected() {
 					ShimmerVerObject svo = sspa.getShimmerVerObject();
 					ShimmerDevice shimmerDeviceNew = null;
-					if (svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3) {
+					if (svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3 || svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_2R ) {
 						shimmerDeviceNew = initializeNewShimmer3(sspa, selectedDevice);
 						mMultiShimmer.put(bluetoothAddress,shimmerDeviceNew);
 					} else if (svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_4_SDK) {
@@ -332,8 +332,15 @@ public class ShimmerService extends Service {
 	            switch (msg.what) { // handlers have a what identifier which is used to identify the type of msg
 	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
-	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
-	            	    
+	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj;
+						try {
+
+							mPlotManager.filterDataAndPlot((ObjectCluster) msg.obj);
+
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	            	    //Filter Signal
 	            	    //PPG to HR
 	            	    if (mPPGtoHREnabled){
@@ -700,20 +707,24 @@ public class ShimmerService extends Service {
 			address = address.replace(":","");
 			bluetoothAddress = bluetoothAddress.replace(":","");
 			if (stemp.getBluetoothRadioState()==BT_STATE.STREAMING && address.equals(bluetoothAddress)){
-				List<SensorDetails> listOfEnabledSensorDetails= stemp.getListOfEnabledSensors();
-				for (SensorDetails sd:listOfEnabledSensorDetails){
-					for (ChannelDetails cd : sd.mListOfChannels){
-						for (CHANNEL_TYPE ct:cd.mListOfChannelTypes) {
-							String[] sensor = new String[4];
-							sensor[0] = stemp.getShimmerUserAssignedName();
-							sensor[1] = cd.mObjectClusterName;
-							sensor[2] = ct.toString();
-							if (ct.equals(CHANNEL_TYPE.UNCAL)) {
-								sensor[3] = cd.mDefaultUnit;
-							} else if (ct.equals(CHANNEL_TYPE.CAL)) {
-								sensor[3] = cd.mDefaultCalibratedUnits;
+				if (stemp.getShimmerVerObject().getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_2R){
+					return ((Shimmer)stemp).getListofEnabledSensorSignalsandFormats();
+				} else {
+					List<SensorDetails> listOfEnabledSensorDetails = stemp.getListOfEnabledSensors();
+					for (SensorDetails sd : listOfEnabledSensorDetails) {
+						for (ChannelDetails cd : sd.mListOfChannels) {
+							for (CHANNEL_TYPE ct : cd.mListOfChannelTypes) {
+								String[] sensor = new String[4];
+								sensor[0] = stemp.getShimmerUserAssignedName();
+								sensor[1] = cd.mObjectClusterName;
+								sensor[2] = ct.toString();
+								if (ct.equals(CHANNEL_TYPE.UNCAL)) {
+									sensor[3] = cd.mDefaultUnit;
+								} else if (ct.equals(CHANNEL_TYPE.CAL)) {
+									sensor[3] = cd.mDefaultCalibratedUnits;
+								}
+								listofSensors.add(sensor);
 							}
-							listofSensors.add(sensor);
 						}
 					}
 				}
@@ -1033,7 +1044,15 @@ public class ShimmerService extends Service {
 	}
 	
 
-	
+	public boolean bluetoothAddressComparator(String bluetoothAddress, String address){
+		address = address.replace(":","");
+		bluetoothAddress = bluetoothAddress.replace(":","");
+		if (address.equals(bluetoothAddress)){
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	public void stopStreaming(String bluetoothAddress) {
 		// TODO Auto-generated method stub
@@ -1049,6 +1068,9 @@ public class ShimmerService extends Service {
 							((Shimmer)stemp).stopStreaming();
 						} else if (stemp instanceof Shimmer4Android){
 							((Shimmer4Android)stemp).mShimmerRadioHWLiteProtocol.stopStreaming();
+						}
+						if (mPlotManager!=null){
+							mPlotManager.removeAllSignals();
 						}
 
 					}

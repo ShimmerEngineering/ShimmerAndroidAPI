@@ -110,16 +110,16 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="0.25" >
-    	
-         
-         <com.androidplot.xy.XYPlot
-	        android:id="@+id/dynamicPlot"
-	        android:layout_width="fill_parent"
-	        android:layout_height="match_parent"
-	        android:layout_weight="1"
-	        title="Shimmer Data Plot"  />
-         
-     </LinearLayout>
+
+
+		 <com.androidplot.xy.XYPlot
+            android:id="@+id/dynamicPlot"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            title="Shimmer Data Plot"  />
+
+	 </LinearLayout>
 
 <!--     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -211,79 +211,8 @@
         android:layout_marginTop="0dp"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal" >
-        
-        <ImageView
-            android:id="@+id/imageBlue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:background="@drawable/circle_blue" 
-            android:scaleType="fitCenter" />
-        
-        <TextView 
-	        android:id="@+id/textSensor1"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textSize="@dimen/small"
-	        android:layout_marginLeft="3dp"
-	        android:textColor="@color/shimmer_grey"
-	        android:text="Test Signal 16Bit"/>
-        
-        <ImageView
-            android:id="@+id/imageOrange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/circle_orange" 
-            android:scaleType="fitCenter" />
-        
-        <TextView 
-	        android:id="@+id/textSensor2"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textSize="@dimen/small"
-	        android:layout_marginLeft="3dp"
-	        android:textColor="@color/shimmer_grey"
-	        android:text="Test Signal 16Bit"/>
-        
-        <ImageView
-            android:id="@+id/imageGrey"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/circle_grey" 
-            android:scaleType="fitCenter" />
-        
-        <TextView 
-	        android:id="@+id/textSensor3"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textSize="@dimen/small"
-	        android:layout_marginLeft="3dp"
-	        android:textColor="@color/shimmer_grey"
-	        android:text="Test Signal 16Bit"/>
-        
-        <ImageView
-            android:id="@+id/imageGreen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/circle_green" 
-            android:scaleType="fitCenter" />
-        
-        <TextView 
-	        android:id="@+id/textSensor4"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textSize="@dimen/small"
-	        android:layout_marginLeft="3dp"
-	        android:textColor="@color/shimmer_grey"
-	        android:text="Test Signal 16Bit"/>
-        
-    </LinearLayout>
+
+	</LinearLayout>
     
     <Button 
         android:id="@+id/menuButton"

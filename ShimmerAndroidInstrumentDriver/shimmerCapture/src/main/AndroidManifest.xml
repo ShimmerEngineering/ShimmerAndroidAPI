@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shimmersensing.shimmerconnect"
-    android:versionCode="10"
-    android:versionName="0.10" >
+    android:versionCode="14"
+    android:versionName="0.14" >
 
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
     <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
@@ -24,11 +24,8 @@
                   android:label="@string/select_device"
                   android:theme="@android:style/Theme.Holo.Light.Dialog">
         </activity>
-		<activity android:name="com.shimmerresearch.shimmercapture.ConfigureActivity" android:theme="@android:style/Theme.Holo.Light.Dialog" android:label="@string/configure_device"></activity>
-    <activity android:name="com.shimmerresearch.shimmercapture.SensorViewActivity" android:theme="@android:style/Theme.Holo.Light.Dialog" android:label="@string/configure_device"></activity>
-     <activity android:name="com.shimmerresearch.shimmercapture.CommandsActivity" android:label="@string/commands"></activity>
-    <activity android:name="com.shimmerresearch.shimmercapture.LogFileActivity"  android:label="@string/logfile"></activity>
-   <service android:enabled="true" android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
+	 <activity android:name="com.shimmerresearch.shimmercapture.CommandsActivity" android:label="@string/commands"></activity>
+    service android:enabled="true" android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
         
     </application>
 

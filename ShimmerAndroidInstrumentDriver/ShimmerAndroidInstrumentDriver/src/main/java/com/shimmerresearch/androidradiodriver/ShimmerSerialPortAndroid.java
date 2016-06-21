@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.UUID;
 
 import it.gerdavax.easybluetooth.BtSocket;
@@ -23,18 +24,18 @@ import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataComm;
 import com.shimmerresearch.driver.DeviceException;
 import com.shimmerresearch.driverUtilities.ShimmerVerObject;
 
-public class ShimmerSerialPortAndroid extends SerialPortComm {
+public class ShimmerSerialPortAndroid extends SerialPortComm implements Serializable{
 	//generic UUID for serial port protocol
 	private UUID mSPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 		
 	public String mBluetoothAddress = "";
-	private BluetoothAdapter mBluetoothAdapter = null;
+	transient private BluetoothAdapter mBluetoothAdapter = null;
 	public BT_STATE mState = BT_STATE.DISCONNECTED;
-	public ConnectThread mConnectThread;
-	public ConnectedThread mConnectedThread;
-	private final BluetoothAdapter mAdapter;
-	private DataInputStream mInStream;
-	private OutputStream mOutStream=null;
+	transient public ConnectThread mConnectThread;
+	transient public ConnectedThread mConnectedThread;
+	transient private final BluetoothAdapter mAdapter;
+	transient private DataInputStream mInStream;
+	transient private OutputStream mOutStream=null;
 	
 	public ShimmerSerialPortAndroid(String bluetoothAddress){
 		mBluetoothAddress = bluetoothAddress;

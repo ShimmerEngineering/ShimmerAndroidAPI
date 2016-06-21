@@ -6,7 +6,7 @@ android {
     defaultConfig {
         multiDexEnabled true
         applicationId "com.shimmerresearch.shimmergraphandlogservice"
-        minSdkVersion 11
+        minSdkVersion 13
         targetSdkVersion 13
     }
 
@@ -20,7 +20,7 @@ android {
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
-    provided files('../libs/ShimmerDriver-0.1.jar')
+    provided files('../libs/ShimmerDriver-0.2.jar')
     provided files('../libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     provided files('../libs/androidplot-core-0.5.0-release.jar')
     provided 'com.google.guava:guava:19.0'

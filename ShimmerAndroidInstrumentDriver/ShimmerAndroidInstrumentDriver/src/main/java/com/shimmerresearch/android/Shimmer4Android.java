@@ -10,7 +10,7 @@ import com.shimmerresearch.driver.*;
 
 public class Shimmer4Android extends Shimmer4 {
 
-    public final Handler mHandler;
+    transient public final Handler mHandler;
 
     @Override
     public void sendCallBackMsg(int msgid,Object obj){

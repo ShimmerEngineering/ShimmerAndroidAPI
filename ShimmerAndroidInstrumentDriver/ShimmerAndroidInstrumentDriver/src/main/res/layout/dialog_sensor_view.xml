@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <Button
+        android:text="Done"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_done" />
+
     <EditText
         android:id="@+id/editTextFilterPlotSignal"
         android:layout_width="match_parent"
@@ -12,12 +18,6 @@
 
         <requestFocus />
     </EditText>
-
-    <Button
-        android:text="Done"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button_done" />
 
     <Button
         android:id="@+id/ButtonFilterPlotSignal"

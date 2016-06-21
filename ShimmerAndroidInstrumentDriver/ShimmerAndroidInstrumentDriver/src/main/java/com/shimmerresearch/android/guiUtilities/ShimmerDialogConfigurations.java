@@ -1,13 +1,25 @@
 package com.shimmerresearch.android.guiUtilities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Sensor;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckedTextView;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetails;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
@@ -82,11 +94,11 @@ public class ShimmerDialogConfigurations {
                         shimmerDeviceClone.infoMemByteArrayGenerate(true);
                         if (shimmerDevice instanceof Shimmer) {
                             ((Shimmer)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
-                            try {
+                            /*try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
-                            }
+                            }*/
                             ((Shimmer)shimmerDevice).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
                         } else if (shimmerDevice instanceof Shimmer4Android){
                             ((Shimmer4Android)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
@@ -161,6 +173,184 @@ public class ShimmerDialogConfigurations {
                     }
                 });
         builder.create().show();
+    }
+    public static void showSelectSensorPlot(Context context,final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot){
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_sensor_view);
+        final Button buttonSetPlotSignalFilter = (Button) dialog.findViewById(R.id.ButtonFilterPlotSignal);
+        final Button buttonResetPlotSignalFilter = (Button) dialog.findViewById(R.id.buttonResetFilterPlotSignal);
+        final Button buttonDone = (Button) dialog.findViewById(R.id.button_done);
+        final EditText editTextSignalFilter = (EditText) dialog.findViewById(R.id.editTextFilterPlotSignal);
+        dialog.setCanceledOnTouchOutside(true);
+        TextView title = (TextView) dialog.findViewById(android.R.id.title);
+        title.setText("Select Signal");
+        final ListView listView = (ListView) dialog.findViewById(android.R.id.list);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        final List<String[]> listofChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
+
+        List<String> sensorList = new ArrayList<String>();
+        for(int i=0;i<listofChannels.size();i++) {
+            sensorList.add(joinStrings(listofChannels.get(i)));
+        }
+
+        final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+
+        final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+        listView.setAdapter(adapterSensorNames);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        //listView.setItemChecked(position, value);
+
+        for (int p=0;p<listofChannels.size();p++){
+            if (shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(p))){
+                listView.setItemChecked(p, true);
+            }
+        }
+
+        buttonDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.hide();
+            }
+        });
+
+        buttonSetPlotSignalFilter.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                List<String> sensorList = new ArrayList<String>();
+                String plotSignaltoFilter  = editTextSignalFilter.getText().toString();
+
+                for (int i=listofChannels.size()-1;i>-1;i--){
+                    String signal = joinStrings(listofChannels.get(i));
+                    if (!signal.toLowerCase().contains(plotSignaltoFilter.toLowerCase())){
+
+                        listofChannels.remove(i);
+                    }
+
+                }
+
+                for(int i=0;i<listofChannels.size();i++) {
+                    sensorList.add(joinStrings(listofChannels.get(i)));
+                }
+
+                final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+                ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(dialog.getContext(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+                listView.setAdapter(adapterSensorNames);
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+                for (int p=0;p<listofChannels.size();p++){
+                    if (shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(p))){
+                        listView.setItemChecked(p, true);
+                    }
+                }
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                    @Override
+                    public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+                                            long arg3) {
+                        CheckedTextView cb = (CheckedTextView) arg1;
+                        if (!shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(index))){
+                            try {
+                                shimmerService.mPlotManager.addSignal(listofChannels.get(index), dynamicPlot);
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        } else {
+                            shimmerService.mPlotManager.removeSignal(listofChannels.get(index));
+                        }
+                    }
+
+                });
+
+            }
+        });
+
+        buttonResetPlotSignalFilter.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                final List<String[]> listofChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
+                List<String> sensorList = new ArrayList<String>();
+                for(int i=0;i<listofChannels.size();i++) {
+                    sensorList.add(joinStrings(listofChannels.get(i)));
+                }
+
+                final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+
+                final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(dialog.getContext(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+                listView.setAdapter(adapterSensorNames);
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                //listView.setItemChecked(position, value);
+
+                for (int p=0;p<listofChannels.size();p++){
+                    if (shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(p))){
+                        listView.setItemChecked(p, true);
+                    }
+                }
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                    @Override
+                    public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+                                            long arg3) {
+                        CheckedTextView cb = (CheckedTextView) arg1;
+                        if (!shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(index))){
+                            try {
+                                shimmerService.mPlotManager.addSignal(listofChannels.get(index), dynamicPlot);
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        } else {
+                            shimmerService.mPlotManager.removeSignal(listofChannels.get(index));
+                        }
+                    }
+
+                });
+
+
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+                                    long arg3) {
+                CheckedTextView cb = (CheckedTextView) arg1;
+                if (!shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(index))){
+                    try {
+                        shimmerService.mPlotManager.addSignal(listofChannels.get(index), dynamicPlot);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } else {
+                    shimmerService.mPlotManager.removeSignal(listofChannels.get(index));
+                }
+            }
+
+        });
+
+        dialog.show();
+
+    }
+
+    public static String joinStrings(String[] a){
+        String js="";
+        for (int i=0;i<a.length;i++){
+            if (i==0){
+                js = a[i];
+            } else{
+                js = js + " " + a[i];
+            }
+        }
+        return js;
     }
 
 }

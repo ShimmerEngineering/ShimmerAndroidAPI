@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.androidplot.ui.DynamicTableModel;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -64,7 +65,7 @@ import com.shimmerresearch.driverUtilities.ConfigOptionDetails;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
 import com.shimmerresearch.driverUtilities.SensorDetails;
 import com.shimmerresearch.tools.PlotManagerAndroid;
-import com.shimmersensing.shimmerconnect.R;
+
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
 import android.app.Activity;
@@ -79,11 +80,13 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -115,7 +118,7 @@ import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.Configuration.Shimmer3;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
-
+import com.shimmersensing.shimmerconnect.R;
 
 public class ShimmerCapture extends ServiceActivity {
 
@@ -161,14 +164,6 @@ public class ShimmerCapture extends ServiceActivity {
 	static TextView textAppVersion;
 	String appVersion=""; 
 	
-	static ImageView blueCircle;
-	static ImageView orangeCircle;
-	static ImageView greyCircle;
-	static ImageView greenCircle;
-	static TextView mTextSensor1;
-	static TextView mTextSensor2;
-	static TextView mTextSensor3;
-	static TextView mTextSensor4;
 	TextView mShimmerVersion, mFirmwareVersion;
 	static TextView textDockedStatus, textSensingStatus;
 	static LinearLayout logAndStreamStatusLayout;
@@ -187,7 +182,7 @@ public class ShimmerCapture extends ServiceActivity {
     private static int mGraphSubSamplingCount = 0; //10 
     private static String mFileName = "Default";
     private static boolean mEnableLogging = false;
-    Dialog mDialog, writeToFileDialog, deviceInfoDialog, graphConfigurationDialog;
+    Dialog writeToFileDialog, deviceInfoDialog, graphConfigurationDialog;
     long dialogEnabledSensors=0;
     public ArrayAdapter<String> arrayAdapter;
 	CheckBox mCheckBoxEnableLogging, mCheckBoxResetScreen;
@@ -197,10 +192,6 @@ public class ShimmerCapture extends ServiceActivity {
 	static int mValueConstantTimes = 0;
 
 	List<String[]> mListofChannels;
-
-	Button mButtonSetPlotSignalFilter;
-	Button mButtonResetPlotSignalFilter;
-	EditText mEditTextSignalFilter;
 
 	static int mPlotLimit = 1;
 
@@ -221,7 +212,7 @@ public class ShimmerCapture extends ServiceActivity {
         logAndStreamStatusLayout = (LinearLayout) findViewById(R.id.linearLayout3);
         textDockedStatus = (TextView) findViewById(R.id.textDockedStatus);
         textSensingStatus = (TextView) findViewById(R.id.textSensingStatus);
-        mDialog = new Dialog(this);
+
         writeToFileDialog = new Dialog(this);
         writeToFileDialog.setTitle("Write Data To File");
 		writeToFileDialog.setContentView(R.layout.logfile);	
@@ -276,7 +267,13 @@ public class ShimmerCapture extends ServiceActivity {
         //lineAndPointFormatter1.setLinePaint(p);
         dynamicPlot.setDomainStepMode(XYStepMode.SUBDIVIDE);
         //dynamicPlot.setDomainStepValue(series1.size());
-        dynamicPlot.getLegendWidget().setSize(new SizeMetrics(0, SizeLayoutType.ABSOLUTE, 0, SizeLayoutType.ABSOLUTE));
+		dynamicPlot.getLegendWidget().setTableModel(new DynamicTableModel(1, 4));
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int width = size.x;
+		int height = size.y;
+        dynamicPlot.getLegendWidget().setSize(new SizeMetrics(width/2, SizeLayoutType.ABSOLUTE, height/3, SizeLayoutType.ABSOLUTE));
         // thin out domain/range tick labels so they dont overlap each other:
         dynamicPlot.setTicksPerDomainLabel(5);
         dynamicPlot.setTicksPerRangeLabel(3);
@@ -314,23 +311,8 @@ public class ShimmerCapture extends ServiceActivity {
         dynamicPlot.getLayoutManager().remove(dynamicPlot.getDomainLabelWidget());
         
         
-        blueCircle = (ImageView) findViewById(R.id.imageBlue);
-        orangeCircle = (ImageView) findViewById(R.id.imageOrange);
-        greyCircle = (ImageView) findViewById(R.id.imageGrey);
-        greenCircle = (ImageView) findViewById(R.id.imageGreen);
-        mTextSensor1 = (TextView) findViewById(R.id.textSensor1);
-        mTextSensor2 = (TextView) findViewById(R.id.textSensor2);
-        mTextSensor3 = (TextView) findViewById(R.id.textSensor3);
-        mTextSensor4 = (TextView) findViewById(R.id.textSensor4);
-        
-        blueCircle.setVisibility(View.INVISIBLE);
-        orangeCircle.setVisibility(View.INVISIBLE);
-        greyCircle.setVisibility(View.INVISIBLE);
-        greenCircle.setVisibility(View.INVISIBLE);
-        mTextSensor1.setVisibility(View.INVISIBLE);
-        mTextSensor2.setVisibility(View.INVISIBLE);
-        mTextSensor3.setVisibility(View.INVISIBLE);
-        mTextSensor4.setVisibility(View.INVISIBLE);
+
+
         
         
         menuListViewDialog =  new AlertDialog.Builder(this);
@@ -788,15 +770,7 @@ public class ShimmerCapture extends ServiceActivity {
             case Shimmer.MESSAGE_READ:
 
             	    if ((msg.obj instanceof ObjectCluster)){
-						try {
-							mGraphSubSamplingCount++;
-							//if (mGraphSubSamplingCount%mPlotLimit==0) {
-								mService.mPlotManager.filterDataAndPlot((ObjectCluster) msg.obj);
-							//}
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+
 					}
 				
                 break;
@@ -858,15 +832,7 @@ public class ShimmerCapture extends ServiceActivity {
 				mPlotSeriesMap.clear();
 		    	mPlotDataMap.clear();
 		    	dynamicPlot.clear();
-		    	mTextSensor1.setVisibility(View.INVISIBLE);
-    			blueCircle.setVisibility(View.INVISIBLE);
-    			mTextSensor2.setVisibility(View.INVISIBLE);
-    			orangeCircle.setVisibility(View.INVISIBLE);
-    			mTextSensor3.setVisibility(View.INVISIBLE);
-    			greyCircle.setVisibility(View.INVISIBLE);
-    			mTextSensor4.setVisibility(View.INVISIBLE);
-    			greenCircle.setVisibility(View.INVISIBLE);
-				
+
 			} else if(optionSelected.equals(START_STREAMING)){
 				mValueConstant = true;
 				double samplingRate = mService.getSamplingRate(mBluetoothAddress);
@@ -1027,8 +993,8 @@ public class ShimmerCapture extends ServiceActivity {
 				showEnableSensors(enableSensorsForListView,mService.getEnabledSensors(mBluetoothAddress));
 				
 			} else if(optionSelected.equals(EDIT_GRAPH)){
-				
-				showSelectSensorPlot();
+
+				ShimmerDialogConfigurations.showSelectSensorPlot(ShimmerCapture.this,mService,mBluetoothAddress,dynamicPlot);
 				
 			} else if (optionSelected.equals(NEW_ENABLE_SENSOR)){
 				ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(mService.getShimmer(mBluetoothAddress),ShimmerCapture.this);
@@ -1198,6 +1164,7 @@ public class ShimmerCapture extends ServiceActivity {
 			menuListViewDialog.show();
 			
 			return true;
+
 		}
 		else
 			return true;
@@ -1205,752 +1172,16 @@ public class ShimmerCapture extends ServiceActivity {
 		
 	}
 	
-	public void showSelectSensorPlot(){
 
-		mDialog.setContentView(R.layout.dialog_sensor_view);
-		mDialog.setCanceledOnTouchOutside(true);
-		TextView title = (TextView) mDialog.findViewById(android.R.id.title);
-		title.setText("Select Signal");
-		final ListView listView = (ListView) mDialog.findViewById(android.R.id.list);
-		mButtonSetPlotSignalFilter = (Button) mDialog.findViewById(R.id.ButtonFilterPlotSignal);
-		mButtonResetPlotSignalFilter = (Button) mDialog.findViewById(R.id.buttonResetFilterPlotSignal);
-		Button mButtonDone = (Button) mDialog.findViewById(R.id.button_done);
-		mEditTextSignalFilter = (EditText) mDialog.findViewById(R.id.editTextFilterPlotSignal);
-		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
-		mListofChannels = mService.getListofEnabledSensorSignals(mBluetoothAddress);
-		List<String> sensorList = new ArrayList<String>();
-		for(int i=0;i<mListofChannels.size();i++) {
-			sensorList.add(joinStrings(mListofChannels.get(i)));
-		}
-
-		final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
-
-		final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
-		listView.setAdapter(adapterSensorNames);
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-		//listView.setItemChecked(position, value);
-
-		for (int p=0;p<mListofChannels.size();p++){
-			if (mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(p))){
-				listView.setItemChecked(p, true);
-			}
-		}
-
-		mButtonDone.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mDialog.hide();
-			}
-		});
-
-		mButtonSetPlotSignalFilter.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				List<String> sensorList = new ArrayList<String>();
-				String plotSignaltoFilter  = mEditTextSignalFilter.getText().toString();
-
-				for (int i=mListofChannels.size()-1;i>-1;i--){
-					String signal = joinStrings(mListofChannels.get(i));
-					if (!signal.toLowerCase().contains(plotSignaltoFilter.toLowerCase())){
-
-						mListofChannels.remove(i);
-					}
-
-				}
-
-				for(int i=0;i<mListofChannels.size();i++) {
-					sensorList.add(joinStrings(mListofChannels.get(i)));
-				}
-
-				final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
-				ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(mDialog.getContext(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
-				listView.setAdapter(adapterSensorNames);
-				listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-				for (int p=0;p<mListofChannels.size();p++){
-					if (mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(p))){
-						listView.setItemChecked(p, true);
-					}
-				}
-
-				listView.setOnItemClickListener(new OnItemClickListener(){
-
-					@Override
-					public void onItemClick(AdapterView<?> arg0, View arg1, int index,
-											long arg3) {
-						CheckedTextView cb = (CheckedTextView) arg1;
-						if (cb.isChecked()){
-
-							try {
-								mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						} else {
-
-							mService.mPlotManager.removeSignal(mListofChannels.get(index));
-						}
-					}
-
-				});
-
-			}
-		});
-
-		mButtonResetPlotSignalFilter.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				mListofChannels = mService.getListofEnabledSensorSignals(mBluetoothAddress);
-				List<String> sensorList = new ArrayList<String>();
-				for(int i=0;i<mListofChannels.size();i++) {
-					sensorList.add(joinStrings(mListofChannels.get(i)));
-				}
-
-				final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
-
-				final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(mDialog.getContext(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
-				listView.setAdapter(adapterSensorNames);
-				listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-				//listView.setItemChecked(position, value);
-
-				for (int p=0;p<mListofChannels.size();p++){
-					if (mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(p))){
-						listView.setItemChecked(p, true);
-					}
-				}
-
-				listView.setOnItemClickListener(new OnItemClickListener(){
-
-					@Override
-					public void onItemClick(AdapterView<?> arg0, View arg1, int index,
-											long arg3) {
-						CheckedTextView cb = (CheckedTextView) arg1;
-						if (!cb.isChecked()){
-
-							try {
-								mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						} else {
-
-							mService.mPlotManager.removeSignal(mListofChannels.get(index));
-						}
-					}
-
-				});
-
-
-			}
-		});
-
-		listView.setOnItemClickListener(new OnItemClickListener(){
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int index,
-									long arg3) {
-				CheckedTextView cb = (CheckedTextView) arg1;
-				if (!mService.mPlotManager.checkIfPropertyExist(mListofChannels.get(index))){
-					try {
-						mService.mPlotManager.addSignal(mListofChannels.get(index), dynamicPlot);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else {
-					mService.mPlotManager.removeSignal(mListofChannels.get(index));
-				}
-			}
-
-		});
-
-		mDialog.show();
-
-	}
 	
 	public static void setLegend(){
-		
-		mTextSensor1.setText("");
-		mTextSensor2.setText("");
-		mTextSensor3.setText("");
-		mTextSensor4.setText("");
-		if (mSensorView.equals("Accelerometer")){
-			mTextSensor1.setText("AccelerometerX");
-			mTextSensor2.setText("AccelerometerY");
-			mTextSensor3.setText("AccelerometerZ");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Wide Range Accelerometer")){
-			mTextSensor1.setText("WR AccelerometerX");
-			mTextSensor2.setText("WR AccelerometerY");
-			mTextSensor3.setText("WR AccelerometerZ");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Low Noise Accelerometer")){
-			mTextSensor1.setText("LN AccelerometerX");
-			mTextSensor2.setText("LN AccelerometerY");
-			mTextSensor3.setText("LN AccelerometerZ");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Accelerometer")){
-			mTextSensor1.setText("AccelerometerX");
-			mTextSensor2.setText("AccelerometerY");
-			mTextSensor3.setText("AccelerometerZ");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Gyroscope")){
-			mTextSensor1.setText("GyroscopeX");
-			mTextSensor2.setText("GyroscopeY");
-			mTextSensor3.setText("GyroscopeZ");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Magnetometer")){
-			mTextSensor1.setText("MagnetometerX");
-			mTextSensor2.setText("MagnetometerY");
-			mTextSensor3.setText("MagnetometerZ");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("GSR")){
-			mTextSensor1.setText("GSR");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("EMG") && mService.getShimmerVersion(mBluetoothAddress)!=ShimmerVerDetails.HW_ID.SHIMMER_3){
-			mTextSensor1.setText("EMG");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("ECG") && mService.getShimmerVersion(mBluetoothAddress)!=ShimmerVerDetails.HW_ID.SHIMMER_3){
-			mTextSensor1.setText("ECGRALL");
-			mTextSensor2.setText("ECGLALL");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Bridge Amplifier")){
-			mTextSensor1.setText("Bridge Amplifier High");
-			mTextSensor2.setText("Bridge Amplifier Low");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Heart Rate")){
-			mTextSensor1.setText("Heart Rate");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("ExpBoard A0")){
-			mTextSensor1.setText("ExpBoard A0");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("ExpBoard A7")){
-			mTextSensor1.setText("ExpBoard A7");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Timestamp")){
-			mTextSensor1.setText("TimeStamp");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		} 
-		if (mSensorView.equals("Battery Voltage") && mService.getShimmerVersion(mBluetoothAddress)!=ShimmerVerDetails.HW_ID.SHIMMER_3){
-			mTextSensor1.setText("VSenseReg");
-			mTextSensor2.setText("VSenseBatt");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Battery Voltage") && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-			mTextSensor1.setText("VSenseBatt");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("External ADC A7")){
-			mTextSensor1.setText("External ADC A7");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("External ADC A6")){
-			mTextSensor1.setText("External ADC A6");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("External ADC A15")){
-			mTextSensor1.setText("External ADC A15");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Internal ADC A1")){
-			mTextSensor1.setText("Internal ADC A1");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Internal ADC A12")){
-			mTextSensor1.setText("Internal ADC A12");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Internal ADC A13")){
-			mTextSensor1.setText("Internal ADC A13");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Configuration.Shimmer3.GuiLabelSensors.PPG_TO_HR)){
-			mTextSensor1.setText(Configuration.Shimmer3.GuiLabelSensors.PPG_TO_HR);
-			dynamicPlot.setRangeBoundaries(-15, 300, BoundaryMode.FIXED); // freeze the range boundary:
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Configuration.Shimmer3.GuiLabelSensors.ECG_TO_HR)){
-			mTextSensor1.setText(Configuration.Shimmer3.GuiLabelSensors.ECG_TO_HR);
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Configuration.Shimmer3.ObjectClusterSensorName.GSR_CONDUCTANCE)){
-			mTextSensor1.setText(Configuration.Shimmer3.ObjectClusterSensorName.GSR_CONDUCTANCE);
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Internal ADC A14")){
-			mTextSensor1.setText("Internal ADC A14");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("Pressure")){
-			mTextSensor1.setText("Pressure");
-			mTextSensor2.setText("Temperature");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("ECG") && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-			mTextSensor1.setText("ECG LL-RA");
-			mTextSensor2.setText("ECG LA-RA");
-			mTextSensor3.setText("ECG LL-LA");
-			mTextSensor4.setText("ECG Vx-RL");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.VISIBLE);
-			greenCircle.setVisibility(View.VISIBLE);
-		}
-		if (mSensorView.equals("ECG 16Bit")){
-			mTextSensor1.setText("ECG LL-RA");
-			mTextSensor2.setText("ECG LA-RA");
-			mTextSensor3.setText("ECG LL-LA");
-			mTextSensor4.setText("ECG Vx-RL");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.VISIBLE);
-			greenCircle.setVisibility(View.VISIBLE);
-		}
-		if (mSensorView.equals("EMG") && mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-			mTextSensor1.setText("EMG CH1");
-			mTextSensor2.setText("EMG CH2");
-//			mTextSensor3.setText("EXG2 CH1");
-//			mTextSensor4.setText("EXG2 CH2");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("EMG 16Bit")){
-			mTextSensor1.setText("EMG CH1 16B");
-			mTextSensor2.setText("EMG CH2 16B");
-//			mTextSensor3.setText("EXG2 CH1 16B");
-//			mTextSensor4.setText("EXG2 CH2 16B");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals("ExG Test Signal")){
-			mTextSensor1.setText("TestSignal1");
-			mTextSensor2.setText("TestSignal2");
-			mTextSensor3.setText("TestSignal3");
-			mTextSensor4.setText("TestSignal4");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.VISIBLE);
-			greenCircle.setVisibility(View.VISIBLE);
-		}
-		if (mSensorView.equals("ExG Test Signal 16Bit")){
-			mTextSensor1.setText("TestSignal1 16B");
-			mTextSensor2.setText("TestSignal2 16B");
-			mTextSensor3.setText("TestSignal3 16B");
-			mTextSensor4.setText("TestSignal4 16B");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.VISIBLE);
-			orangeCircle.setVisibility(View.VISIBLE);
-			mTextSensor3.setVisibility(View.VISIBLE);
-			greyCircle.setVisibility(View.VISIBLE);
-			mTextSensor4.setVisibility(View.VISIBLE);
-			greenCircle.setVisibility(View.VISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
-		if (mSensorView.equals(Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT)){
-			mTextSensor1.setText(Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT);
-			mTextSensor2.setText("");
-			mTextSensor3.setText("");
-			mTextSensor4.setText("");
-			mTextSensor1.setVisibility(View.VISIBLE);
-			blueCircle.setVisibility(View.VISIBLE);
-			mTextSensor2.setVisibility(View.INVISIBLE);
-			orangeCircle.setVisibility(View.INVISIBLE);
-			mTextSensor3.setVisibility(View.INVISIBLE);
-			greyCircle.setVisibility(View.INVISIBLE);
-			mTextSensor4.setVisibility(View.INVISIBLE);
-			greenCircle.setVisibility(View.INVISIBLE);
-		}
+
 	}
 	
 	
 	public void showEnableSensors(final String[] sensorNames, long enabledSensors){
 		dialogEnabledSensors=enabledSensors;
+		final Dialog mDialog = new Dialog(this);
 		mDialog.setContentView(R.layout.dialog_enable_sensor_view);
 		TextView title = (TextView) mDialog.findViewById(android.R.id.title);
  		title.setText("Enable Sensor");
