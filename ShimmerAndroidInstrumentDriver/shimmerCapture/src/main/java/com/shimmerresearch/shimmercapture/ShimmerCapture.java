@@ -134,8 +134,8 @@ public class ShimmerCapture extends ServiceActivity {
 	private String START_STREAMING = "Start Streaming";
 	private String START_LOGGING = "Start Logging";
 	private String STOP_LOGGING = "Stop Logging";
-	private String NEW_SHIMMER_CONFIGURATION = "New Shimmer Configuration";
-	private String NEW_ENABLE_SENSOR = "New Enable Sensors";
+	private String NEW_SHIMMER_CONFIGURATION = "Shimmer4 Configuration";
+	private String NEW_ENABLE_SENSOR = "Shimmer4 Enable Sensors";
 
 	//private String START_STREAMING_AND_LOGGING = "Start Streaming+Logging";
 	private String STOP_STREAMING = "Stop Streaming";
@@ -349,10 +349,16 @@ public class ShimmerCapture extends ServiceActivity {
 								arrayAdapter.add(START_LOGGING);
 							}
 						}
-						arrayAdapter.add(ENABLE_SENSOR);
-						arrayAdapter.add(NEW_ENABLE_SENSOR);
-						arrayAdapter.add(SHIMMER_CONFIGURATION);
-						arrayAdapter.add(NEW_SHIMMER_CONFIGURATION);
+						ShimmerDevice sDevice = mService.getShimmer(mBluetoothAddress);
+						if (sDevice.getHardwareVersion()!= ShimmerVerDetails.HW_ID.SHIMMER_4_SDK) {
+							arrayAdapter.add(ENABLE_SENSOR);
+							arrayAdapter.add(SHIMMER_CONFIGURATION);
+
+						} else { //This works for Shimmer3 as Well but for backward compatibility
+							arrayAdapter.add(NEW_ENABLE_SENSOR);
+							arrayAdapter.add(NEW_SHIMMER_CONFIGURATION);
+						}
+
 						arrayAdapter.add(GRAPH_CONFIGURATION);
 						arrayAdapter.add(DEVICE_INFO);
 					}
@@ -1147,10 +1153,17 @@ public class ShimmerCapture extends ServiceActivity {
 					arrayAdapter.add(STOP_STREAMING);
 				else{
 					arrayAdapter.add(START_STREAMING);
-					arrayAdapter.add(ENABLE_SENSOR);
-					arrayAdapter.add(SHIMMER_CONFIGURATION);
+					ShimmerDevice sDevice = mService.getShimmer(mBluetoothAddress);
+					if (sDevice.getHardwareVersion()!= ShimmerVerDetails.HW_ID.SHIMMER_4_SDK) {
+						arrayAdapter.add(ENABLE_SENSOR);
+						arrayAdapter.add(SHIMMER_CONFIGURATION);
+
+					} else { //This works for Shimmer3 as Well but for backward compatibility
+						arrayAdapter.add(NEW_ENABLE_SENSOR);
+						arrayAdapter.add(NEW_SHIMMER_CONFIGURATION);
+
+					}
 					arrayAdapter.add(GRAPH_CONFIGURATION);
-					arrayAdapter.add(NEW_SHIMMER_CONFIGURATION);
 				}
 				arrayAdapter.add(EDIT_GRAPH);
 			}

@@ -24,8 +24,8 @@
                   android:label="@string/select_device"
                   android:theme="@android:style/Theme.Holo.Light.Dialog">
         </activity>
-	 <activity android:name="com.shimmerresearch.shimmercapture.CommandsActivity" android:label="@string/commands"></activity>
-    service android:enabled="true" android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
+	<activity android:name="com.shimmerresearch.shimmercapture.CommandsActivity" android:label="@string/commands"></activity>
+    <service android:enabled="true" android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
         
     </application>
 
