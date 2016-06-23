@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.shimmerresearch.shimmer3dexample"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="10" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
+	<uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+    <application android:icon="@drawable/shimmer_icon" android:label="@string/app_name" 
+    				>
+        <activity android:name="com.shimmerresearch.orientationexample.Shimmer3DOrientationExample"
+            	android:screenOrientation="portrait"
+                  android:label="@string/app_name"
+                  >
+                  
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.shimmerresearch.orientationexample.DeviceListActivity"
+                  android:label="@string/select_device"
+                  android:theme="@android:style/Theme.Dialog">
+        </activity>
+       	<activity android:name="com.shimmerresearch.orientationexample.ConfigureActivity" android:theme="@android:style/Theme.Dialog" android:label="Configure"></activity>
+        
+    </application>
+    
+</manifest> 

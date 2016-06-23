@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="author">Savas Ziplies</string>
+    <string name="website">http://www.insanitydesign.com/</string>
+ 	<string name="app_name">Shimmer3DOrientationExample</string>
+    <string name="connect">Connect a Shimmer</string>
+    <string name="disconnect">Disconnect Shimmer</string>
+    <string name="startstream">Start streaming</string>
+    <string name="stopstream">Stop streaming</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="button_scan">Scan for devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="title_connecting">connecting...</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="select_device">select a Shimmer to connect</string>
+    <string name="title_connected_to">connected: </string>
+    <string name="title_not_connected">not connected</string>
+    <string name="menu_settings">Settings</string>
+    <string name="load_file">Load File</string>
+    <string name="plot">Plot Data</string>
+</resources>

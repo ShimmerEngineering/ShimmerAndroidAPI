@@ -3,30 +3,21 @@
 
     <item
         is-multidex="false"
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.4\5fe28b9518e58819180a43a850fbc0dd24b7c050\commons-lang3-3.4.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="5fe28b9518e58819180a43a850fbc0dd24b7c050">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\commons-lang3-3.4_f2131674b918236e61a6819c36956174d36960a9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\java3d\vecmath\1.3.1\a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d\vecmath-1.3.1.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\vecmath-1.3.1_db4ad13f457819bef54a01f4c54afd70630916f6.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerDriver-0.2.jar"
         jumboMode="true"
         optimize="false"
         revision="19.1.0"
-        sha1="a09406b1ecb3d7ba8173a5082d01234d704895f9">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\instant-run_97df3379a208d0b700f5714ff86534f6d5cb76d7.jar" />
+        sha1="1c697f27880f6cc85307e38469c648a1ad544b69">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\ShimmerDriver-0.2_0a715c5f17dc9a5eeeaa215a05653f47d9188354.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\androidplot-core-0.5.0-release.jar"
+        jumboMode="true"
+        optimize="false"
+        revision="19.1.0"
+        sha1="ac168e7cd2fe94a25dad9410436d13f9dc566197">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\androidplot-core-0.5.0-release_ad1a23d1d9ddab3df1bbb35e954062833c000c37.jar" />
     </item>
     <item
         is-multidex="false"
@@ -35,52 +26,25 @@
         optimize="false"
         revision="19.1.0"
         sha1="5fe28b9518e58819180a43a850fbc0dd24b7c050">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\commons-lang3-3.4_f2131674b918236e61a6819c36956174d36960a9.jar" />
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\commons-lang3-3.4_f2131674b918236e61a6819c36956174d36960a9.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         optimize="false"
         revision="19.1.0"
-        sha1="7a4ea4498661d5310e82d732d33d9de01cd8f406">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\instant-run-bootstrap_65a99ff6ba90c416cf1bfd35771ef61924d8c1e3.jar" />
+        sha1="9b1042700ef1a95e92f7e97d090d36bfffb2098b">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\instant-run_5fe3798230fd20d28fda3f2c0d81b5f57a77d1db.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerDriver-0.1.jar"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
         jumboMode="true"
         optimize="false"
         revision="19.1.0"
-        sha1="6eb8ee3b484cd8087dd1532bec00c4d9ea89350e">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\ShimmerDriver-0.1_d3d977d10e2e37e48d941473742e583decca3f03.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-v4\24.0.0-beta1\jars\libs\internal_impl-24.0.0-beta1.jar"
-        jumboMode="true"
-        optimize="false"
-        revision="19.1.0"
-        sha1="23d564c059873f398dc5d967f56791a66472ce76">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\internal_impl-24.0.0-beta1_49a1a42e074fc89e9652189d31192fa4def59a56.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-v4\24.0.0-beta1\jars\libs\internal_impl-24.0.0-beta1.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="23d564c059873f398dc5d967f56791a66472ce76">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\internal_impl-24.0.0-beta1_49a1a42e074fc89e9652189d31192fa4def59a56.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\com.android.support-multidex-1.0.1_7e1e0b3a8a8834cb47a31524849a603cf701f136.jar" />
+        sha1="014a11ddd247270247357edfe5c89760d382f95f">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\ShimmerBiophysicalProcessingLibrary_Rev_0_11_7007835f05622b572b73d996f9aab7ca4b52de75.jar" />
     </item>
     <item
         is-multidex="false"
@@ -89,7 +53,7 @@
         optimize="false"
         revision="19.1.0"
         sha1="de80fe047052445869b96f6def6baca7182c95af">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\protobuf-java-3.0.0-beta-2_a0f22ad94f4c69dc4c3a27251e1295a304dd8651.jar" />
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\protobuf-java-3.0.0-beta-2_a0f22ad94f4c69dc4c3a27251e1295a304dd8651.jar" />
     </item>
     <item
         is-multidex="false"
@@ -98,142 +62,43 @@
         optimize="false"
         revision="19.1.0"
         sha1="6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\guava-19.0_398fc128f6396dc68d8a42084182729fca7ea6d0.jar" />
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\guava-19.0_398fc128f6396dc68d8a42084182729fca7ea6d0.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\19.0\6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9\guava-19.0.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\guava-19.0_398fc128f6396dc68d8a42084182729fca7ea6d0.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-v4\24.0.0-beta1\jars\classes.jar"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\AndroidBluetoothLibrary.jar"
         jumboMode="true"
         optimize="false"
         revision="19.1.0"
-        sha1="f81eecb8d5e9e548f75f277830a94a9b37fbb987">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\com.android.support-support-v4-24.0.0-beta1_08a29c37ea925f449c1918fddbbd0bd54f3c6658.jar" />
+        sha1="3a8a10941104e7ed856ddcdd7449774a302717f5">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\AndroidBluetoothLibrary_f4501adb6477587a4fd969eb4d5af4740c2fe6c0.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\com.google.protobuf\protobuf-java\3.0.0-beta-2\de80fe047052445869b96f6def6baca7182c95af\protobuf-java-3.0.0-beta-2.jar"
-        jumboMode="false"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
         optimize="false"
         revision="19.1.0"
-        sha1="de80fe047052445869b96f6def6baca7182c95af">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\protobuf-java-3.0.0-beta-2_a0f22ad94f4c69dc4c3a27251e1295a304dd8651.jar" />
+        sha1="552842359b3ce785bc60c26fd280291e3fff179f">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\instant-run-bootstrap_c4a315d72e7a67c1d04d62f3872bc932d9aba658.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
+        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math\2.2\4877b85d388275f994a5cfc7eceb73a8045d3006\commons-math-2.2.jar"
+        jumboMode="true"
+        optimize="false"
+        revision="19.1.0"
+        sha1="4877b85d388275f994a5cfc7eceb73a8045d3006">
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\commons-math-2.2_8960da469b49b2d1ffc8747afb676a49a8c0ebe3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
         jumboMode="true"
         optimize="false"
         revision="19.1.0"
         sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\com.android.support-multidex-1.0.1_7e1e0b3a8a8834cb47a31524849a603cf701f136.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math\2.2\4877b85d388275f994a5cfc7eceb73a8045d3006\commons-math-2.2.jar"
-        jumboMode="true"
-        optimize="false"
-        revision="19.1.0"
-        sha1="4877b85d388275f994a5cfc7eceb73a8045d3006">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\commons-math-2.2_8960da469b49b2d1ffc8747afb676a49a8c0ebe3.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math\2.2\4877b85d388275f994a5cfc7eceb73a8045d3006\commons-math-2.2.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="4877b85d388275f994a5cfc7eceb73a8045d3006">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\commons-math-2.2_8960da469b49b2d1ffc8747afb676a49a8c0ebe3.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\24.0.0-beta1\support-annotations-24.0.0-beta1.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="04705c19cdec60364bc04e2e928c274da1ba301b">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\support-annotations-24.0.0-beta1_81a8902bb15f2e924f5c01abc69557512db1329f.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\androidplot-core-0.5.0-release.jar"
-        jumboMode="true"
-        optimize="false"
-        revision="19.1.0"
-        sha1="a374e1f75b7d9a90de0dce04ccbc5b72fdd368ab">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\androidplot-core-0.5.0-release_2fd5afd6cfda984fe48e2c5f4d428d1a915ef352.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\androidplot-core-0.5.0-release.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="55b7d99ca4b36f8d9737fcbb5d7edab9aaa145ca">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\androidplot-core-0.5.0-release_2fd5afd6cfda984fe48e2c5f4d428d1a915ef352.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-v4\24.0.0-beta1\jars\classes.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="f81eecb8d5e9e548f75f277830a94a9b37fbb987">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\com.android.support-support-v4-24.0.0-beta1_08a29c37ea925f449c1918fddbbd0bd54f3c6658.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
-        jumboMode="true"
-        optimize="false"
-        revision="19.1.0"
-        sha1="dbab5d4a32e215e22bda61f57932ec74269921e4">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\ShimmerBiophysicalProcessingLibrary_Rev_0_11_d8835c4644e903ca797cdad8b5030d517e76b611.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\AndroidBluetoothLibrary.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="320ce9aa56d943ded2a7ebb6ae25dcc1610e4b31">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\AndroidBluetoothLibrary_b91a4260947d33cb3c3d4275471edc49937fbaf3.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\24.0.0-beta1\support-annotations-24.0.0-beta1.jar"
-        jumboMode="true"
-        optimize="false"
-        revision="19.1.0"
-        sha1="04705c19cdec60364bc04e2e928c274da1ba301b">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\support-annotations-24.0.0-beta1_81a8902bb15f2e924f5c01abc69557512db1329f.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
-        jumboMode="false"
-        optimize="false"
-        revision="19.1.0"
-        sha1="007c41e9c2fa8079463a30c33952975b71447e8a">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\ShimmerBiophysicalProcessingLibrary_Rev_0_11_d8835c4644e903ca797cdad8b5030d517e76b611.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\AndroidBluetoothLibrary.jar"
-        jumboMode="true"
-        optimize="false"
-        revision="19.1.0"
-        sha1="684a9ed01fee6891312be37625a89bf894acd20e">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\AndroidBluetoothLibrary_b91a4260947d33cb3c3d4275471edc49937fbaf3.jar" />
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\com.android.support-multidex-1.0.1_97e09482ab0ad8b4ef8d99e1c9cca57fe574df5b.jar" />
     </item>
     <item
         is-multidex="false"
@@ -242,7 +107,7 @@
         optimize="false"
         revision="19.1.0"
         sha1="a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\pre-dexed\debug\vecmath-1.3.1_db4ad13f457819bef54a01f4c54afd70630916f6.jar" />
+        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\pre-dexed\debug\vecmath-1.3.1_db4ad13f457819bef54a01f4c54afd70630916f6.jar" />
     </item>
 
 </items>

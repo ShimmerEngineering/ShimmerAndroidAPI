@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout 
+    android:id="@+id/graphics_frameLayout1" 
+    android:layout_width="fill_parent" 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_height="fill_parent">
+
+    <android.opengl.GLSurfaceView
+        android:id="@+id/graphics_glsurfaceview1" 
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent">
+    </android.opengl.GLSurfaceView>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+	 <LinearLayout
+	     android:layout_width="match_parent"
+	     android:layout_height="wrap_content" >
+
+	     <Button
+	         android:id="@+id/buttonSet"
+	         android:layout_width="0dp"
+	         android:layout_height="wrap_content"
+	         android:layout_weight="1"
+	         android:text="Set" />
+	     <Button
+	         android:id="@+id/buttonReset"
+	         android:layout_width="0dp"
+	         android:layout_height="wrap_content"
+	         android:layout_weight="1"
+	         android:text="Reset" />
+	 </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q1" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q2" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q3" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q4" />
+        </LinearLayout>
+        
+                <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textViewQ1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q1" />
+
+            <TextView
+                android:id="@+id/textViewQ2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q2" />
+
+            <TextView
+                android:id="@+id/textViewQ3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q3" />
+
+            <TextView
+                android:id="@+id/textViewQ4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Q4" />
+        </LinearLayout>
+        
+        
+    </LinearLayout>
+
+</FrameLayout>
