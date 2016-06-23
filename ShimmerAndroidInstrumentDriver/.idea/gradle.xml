@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/ShimmerAndroidInstrumentDriver" />
             <option value="$PROJECT_DIR$/multiShimmerTemplate" />
             <option value="$PROJECT_DIR$/shimmer3DOrientationExample" />
+            <option value="$PROJECT_DIR$/shimmer9DOFCalibration" />
             <option value="$PROJECT_DIR$/shimmerCapture" />
           </set>
         </option>

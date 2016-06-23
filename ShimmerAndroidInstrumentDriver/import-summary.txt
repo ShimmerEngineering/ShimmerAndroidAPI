@@ -8,18 +8,19 @@ should evaluate whether these are still needed in your project and if
 so manually move them:
 
 * .gitignore
-* Readme.txt
-* Shimmer3DOrientationExample.iml
+* ic_launcher-web.png
+* proguard-project.txt
 
 Moved Files:
 ------------
 Android Gradle projects use a different directory structure than ADT
 Eclipse projects. Here's how the projects were restructured:
 
-* AndroidManifest.xml => shimmer3DOrientationExample\src\main\AndroidManifest.xml
-* lint.xml => shimmer3DOrientationExample\lint.xml
-* res\ => shimmer3DOrientationExample\src\main\res\
-* src\ => shimmer3DOrientationExample\src\main\java\
+* AndroidManifest.xml => shimmer9DOFCalibration\src\main\AndroidManifest.xml
+* assets\ => shimmer9DOFCalibration\src\main\assets
+* lint.xml => shimmer9DOFCalibration\lint.xml
+* res\ => shimmer9DOFCalibration\src\main\res\
+* src\ => shimmer9DOFCalibration\src\main\java\
 
 Next Steps:
 -----------

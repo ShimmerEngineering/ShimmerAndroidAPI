@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+<dimen name="textSize">22sp</dimen>
+<dimen name="calTextSize">24sp</dimen>
+
+</resources>
