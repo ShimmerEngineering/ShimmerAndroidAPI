@@ -36,6 +36,7 @@ android {
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
+    compile project(':ShimmerAdvanceLibrary')
     compile 'org.apache.commons:commons-math:2.2'
     compile 'org.apache.commons:commons-lang3:3.4'
     provided files('../libs/ShimmerDriver-0.2.jar')

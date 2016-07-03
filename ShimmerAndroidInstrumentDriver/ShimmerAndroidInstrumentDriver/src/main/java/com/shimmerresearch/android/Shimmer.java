@@ -1277,18 +1277,6 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	@Override
-	public String getChannelLabel(int sensorKey) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ShimmerVerObject> getListOfCompatibleVersionInfo(int sensorKey) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Set<Integer> getSensorMapKeySet() {
 		// TODO Auto-generated method stub
 		return null;

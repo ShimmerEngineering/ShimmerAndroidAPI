@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.androidplot.ui.DynamicTableModel;
+import com.shimmerresearch.advance.FilterManager;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -204,7 +205,7 @@ public class ShimmerCapture extends ServiceActivity {
     	super.onCreate(savedInstanceState);
         Log.d("ShimmerActivity","On Create");
         super.onCreate(savedInstanceState);
-        
+		FilterManager filterManager = new FilterManager();
         ShimmerCapture.context = getApplicationContext();
         setContentView(R.layout.main);
         Log.d("ShimmerActivity","On Create");
