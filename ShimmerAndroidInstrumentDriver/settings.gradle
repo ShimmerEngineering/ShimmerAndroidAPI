@@ -3,5 +3,6 @@ include ':shimmerCapture'
 include ':multiShimmerTemplate'
 include ':shimmer3DOrientationExample'
 include ':shimmer9DOFCalibration'
-include ':ShimmerAdvanceLibrary'
-project (":ShimmerAdvanceLibrary").projectDir = new File("../../ShimmerAdvanceAPI/ShimmerAdvanceLibrary")
+//Don't need shimmeradvancelibrary is just an example on how to import projects from different folders
+//include ':ShimmerAdvanceLibrary'
+//project (":ShimmerAdvanceLibrary").projectDir = new File("../../ShimmerAdvanceAPI/ShimmerAdvanceLibrary")

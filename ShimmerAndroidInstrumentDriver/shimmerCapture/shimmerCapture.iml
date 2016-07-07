@@ -114,6 +114,5 @@
     <orderEntry type="library" exported="" name="protobuf-java-3.0.0-beta-2" level="project" />
     <orderEntry type="library" exported="" name="vecmath-1.3.1" level="project" />
     <orderEntry type="module" module-name="ShimmerAndroidInstrumentDriver-ShimmerAndroidInstrumentDriver" exported="" />
-    <orderEntry type="module" module-name="ShimmerAdvanceLibrary" exported="" />
   </component>
 </module>
