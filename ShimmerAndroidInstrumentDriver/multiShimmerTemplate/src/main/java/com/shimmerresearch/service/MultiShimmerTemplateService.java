@@ -39,6 +39,7 @@ import com.shimmerresearch.database.ShimmerConfiguration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerObject;
+import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails.EXG_CHIP_INDEX;
 import com.shimmerresearch.tools.Logging;
@@ -434,7 +435,7 @@ public class MultiShimmerTemplateService extends Service {
 		            			}
 		            			
 		            		}
-		            		objectCluster.addData("Heart Rate","CAL", "bpm", heartRate);
+		            		objectCluster.addData("Heart Rate", ChannelDetails.CHANNEL_TYPE.CAL, "bpm", heartRate);
 	            	    }
 	            	    
 	            	    if(mEnableHeartRateECG){
@@ -480,7 +481,7 @@ public class MultiShimmerTemplateService extends Service {
 		            		}
 
 		            
-		            		objectCluster.addData("Heart Rate","CAL", "bpm", heartRate);
+		            		objectCluster.addData("Heart Rate", ChannelDetails.CHANNEL_TYPE.CAL, "bpm", heartRate);
 	            	    }
 	            	    
 	            	    
@@ -1639,7 +1640,7 @@ public class MultiShimmerTemplateService extends Service {
 		String[] enabledSignal;
 		
 		Shimmer tmp = (Shimmer) mMultiShimmer.get(bluetoothAddress);
-		enabledSignal = tmp.getListofEnabledSensorSignals();
+		enabledSignal = tmp.getListofEnabledChannelSignals();
 		
 		return enabledSignal;
 	}

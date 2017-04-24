@@ -1,356 +1,255 @@
 package com.shimmerresearch.androidradiodriver;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.comms.serialPortInterface.AbstractSerialPortHal;
+import com.shimmerresearch.comms.serialPortInterface.ErrorCodesSerialPort;
+import com.shimmerresearch.comms.serialPortInterface.SerialPortListener;
+
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.UUID;
 
-import it.gerdavax.easybluetooth.BtSocket;
-import it.gerdavax.easybluetooth.LocalDevice;
-import it.gerdavax.easybluetooth.RemoteDevice;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.util.Log;
+/**
+ * Created by ASaez on 11-Aug-16.
+ */
 
-import com.shimmerresearch.android.Shimmer;
-import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
-import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataCommListener;
-import com.shimmerresearch.comms.serialPortInterface.SerialPortComm;
-import com.shimmerresearch.comms.serialPortInterface.ShimmerSerialEventCallback;
-import com.shimmerresearch.comms.serialPortInterface.ByteLevelDataComm;
-import com.shimmerresearch.driver.DeviceException;
-import com.shimmerresearch.driverUtilities.ShimmerVerObject;
+public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
 
-public class ShimmerSerialPortAndroid extends SerialPortComm implements Serializable{
-	//generic UUID for serial port protocol
-	private UUID mSPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-		
-	public String mBluetoothAddress = "";
-	transient private BluetoothAdapter mBluetoothAdapter = null;
-	public BT_STATE mState = BT_STATE.DISCONNECTED;
-	transient public ConnectThread mConnectThread;
-	transient public ConnectedThread mConnectedThread;
-	transient private final BluetoothAdapter mAdapter;
-	transient private DataInputStream mInStream;
-	transient private OutputStream mOutStream=null;
-	
-	public ShimmerSerialPortAndroid(String bluetoothAddress){
-		mBluetoothAddress = bluetoothAddress;
-		mAdapter = BluetoothAdapter.getDefaultAdapter();
-	}
-	
-	@Override
-	public void connect() throws DeviceException {
+    //generic UUID for serial port protocol
+    private UUID mSPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-			mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-			BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mBluetoothAddress);
+    public ShimmerBluetooth.BT_STATE mState = ShimmerBluetooth.BT_STATE.DISCONNECTED;
 
-			// Cancel any thread attempting to make a connection
-			if (mState == BT_STATE.CONNECTING) {
-				if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
-			}
-			// Cancel any thread currently running a connection
-			if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+    public String mBluetoothAddress = "";
+    transient private BluetoothAdapter mBluetoothAdapter;
+    transient  private BluetoothDevice device;
+    transient private BluetoothSocket mBluetoothSocket;
+    transient private DataInputStream mInStream;
+    transient private OutputStream mOutStream;
 
-			// Start the thread to connect with the given device
-			mConnectThread = new ConnectThread(device);
-			mConnectThread.start();
-	}
-
-	@Override
-	public void disconnect() throws DeviceException {
-		// TODO Auto-generated method stub
-		if (mConnectThread != null) {
-			mConnectThread.cancel(); 
-			mConnectThread = null;
-		}
-		if (mConnectedThread != null) {
-			mConnectedThread.cancel();
-			mConnectedThread = null;
-		}
-		eventDeviceDisconnected();
-	}
-
-	@Override
-	public void closeSafely() throws DeviceException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clearSerialPortRxBuffer() throws DeviceException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void txBytes(byte[] buf) throws DeviceException {
-		// Create temporary object
-		ConnectedThread r;
-		// Synchronize a copy of the ConnectedThread
-		synchronized (this) {
-			//if (mState != BT_STATE.CONNECTED && mState != BT_STATE.STREAMING) return;
-			if (mState == BT_STATE.DISCONNECTED ) return;
-			r = mConnectedThread;
-		}
-		// Perform the write unsynchronized
-		r.write(buf);
-	}
-
-	@Override
-	public byte[] rxBytes(int numBytes) throws DeviceException {
-		// TODO Auto-generated method stub
-		byte[] b = new byte[numBytes];
-		try {
-			//mIN.read(b,0,numberofBytes);
-			mInStream.readFully(b,0,numBytes);
-			return(b);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Connection Lost");
-			e.printStackTrace();
-		}	
-		return null;
-	}
-
-	@Override
-	public void registerSerialPortRxEventCallback(
-			ShimmerSerialEventCallback shimmerSerialEventCallback) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isSerialPortReaderStarted() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setVerboseMode(boolean verboseMode, boolean isDebugMode) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean bytesAvailableToBeRead() throws DeviceException {
-		try {
-			if (mInStream!=null){
-				if (mInStream.available()!=0){
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				System.out.println("IN STREAM NULL");
-				return false;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println(e);
-			return false;
-		}
-	
-	}
-
-	@Override
-	public int availableBytes() throws DeviceException {
-		try {
-			return mInStream.available();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return 0;
-		}
-	}
-
-	@Override
-	public boolean isConnected() {
-		if (mConnectedThread!=null){
-			return mConnectedThread.mSocket.isConnected();
-		}
-		return false;
-	}
-	
+    public ShimmerSerialPortAndroid(String bluetoothAddress){
+        mBluetoothAddress = bluetoothAddress;
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    }
 
 
-	/**
-	 * This thread runs while attempting to make an outgoing connection
-	 * with a device. It runs straight through; the connection either
-	 * succeeds or fails.
-	 */
-	public class ConnectThread extends Thread {
-		public final BluetoothSocket mSocket;
-		private final BluetoothDevice mDevice;
+    @Override
+    public void connect(){
 
-		public ConnectThread(BluetoothDevice device) {
-			mDevice = device;
-			BluetoothSocket tmp = null;
-			// Get a BluetoothSocket for a connection with the
-			// given BluetoothDevice
-			try {
-				tmp = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
-			} catch (IOException e) {
-				eventDeviceDisconnected();
+        if (mState == ShimmerBluetooth.BT_STATE.DISCONNECTED) {
 
-			}
-			mSocket = tmp;
-		}
+            createBluetoothSocket();
+            connectBluetoothSocket();
+            getIOStreams();
 
-		public void run() {
-			setName("ConnectThread");
+            mState = ShimmerBluetooth.BT_STATE.CONNECTED;
+            eventDeviceConnected();
+        }
+    }
 
-			// Always cancel discovery because it will slow down a connection
-			mAdapter.cancelDiscovery();
+    private void createBluetoothSocket() {
+        try {
+            device = mBluetoothAdapter.getRemoteDevice(mBluetoothAddress);
+            mBluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
+        }
+    }
 
-			try {
-				// Connect the device through the socket. This will block
-				// until it succeeds or throws an exception
-				mSocket.connect();
-			} catch (IOException connectException) {
-				eventDeviceDisconnected();
-				// Unable to connect; close the socket and get out
-				try {
-					mSocket.close();
-				} catch (IOException closeException) { }
-				return;
-			}
-			// Reset the ConnectThread because we're done
-			synchronized (ShimmerSerialPortAndroid.this) {
-				mConnectThread = null;
-			}
-			// Start the connected thread
-			//connected(mmSocket, mmDevice);
-			// Cancel the thread that completed the connection
-			if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
-			// Cancel any thread currently running a connection
-			if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
-			// Start the thread to manage the connection and perform transmissions
-			mConnectedThread = new ConnectedThread(mSocket);
-			if (mState==BT_STATE.CONNECTED) {
-				eventDeviceConnected();
-			}
-		}
+    private void connectBluetoothSocket(){
+        try {
+            mBluetoothSocket.connect();
+        } catch (IOException e) {
+            closeBluetoothSocket();
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
+        }
+    }
 
-		public void cancel() {
-			try {
-				mSocket.close();
-			} catch (IOException e) { }
-		}
+    private void getIOStreams(){
+        try {
+            InputStream tmpIn = mBluetoothSocket.getInputStream();
+            mInStream =  new DataInputStream(tmpIn);
+            mOutStream = mBluetoothSocket.getOutputStream();
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
+        }
+    }
+
+    private void closeBluetoothSocket(){
+        try {
+            if(mBluetoothSocket != null) {
+                mBluetoothSocket.close();
+            }
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_CLOSING);
+        }
+        finally {
+            mBluetoothSocket = null;
+        }
+    }
+
+    private void closeInputStream(){
+        try {
+            if(mInStream != null) {
+                mInStream.close();
+            }
+        }
+        catch (IOException e){
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_CLOSING);
+        }
+        finally {
+            mInStream = null;
+        }
+    }
 
 
-	}
-	/**
-	 * This thread runs during a connection with a remote device.
-	 * It handles all incoming and outgoing transmissions.
-	 */
-	public class ConnectedThread{
-		public BluetoothSocket mSocket=null;
-		public ConnectedThread(BluetoothSocket socket) {
 
-			mSocket = socket;
-			InputStream tmpIn = null;
-			OutputStream tmpOut = null;
+    private void closeOutputStream(){
+        try {
+            if(mOutStream != null) {
+                mOutStream.close();
+            }
+        }
+        catch (IOException e){
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_CLOSING);
+        }
+        finally {
+            mOutStream = null;
+        }
+    }
 
-			// Get the BluetoothSocket input and output streams
-			try {
-				tmpIn = socket.getInputStream();
-				tmpOut = socket.getOutputStream();
-			} catch (IOException e) {
-				eventDeviceDisconnected();
-			}
 
-			//mInStream = new BufferedInputStream(tmpIn);
-			mInStream = new DataInputStream(tmpIn);
-			mOutStream = tmpOut;
-			mState = BT_STATE.CONNECTED;
-		}
-		/**
-		 * Write to the connected OutStream.
-		 * @param buffer  The bytes to write
-		 */
-		private void write(byte[] buffer) {
-			try {
-				mOutStream.write(buffer);
-				
-			} catch (IOException e) {
-				
-			}
-		}
+    @Override
+    public void disconnect()  {
+        closeBTConnection();
+        eventDeviceConnected();
+    }
 
-		public void cancel() {
-			if(mInStream != null) {
-				try {
-					mInStream.close();
-				} catch (IOException e) {}
-			}
-			if(mOutStream != null) {
-				try {
-					mOutStream.close();
-				} catch (IOException e) {}
-			}
-			if(mSocket != null) {
-				try {
-					mSocket.close();
-				} catch (IOException e) {}
-			}
-		}
-	}
+    @Override
+    public void closeSafely()  {
+        closeBTConnection();
+        eventDeviceConnected();
+    }
+
+    private void closeBTConnection()  {
+        closeInputStream();
+        closeOutputStream();
+        closeBluetoothSocket();
+        mState = ShimmerBluetooth.BT_STATE.DISCONNECTED;
+    }
+
+    @Override
+    public void clearSerialPortRxBuffer()  {
+//        try {
+//            mInStream.skipBytes(mInStream.available());
+//        } catch (IOException e) {
+//            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_READING_DATA);
+//        }
+    }
+
+    @Override
+    public void txBytes(byte[] bytes)  {
+
+        synchronized (this) {
+            if (mState == ShimmerBluetooth.BT_STATE.DISCONNECTED ) return;
+        }
+        // Perform the write unsynchronized
+        write(bytes);
+    }
+
+    private void write(byte[] buffer)  {
+        try {
+            mOutStream.write(buffer);
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_WRITING_DATA);
+        }
+    }
+
+    @Override
+    public byte[] rxBytes(int numBytes){
+        byte[] buffer = new byte[numBytes];
+        try {
+            mInStream.readFully(buffer,0,numBytes);
+            return(buffer);
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_READING_DATA);
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean isSerialPortReaderStarted() {
+        return mInStream != null ? true : false;
+    }
+
+    @Override
+    public void setVerboseMode(boolean b, boolean b1) {
+
+    }
+
+    @Override
+    public boolean bytesAvailableToBeRead()  {
+        try {
+            if (mInStream!=null){
+                return mInStream.available() !=0 ? true : false;
+            } else {
+                System.out.println("IN STREAM NULL");
+                return false;
+            }
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_READING_DATA);
+            return false;
+        }
+    }
+
+    @Override
+    public int availableBytes()  {
+        try {
+            return mInStream.available();
+        } catch (IOException e) {
+            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_READING_DATA);
+            return 0;
+        }
+    }
+
+    @Override
+    public boolean isConnected() {
+        if (mBluetoothSocket!=null){
+            return mBluetoothSocket.isConnected();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isDisonnected() {
+        return false;
+    }
+
+    @Override
+    public void registerSerialPortRxEventCallback(SerialPortListener serialPortListener) {
+
+    }
+
+    private void catchException(Exception e, int errorCode)  {
+        e.printStackTrace();
+        eventDeviceDisconnected();
+
+    }
 
 
 
 
+    public BluetoothSocket getBluetoothSocket(){
+        return mBluetoothSocket;
+    }
 
 
-
-	@Override
-	public boolean isDisonnected() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public ShimmerVerObject getShimmerVerObject() {
-		// TODO Auto-generated method stub
-
-		// TODO Auto-generated method stub
-		byte[] instruction = {GET_SHIMMER_VERSION_COMMAND}; //every radio should have a method to get the version object, the command value should be the same across all byte radios
-		byte[] response;
-		try {
-			txBytes(instruction);
-			Thread.sleep(200);
-			response = rxBytes(3);
-			int hardwareVersion = response[2];
-			instruction[0] = GET_FW_VERSION_COMMAND;
-			txBytes(instruction);
-			byte[] bufferInquiry = new byte[6];
-			Thread.sleep(200);
-			rxBytes(1);
-			rxBytes(1);
-			bufferInquiry = rxBytes(6);
-			int firmwareIdentifier=(int)((bufferInquiry[1]&0xFF)<<8)+(int)(bufferInquiry[0]&0xFF);
-			int firmwareVersionMajor = (int)((bufferInquiry[3]&0xFF)<<8)+(int)(bufferInquiry[2]&0xFF);
-			int firmwareVersionMinor = ((int)((bufferInquiry[4]&0xFF)));
-			int firmwareVersionInternal=(int)(bufferInquiry[5]&0xFF);
-			ShimmerVerObject sVOHw = new ShimmerVerObject(hardwareVersion, firmwareIdentifier, firmwareVersionMajor, firmwareVersionMinor, firmwareVersionInternal);
-			return sVOHw;
-		} catch (DeviceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		return null;
-
-	}
-	
 }
-
-	
-
-
-

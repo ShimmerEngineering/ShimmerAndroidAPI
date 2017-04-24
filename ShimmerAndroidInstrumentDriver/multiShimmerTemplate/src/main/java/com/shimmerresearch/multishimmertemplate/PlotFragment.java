@@ -370,14 +370,14 @@ public class PlotFragment extends Fragment {
 	  			deviceNames[pos]=sc.getDeviceName();
 	      		deviceBluetoothAddresses[pos]=sc.getBluetoothAddress();
 	      		Shimmer shimmer = mService.getShimmer(deviceBluetoothAddresses[pos]);
-	      		mEnabledSensorNames[pos]=shimmer.getListofEnabledSensorSignals();
+	      		mEnabledSensorNames[pos]=shimmer.getListofEnabledChannelSignals();
 	      		numberofChilds[pos]=getNumberofChildren(sc.getEnabledSensors(),sc.getBluetoothAddress());
 	      		ArrayList<SelectedSensors> sensors = new ArrayList<SelectedSensors>();
 	      		if(mSelectedSignals!=null)
-	      			for(int i=0; i<shimmer.getListofEnabledSensorSignals().length;i++)
+	      			for(int i=0; i<shimmer.getListofEnabledChannelSignals().length;i++)
 	      				sensors.add(new SelectedSensors(mEnabledSensorNames[pos][i], mSelectedSignals[pos][i]));
 	      		else
-	      			for(int i=0; i<shimmer.getListofEnabledSensorSignals().length;i++)
+	      			for(int i=0; i<shimmer.getListofEnabledChannelSignals().length;i++)
 	      				sensors.add(new SelectedSensors(mEnabledSensorNames[pos][i], false));
 	      		
 	      		mSelectedSensors.put(deviceBluetoothAddresses[pos], sensors);

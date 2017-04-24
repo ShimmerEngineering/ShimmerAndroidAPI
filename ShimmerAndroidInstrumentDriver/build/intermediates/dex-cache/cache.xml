@@ -2,88 +2,319 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.4\5fe28b9518e58819180a43a850fbc0dd24b7c050\commons-lang3-3.4.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="5fe28b9518e58819180a43a850fbc0dd24b7c050">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-lang3-3.4_f2131674b918236e61a6819c36956174d36960a9.jar" />
+        sha1="3855121e83b525150312e04d114c382bded92081">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\ShimmerBiophysicalProcessingLibrary_Rev_0_11_fbd58230a077055d430f07e204415692cc38c745.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerDriver-0.2.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.protobuf.nano\protobuf-javanano\3.0.0-alpha-5\357e60f95cebb87c72151e49ba1f570d899734f8\protobuf-javanano-3.0.0-alpha-5.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="616a5c2932882228eda642733ac1386d2c2762cd">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\ShimmerDriver-0.2_7370c5484a7afe5bae60a222bef966c1e2e80761.jar" />
+        sha1="357e60f95cebb87c72151e49ba1f570d899734f8">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\protobuf-javanano-3.0.0-alpha-5_1b6d4d29b47822477f3f3800abbe4d02688650b3.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\19.0.1\support-v4-19.0.1.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\androidplot-core-0.5.0-release.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="587da9a481ffd341d2fa091704489b89845ddacd">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\support-v4-19.0.1_a072bddf8ab1b1765ee6624ea06cf249364ee295.jar" />
+        sha1="a08bcc8dba24bfe666c84df486f4bde7afba07d9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\androidplot-core-0.5.0-release_6249783b261b81d1f767a2fa1eb3586e8d0f396e.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\androidplot-core-0.5.0-release.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\pl.edu.icm\JLargeArrays\1.5\fe1350c7b5537c144fb0af39206e212ad1bbbe2\JLargeArrays-1.5.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="14e195562f489cfcb42a5f2a74f3e7b87a01063a">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\androidplot-core-0.5.0-release_5a40814b360979fd94211159eb529efaee91770b.jar" />
+        sha1="0fe1350c7b5537c144fb0af39206e212ad1bbbe2">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\JLargeArrays-1.5_b63b3160aba9b9d97622c3aefc8aa47505d235f2.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\com.google.protobuf\protobuf-java\3.0.0-beta-2\de80fe047052445869b96f6def6baca7182c95af\protobuf-java-3.0.0-beta-2.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.managers.bluetoothmanager\ShimmerBluetoothManager\1.0b\edc88c5ccc9425ed15c19c068647d9c2580588ba\ShimmerBluetoothManager-1.0b.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="de80fe047052445869b96f6def6baca7182c95af">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\protobuf-java-3.0.0-beta-2_a0f22ad94f4c69dc4c3a27251e1295a304dd8651.jar" />
+        sha1="edc88c5ccc9425ed15c19c068647d9c2580588ba">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\ShimmerBluetoothManager-1.0b_cb005521dfd95a6367f67796a68f2942158ec465.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\19.0\6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9\guava-19.0.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp\okhttp\2.5.0\4de2b4ed3445c37ec1720a7d214712e845a24636\okhttp-2.5.0.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\guava-19.0_398fc128f6396dc68d8a42084182729fca7ea6d0.jar" />
+        sha1="4de2b4ed3445c37ec1720a7d214712e845a24636">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\okhttp-2.5.0_683323dfc2c868ac148e8c752980d50c3c18064d.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\AndroidBluetoothLibrary.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\joda-time\joda-time\2.9.4\1c295b462f16702ebe720bbb08f62e1ba80da41b\joda-time-2.9.4.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="7daf899ca3c58c32b5b498c0f1e3d1824cdef12d">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\AndroidBluetoothLibrary_5e1d5fbc411604bdfca4032a1d3bfed921cb86bc.jar" />
+        sha1="1c295b462f16702ebe720bbb08f62e1ba80da41b">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\joda-time-2.9.4_e853adf29d863b730ea6e6c3be22274554602137.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\classes.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math3\3.6\825c90790e83af784be1de0a3f3a9f066cf884b9\commons-math3-3.6.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="657277ce935ffe2bc28ddeb2a98100d5a9ec37dd">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\ShimmerAndroidInstrumentDriver-ShimmerAndroidInstrumentDriver-unspecified_89b6209486fd7a1ade695e08284d85ac103fe59c.jar" />
+        sha1="825c90790e83af784be1de0a3f3a9f066cf884b9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-math3-3.6_1d4e524b72db4ea0c22c062145f26914c4995af4.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-netty\1.0.0-pre1\53094773926bf863daa8faa3ff1175f3f6909ca8\grpc-netty-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="53094773926bf863daa8faa3ff1175f3f6909ca8">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-netty-1.0.0-pre1_ed34b3753b6e774429a6c2836ec150362f9f8d66.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-stub\1.0.0-pre1\1fb325fdb52b0e5df3aea3a98b0f75119b2a3701\grpc-stub-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="1fb325fdb52b0e5df3aea3a98b0f75119b2a3701">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-stub-1.0.0-pre1_0128906a36394c004077cd9e112028d1591d1539.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="870b80b684db1a054aaa4c9301883273128f9e7c">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\instant-run_bb897f5b4b6e0c04ec8cbf7795c2f5f422029e6a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-protobuf\1.0.0-pre1\9e5235fbae40a22fe97a4cd55333b18969ef76cb\grpc-protobuf-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="9e5235fbae40a22fe97a4cd55333b18969ef76cb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-protobuf-1.0.0-pre1_676d9b571c63dc7ce5e19e61216a08f4b27e8503.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.auth\google-auth-library-credentials\0.4.0\171da91494a1391aef13b88bd7302b29edb8d3b3\google-auth-library-credentials-0.4.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="171da91494a1391aef13b88bd7302b29edb8d3b3">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\google-auth-library-credentials-0.4.0_528d48d50fe4a587d73132dd3a43564ef917613a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-core\1.0.0-pre1\6489670c182cb214cdcbbd7e6508b4f3ac831ce5\grpc-core-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="6489670c182cb214cdcbbd7e6508b4f3ac831ce5">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-core-1.0.0-pre1_559f3c13a52c837366a2783982b73f025f6240c9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.github.wendykierp\JTransforms\3.1\f1f6d3c9c9bc04f848e38bdb77dea01e8764a01f\JTransforms-3.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="f1f6d3c9c9bc04f848e38bdb77dea01e8764a01f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\JTransforms-3.1_3dc88a1b9d975961ef59e198a9368c2e7a8199b0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.slf4j\slf4j-api\1.7.21\139535a69a4239db087de9bab0bee568bf8e0b70\slf4j-api-1.7.21.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="139535a69a4239db087de9bab0bee568bf8e0b70">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\slf4j-api-1.7.21_ef10812f0b481312b8f579de2d2c165726703568.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
         sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\com.android.support-multidex-1.0.1_1e3e9cd4cd344b247717c978a648eefd59abe43f.jar" />
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\com.android.support-multidex-1.0.1_114f0def321780b89c9d186e67347e74d4c0c4fb.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math\2.2\4877b85d388275f994a5cfc7eceb73a8045d3006\commons-math-2.2.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.4\5fe28b9518e58819180a43a850fbc0dd24b7c050\commons-lang3-3.4.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="4877b85d388275f994a5cfc7eceb73a8045d3006">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-math-2.2_8960da469b49b2d1ffc8747afb676a49a8c0ebe3.jar" />
+        sha1="5fe28b9518e58819180a43a850fbc0dd24b7c050">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-lang3-3.4_6f2d2c2aca75d8470dea11e7471f903e23b67909.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\.gradle\caches\modules-2\files-2.1\java3d\vecmath\1.3.1\a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d\vecmath-1.3.1.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.findbugs\jsr305\3.0.0\5871fb60dc68d67da54a663c3fd636a10a532948\jsr305-3.0.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\jsr305-3.0.0_3a3ed28e08e17cfd74280d4f4729ed886de33500.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.6.0\98476622f10715998eacf9240d6b479f12c66143\okio-1.6.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="98476622f10715998eacf9240d6b479f12c66143">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\okio-1.6.0_c6c36c9266a53bff725e5087f6a3090b1d0ab593.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-collections\commons-collections\3.2\f951934aa5ae5a88d7e6dfaa6d32307d834a88be\commons-collections-3.2.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="f951934aa5ae5a88d7e6dfaa6d32307d834a88be">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-collections-3.2_7d612583996d4f64c3a2e8a620ba8e781ab27616.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-codec\commons-codec\1.6\b7f0fc8f61ecadeb3695f0b9464755eee44374d4\commons-codec-1.6.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="b7f0fc8f61ecadeb3695f0b9464755eee44374d4">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-codec-1.6_249620c2dab3298fe8658b3f6e0464933c70c281.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-lang\commons-lang\2.6\ce1edb914c94ebc388f086c6827e8bdeec71ac2\commons-lang-2.6.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="0ce1edb914c94ebc388f086c6827e8bdeec71ac2">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-lang-2.6_9007383960af2b89d188e1c8b657a2b6bbb9ac08.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-auth\1.0.0-pre1\f0f297a406c45ecc030e2aca69b81a7ed67c3de7\grpc-auth-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="f0f297a406c45ecc030e2aca69b81a7ed67c3de7">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-auth-1.0.0-pre1_1251348be47be6cb19aeab0bf3ea3120ef80dae0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="b2bb77c0dbf2f901a3556c7229ea84c9185c2cc0">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\instant-run-bootstrap_2e7b5bd650664933c0f177d826a8ba0aac87148a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.codeminders\hidapi\1.1\65b153b94d8e12b5be1c305f477e2f21c3ec1bb2\hidapi-1.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="65b153b94d8e12b5be1c305f477e2f21c3ec1bb2">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\hidapi-1.1_51f48a4a7f03dc82f013b894963d48c842ac685a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-protobuf-lite\1.0.0-pre1\8ab07e256e0d9fb3650954f38bc09b5ea258b716\grpc-protobuf-lite-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="8ab07e256e0d9fb3650954f38bc09b5ea258b716">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-protobuf-lite-1.0.0-pre1_b63b16cb31a963fdc77912ab6642b958ceb2f6e2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\19.0\6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9\guava-19.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\guava-19.0_de256f5692e7e6c8452e812f62a87334ff3d62de.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.4d\6e9af5a4cb0373505992a0f8a0f17997274a45fd\ShimmerDriver-0.4d.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="6e9af5a4cb0373505992a0f8a0f17997274a45fd">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\ShimmerDriver-0.4d_460a97afd998f94050e2172dc30413f2aec442ee.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\java3d\vecmath\1.3.1\a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d\vecmath-1.3.1.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
         sha1="a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\vecmath-1.3.1_db4ad13f457819bef54a01f4c54afd70630916f6.jar" />
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\vecmath-1.3.1_016743bf3038fb0ab45816b57d2c6a0ac3a92b7d.jar" />
     </item>
     <item
-        jar="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
-        jumboMode="false"
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-protobuf-nano\1.0.0-pre1\c88ce3b66d21eadcdfecb8326ecd976b2aecbe9f\grpc-protobuf-nano-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
         revision="19.1.0"
-        sha1="5330245023e297bd52f88c6ebe1d2d77f5a9da47">
-        <dex dex="C:\Users\Lim\git\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\ShimmerBiophysicalProcessingLibrary_Rev_0_11_0ab89f05398caba2bf2baf0971dc7ee1a3e7eac7.jar" />
+        sha1="c88ce3b66d21eadcdfecb8326ecd976b2aecbe9f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-protobuf-nano-1.0.0-pre1_b0ba1f88e80153da78c1529dbb2ced122dfbe951.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\exploded-aar\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\unspecified\jars\libs\AndroidBluetoothLibrary.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="7f53e8175d44f2c87f4bf757d0e03961af1b038e">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\AndroidBluetoothLibrary_a9bcfb55508d75ca76829f7602c0c57ec99147ea.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\19.0.1\support-v4-19.0.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="587da9a481ffd341d2fa091704489b89845ddacd">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\support-v4-19.0.1_cc69829a87e06fa21364e686c5563de261213b3d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-okhttp\1.0.0-pre1\3cd4e41931268eef7c1ce00a2baecba6e53cb1da\grpc-okhttp-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="3cd4e41931268eef7c1ce00a2baecba6e53cb1da">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\grpc-okhttp-1.0.0-pre1_9418fe6fb78f81a5f57700301c2208ea09653de4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math\2.2\4877b85d388275f994a5cfc7eceb73a8045d3006\commons-math-2.2.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="19.1.0"
+        sha1="4877b85d388275f994a5cfc7eceb73a8045d3006">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer9DOFCalibration\build\intermediates\pre-dexed\debug\commons-math-2.2_56e3af8e65e82a65c2d272a36b43498af43ba7a8.jar" />
     </item>
 
 </items>

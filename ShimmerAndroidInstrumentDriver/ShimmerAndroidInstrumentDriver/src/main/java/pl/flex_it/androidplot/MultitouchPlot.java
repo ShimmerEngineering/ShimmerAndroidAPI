@@ -1,16 +1,17 @@
 package pl.flex_it.androidplot;
 
-import com.androidplot.series.XYSeries;
-import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeriesFormatter;
-
 import android.content.Context;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+
+import com.androidplot.series.XYSeries;
+import com.androidplot.xy.BoundaryMode;
+import com.androidplot.xy.XYPlot;
+import com.androidplot.xy.XYSeriesFormatter;
+import com.androidplot.xy.XYSeriesRenderer;
 
 
 
@@ -62,6 +63,11 @@ public class MultitouchPlot extends XYPlot implements OnTouchListener
 	{
 		super(context, attrs, defStyle);
 		initTouchHandling();
+	}
+
+	@Override
+	protected XYSeriesRenderer a(Class aClass) {
+		return null;
 	}
 
 	private void initTouchHandling()

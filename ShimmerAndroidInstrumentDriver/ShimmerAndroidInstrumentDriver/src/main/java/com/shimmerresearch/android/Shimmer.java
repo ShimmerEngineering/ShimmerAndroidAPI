@@ -132,49 +132,6 @@
 
 package com.shimmerresearch.android;
 
-import it.gerdavax.easybluetooth.BtSocket;
-import it.gerdavax.easybluetooth.LocalDevice;
-import it.gerdavax.easybluetooth.RemoteDevice;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-
-import com.shimmerresearch.algorithms.GradDes3DOrientation;
-import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
-import com.shimmerresearch.bluetooth.ShimmerBluetooth;
-import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
-import com.shimmerresearch.driver.Configuration;
-import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
-import com.shimmerresearch.driver.InfoMemLayoutShimmer3;
-import com.shimmerresearch.driver.ObjectCluster;
-import com.shimmerresearch.driver.ShimmerDevice;
-import com.shimmerresearch.driver.ShimmerMsg;
-import com.shimmerresearch.driver.ShimmerObject;
-import com.shimmerresearch.driver.Configuration.Shimmer3;
-import com.shimmerresearch.driver.Configuration.Shimmer3.SensorBitmap;
-import com.shimmerresearch.driverUtilities.ShimmerVerObject;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -183,6 +140,29 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
+import com.shimmerresearch.driver.InfoMemLayoutShimmer3;
+import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driver.ShimmerMsg;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.Set;
+import java.util.UUID;
+
+import it.gerdavax.easybluetooth.BtSocket;
+import it.gerdavax.easybluetooth.LocalDevice;
+import it.gerdavax.easybluetooth.RemoteDevice;
 //import java.io.FileOutputStream;
 
 public class Shimmer extends ShimmerBluetooth{
@@ -233,7 +213,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public static final int MSG_STATE_STOP_STREAMING = 5;
 
 	protected String mClassName="Shimmer";
-	
+
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
 	transient private BluetoothAdapter mBluetoothAdapter = null;
 
@@ -253,7 +233,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
 		mShimmerUserAssignedName=myName;
-		mContinousSync=continousSync;
+//		mContinousSync=continousSync;
 		mSetupDevice=false;
 	}
 	
@@ -262,7 +242,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
 		mShimmerUserAssignedName=myName;
-		mContinousSync=continousSync;
+//		mContinousSync=continousSync;
 		mSetupDevice=false;
 	}
 	
@@ -283,12 +263,12 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
 		setSamplingRateShimmer(samplingRate);
-		mAccelRange = accelRange;
+		setDigitalAccelRange(accelRange); //		mAccelRange = accelRange;
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
 		mSetupDevice = true;
-		mContinousSync = continousSync;
+//		mContinousSync = continousSync;
 	}
 
 	/**
@@ -302,18 +282,18 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
 	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
-	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, int magGain) {
+	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, int magRange) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
 		setSamplingRateShimmer(samplingRate);
-		mAccelRange = accelRange;
-		mMagRange = magGain;
+		setDigitalAccelRange(accelRange); //		mAccelRange = accelRange;
+		setMagRange(magRange); // mMagRange = magRange;
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
 		mSetupDevice = true;
-		mContinousSync = continousSync;
+//		mContinousSync = continousSync;
 	}
 
 	
@@ -333,17 +313,17 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
 		setSamplingRateShimmer(samplingRate);
-		mAccelRange = accelRange;
+		setDigitalAccelRange(accelRange); // mAccelRange = accelRange;
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
 		mSetupDevice = true;
-		mContinousSync = continousSync;
+//		mContinousSync = continousSync;
 		mLowPowerMag = enableLowPowerMag;
 		mLowPowerAccelWR = enableLowPowerAccel;
 		mLowPowerGyro = enableLowPowerGyro;
-		mGyroRange = gyroRange;
-		mMagRange = magRange;
+		setGyroRange(gyroRange); //	mGyroRange = gyroRange;
+		setMagRange(magRange); // mMagRange = magRange;
 	}
 
 
@@ -363,17 +343,17 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
 		setSamplingRateShimmer(samplingRate);
-		mAccelRange = accelRange;
+		setDigitalAccelRange(accelRange); //		mAccelRange = accelRange;
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
 		mSetupDevice = true;
-		mContinousSync = continousSync;
+//		mContinousSync = continousSync;
 		mLowPowerMag = enableLowPowerMag;
 		mLowPowerAccelWR = enableLowPowerAccel;
 		mLowPowerGyro = enableLowPowerGyro;
-		mGyroRange = gyroRange;
-		mMagRange = magRange;
+		setGyroRange(gyroRange); //	mGyroRange = gyroRange;
+		setMagRange(magRange); // mMagRange = magRange;
 		mSetupEXG = true;
 		mEXG1RegisterArray = exg1;
 		mEXG2RegisterArray = exg2;
@@ -868,7 +848,7 @@ public class Shimmer extends ShimmerBluetooth{
 			//only do this during the initialization process to indicate that it is fully initialized, dont do this for a normal inqiuiry
 			mIsInitialised = true;
 		}
-		if(mIsSDLogging){
+		if(isSDLogging()){
 			if (mIsInitialised){
 				setBluetoothRadioState(BT_STATE.SDLOGGING);
 			} else {
@@ -889,7 +869,7 @@ public class Shimmer extends ShimmerBluetooth{
 		msg.setData(bundle);
 		mHandler.sendMessage(msg);
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" is now Streaming");
-		if (mIsSDLogging){
+		if (isSDLogging()){
 			setBluetoothRadioState(BT_STATE.STREAMING_AND_SDLOGGING);
 			
 		} else{
@@ -903,9 +883,9 @@ public class Shimmer extends ShimmerBluetooth{
 	/*
 	 * Set and Get Methods
 	 * */    
-	public void setContinuousSync(boolean continousSync){
-		mContinousSync=continousSync;
-	}
+//	public void setContinuousSync(boolean continousSync){
+//		mContinousSync=continousSync;
+//	}
 
 	public boolean getStreamingStatus(){
 		return mIsStreaming;
@@ -1084,7 +1064,7 @@ public class Shimmer extends ShimmerBluetooth{
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" stopped streaming");
 		msg.setData(bundle);
-		if (mIsSDLogging){
+		if (isSDLogging()){
 			setBluetoothRadioState(BT_STATE.SDLOGGING);
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
@@ -1094,7 +1074,6 @@ public class Shimmer extends ShimmerBluetooth{
 		
 	}
 
-	@Override
 	protected void logAndStreamStatusChanged() {
 
 		
@@ -1115,13 +1094,13 @@ public class Shimmer extends ShimmerBluetooth{
 			}
 		}
 		else{
-			if(mIsStreaming && mIsSDLogging){
+			if(mIsStreaming && isSDLogging()){
 				setBluetoothRadioState(BT_STATE.STREAMING_AND_SDLOGGING);
 			}
 			else if(mIsStreaming){
 				setBluetoothRadioState(BT_STATE.STREAMING);
 			}
-			else if(mIsSDLogging){
+			else if(isSDLogging()){
 				setBluetoothRadioState(BT_STATE.SDLOGGING);
 			}
 			else{
@@ -1160,7 +1139,7 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	protected void processMsgFromCallback(ShimmerMsg shimmerMSG) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -1208,23 +1187,33 @@ public class Shimmer extends ShimmerBluetooth{
 	public boolean isConnected(){
 		return mIsConnected;
 	}
-	
+
+	@Override
+	public void disconnect(){
+		this.stop();
+	}
+
 	@Override
 	protected void startOperation(BT_STATE currentOperation) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void startOperation(BT_STATE currentOperation, int totalNumOfCmds) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	protected void eventLogAndStreamStatusChanged(byte b) {
+		logAndStreamStatusChanged();
 	}
 
 	@Override
 	protected void batteryStatusChanged() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -1252,22 +1241,23 @@ public class Shimmer extends ShimmerBluetooth{
 	protected void interpretDataPacketFormat(Object object,
 			COMMUNICATION_TYPE commType) {
 	}
+
+	@Override
+	public void createConfigBytesLayout() {
+		//TODO check this is ok
+		mInfoMemLayout = new InfoMemLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
+	}
+
 	protected void finishOperation(BT_STATE currentOperation) {
 
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void dockedStateChange() {
 		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void createInfoMemLayout() {
-		// TODO Auto-generated method stub
-		mInfoMemLayout = new InfoMemLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
 	}
 
 	@Override

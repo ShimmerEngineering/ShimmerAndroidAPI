@@ -2,7 +2,7 @@ package com.shimmerresearch.android;
 
 import android.os.Handler;
 
-import com.shimmerresearch.driver.*;
+import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
 
 /**
  * Created by Lim on 06/06/2016.

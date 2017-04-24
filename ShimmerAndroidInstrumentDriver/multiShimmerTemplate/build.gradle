@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 23
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         applicationId "com.shimmerresearch.multishimmertemplate"
+        multiDexEnabled true
         minSdkVersion 14
         targetSdkVersion 17
     }
@@ -24,12 +25,17 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/INDEX.LIST'
     }
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+        jumboMode = true
+    }
 }
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
     compile 'com.android.support:support-v4:+'
-    provided files('../ShimmerAndroidInstrumentDriver/libs/ShimmerDriver-0.2.jar')
     provided files('../ShimmerAndroidInstrumentDriver/libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     provided files('../ShimmerAndroidInstrumentDriver/libs/androidplot-core-0.5.0-release.jar')
     provided 'com.google.guava:guava:19.0'

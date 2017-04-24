@@ -26,7 +26,12 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	XYPlot mDynamicPlot = null;
 	int mXAxisLimit = 500;
 	boolean mClearGraphatLimit = false;
-	
+
+	@Override
+	public void setTraceLineStyleAll(PLOT_LINE_STYLE plot_line_style) {
+
+	}
+
 	/**Constructor
 	 * 
 	 */
