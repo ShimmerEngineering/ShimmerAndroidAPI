@@ -230,7 +230,7 @@ public class ShimmerService extends Service {
 	public void connectShimmer(final String bluetoothAddress, final String selectedDevice){
 
 
-		
+
 		Log.d("Shimmer","net Connection");
 		Shimmer shimmerDevice=new Shimmer(this, mHandler,selectedDevice,true);
 		mMultiShimmer.remove(bluetoothAddress);
