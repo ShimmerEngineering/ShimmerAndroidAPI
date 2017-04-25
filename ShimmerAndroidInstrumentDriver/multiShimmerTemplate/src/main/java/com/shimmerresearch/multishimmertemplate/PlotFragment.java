@@ -50,6 +50,7 @@ import com.androidplot.xy.XYStepMode;
 import com.androidplot.xy.YLayoutStyle;
 import com.shimmerresearch.adapters.CheckboxListAdapter;
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.database.DatabaseHandler;
 import com.shimmerresearch.database.ShimmerConfiguration;
 import com.shimmerresearch.driver.FormatCluster;
@@ -506,7 +507,7 @@ public class PlotFragment extends Fragment {
 	            case Shimmer.MESSAGE_TOAST:
 	            	Log.d("toast",msg.getData().getString(Shimmer.TOAST));
 	            	
-	            case Shimmer.MESSAGE_READ:
+	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	            	    if ((msg.obj instanceof ObjectCluster)){
 	            	    	
 	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
