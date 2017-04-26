@@ -1144,6 +1144,7 @@ public class ConfigurationFragment extends Fragment{
   		if (((Shimmer.SENSOR_EXG1_24BIT & enableSensors)>0 || (Shimmer.SENSOR_EXG1_16BIT & enableSensors)>0) && (mService.isEXGUsingECG24Configuration(mBluetoothAddress)||mService.isEXGUsingECG16Configuration(mBluetoothAddress))){
   			final List<String> list=new ArrayList<String>();
   	        list.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
+			list.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
   	        list.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
   	        list.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
   	        ArrayAdapter<String> adp= new ArrayAdapter<String>(getActivity(),
