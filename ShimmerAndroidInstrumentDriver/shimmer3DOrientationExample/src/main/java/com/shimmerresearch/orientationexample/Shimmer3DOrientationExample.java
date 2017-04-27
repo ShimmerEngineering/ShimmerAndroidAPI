@@ -67,7 +67,7 @@ public class Shimmer3DOrientationExample extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.exercise);
-		Configuration.setTooLegacyObjectClusterSensorNames();
+
 		t= new MyGLSurfaceView(this);
 		//Create an Instance with this Activity
 		glSurface = (GLSurfaceView)findViewById(R.id.graphics_glsurfaceview1);
