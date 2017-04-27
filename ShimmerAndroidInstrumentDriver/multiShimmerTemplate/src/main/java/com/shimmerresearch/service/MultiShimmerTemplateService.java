@@ -38,7 +38,6 @@ import com.shimmerresearch.database.DatabaseHandler;
 import com.shimmerresearch.database.ShimmerConfiguration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
-import com.shimmerresearch.driver.ShimmerObject;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails.EXG_CHIP_INDEX;
@@ -100,7 +99,7 @@ public class MultiShimmerTemplateService extends Service {
 	static Filter mLPFilterECG;
 	static Filter mHPFilterECG;
 	public static String mBluetoothAddressToHeartRate;
-	static private boolean mEnableHeartRate = false;
+	static private boolean mEnableHeartRatePPG = false;
 	static private boolean mEnableHeartRateECG = false;
 	static private boolean mNewPPGSignalProcessing = true;
 	static private boolean mNewECGSignalProcessing = true;
@@ -393,7 +392,7 @@ public class MultiShimmerTemplateService extends Service {
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
 	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
 	            	    
-	            	    if(mEnableHeartRate){
+	            	    if(mEnableHeartRatePPG){
 //	            	    	mShimmerHeartRate = (Shimmer) mMultiShimmer.get(objectCluster.mBluetoothAddress);
 //	            	    	if (mNewPPGSignalProcessing) {
 //								mHeartRateCalculation = new PpgSignalProcessing(mShimmerHeartRate.getSamplingRate(), mNumberOfBeatsToAverage,10); //10 second training period
@@ -1003,7 +1002,7 @@ public class MultiShimmerTemplateService extends Service {
 
 	public void startStreaming(String bluetoothAddress) {
 		// TODO Auto-generated method stub
-				if(mEnableHeartRate){
+				if(mEnableHeartRatePPG){
 					if(bluetoothAddress.equals(mBluetoothAddressToHeartRate) && mHeartRateCalculation!=null)
 						mHeartRateCalculation.resetParameters();
 					if(bluetoothAddress.equals(mBluetoothAddressToHeartRate) && mHeartRateCalculationECG!=null)
@@ -1748,7 +1747,7 @@ public class MultiShimmerTemplateService extends Service {
 	public void enableHeartRate(String bluetoothAddress, boolean enabled, String sensorToHeartRate){
 		
 		
-		mEnableHeartRate = enabled;
+		mEnableHeartRatePPG = enabled;
 		if(enabled){
 			mNewPPGSignalProcessing = true;
 			mCountPPGInitial=0;
@@ -1839,7 +1838,7 @@ public void enableHeartRateECG(String bluetoothAddress, boolean enabled, String 
 	
 	public boolean isHeartRateEnabled(){
 		
-		return mEnableHeartRate;
+		return mEnableHeartRatePPG;
 	}
 	public boolean isHeartRateEnabledECG(){
 		

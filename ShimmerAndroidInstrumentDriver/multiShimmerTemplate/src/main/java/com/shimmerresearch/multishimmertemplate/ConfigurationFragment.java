@@ -1145,6 +1145,7 @@ public class ConfigurationFragment extends Fragment{
   			final List<String> list=new ArrayList<String>();
   	        list.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
   	        list.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
+			list.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
   	        list.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
   	        ArrayAdapter<String> adp= new ArrayAdapter<String>(getActivity(),
   	        		android.R.layout.simple_list_item_1,list);
@@ -1203,7 +1204,7 @@ public class ConfigurationFragment extends Fragment{
 						mSensorToHeartRate = Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT;
   					}
 					else{
-						Toast.makeText(getActivity(), "WARNING: The sensor A12 is not enabled", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "WARNING: ECG is not enabled", Toast.LENGTH_SHORT).show();
 						mSensorToHeartRate="";
 					}
 					
@@ -1213,17 +1214,26 @@ public class ConfigurationFragment extends Fragment{
 						mSensorToHeartRate = Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
   					}
 					else{
-						Toast.makeText(getActivity(), "WARNING: The sensor A13 is not enabled", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "WARNING: ECG is not enabled", Toast.LENGTH_SHORT).show();
 						mSensorToHeartRate="";
 					}
 					
+				}
+				else if(parent.getItemAtPosition(pos).toString().equals(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT)) {
+					if(((Shimmer.SENSOR_EXG1_24BIT & enableSensors)>0 || (Shimmer.SENSOR_EXG1_16BIT & enableSensors)>0) && (mService.isEXGUsingECG24Configuration(mBluetoothAddress)||mService.isEXGUsingECG16Configuration(mBluetoothAddress))){
+						mSensorToHeartRate = Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT;
+					}
+					else{
+						Toast.makeText(getActivity(), "WARNING: ECG is not enabled", Toast.LENGTH_SHORT).show();
+						mSensorToHeartRate="";
+					}
 				}
 				else if(parent.getItemAtPosition(pos).toString().equals(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT)){
 					if(((Shimmer.SENSOR_EXG1_24BIT & enableSensors)>0 || (Shimmer.SENSOR_EXG1_16BIT & enableSensors)>0) && (mService.isEXGUsingECG24Configuration(mBluetoothAddress)||mService.isEXGUsingECG16Configuration(mBluetoothAddress))){
 						mSensorToHeartRate = Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT;
   					}
 					else{
-						Toast.makeText(getActivity(), "WARNING: The sensor A14 is not enabled", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "WARNING: ECG is not enabled", Toast.LENGTH_SHORT).show();
 						mSensorToHeartRate="";
 					}
 				}
@@ -1275,7 +1285,8 @@ public class ConfigurationFragment extends Fragment{
 					else{
 						if (mSensorToHeartRate.equals(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT) ||
 								mSensorToHeartRate.equals(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT) || 
-										mSensorToHeartRate.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT)){
+										mSensorToHeartRate.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT) ||
+										mSensorToHeartRate.equals(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT)){
 							if(mService.getSamplingRate(mBluetoothAddress)>128){
 								Toast.makeText(getActivity(), "A lower sampling rate (e.g. 128 Hz) is recommended due to Android device processing limitations", Toast.LENGTH_LONG).show();	
 							}
