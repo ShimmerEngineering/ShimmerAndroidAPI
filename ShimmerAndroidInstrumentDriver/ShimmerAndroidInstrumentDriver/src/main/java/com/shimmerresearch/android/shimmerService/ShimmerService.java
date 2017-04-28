@@ -712,6 +712,7 @@ public class ShimmerService extends Service {
 								sensor[0] = stemp.getShimmerUserAssignedName();
 								sensor[1] = cd.mObjectClusterName;
 								sensor[2] = ct.toString();
+								sensor[3] = "";
 								if (ct.equals(CHANNEL_TYPE.UNCAL)) {
 //									sensor[3] = cd.mDefaultUnit;
 								} else if (ct.equals(CHANNEL_TYPE.CAL)) {
