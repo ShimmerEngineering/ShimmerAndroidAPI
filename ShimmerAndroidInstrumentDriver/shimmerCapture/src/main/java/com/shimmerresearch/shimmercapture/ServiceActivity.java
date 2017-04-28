@@ -30,7 +30,7 @@ public class ServiceActivity extends Activity {
 
       	public void onServiceConnected(ComponentName arg0, IBinder service) {
       		// TODO Auto-generated method stub
-      		Log.d("ShimmerService", "srvice connected");
+      		Log.d("ShimmerService", "service connected");
       		LocalBinder binder = (ShimmerService.LocalBinder) service;
       		mService = binder.getService();
       		mServiceBind = true;

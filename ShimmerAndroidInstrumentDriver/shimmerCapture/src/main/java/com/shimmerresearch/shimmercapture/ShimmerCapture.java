@@ -177,7 +177,7 @@ public class ShimmerCapture extends ServiceActivity {
     private static String mBluetoothAddress = null;
     // Member object for communication services
     private String mSignaltoGraph;
-    private static String mSensorView = ""; //The sensor device which should be viewed on the graph
+    //private static String mSensorView = ""; //The sensor device which should be viewed on the graph
     private static boolean legendInitializate;
     private static int mGraphSubSamplingCount = 0; //10 
     private static String mFileName = "Default";
@@ -631,11 +631,11 @@ public class ShimmerCapture extends ServiceActivity {
                 	deviceState="Streaming";
                     textDeviceName.setText(mBluetoothAddress);
                     textDeviceState.setText(deviceState);
-                    //set the enable logging regarding the user selection
+                    //TODO: set the enable logging regarding the user selection
                     mService.setEnableLogging(mEnableLogging);
-                    if(!mSensorView.equals(""))
-                    	setLegend();
-                    else{
+                    //TODO: if(!mSensorView.equals(""))
+                    //TODO:	setLegend();
+                    //TODO: else{
                     	List<String> sensorList = mService.getListofEnabledSensors(mBluetoothAddress);
                     	if(sensorList!=null){
     	            		if(mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
@@ -686,11 +686,11 @@ public class ShimmerCapture extends ServiceActivity {
 
 							sensorList.add("Timestamp");
 
-							mSensorView = sensorList.get(0);
-							setLegend();
+							//TODO: mSensorView = sensorList.get(0);
+							//TODO: setLegend();
                     	}
 
-                    }
+                    //}
                 	break;
                 case STREAMING_AND_SDLOGGING:
 
@@ -700,7 +700,7 @@ public class ShimmerCapture extends ServiceActivity {
                     textDeviceState.setText(deviceState);
                     //set the enable logging regarding the user selection
                     mService.setEnableLogging(mEnableLogging);
-                    if(!mSensorView.equals(""))
+                    /*if(!mSensorView.equals(""))
                     	setLegend();
                     else{
                     	List<String> sensorList = mService.getListofEnabledSensors(mBluetoothAddress);
@@ -756,7 +756,7 @@ public class ShimmerCapture extends ServiceActivity {
                 		sensorList.add("Timestamp");
                     	mSensorView = sensorList.get(0);
                     	setLegend();
-                    }
+                    }*/
                 	break;
                 case DISCONNECTED:
                 	Log.d("ShimmerActivity","Shimmer No State");
