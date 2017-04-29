@@ -4,6 +4,10 @@ android {
     compileSdkVersion 23
     buildToolsVersion '25.0.2'
 
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         // Enabling multidex support.
         multiDexEnabled true
