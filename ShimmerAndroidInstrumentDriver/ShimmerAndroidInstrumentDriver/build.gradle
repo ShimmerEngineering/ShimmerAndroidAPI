@@ -1,4 +1,11 @@
+//JC: use gradlew install and then comment out install and use gradlew bintray
+
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+version = '0.4b'
 
 android {
     compileSdkVersion 23
@@ -76,5 +83,117 @@ dependencies {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
+    }
+
+
+
+
+
+/*
+    install {
+        repositories.mavenInstaller {
+            // This generates POM.xml with proper parameters
+            pom {
+                project {
+                    packaging 'aar'
+                    groupId 'com.shimmerresearch.android'
+                    artifactId 'com.shimmerresearch.android'
+
+                    // Add your description here
+                    name ''
+                    description ''
+                    url ''
+
+                    // Set your license
+                    licenses {
+                        license {
+                            name 'MIT License'
+                            url 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'stefanosiano'
+                            name 'Stefano Siano'
+                            email 'stefano.siano91@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection ''
+                        developerConnection ''
+                        url ''
+
+                    }
+                }
+            }
+        }
+    }
+*/
+
+
+
+
+    if (project.hasProperty("android")) { // Android libraries
+        task sourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.srcDirs
+        }
+
+        task javadoc(type: Javadoc) {
+            source = android.sourceSets.main.java.srcDirs
+            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        }
+    } else { // Java libraries
+        task sourcesJar(type: Jar, dependsOn: classes) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+    }
+
+    publishing{
+        publications {
+            maven(MavenPublication)  {
+                groupId 'com.shimmerresearch.android'
+                version = project.version
+                artifactId project.getName()
+                artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            }
+        }
+    }
+
+// https://github.com/bintray/gradle-bintray-plugin
+    bintray {
+        user = bintray_username //this usually comes from gradle.properties file in ~/.gradle
+        key = bintray_api_key //this usually comes from gradle.properties file in ~/.gradle
+
+        configurations = ['archives']
+
+        // Package info for BinTray
+        pkg {
+            repo = 'testshimmer'
+            // it is the name that appears in bintray when logged
+            name = 'shimmerandroiddriver'
+            desc = 'awsome jc'
+            websiteUrl = ''
+            vcsUrl = ''
+            licenses = ['MIT']
+            publish = true
+            publicDownloadNumbers = true
+            version {
+                name = project.version
+                desc = ''
+                released = new Date()
+                vcsTag = ''
+            }
+        }
     }
 }
