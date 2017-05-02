@@ -171,7 +171,7 @@ dependencies {
     }
 
 // https://github.com/bintray/gradle-bintray-plugin
-    bintray {
+    /*bintray {
         user = bintray_username //this usually comes from gradle.properties file in ~/.gradle
         key = bintray_api_key //this usually comes from gradle.properties file in ~/.gradle
 
@@ -195,5 +195,5 @@ dependencies {
                 vcsTag = ''
             }
         }
-    }
+    }*/
 }

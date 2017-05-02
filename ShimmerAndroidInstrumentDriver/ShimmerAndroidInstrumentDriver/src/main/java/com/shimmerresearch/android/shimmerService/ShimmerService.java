@@ -150,22 +150,23 @@ public class ShimmerService extends Service {
 	}
 
 	public void disconnectAllDevices(){
-//		Collection<Object> colS=mMultiShimmer.values();
-//		Iterator<Object> iterator = colS.iterator();
-//		while (iterator.hasNext()) {
-//			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-//			if (stemp instanceof Shimmer) {
-//				((Shimmer)stemp).stop();
-//			} else if (stemp instanceof Shimmer4Android){
+		Collection<Object> colS=mMultiShimmer.values();
+		Iterator<Object> iterator = colS.iterator();
+		while (iterator.hasNext()) {
+			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
+			if (stemp instanceof Shimmer) {
+				((Shimmer) stemp).stop();
+			}
+//			else if (stemp instanceof Shimmer4Android){
 //				try {
 //					((Shimmer4Android) stemp).mShimmerRadioHWLiteProtocol.disconnect();
 //				} catch(Exception e){
 //					e.printStackTrace();
 //				}
 //			}
-//		}
-//		//mMultiShimmer.clear();
-//		mLogShimmer.clear();
+		}
+		mMultiShimmer.clear();
+		mLogShimmer.clear();
 	}
 
     @Override
@@ -700,7 +701,9 @@ public class ShimmerService extends Service {
 			String address = stemp.getMacId();
 			address = address.replace(":","");
 			bluetoothAddress = bluetoothAddress.replace(":","");
-			if (stemp.getBluetoothRadioState()==BT_STATE.STREAMING && address.equals(bluetoothAddress)){
+
+			BT_STATE btState = stemp.getBluetoothRadioState();
+			if ((btState==BT_STATE.STREAMING || btState==BT_STATE.STREAMING_AND_SDLOGGING) && address.equals(bluetoothAddress)){
 				if (stemp.getShimmerVerObject().getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_2R){
 					return ((Shimmer)stemp).getListofEnabledChannelSignalsandFormats();
 				} else {
@@ -1203,7 +1206,8 @@ public class ShimmerService extends Service {
 			String address = stemp.getMacId();
 			address = address.replace(":","");
 			bluetoothAddress = bluetoothAddress.replace(":","");
-			if ((stemp.getBluetoothRadioState()== BT_STATE.STREAMING)  && address.equals(bluetoothAddress)){
+			BT_STATE btState = stemp.getBluetoothRadioState();
+			if ((btState==BT_STATE.STREAMING || btState==BT_STATE.STREAMING_AND_SDLOGGING)  && address.equals(bluetoothAddress)){
 				deviceStreaming=true;
 			}
 		}
