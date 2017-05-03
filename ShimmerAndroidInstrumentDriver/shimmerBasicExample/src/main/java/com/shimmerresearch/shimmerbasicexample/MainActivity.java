@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize Handler
         mHandler = new Handler() {
+
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
