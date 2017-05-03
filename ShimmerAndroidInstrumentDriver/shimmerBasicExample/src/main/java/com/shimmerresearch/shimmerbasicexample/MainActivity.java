@@ -2,6 +2,7 @@ package com.shimmerresearch.shimmerbasicexample;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -20,6 +21,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Initialize Handler
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+            }
+        };
+
 
         btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
 
@@ -42,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onStop();
     }
+
+
 
 
 }
