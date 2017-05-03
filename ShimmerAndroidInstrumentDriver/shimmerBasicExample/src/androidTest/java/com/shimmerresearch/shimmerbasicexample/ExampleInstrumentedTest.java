@@ -1,4 +1,4 @@
-package com.example.shimmerbasicexample;
+package com.shimmerresearch.shimmerbasicexample;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
