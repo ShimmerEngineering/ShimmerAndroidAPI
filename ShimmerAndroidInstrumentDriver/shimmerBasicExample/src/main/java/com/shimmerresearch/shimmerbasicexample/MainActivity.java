@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     Handler mHandler;
     BluetoothDevice shimmerBtDevice;
     final static String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
-
+    //final static String shimmerBtAdd = "00:06:66:88:DB:79";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
