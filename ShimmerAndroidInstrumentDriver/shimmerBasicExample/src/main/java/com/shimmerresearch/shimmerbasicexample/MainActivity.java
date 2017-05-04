@@ -6,7 +6,10 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
+import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -15,6 +18,7 @@ import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -106,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                             shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);
                             if(shimmerDevice != null) { Log.i(LOG_TAG, "Got the ShimmerDevice!"); }
                             else { Log.i(LOG_TAG, "ShimmerDevice returned is NULL!"); }
-                            shimmerDevice.startStreaming(); //Start streaming the data from the Shimmer
+                            //shimmerDevice.startStreaming(); //Start streaming the data from the Shimmer
                             break;
                         case CONNECTING:
                             Log.i(LOG_TAG, "Shimmer [" + macAddress + "] is CONNECTING");
@@ -131,6 +135,24 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+    //Called when the menu button is pressed
+    public void openMenu(View v) throws IOException {
+
+        if(shimmerDevice != null) {
+            if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
+                ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(shimmerDevice, MainActivity.this);
+            }
+            else {
+                Log.e(LOG_TAG, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING");
+                Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            Log.e(LOG_TAG, "Cannot open menu! Shimmer device is not connected");
+            Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is not connected", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
 
