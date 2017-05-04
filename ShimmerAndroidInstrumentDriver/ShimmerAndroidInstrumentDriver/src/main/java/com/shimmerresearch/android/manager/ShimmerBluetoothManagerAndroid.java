@@ -51,13 +51,6 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         loadBtShimmers();
     }
 
-    public ShimmerBluetoothManagerAndroid(Context context){
-        super();
-        this.mContext = context;
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        loadBtShimmers();
-    }
-
 
     public Handler getHandler(){
         return mHandler;
