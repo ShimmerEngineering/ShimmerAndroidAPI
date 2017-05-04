@@ -7,13 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
+import com.shimmerresearch.driver.ShimmerDevice;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
-    Handler mHandler;
-    BluetoothDevice shimmerBtDevice;
+    ShimmerDevice shimmerDevice;
     final static String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
     //final static String shimmerBtAdd = "00:06:66:88:DB:79";
 
@@ -22,18 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Initialize Handler
-        mHandler = new Handler() {
-
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-            }
-        };
-
-
         btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
-
     }
 
     @Override
@@ -41,6 +32,21 @@ public class MainActivity extends AppCompatActivity {
 
         //Connect the Shimmer through Bluetooth Address
         btManager.connectShimmerTroughBTAddress(shimmerBtAdd);
+
+
+        //Delay the start logging for 10s so that a Bluetooth connection can be established first
+        final Handler delayHandler = new Handler();
+        delayHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String s = shimmerBtAdd.replaceAll(":","");
+                List<ShimmerDevice> mList = btManager.getListOfConnectedDevices();
+                String a = mList.toString();
+                btManager.startLogging(mList.get(0));
+            }
+        }, 10000);
+
+
 
         super.onStart();
     }
@@ -53,6 +59,17 @@ public class MainActivity extends AppCompatActivity {
 
         super.onStop();
     }
+
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+
+
+
+            super.handleMessage(msg);
+        }
+    };
 
 
 
