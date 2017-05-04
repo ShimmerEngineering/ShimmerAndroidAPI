@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/shimmer9DOFCalibration" />
             <option value="$PROJECT_DIR$/shimmerBasicExample" />
             <option value="$PROJECT_DIR$/shimmerCapture" />
+            <option value="$PROJECT_DIR$/shimmerGrpcClientExample" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

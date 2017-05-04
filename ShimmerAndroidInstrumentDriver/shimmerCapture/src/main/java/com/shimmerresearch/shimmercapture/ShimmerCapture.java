@@ -468,8 +468,8 @@ public class ShimmerCapture extends ServiceActivity {
         
         AppRater appRater = new AppRater(this, getPackageName());
         appRater.show();
- 
-    }
+
+	}
     
     @Override
     public void onStart() {

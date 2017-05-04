@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.shimmerresearch.shimmer3dexample"
         minSdkVersion 14
-        targetSdkVersion 14
+        targetSdkVersion 25
         multiDexEnabled true
     }
 
@@ -18,12 +18,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
-    }
-    dexOptions {
-        incremental true
-        javaMaxHeapSize "4g"
-        preDexLibraries = false
-        jumboMode = true
     }
 }
 

@@ -8,7 +8,7 @@ android {
         applicationId "com.shimmerresearch.multishimmertemplate"
         multiDexEnabled true
         minSdkVersion 14
-        targetSdkVersion 17
+        targetSdkVersion 25
     }
 
     buildTypes {
@@ -25,12 +25,7 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/INDEX.LIST'
     }
-    dexOptions {
-        incremental true
-        javaMaxHeapSize "4g"
-        preDexLibraries = false
-        jumboMode = true
-    }
+
 }
 
 dependencies {

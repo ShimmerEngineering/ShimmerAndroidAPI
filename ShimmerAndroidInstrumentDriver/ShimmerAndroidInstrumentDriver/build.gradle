@@ -77,12 +77,12 @@ dependencies {
     compile ('com.shimmerresearch.managers.bluetoothmanager:ShimmerBluetoothManager:1.0b') {
                 // excluding org.json which is provided by Android
                 exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
+        //exclude group: 'com.google.protobuf'
             }
     compile ('com.shimmerresearch.driver:ShimmerDriver:0.4d') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
+        //exclude group: 'com.google.protobuf'
     }
 
 
