@@ -43,10 +43,11 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     Context mContext;
     Handler mHandler;
 
-    public ShimmerBluetoothManagerAndroid(Context context, Handler handler){
+    public ShimmerBluetoothManagerAndroid(Context context, Handler handler) throws Exception {
         super();
         this.mContext = context;
         this.mHandler = handler;
+        if(mHandler==null){ throw new Exception("Handler is NULL"); }
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         loadBtShimmers();
     }
