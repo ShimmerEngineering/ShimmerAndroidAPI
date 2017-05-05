@@ -78,7 +78,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ShimmerService extends Service {
-	private static final String TAG = "MyService";
+	private static final String TAG = "ShimmerService";
     public Logging shimmerLog1 = null;
     private boolean mEnableLogging=false;
 	private BluetoothAdapter mBluetoothAdapter = null;
