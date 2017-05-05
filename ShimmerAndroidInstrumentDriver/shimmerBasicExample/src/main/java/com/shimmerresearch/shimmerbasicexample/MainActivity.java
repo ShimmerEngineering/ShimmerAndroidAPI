@@ -1,5 +1,6 @@
 package com.shimmerresearch.shimmerbasicexample;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 import android.os.Message;
@@ -29,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     ShimmerDevice shimmerDevice;
     final static String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
     final static String LOG_TAG = "SHIMMER";
-    //final static String shimmerBtAdd = "00:06:66:88:DB:79";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         //Connect the Shimmer using its Bluetooth Address
-        btManager.connectShimmerTroughBTAddress(shimmerBtAdd);
+        try {
+            btManager.connectShimmerTroughBTAddress(shimmerBtAdd);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Error. Shimmer device not paired or Bluetooth is not enabled");
+            Toast.makeText(this, "Error. Shimmer device not paired or Bluetooth is not enabled. " +
+                            "Please close the app and pair or enable Bluetooth", Toast.LENGTH_LONG).show();
+        }
         super.onStart();
     }
 
@@ -81,13 +87,21 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what) {
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
                     if ((msg.obj instanceof ObjectCluster)) {
+
                         ObjectCluster objectCluster = (ObjectCluster) msg.obj;
+
                         //Retrieve all possible formats for the current sensor device:
-                        Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.BATT_PERCENTAGE);
-                        FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        float data = (float) formatCluster.mData;
-                        Log.i("DATA", "Accel LN X: " + data);
-                        String macAddress = "";
+                        Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP);
+                        FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
+                        double timeStampData = timeStampCluster.mData;
+
+                        allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
+                        FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
+                        double accelXData = accelXCluster.mData;
+
+                        Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
+                        Log.i(LOG_TAG, "Accel LN X: " + accelXData);
+
                     }
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
@@ -110,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                             shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);
                             if(shimmerDevice != null) { Log.i(LOG_TAG, "Got the ShimmerDevice!"); }
                             else { Log.i(LOG_TAG, "ShimmerDevice returned is NULL!"); }
-                            //shimmerDevice.startStreaming(); //Start streaming the data from the Shimmer
+                            shimmerDevice.startStreaming(); //Start streaming the data from the Shimmer
                             break;
                         case CONNECTING:
                             Log.i(LOG_TAG, "Shimmer [" + macAddress + "] is CONNECTING");

@@ -3,6 +3,8 @@ package com.shimmerresearch.androidradiodriver;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.comms.serialPortInterface.AbstractSerialPortHal;
@@ -47,10 +49,24 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
 
             createBluetoothSocket();
             connectBluetoothSocket();
-            getIOStreams();
 
-            mState = ShimmerBluetooth.BT_STATE.CONNECTED;
-            eventDeviceConnected();
+            if(mBluetoothSocket!=null) {
+                boolean isStream = getIOStreams();
+                if(isStream) {
+                    mState = ShimmerBluetooth.BT_STATE.CONNECTED;
+                    eventDeviceConnected();
+                }
+                else{
+                    Log.e("Shimmer", "Could not get IO Stream!");
+                    NullPointerException e = new NullPointerException();
+                    catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
+                }
+            }
+            else {
+                Log.e("Shimmer", "Shimmer device is not online!");
+                NullPointerException e = new NullPointerException();
+                catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTION);
+            }
         }
     }
 
@@ -72,14 +88,16 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
         }
     }
 
-    private void getIOStreams(){
+    private boolean getIOStreams(){
         try {
             InputStream tmpIn = mBluetoothSocket.getInputStream();
             mInStream =  new DataInputStream(tmpIn);
             mOutStream = mBluetoothSocket.getOutputStream();
         } catch (IOException e) {
             catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
+            return false;
         }
+        return true;
     }
 
     private void closeBluetoothSocket(){
