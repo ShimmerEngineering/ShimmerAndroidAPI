@@ -12,24 +12,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="759bd97bc534c2bd70dc996e5086267a50e7731a">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_ba138c75be7822f8bfccaf6474e758ae67fd1028\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\androidplot-core-0.5.0-release.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="a08bcc8dba24bfe666c84df486f4bde7afba07d9">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\androidplot-core-0.5.0-release_9f0ad4e3caca255ead6fab8acfd7a8b7c19103c0\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\AndroidBluetoothLibrary.jar"
         jumboMode="true"
         optimize="true"
@@ -45,6 +27,24 @@
         revision="25.0.2"
         sha1="3855121e83b525150312e04d114c382bded92081">
         <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\ShimmerBiophysicalProcessingLibrary_Rev_0_11_6653c5c9189a1d0ac28babe0be66d5ddb7acb08e\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e602912d062db7dcd9699be2d25bc6b1ad815489">
+        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_ba138c75be7822f8bfccaf6474e758ae67fd1028\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\androidplot-core-0.5.0-release.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="a08bcc8dba24bfe666c84df486f4bde7afba07d9">
+        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\androidplot-core-0.5.0-release_9f0ad4e3caca255ead6fab8acfd7a8b7c19103c0\classes.dex" />
     </item>
 
 </items>
