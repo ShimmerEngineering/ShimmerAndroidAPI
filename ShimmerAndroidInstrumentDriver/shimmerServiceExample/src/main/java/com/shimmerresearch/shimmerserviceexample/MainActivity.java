@@ -1,9 +1,11 @@
 package com.shimmerresearch.shimmerserviceexample;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.renderscript.ScriptGroup;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
@@ -20,36 +23,46 @@ import com.shimmerresearch.android.shimmerService.ShimmerService;
 public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
+    BluetoothAdapter btAdapter;
     ShimmerService mService;
     Handler mHandler;
 
-    final static String LOG_TAG = "SHIMMER";
+    final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        try {
-            btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't create ShimmerBluetoothManagerAndroid. Error: " + e);
-        }
+
+//        else {
+//            try {
+//                btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
+//            } catch (Exception e) {
+//                Log.e(LOG_TAG, "Couldn't create ShimmerBluetoothManagerAndroid. Error: " + e);
+//            }
+//        }
     }
 
 
     @Override
     protected void onStart() {
-        //Start the Shimmer service
-        Intent intent = new Intent(this, ShimmerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        //getApplicationContext().bindService(new Intent(this, ShimmerService.class), mConnection, Context.BIND_AUTO_CREATE);
-        Log.d(LOG_TAG, "Shimmer Service started");
-        Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
+        //Check if Bluetooth is enabled
+        if (!btAdapter.isEnabled()) {
+            int REQUEST_ENABLE_BT = 1;
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            //Start the Shimmer service
+            Intent intent = new Intent(this, ShimmerService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            Log.d(LOG_TAG, "Shimmer Service started");
+            Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
+        }
         super.onStart();
     }
 
@@ -66,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void openMenu(View view) {
-        Intent serverIntent = new Intent(getApplicationContext(), ShimmerDialogBluetooth.class);
+        Intent serverIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
         startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);
     }
 
@@ -130,6 +143,29 @@ public class MainActivity extends AppCompatActivity {
 //            mServiceBind = false;
 //        }
 //    };
+
+
+    //If Bluetooth was not on, get the result from the activity to switch on Bluetooth
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, ShimmerService.class);
+                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                Log.d(LOG_TAG, "Shimmer Service started");
+                Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
+            }
+            else if(resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Please enable Bluetooth to proceed.", Toast.LENGTH_LONG).show();
+                int REQUEST_ENABLE_BT = 1;
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+            else {
+                Toast.makeText(this, "Unknown Error! Your device may not support Bluetooth!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
 
 

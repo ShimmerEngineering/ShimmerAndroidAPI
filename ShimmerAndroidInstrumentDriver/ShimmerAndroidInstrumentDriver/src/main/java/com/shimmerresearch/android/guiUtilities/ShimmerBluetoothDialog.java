@@ -1,4 +1,4 @@
-package com.shimmerresearch.shimmerserviceexample;
+package com.shimmerresearch.android.guiUtilities;
 /*
  * Copyright (C) 2009 The Android Open Source Project
  *
@@ -23,6 +23,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +37,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.shimmerresearch.androidinstrumentdriver.R;
+
 import java.util.Set;
 
 /**
@@ -45,7 +49,7 @@ import java.util.Set;
  * Activity in the result Intent.
  * 
  */
-public class ShimmerDialogBluetooth extends Activity {
+public class ShimmerBluetoothDialog extends Activity {
     // Debugging
     private static final String TAG = "DeviceListActivity";
     private static final boolean D = true;
@@ -62,8 +66,14 @@ public class ShimmerDialogBluetooth extends Activity {
     private Button scanButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        //Set Material Design if the device's OS is Android Lollipop or higher
+        if(Build.VERSION.SDK_INT >= 21) {
+            setTheme(android.R.style.Theme_Material_Light_Dialog);
+        } else {
+            setTheme(android.R.style.Theme_Holo_Light_Dialog);
+        }
 
+        super.onCreate(savedInstanceState);
         // Setup the window
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.device_list);
