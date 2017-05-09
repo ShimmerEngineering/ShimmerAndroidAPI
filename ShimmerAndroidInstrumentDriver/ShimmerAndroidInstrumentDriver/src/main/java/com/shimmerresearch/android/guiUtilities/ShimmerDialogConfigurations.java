@@ -91,7 +91,7 @@ public class ShimmerDialogConfigurations {
                         for (int selected:mSelectedItems) {
                             shimmerDeviceClone.setSensorEnabledState((int)sensorKeys[selected],listEnabled[selected]);
                         }
-                        shimmerDeviceClone.refreshShimmerInfoMemBytes();
+                        //shimmerDeviceClone.refreshShimmerInfoMemBytes();
                         if (shimmerDevice instanceof Shimmer) {
                             //((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                             /*try {

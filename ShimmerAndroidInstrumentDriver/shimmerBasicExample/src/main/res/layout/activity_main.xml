@@ -8,10 +8,11 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Please refer to the Android Logcat for signal data" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:text="Enable/Disable Sensors"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView" />
 
     <Button
         android:id="@+id/button"
@@ -21,5 +22,37 @@
         android:onClick="openMenu"
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="447dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Configuration"
+        android:onClick="openConfigMenu"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Please refer to the Android Logcat for signal data" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Streaming"
+        android:onClick="startStreaming"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop Streaming"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp"
+        android:onClick="stopStreaming" />
 
 </android.widget.LinearLayout>
