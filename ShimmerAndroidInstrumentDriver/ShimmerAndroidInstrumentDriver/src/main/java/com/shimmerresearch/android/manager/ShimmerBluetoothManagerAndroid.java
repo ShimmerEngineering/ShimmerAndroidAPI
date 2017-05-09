@@ -183,7 +183,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Shimmer4 shimmer4 = createNewShimmer4("", bluetoothAddress); //first parameter is com port, but we do not know it in android
         if(serialPortComm!=null){
             CommsProtocolRadio commsProtocolRadio = new CommsProtocolRadio(serialPortComm, new LiteProtocol(bluetoothAddress));
-            shimmer4.setRadio(commsProtocolRadio);
+            shimmer4.setCommsProtocolRadio(commsProtocolRadio);
         }
 
         return shimmer4;
@@ -196,7 +196,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         if(shimmer4.isReadyToConnect()){
             ShimmerRadioInitializerAndroid radio = (ShimmerRadioInitializerAndroid) getRadioInitializer(btAddress);
             AbstractSerialPortHal abstractComport = radio.getSerialCommPort();
-            shimmer4.setRadio(new CommsProtocolRadio(abstractComport, new LiteProtocol(btAddress)));
+            shimmer4.setCommsProtocolRadio(new CommsProtocolRadio(abstractComport, new LiteProtocol(btAddress)));
 
             try {
                 shimmer4.connect();

@@ -1153,7 +1153,7 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 	
 	@Override
-	protected void setBluetoothRadioState(BT_STATE state) {
+	public void setBluetoothRadioState(BT_STATE state) {
 
 		
 		//TODO: below not needed any more?
