@@ -49,6 +49,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         this.mHandler = handler;
         if(mHandler==null){ throw new Exception("Handler is NULL"); }
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(checkBtEnabled(mBluetoothAdapter)==false) { throw new Exception("Bluetooth not Enabled"); }
         loadBtShimmers();
     }
 
@@ -245,4 +246,12 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void addCallBack(BasicProcessWithCallBack basicProcessWithCallBack) {
 
     }
+
+    boolean checkBtEnabled(BluetoothAdapter btAdapter) {
+        if(!btAdapter.isEnabled()) {
+            return false;
+        }
+        return true;
+    }
+
 }

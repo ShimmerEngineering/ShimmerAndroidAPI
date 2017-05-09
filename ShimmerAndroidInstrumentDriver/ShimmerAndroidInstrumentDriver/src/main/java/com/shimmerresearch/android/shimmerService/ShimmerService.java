@@ -117,7 +117,7 @@ public class ShimmerService extends Service {
 
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "My Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Shimmer Service Created", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onCreate");
 	}
 
@@ -138,7 +138,7 @@ public class ShimmerService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Shimmer Service Stopped", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onDestroy");
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
@@ -233,7 +233,7 @@ public class ShimmerService extends Service {
 
 
 		Log.d("Shimmer","net Connection");
-		Shimmer shimmerDevice=new Shimmer(this, mHandler,selectedDevice,true);
+		Shimmer shimmerDevice=new Shimmer(this, mHandler, selectedDevice, true);
 		mMultiShimmer.remove(bluetoothAddress);
 		if (mMultiShimmer.get(bluetoothAddress)==null){
 			mMultiShimmer.put(bluetoothAddress,shimmerDevice);
@@ -450,7 +450,7 @@ public class ShimmerService extends Service {
 	                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
 	                	 Intent intent = new Intent("com.shimmerresearch.service.ShimmerService");
 	                	 Log.d("ShimmerGraph","Sending");
-	            		   mHandlerGraph.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, msg.arg1, -1, msg.obj).sendToTarget();
+	            		   //mHandlerGraph.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, msg.arg1, -1, msg.obj).sendToTarget();
 	            		   if(msg.arg1==Shimmer.MSG_STATE_STOP_STREAMING){ //deprecated shimmer
 	            			     closeAndRemoveFile(((ObjectCluster)msg.obj).getMacAddress());
 	            		   } else {
@@ -472,7 +472,8 @@ public class ShimmerService extends Service {
 	            				   intent.putExtra("ShimmerDeviceName", shimmerName );
 	            				   intent.putExtra("ShimmerState",BT_STATE.CONNECTED);
 	            				   sendBroadcast(intent);
-	            				   break;
+								   String s = mMultiShimmer.toString();
+								   break;
 	            			   case CONNECTING:
 	            				   intent.putExtra("ShimmerBluetoothAddress", macAddress );
 	            				   intent.putExtra("ShimmerDeviceName", shimmerName );

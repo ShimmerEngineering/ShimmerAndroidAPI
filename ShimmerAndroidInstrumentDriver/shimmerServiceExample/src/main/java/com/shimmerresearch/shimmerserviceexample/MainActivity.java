@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     ShimmerService mService;
     Handler mHandler;
 
+    boolean isServiceStarted = false;
+
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mService = ((ShimmerService.LocalBinder)service).getService();
-
+            isServiceStarted = true;
             // Tell the user about this for our demo.
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
         }
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             // Because it is running in our same process, we should never
             // see this happen.
             mService = null;
+            isServiceStarted = false;
             Log.d(SERVICE_TAG, "Shimmer Service Disconnected");
         }
     };
@@ -168,5 +171,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    boolean checkBtEnabled() {
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(!btAdapter.isEnabled()) {
+            return false;
+        }
+        return true;
+    }
+
+    void connectShimmer(View view) {
+        if(isServiceStarted) {
+            mService.connectShimmer("00:06:66:66:96:86", "Shimmer39686");
+        }
+        else {
+            Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
+        }
+    }
 
 }
