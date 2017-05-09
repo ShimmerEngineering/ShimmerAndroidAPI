@@ -352,6 +352,11 @@ public class ShimmerService extends Service {
 		}
 	}
 
+	//TODO: Remove This
+	public void clickToggle() {
+		btManager.toggleLED();
+	}
+
 
 	  public final Handler mHandler = new Handler() {
 	        public void handleMessage(Message msg) {
