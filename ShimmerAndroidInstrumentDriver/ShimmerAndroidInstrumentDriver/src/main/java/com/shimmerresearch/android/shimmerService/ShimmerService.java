@@ -53,6 +53,7 @@ import android.widget.Toast;
 import com.shimmerresearch.algorithms.Filter;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.biophysicalprocessing.ECGtoHRAdaptive;
 import com.shimmerresearch.biophysicalprocessing.PPGtoHRAlgorithm;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -105,6 +106,7 @@ public class ShimmerService extends Service {
 	private String mPPGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.INT_EXP_ADC_A13;
 	private String mECGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
 	public PlotManagerAndroid mPlotManager;
+	private ShimmerBluetoothManagerAndroid btManager;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -119,6 +121,13 @@ public class ShimmerService extends Service {
 	public void onCreate() {
 		Toast.makeText(this, "Shimmer Service Created", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onCreate");
+
+		try {
+			btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
+		} catch (Exception e) {
+			Log.e(TAG, "ERROR! " + e);
+			Toast.makeText(this, "Error! Could not create Bluetooth Manager!", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	public class LocalBinder extends Binder {
