@@ -395,7 +395,7 @@ public class ShimmerService extends Service {
 	            	    //PPG to HR
 
 	            		if (mConvertGSRtoSiemens){
-            				Collection<FormatCluster> dataFormatsGSR = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.GSR);  // first retrieve all the possible formats for the current sensor device
+            				Collection<FormatCluster> dataFormatsGSR = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.GSR_RESISTANCE);  // first retrieve all the possible formats for the current sensor device
 	            			FormatCluster formatClusterGSR = ((FormatCluster)ObjectCluster.returnFormatCluster(dataFormatsGSR,CHANNEL_TYPE.CAL.toString())); // retrieve the calibrated data
 	            			if (formatClusterGSR!=null){
 	            				double gsrdata = formatClusterGSR.mData * 1000; //in ohms
