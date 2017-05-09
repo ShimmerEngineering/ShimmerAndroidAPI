@@ -118,8 +118,8 @@
     <orderEntry type="library" exported="" name="commons-math3-3.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-core-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="AndroidBluetoothLibrary" level="project" />
-    <orderEntry type="library" exported="" name="protobuf-lite-3.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
+    <orderEntry type="library" exported="" name="protobuf-lite-3.0.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="grpc-netty-1.0.0-pre1" level="project" />
@@ -129,7 +129,6 @@
     <orderEntry type="library" exported="" name="protobuf-java-3.0.0-beta-4" level="project" />
     <orderEntry type="library" exported="" name="protobuf-java-util-3.0.0-beta-3" level="project" />
     <orderEntry type="library" exported="" name="commons-lang-2.6" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-0.5b" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="httpcore-4.3.3" level="project" />
     <orderEntry type="library" exported="" name="protobuf-javanano-3.0.0-alpha-5" level="project" />
@@ -137,6 +136,7 @@
     <orderEntry type="library" exported="" name="grpc-okhttp-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-auth-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="google-auth-library-credentials-0.4.0" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.5d" level="project" />
     <orderEntry type="library" exported="" name="commons-collections-3.2" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-lite-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="JLargeArrays-1.5" level="project" />

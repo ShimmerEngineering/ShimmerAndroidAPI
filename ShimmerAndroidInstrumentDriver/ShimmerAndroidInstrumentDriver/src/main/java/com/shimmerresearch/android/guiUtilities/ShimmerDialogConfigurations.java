@@ -93,7 +93,7 @@ public class ShimmerDialogConfigurations {
                         }
                         shimmerDeviceClone.refreshShimmerInfoMemBytes();
                         if (shimmerDevice instanceof Shimmer) {
-                            //((Shimmer)shimmerDevice).setinfowriteConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            //((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                             /*try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
@@ -101,7 +101,7 @@ public class ShimmerDialogConfigurations {
                             }*/
                             ((Shimmer)shimmerDevice).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
                         } else if (shimmerDevice instanceof Shimmer4Android){
-                            //((Shimmer4Android)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            //((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                         }
                     }
                 })
@@ -166,9 +166,9 @@ public class ShimmerDialogConfigurations {
                         shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
                         shimmerDeviceClone.refreshShimmerInfoMemBytes();
                         if (shimmerDevice instanceof Shimmer) {
-                            //((Shimmer)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                         } else if (shimmerDevice instanceof Shimmer4Android){
-                            //((Shimmer4Android)shimmerDevice).writeConfigurationToInfoMem(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                         }
                     }
                 });

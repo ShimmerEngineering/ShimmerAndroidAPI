@@ -79,7 +79,7 @@ dependencies {
                 exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.5b') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.5d') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'

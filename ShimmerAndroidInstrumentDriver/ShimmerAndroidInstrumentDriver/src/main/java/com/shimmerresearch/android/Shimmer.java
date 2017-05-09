@@ -221,13 +221,24 @@ public class Shimmer extends ShimmerBluetooth{
 	{
 		setUseInfoMemConfigMethod(true);
 	}
-	
+
 	/**
-	 * Constructor. Prepares a new Bluetooth session.
-	 * @param handler  A Handler to send messages back to the UI Activity
-	 * @param myName  To allow the user to set a unique identifier for each Shimmer device
-	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
+	 * @param handler add handler to receive msgs from the shimmer class
 	 */
+	public Shimmer(Handler handler) {
+		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothRadioState = BT_STATE.DISCONNECTED;
+		mHandler = handler;
+//		mContinousSync=continousSync;
+		mSetupDevice=false;
+	}
+
+	/**
+	 *
+	 * @deprecated Do not use this method!
+	 * myName will not be set as the shimmer user assigned name
+	 */
+	@Deprecated
 	public Shimmer(Handler handler, String myName, Boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -236,7 +247,12 @@ public class Shimmer extends ShimmerBluetooth{
 //		mContinousSync=continousSync;
 		mSetupDevice=false;
 	}
-	
+	/**
+	 *
+	 * @deprecated Do not use this method!
+	 * myName will not be set as the shimmer user assigned name
+	 */
+	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, Boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
