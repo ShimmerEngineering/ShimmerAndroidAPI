@@ -106,7 +106,9 @@ public class ShimmerService extends Service {
 	private String mPPGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.INT_EXP_ADC_A13;
 	private String mECGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
 	public PlotManagerAndroid mPlotManager;
+
 	private ShimmerBluetoothManagerAndroid btManager;
+
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -149,16 +151,25 @@ public class ShimmerService extends Service {
 	public void onDestroy() {
 		Toast.makeText(this, "Shimmer Service Stopped", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onDestroy");
+
+		btManager.disconnectAllDevices();
+
+/*		TODO:
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
 			Shimmer stemp=(Shimmer) iterator.next();
 			stemp.stop();
 		}
+*/
 
 	}
 
 	public void disconnectAllDevices(){
+
+		btManager.disconnectAllDevices();
+
+/*		TODO:
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
@@ -174,11 +185,12 @@ public class ShimmerService extends Service {
 //				}
 //			}
 		}
+*/
 		mMultiShimmer.clear();
 		mLogShimmer.clear();
 	}
 
-    @Override
+	@Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("LocalService", "Received start id " + startId + ": " + intent);
         // We want this service to continue running until it is explicitly
@@ -239,8 +251,9 @@ public class ShimmerService extends Service {
 
 	public void connectShimmer(final String bluetoothAddress, final String selectedDevice){
 
+		btManager.connectShimmerTroughBTAddress(bluetoothAddress);
 
-
+/*		TODO:
 		Log.d("Shimmer","net Connection");
 		Shimmer shimmerDevice=new Shimmer(this, mHandler, selectedDevice, true);
 		mMultiShimmer.remove(bluetoothAddress);
@@ -248,6 +261,9 @@ public class ShimmerService extends Service {
 			mMultiShimmer.put(bluetoothAddress,shimmerDevice);
 			((Shimmer) mMultiShimmer.get(bluetoothAddress)).connect(bluetoothAddress,"default");
 		}
+*/
+
+
 //		mMultiShimmer.remove(bluetoothAddress);
 //		if (mMultiShimmer.get(bluetoothAddress)==null) {
 //			final Old_ShimmerSerialPortAndroid sspa = new Old_ShimmerSerialPortAndroid(bluetoothAddress);
@@ -309,17 +325,23 @@ public class ShimmerService extends Service {
 	public void onStop(){
 		Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onDestroy");
+
+		btManager.disconnectAllDevices();
+
+/*		TODO:
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
 			Shimmer stemp=(Shimmer) iterator.next();
 			stemp.stop();
 		}
+*/
 	}
 
 
 
 	public void toggleAllLEDS(){
+		//TODO: Move to Bluetooth Manager class?
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
@@ -477,27 +499,37 @@ public class ShimmerService extends Service {
 							   }
 	            			   switch (state) {
 	            			   case CONNECTED:
-	            				   intent.putExtra("ShimmerBluetoothAddress", macAddress );
-	            				   intent.putExtra("ShimmerDeviceName", shimmerName );
+								   ShimmerDevice shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
+								   mMultiShimmer.remove(macAddress);
+								   if (mMultiShimmer.get(macAddress)==null) { mMultiShimmer.put(macAddress,shimmerDevice); }
+								   intent.putExtra("ShimmerBluetoothAddress", macAddress);
+	            				   intent.putExtra("ShimmerDeviceName", shimmerName);
 	            				   intent.putExtra("ShimmerState",BT_STATE.CONNECTED);
 	            				   sendBroadcast(intent);
-								   String s = mMultiShimmer.toString();
 								   break;
 	            			   case CONNECTING:
-	            				   intent.putExtra("ShimmerBluetoothAddress", macAddress );
-	            				   intent.putExtra("ShimmerDeviceName", shimmerName );
+	            				   intent.putExtra("ShimmerBluetoothAddress", macAddress);
+	            				   intent.putExtra("ShimmerDeviceName", shimmerName);
 	            				   intent.putExtra("ShimmerState",BT_STATE.CONNECTING);
+								   sendBroadcast(intent);
 	            				   break;
 	            			   case STREAMING:
+								   intent.putExtra("ShimmerBluetoothAddress", macAddress);
+								   intent.putExtra("ShimmerDeviceName", shimmerName);
+								   intent.putExtra("ShimmerState", BT_STATE.STREAMING);
+								   sendBroadcast(intent);
 	            				   break;
 	            			   case STREAMING_AND_SDLOGGING:
-	            				   break;
+								   intent.putExtra("ShimmerBluetoothAddress", macAddress);
+								   intent.putExtra("ShimmerDeviceName", shimmerName);
+								   intent.putExtra("ShimmerState", BT_STATE.STREAMING_AND_SDLOGGING);
+								   sendBroadcast(intent);
+								   break;
 	            			   case SDLOGGING:
 	            				   Log.d("Shimmer",((ObjectCluster) msg.obj).getMacAddress() + "  " + ((ObjectCluster) msg.obj).getShimmerName());
-
 	            				   intent.putExtra("ShimmerBluetoothAddress", ((ObjectCluster) msg.obj).getMacAddress() );
 	            				   intent.putExtra("ShimmerDeviceName", ((ObjectCluster) msg.obj).getShimmerName() );
-	            				   intent.putExtra("ShimmerState",BT_STATE.CONNECTED);
+	            				   intent.putExtra("ShimmerState",BT_STATE.SDLOGGING);
 	            				   sendBroadcast(intent);
 	            				   break;
 	            			   case DISCONNECTED:
@@ -526,7 +558,7 @@ public class ShimmerService extends Service {
 
 
     public void stopStreamingAllDevices() {
-		// TODO Auto-generated method stub
+/*		TODO: check if this works
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
@@ -536,10 +568,17 @@ public class ShimmerService extends Service {
 				stemp.stopStreaming();
 			}
 		}
+*/
+		btManager.stopStreamingAllDevices();
 	}
 
 	public void startStreamingAllDevices() {
+
+		//TODO: Check if this works
+		btManager.startStreamingAllDevices();
+
 		// TODO Auto-generated method stub
+/*
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
@@ -555,12 +594,14 @@ public class ShimmerService extends Service {
 				stemp.startStreaming();
 			}
 		}
+*/
 	}
 
 	public void setEnableLogging(boolean enableLogging){
 		mEnableLogging=enableLogging;
 		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
 	}
+
 	public boolean getEnableLogging(){
 		return mEnableLogging;
 	}
@@ -665,7 +706,7 @@ public class ShimmerService extends Service {
 	}
 
 	public void toggleLED(String bluetoothAddress) {
-		// TODO Auto-generated method stub
+		// TODO Move to ShimmerBluetoothManager
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {

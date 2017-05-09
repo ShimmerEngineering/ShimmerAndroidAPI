@@ -11,6 +11,7 @@ import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.androidradiodriver.ShimmerRadioInitializerAndroid;
 import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerRadioInitializer;
 import com.shimmerresearch.comms.radioProtocol.CommsProtocolRadio;
 import com.shimmerresearch.comms.radioProtocol.LiteProtocol;
@@ -27,6 +28,8 @@ import com.shimmerresearch.exception.DeviceNotPairedException;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -253,5 +256,18 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         }
         return true;
     }
+
+//    public void toggleLED(String bluetoothAddress) {
+//        // TODO Move to ShimmerBluetoothManager
+//        Collection<Object> colS=mMultiShimmer.values();
+//        Iterator<Object> iterator = colS.iterator();
+//        while (iterator.hasNext()) {
+//            Shimmer stemp=(Shimmer) iterator.next();
+//            if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
+//                stemp.toggleLed();
+//            }
+//        }
+//    }
+
 
 }
