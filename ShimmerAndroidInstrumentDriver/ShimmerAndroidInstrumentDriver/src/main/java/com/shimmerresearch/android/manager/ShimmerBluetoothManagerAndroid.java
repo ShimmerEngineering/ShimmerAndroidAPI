@@ -29,9 +29,13 @@ import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+
+import static android.R.id.list;
 
 /**
  * Created by ASaez on 10-Aug-16.
@@ -257,17 +261,23 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         return true;
     }
 
-//    public void toggleLED(String bluetoothAddress) {
-//        // TODO Move to ShimmerBluetoothManager
-//        Collection<Object> colS=mMultiShimmer.values();
-//        Iterator<Object> iterator = colS.iterator();
-//        while (iterator.hasNext()) {
-//            Shimmer stemp=(Shimmer) iterator.next();
-//            if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
-//                stemp.toggleLed();
-//            }
-//        }
-//    }
+    public void toggleLED() {
+
+        List<ShimmerDevice> deviceList = getListOfConnectedDevices();
+        HashMap<String, Object> mMultiShimmer = new HashMap<String, Object>(7);
+        for(ShimmerDevice i : deviceList) {
+            mMultiShimmer.put(i.getMacId(), i);
+        }
+
+        Collection<Object> colS=mMultiShimmer.values();
+        Iterator<Object> iterator = colS.iterator();
+        while (iterator.hasNext()) {
+            Shimmer stemp=(Shimmer) iterator.next();
+            if (stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING){
+                stemp.toggleLed();
+            }
+        }
+    }
 
 
 }

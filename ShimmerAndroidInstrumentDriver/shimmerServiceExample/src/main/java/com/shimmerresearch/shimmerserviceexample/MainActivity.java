@@ -19,10 +19,12 @@ import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.driver.ShimmerDevice;
 
 public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
+    ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
     ShimmerService mService;
     Handler mHandler;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         btAdapter = BluetoothAdapter.getDefaultAdapter();
-
+        dialog = new ShimmerDialogConfigurations();
 
 //        else {
 //            try {
@@ -186,6 +188,12 @@ public class MainActivity extends AppCompatActivity {
         else {
             Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
         }
+    }
+
+    //TODO: Remove this
+    void testButton(View view) {
+        ShimmerDevice sDevice = mService.getShimmer("00:06:66:66:96:86");
+        dialog.buildShimmerConfigOptions(sDevice, this);
     }
 
 }
