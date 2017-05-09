@@ -114,13 +114,13 @@ public class CommandsActivity extends ServiceActivity {
         	}
         } 
         
-        buttonGsr.setText("GSR Range"+"\n"+ SensorGSR.ListofGSRRange[mGSRRangeV]);
-        
+        buttonGsr.setText("GSR Range"+"\n"+ SensorGSR.ListofGSRRangeResistance[mGSRRangeV]);
+
         buttonToggleLED.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub    				
+				// TODO Auto-generated method stub
 				ServiceActivity.mService.toggleLED(mBluetoothAddress);
 				Toast.makeText(getApplicationContext(), "Toggle LED", Toast.LENGTH_SHORT).show();
 			}
@@ -443,25 +443,25 @@ public class CommandsActivity extends ServiceActivity {
         
         //The Gsr Range is the same for the Shimmer 3 and the Shimmer 2 so we only need to do one dialog
         final AlertDialog.Builder dialogGsrRange = new AlertDialog.Builder(this);		 
-        dialogGsrRange.setTitle("GSR Range").setItems(SensorGSR.ListofGSRRange, new DialogInterface.OnClickListener() {
+        dialogGsrRange.setTitle("GSR Range").setItems(SensorGSR.ListofGSRRangeResistance, new DialogInterface.OnClickListener() {
                 	public void onClick(DialogInterface dialog, int item) {
-                		 Log.d("Shimmer",SensorGSR.ListofGSRRange[item]);
+                		 Log.d("Shimmer",SensorGSR.ListofGSRRangeResistance[item]);
              		    int gsrRange=0;
-             		   if (SensorGSR.ListofGSRRange[item]==SensorGSR.ListofGSRRange[0]){
+             		   if (SensorGSR.ListofGSRRangeResistance[item]==SensorGSR.ListofGSRRangeResistance[0]){
             		    	gsrRange=0;
-            		    } else if (SensorGSR.ListofGSRRange[item]==SensorGSR.ListofGSRRange[1]){
+            		    } else if (SensorGSR.ListofGSRRangeResistance[item]==SensorGSR.ListofGSRRangeResistance[1]){
             		    	gsrRange=1;
-            		    } else if (SensorGSR.ListofGSRRange[item]==SensorGSR.ListofGSRRange[2]){
+            		    } else if (SensorGSR.ListofGSRRangeResistance[item]==SensorGSR.ListofGSRRangeResistance[2]){
             		    	gsrRange=2;
-            		    } else if (SensorGSR.ListofGSRRange[item]==SensorGSR.ListofGSRRange[3]){
+            		    } else if (SensorGSR.ListofGSRRangeResistance[item]==SensorGSR.ListofGSRRangeResistance[3]){
             		    	gsrRange=3;
-            		    } else if (SensorGSR.ListofGSRRange[item]==SensorGSR.ListofGSRRange[4]){
+            		    } else if (SensorGSR.ListofGSRRangeResistance[item]==SensorGSR.ListofGSRRangeResistance[4]){
             		    	gsrRange=4;
             		    }
 
              		    ServiceActivity.mService.writeGSRRange(mBluetoothAddress, gsrRange);
-             		    Toast.makeText(getApplicationContext(), "Gsr range changed. New range = "+SensorGSR.ListofGSRRange[item], Toast.LENGTH_SHORT).show();
-             		    buttonGsr.setText("GSR RANGE"+"\n"+"("+SensorGSR.ListofGSRRange[item]+")");
+             		    Toast.makeText(getApplicationContext(), "Gsr range changed. New range = "+SensorGSR.ListofGSRRangeResistance[item], Toast.LENGTH_SHORT).show();
+             		    buttonGsr.setText("GSR RANGE"+"\n"+"("+SensorGSR.ListofGSRRangeResistance[item]+")");
              		   
            	      }
         });
