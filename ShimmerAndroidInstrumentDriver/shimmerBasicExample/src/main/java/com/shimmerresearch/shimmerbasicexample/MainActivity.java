@@ -2,6 +2,7 @@ package com.shimmerresearch.shimmerbasicexample;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -32,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
     //00:06:66:43:b4:8b
     //final static String shimmerBtAdd = "00:06:66:66:96:A9";  //Put the address of the Shimmer device you want to connect here
     final static String shimmerBtAdd = "00:06:66:43:B4:8B";  //Put the address of the Shimmer device you want to connect here
+
+    //TODO: Add this into the ShimmerBluetoothDialog class
+    final static int REQUEST_CONNECT_SHIMMER = 2;
+
 
     final static String LOG_TAG = "SHIMMER";
 
@@ -194,6 +200,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void pairedDevices(View v) {
+        Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
+        startActivityForResult(intent, REQUEST_CONNECT_SHIMMER);
+    }
 
 
 }
