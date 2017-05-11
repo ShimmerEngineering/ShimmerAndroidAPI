@@ -23,6 +23,7 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
 import com.shimmerresearch.driverUtilities.BluetoothDeviceDetails;
 import com.shimmerresearch.driverUtilities.HwDriverShimmerDeviceDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerObject;
 import com.shimmerresearch.exception.DeviceNotPairedException;
 
 import com.shimmerresearch.exceptions.ShimmerException;
@@ -163,10 +164,23 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     @Override
     protected ShimmerDevice createNewShimmer3(ShimmerRadioInitializer shimmerRadioInitializer, String bluetoothAddress) {
         ShimmerSerialPortAndroid serialPort = (ShimmerSerialPortAndroid) shimmerRadioInitializer.getSerialCommPort();
-        Shimmer shimmer = new Shimmer(mContext, mHandler,DEFAULT_SHIMMER_NAME,true);
+        Shimmer shimmer = new Shimmer(mHandler);
         shimmer.setDelayForBtRespone(true);
         mMapOfBtConnectedShimmers.put(bluetoothAddress, shimmer);
-        return initializeShimmer3(serialPort, shimmer);
+        ShimmerVerObject sVO = shimmerRadioInitializer.getShimmerVerObject();
+        if (sVO.isShimmerGen3()){
+            return initializeShimmer3(serialPort, shimmer);
+        } else if(sVO.isShimmerGen2()) {
+            return initializeShimmer2r(serialPort, shimmer);
+        }
+        return null;
+    }
+
+    protected ShimmerDevice initializeShimmer2r(AbstractSerialPortHal abstractSerialPortComm, ShimmerDevice shimmerDevice) {
+        ShimmerSerialPortAndroid serialPort = (ShimmerSerialPortAndroid) abstractSerialPortComm;
+        ((Shimmer) shimmerDevice).setRadio(serialPort.getBluetoothSocket());
+        shimmerDevice.addCommunicationRoute(Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+        return shimmerDevice;
     }
 
     protected ShimmerDevice initializeShimmer3(AbstractSerialPortHal abstractSerialPortComm, ShimmerDevice shimmerDevice) {
