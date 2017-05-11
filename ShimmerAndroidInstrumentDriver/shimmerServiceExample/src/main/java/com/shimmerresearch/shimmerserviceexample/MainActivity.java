@@ -111,46 +111,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
-//    protected ServiceConnection mTestServiceConnection = new ServiceConnection() {
-//
-//        public void onServiceConnected(ComponentName arg0, IBinder service) {
-//            Log.d(SERVICE_TAG, "Shimmer Service is connected");
-//            ShimmerService.LocalBinder binder = (com.shimmerresearch.shimmerService.MultiShimmerTemplateService.LocalBinder) service;
-//            mService = binder.getService();
-//            db=mService.mDataBase;
-//            mServiceBind = true;
-//            //update the view
-//
-//            // this is needed because sometimes when there is an actitivity switch the service is not connecte yet, before the fragment was created, thus the fragment has no access to the service
-//            ConfigurationFragment configF = (ConfigurationFragment)getFragmentManager().findFragmentByTag("Configure");
-//            PlotFragment plotF = (PlotFragment)getFragmentManager().findFragmentByTag("Plot");
-//            DevicesFragment deviceF = (DevicesFragment)getFragmentManager().findFragmentByTag("Devices");
-//
-//
-//            if (configF!=null){
-//                configF.mService = mService;
-//                configF.setup();
-//            } else if (plotF!=null){
-//                plotF.mService = mService;
-//                plotF.setup();
-//            } else if (deviceF!=null){
-//                deviceF.mService = mService;
-//                deviceF.setup();
-//            } else {
-//
-//            }
-//
-//
-//        }
-//
-//        public void onServiceDisconnected(ComponentName arg0) {
-//            mServiceBind = false;
-//        }
-//    };
-
-
-    //If Bluetooth was not on, get the result from the activity to switch on Bluetooth
+    //If Bluetooth was not enabled, get the result from the activity to switch on Bluetooth
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
