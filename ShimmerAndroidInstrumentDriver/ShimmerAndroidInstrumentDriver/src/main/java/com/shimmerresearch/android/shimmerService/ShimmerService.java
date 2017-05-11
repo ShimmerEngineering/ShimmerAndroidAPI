@@ -860,7 +860,7 @@ public class ShimmerService extends Service {
 	 */
 	@Deprecated
 	public int getAccelRange(String bluetoothAddress) {
-		btManager.getAccelRange(bluetoothAddress);
+		return btManager.getAccelRange(bluetoothAddress);
 	}
 
 	/**
@@ -1054,41 +1054,34 @@ public class ShimmerService extends Service {
 		btManager.enableLowPowerMag(bluetoothAddress, enable);
 	}
 
-
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @param limit
+	 */
+	@Deprecated
 	public void setBattLimitWarning(String bluetoothAddress, double limit) {
-		// TODO Auto-generated method stub
-		Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				stemp.setBattLimitWarning(limit);
-			}
-		}
-
+		btManager.setBattLimitWarning(bluetoothAddress, limit);
 	}
 
-
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public double getBattLimitWarning(String bluetoothAddress) {
-		// TODO Auto-generated method stub
-		double limit=-1;
-		Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				limit=stemp.getBattLimitWarning();
-			}
-		}
-		return limit;
+		return btManager.getBattLimitWarning(bluetoothAddress);
 	}
 
-
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public double getPacketReceptionRate(String bluetoothAddress) {
-		// TODO Auto-generated method stub
-		double rate=-1;
-		Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				rate=stemp.getPacketReceptionRate();
-			}
-		}
+		double rate = btManager.getPacketReceptionRate(bluetoothAddress);
 		return rate;
 	}
 
@@ -1103,11 +1096,8 @@ public class ShimmerService extends Service {
 
 			}
 		}
-
-
 		mLogShimmer.remove(bluetoothAddress);
 		mMultiShimmer.remove(bluetoothAddress);
-
 	}
 
 	public void setGraphHandler(Handler handler){
@@ -1119,53 +1109,34 @@ public class ShimmerService extends Service {
 		mGraphing=setting;
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public boolean DevicesConnected(String bluetoothAddress){
-		if (bluetoothAddress==null){
-			return false;
-		}
-		boolean deviceConnected=false;
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-			String address = stemp.getMacId();
-			address = address.replace(":","");
-			bluetoothAddress = bluetoothAddress.replace(":","");
-			if (stemp.getBluetoothRadioState()!=BT_STATE.DISCONNECTED && address.equals(bluetoothAddress)){
-				deviceConnected=true;
-			}
-		}
-		return deviceConnected;
+		return btManager.DevicesConnected(bluetoothAddress);
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public boolean DeviceIsLogging(String bluetoothAddress){
-		boolean deviceLogging=false;
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-			if ((stemp.mBluetoothRadioState == BT_STATE.SDLOGGING || stemp.mBluetoothRadioState == BT_STATE.STREAMING_AND_SDLOGGING) && stemp.getMacId().equals(bluetoothAddress.replaceAll(":",""))){
-				deviceLogging=true;
-			}
-		}
-		return deviceLogging;
+		return btManager.DeviceIsLogging(bluetoothAddress);
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public boolean DeviceIsStreaming(String bluetoothAddress){
-		boolean deviceStreaming=false;
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-			String address = stemp.getMacId();
-			address = address.replace(":","");
-			bluetoothAddress = bluetoothAddress.replace(":","");
-			BT_STATE btState = stemp.getBluetoothRadioState();
-			if ((btState==BT_STATE.STREAMING || btState==BT_STATE.STREAMING_AND_SDLOGGING)  && address.equals(bluetoothAddress)){
-				deviceStreaming=true;
-			}
-		}
-		return deviceStreaming;
+		return btManager.DeviceIsStreaming(bluetoothAddress);
 	}
 
 	public void setLoggingName(String name){
@@ -1181,41 +1152,28 @@ public class ShimmerService extends Service {
 		}
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public String getFWVersion (String bluetoothAddress){
-		String version="";
-		ShimmerDevice stemp=(ShimmerDevice) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			version=stemp.getFirmwareVersionMajor()+"."+stemp.getFirmwareVersionMinor();
-		}
-		return version;
+		return btManager.getFWVersion(bluetoothAddress);
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public int getShimmerVersion (String bluetoothAddress){
-		int version=0;
-		ShimmerDevice stemp=(ShimmerDevice) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			version=stemp.getHardwareVersion();
-		}
-		return version;
+		return btManager.getShimmerVersion(bluetoothAddress);
 	}
-
-
 
 	public ShimmerDevice getShimmer(String bluetoothAddress){
-		// TODO Auto-generated method stub
-		ShimmerDevice shimmer = null;
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			shimmer=(ShimmerDevice) iterator.next();
-			String address = shimmer.getMacId();
-			address = address.replace(":","");
-			bluetoothAddress = bluetoothAddress.replace(":","");
-			if (address.equals(bluetoothAddress)){
-				return shimmer;
-			}
-		}
-		return shimmer;
+		return btManager.getShimmer(bluetoothAddress);
 	}
 
 	public void test(){
@@ -1259,29 +1217,15 @@ public class ShimmerService extends Service {
 		return tmp.isEXGUsingEMG16Configuration();
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @param setting
+	 */
+	@Deprecated
 	public void writeEXGSetting(String bluetoothAddress,int setting) {
-		// TODO Auto-generated method stub
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			if ((stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				if (setting==0){
-					stemp.enableDefaultECGConfiguration();
-				} else if (setting==1){
-					stemp.enableDefaultEMGConfiguration();
-				} else if (setting==2){
-					stemp.enableEXGTestSignal();
-
-				}
-
-			} else {
-
-			}
-		}
+		btManager.writeEXGSetting(bluetoothAddress, setting);
 	}
-
-
 
 	//convert the system time in miliseconds to a "readable" date format with the next format: YYYY MM DD HH MM SS
 	private String fromMilisecToDate(long miliseconds){
@@ -1294,47 +1238,43 @@ public class ShimmerService extends Service {
 		return date;
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public boolean isUsingLogAndStreamFW(String bluetoothAddress){
-
-		boolean logAndStream = false;
-		ShimmerDevice stemp=(ShimmerDevice) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if(stemp.getFirmwareIdentifier()==3)
-				logAndStream = true;
-		}
-		return logAndStream;
-
+		return btManager.isUsingLogAndStreamFW(bluetoothAddress);
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 */
+	@Deprecated
 	public void readStatusLogAndStream(String bluetoothAddress){
-
-		Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if(stemp.getFirmwareIdentifier()==3)
-				stemp.readStatusLogAndStream();
-		}
+		btManager.readStatusLogAndStream(bluetoothAddress);
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public boolean isSensing(String bluetoothAddress){
-
-		Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if(stemp.getFirmwareIdentifier()==3)
-				return stemp.isSensing();
-		}
-
-		return false;
+		return btManager.isSensing(bluetoothAddress);
 	}
 
+	/**
+	 * This method is kept for backwards compatibility with existing apps
+	 * @param bluetoothAddress
+	 * @return
+	 */
+	@Deprecated
 	public boolean isDocked(String bluetoothAddress){
-
-		Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
-		if (stemp!=null){
-			if(stemp.getFirmwareIdentifier()==3)
-				return stemp.isDocked();
-		}
-
-		return false;
+		return btManager.isDocked(bluetoothAddress);
 	}
 
 }

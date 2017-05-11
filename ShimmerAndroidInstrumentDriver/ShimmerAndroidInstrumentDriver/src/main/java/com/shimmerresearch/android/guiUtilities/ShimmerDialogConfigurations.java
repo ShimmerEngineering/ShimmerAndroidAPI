@@ -141,7 +141,7 @@ public class ShimmerDialogConfigurations {
         builder.create().show();
     }
 
-    public static void buildConfigOptionDetailsSensor(final String key,Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
+    public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
         String title = "";

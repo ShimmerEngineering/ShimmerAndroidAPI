@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     public void startStreaming(View v){
         shimmerDevice.startStreaming();
     }
+
     public void openConfigMenu(View v){
         if(shimmerDevice != null) {
             if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
@@ -174,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is not connected", Toast.LENGTH_SHORT).show();
         }
     }
+
     //Called when the menu button is pressed
     public void openMenu(View v) throws IOException {
 
