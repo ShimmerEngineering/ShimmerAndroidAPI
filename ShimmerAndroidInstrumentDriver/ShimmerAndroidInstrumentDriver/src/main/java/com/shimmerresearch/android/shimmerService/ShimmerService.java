@@ -338,23 +338,29 @@ public class ShimmerService extends Service {
 */
 	}
 
-
-
+	/**
+	 * We recommend using ShimmerBluetoothManagerAndroid when configuring the Shimmer LEDs.
+	 * This method is kept for backwards compatibility with existing apps.
+	 */
+	@Deprecated
 	public void toggleAllLEDS(){
-		//TODO: Move to Bluetooth Manager class?
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			if (stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING){
-				stemp.toggleLed();
-			}
-		}
+		btManager.toggleAllLEDS();
 	}
 
-	//TODO: Remove This
+	/**
+	 * We recommend using ShimmerBluetoothManagerAndroid when configuring the Shimmer LEDs.
+	 * This method is kept for backwards compatibility with existing apps.
+	 * @param bluetoothAddress
+	 */
+	@Deprecated
+	public void toggleLED(String bluetoothAddress) {
+		btManager.toggleLED(bluetoothAddress);
+	}
+
+
+	//TODO: Remove This when done testing
 	public void clickToggle() {
-		btManager.toggleLED();
+		btManager.toggleAllLEDS();
 	}
 
 
@@ -582,7 +588,6 @@ public class ShimmerService extends Service {
 		//TODO: Check if this works
 		btManager.startStreamingAllDevices();
 
-		// TODO Auto-generated method stub
 /*
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
@@ -610,8 +615,9 @@ public class ShimmerService extends Service {
 	public boolean getEnableLogging(){
 		return mEnableLogging;
 	}
+
 	public void setAllSampingRate(double samplingRate) {
-		// TODO Auto-generated method stub
+
 		Collection<Object> colS=mMultiShimmer.values();
 		Iterator<Object> iterator = colS.iterator();
 		while (iterator.hasNext()) {
@@ -706,18 +712,6 @@ public class ShimmerService extends Service {
 					mPPGtoHREnabled = false;
 				}
 				stemp.writeEnabledSensors(enabledSensors);
-			}
-		}
-	}
-
-	public void toggleLED(String bluetoothAddress) {
-		// TODO Move to ShimmerBluetoothManager
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			if ((stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				stemp.toggleLed();
 			}
 		}
 	}
