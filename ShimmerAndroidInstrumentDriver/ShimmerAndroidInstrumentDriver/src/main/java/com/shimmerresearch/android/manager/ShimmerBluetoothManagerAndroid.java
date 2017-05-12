@@ -289,7 +289,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     /*
-       ------------- Methods from ShimmerService below -------------
+       ------------------- Methods from ShimmerService below -------------------
      */
     public void toggleAllLEDS() {
 

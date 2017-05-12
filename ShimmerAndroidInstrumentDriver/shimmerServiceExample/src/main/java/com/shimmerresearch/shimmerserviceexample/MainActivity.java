@@ -152,7 +152,8 @@ public class MainActivity extends AppCompatActivity {
     //TODO: Remove this
     void testButton(View view) {
         ShimmerDevice sDevice = mService.getShimmer("00:06:66:66:96:86");
-        dialog.buildShimmerConfigOptions(sDevice, this);
+        dialog.buildShimmersConnectedList(mService.getBluetoothManager().getListOfConnectedDevices(), this);
+        //dialog.buildShimmerConfigOptions(sDevice, this);
     }
 
 }

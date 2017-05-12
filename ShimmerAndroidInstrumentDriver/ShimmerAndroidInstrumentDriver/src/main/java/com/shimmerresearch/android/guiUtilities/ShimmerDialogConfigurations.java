@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.driver.ShimmerDevice;
@@ -339,6 +340,43 @@ public class ShimmerDialogConfigurations {
 
         dialog.show();
 
+    }
+
+    /**
+     * This displays a popup dialog populated by the list of Shimmers connected via Shimmer Bluetooth Manager.
+     * @param
+     */
+    public void buildShimmersConnectedList(List<ShimmerDevice> deviceList, Context context) {
+        //List<ShimmerDevice> deviceList = btManager.getListOfConnectedDevices();
+        CharSequence[] nameList = new CharSequence[deviceList.size()];
+        CharSequence[] macList = new CharSequence[deviceList.size()];
+        CharSequence[] displayList = new CharSequence[deviceList.size()];
+
+        for(int i=0; i<nameList.length; i++) {
+            nameList[i] = deviceList.get(i).getShimmerUserAssignedName();
+            macList[i] = deviceList.get(i).getMacId();
+            displayList[i] = nameList[i] + "\n" + macList[i];
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Connected Shimmers")
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .setItems(displayList, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public static String joinStrings(String[] a){
