@@ -1,5 +1,6 @@
 package com.shimmerresearch.shimmerserviceexample;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     ShimmerService mService;
     Handler mHandler;
 
+    //Extra for intent from ShimmerBluetoothDialog
+    public static final String EXTRA_DEVICE_ADDRESS = "device_address";
+
     boolean isServiceStarted = false;
 
     final static String LOG_TAG = "Shimmer";
@@ -42,16 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
-
-//        else {
-//            try {
-//                btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
-//            } catch (Exception e) {
-//                Log.e(LOG_TAG, "Couldn't create ShimmerBluetoothManagerAndroid. Error: " + e);
-//            }
-//        }
     }
-
 
     @Override
     protected void onStart() {
@@ -69,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onStart();
     }
-
-
 
     @Override
     protected void onDestroy() {
@@ -111,10 +104,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    //If Bluetooth was not enabled, get the result from the activity to switch on Bluetooth
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
+        if (requestCode == 1) { //The system Bluetooth enable dialog has returned a result
             if(resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, ShimmerService.class);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -131,8 +123,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Unknown Error! Your device may not support Bluetooth!", Toast.LENGTH_LONG).show();
             }
         }
+        else if(requestCode == 2) { //The devices paired list has returned a result
+            if(resultCode == Activity.RESULT_OK) {
+                //Get the Bluetooth mac address of the selected device:
+                String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
+                mService.connectShimmer(macAdd);    //Connect to the selected device
+            }
+        }
     }
-
 
     boolean checkBtEnabled() {
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -144,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     void connectShimmer(View view) {
         if(isServiceStarted) {
-            mService.connectShimmer("00:06:66:66:96:86", "Shimmer39686");
+            mService.connectShimmer("00:06:66:66:96:86");
         }
         else {
             Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();

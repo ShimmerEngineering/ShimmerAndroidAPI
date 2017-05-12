@@ -249,19 +249,10 @@ public class ShimmerService extends Service {
 		return mECGtoHREnabled;
 	}
 
-	public void connectShimmer(final String bluetoothAddress, final String selectedDevice){
+	public void connectShimmer(final String bluetoothAddress){
 
 		btManager.connectShimmerTroughBTAddress(bluetoothAddress);
 
-/*		TODO:
-		Log.d("Shimmer","net Connection");
-		Shimmer shimmerDevice=new Shimmer(this, mHandler, selectedDevice, true);
-		mMultiShimmer.remove(bluetoothAddress);
-		if (mMultiShimmer.get(bluetoothAddress)==null){
-			mMultiShimmer.put(bluetoothAddress,shimmerDevice);
-			((Shimmer) mMultiShimmer.get(bluetoothAddress)).connect(bluetoothAddress,"default");
-		}
-*/
 
 
 //		mMultiShimmer.remove(bluetoothAddress);
@@ -296,6 +287,15 @@ public class ShimmerService extends Service {
 //				e.printStackTrace();
 //			}
 //		}
+	}
+
+	public void connectShimmerAndSetName(String bluetoothAddress, String deviceName) {
+		Shimmer shimmerDevice = new Shimmer(this, mHandler, deviceName, true);
+		mMultiShimmer.remove(bluetoothAddress);
+		if (mMultiShimmer.get(bluetoothAddress)==null){
+			mMultiShimmer.put(bluetoothAddress,shimmerDevice);
+			((Shimmer) mMultiShimmer.get(bluetoothAddress)).connect(bluetoothAddress,"default");
+		}
 	}
 //
 //	private Shimmer initializeNewShimmer3(ByteLevelDataComm bldc,String selectedDevice) {
