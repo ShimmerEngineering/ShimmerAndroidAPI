@@ -139,6 +139,12 @@ public class ShimmerDialogConfigurations {
                         buildConfigOptionDetailsSensor(cs[which].toString(),configOptionsMap,context, shimmerDevice, shimmerDeviceClone);
                     }
                 });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
         builder.create().show();
     }
 
@@ -346,7 +352,7 @@ public class ShimmerDialogConfigurations {
      * This displays a popup dialog populated by the list of Shimmers connected via Shimmer Bluetooth Manager.
      * @param
      */
-    public void buildShimmersConnectedList(List<ShimmerDevice> deviceList, Context context) {
+    public void buildShimmersConnectedList(final List<ShimmerDevice> deviceList, final Context context) {
         //List<ShimmerDevice> deviceList = btManager.getListOfConnectedDevices();
         CharSequence[] nameList = new CharSequence[deviceList.size()];
         CharSequence[] macList = new CharSequence[deviceList.size()];
@@ -360,23 +366,45 @@ public class ShimmerDialogConfigurations {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setTitle("Connected Shimmers")
+        builder.setTitle("Connected Shimmers");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.setItems(displayList, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                ShimmerDevice shimmerDevice = deviceList.get(i);
+                buildSensorOrConfigOptions(shimmerDevice, context);
+                //dialogInterface.cancel();
+            }
+        });
 
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                })
-                .setItems(displayList, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
+        builder.create().show();
+    }
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    public void buildSensorOrConfigOptions(final ShimmerDevice shimmerDevice, final Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        CharSequence[] items = new CharSequence[2];
+        items[0] = "Enable/Disable Sensors";
+        items[1] = "Device Configuration";
+
+        builder.setTitle("Options");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(i == 0) {
+                    buildShimmerSensorEnableDetails(shimmerDevice, context);
+                }
+                else if(i == 1) {
+                    buildShimmerConfigOptions(shimmerDevice, context);
+                }
+            }
+        });
+
+        builder.create().show();
     }
 
     public static String joinStrings(String[] a){
