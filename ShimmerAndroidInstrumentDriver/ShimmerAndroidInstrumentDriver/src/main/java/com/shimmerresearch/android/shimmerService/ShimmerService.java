@@ -250,77 +250,8 @@ public class ShimmerService extends Service {
 	}
 
 	public void connectShimmer(final String bluetoothAddress){
-
 		btManager.connectShimmerTroughBTAddress(bluetoothAddress);
-
-
-
-//		mMultiShimmer.remove(bluetoothAddress);
-//		if (mMultiShimmer.get(bluetoothAddress)==null) {
-//			final Old_ShimmerSerialPortAndroid sspa = new Old_ShimmerSerialPortAndroid(bluetoothAddress);
-//			//sspa = new ShimmerSerialPortJssc("COM89", SerialPort.BAUDRATE_115200);
-//			sspa.setByteLevelDataCommListener(new ByteLevelDataCommListener() {
-//				@Override
-//				public void eventConnected() {
-//					ShimmerVerObject svo = sspa.getShimmerVerObject();
-//					ShimmerDevice shimmerDeviceNew = null;
-//					if (svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3 || svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_2R ) {
-//						shimmerDeviceNew = initializeNewShimmer3(sspa, selectedDevice);
-//						mMultiShimmer.put(bluetoothAddress,shimmerDeviceNew);
-//					} else if (svo.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_4_SDK) {
-//						shimmerDeviceNew = initializeNewShimmer4(sspa, selectedDevice);
-//						shimmerDeviceNew.setMacIdFromUart(bluetoothAddress);
-//						mMultiShimmer.put(bluetoothAddress,shimmerDeviceNew);
-//					}
-//				}
-//
-//				@Override
-//				public void eventDisconnected() {
-//					System.out.println("Shimmer Disconnected");
-//					mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(selectedDevice,bluetoothAddress,BT_STATE.DISCONNECTED)).sendToTarget();
-//				}
-//			});
-//			try {
-//				sspa.connect();
-//			} catch (DeviceException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
 	}
-
-	public void connectShimmerAndSetName(String bluetoothAddress, String deviceName) {
-		Shimmer shimmerDevice = new Shimmer(this, mHandler, deviceName, true);
-		mMultiShimmer.remove(bluetoothAddress);
-		if (mMultiShimmer.get(bluetoothAddress)==null){
-			mMultiShimmer.put(bluetoothAddress,shimmerDevice);
-			((Shimmer) mMultiShimmer.get(bluetoothAddress)).connect(bluetoothAddress,"default");
-		}
-	}
-//
-//	private Shimmer initializeNewShimmer3(ByteLevelDataComm bldc,String selectedDevice) {
-//		Old_ShimmerSerialPortAndroid ssjc = (Old_ShimmerSerialPortAndroid) bldc;
-//		Shimmer shimmer = new Shimmer(this, mHandler,selectedDevice,true);
-//		return initializeShimmer3(ssjc, shimmer);
-//	}
-//
-//	private Shimmer initializeShimmer3(Old_ShimmerSerialPortAndroid ssja, Shimmer shimmer) {
-//		shimmer.setRadio(ssja.mConnectedThread.mSocket);
-//		shimmer.addCommunicationRoute(Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-//		return shimmer;
-//	}
-//	private Shimmer4Android initializeShimmer4(ByteLevelDataComm bldc, Shimmer4Android shimmer4) {
-//		shimmer4.setRadio(new ShimmerRadioProtocol(bldc, new LiteProtocol()));
-//		shimmer4.addCommunicationRoute(Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-//		return shimmer4;
-//	}
-//
-//	private Shimmer4 initializeNewShimmer4(ByteLevelDataComm bldc, String selectedDevice) {
-//		Shimmer4Android shimmer = new Shimmer4Android(mHandler);
-//		shimmer.setShimmerUserAssignedName(selectedDevice);
-//		return initializeShimmer4(bldc, shimmer);
-//	}
-
 
 	public void onStop(){
 		Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
