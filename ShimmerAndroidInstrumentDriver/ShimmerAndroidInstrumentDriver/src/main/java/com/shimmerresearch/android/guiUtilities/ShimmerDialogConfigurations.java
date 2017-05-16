@@ -21,7 +21,9 @@ import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.androidinstrumentdriver.R;
+import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetails;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
 import com.shimmerresearch.driverUtilities.SensorDetails;
@@ -93,6 +95,10 @@ public class ShimmerDialogConfigurations {
                             shimmerDeviceClone.setSensorEnabledState((int)sensorKeys[selected],listEnabled[selected]);
                         }
                         //shimmerDeviceClone.refreshShimmerInfoMemBytes();
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, shimmerDeviceClone);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
                         if (shimmerDevice instanceof Shimmer) {
                             //((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                             /*try {
@@ -171,7 +177,12 @@ public class ShimmerDialogConfigurations {
                         // of the selected item
                         Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
                         shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
-                        shimmerDeviceClone.refreshShimmerInfoMemBytes();
+
+                        //shimmerDeviceClone.refreshShimmerInfoMemBytes();
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, shimmerDeviceClone);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
                         if (shimmerDevice instanceof Shimmer) {
                             ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                         } else if (shimmerDevice instanceof Shimmer4Android){

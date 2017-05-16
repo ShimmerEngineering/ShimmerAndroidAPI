@@ -813,9 +813,7 @@ public class ShimmerService extends Service {
 	 */
 	@Deprecated
 	public int getGSRRange(String bluetoothAddress) {
-		int gRange=-1;
-		gRange = btManager.getGSRRange(bluetoothAddress);
-		return gRange;
+		return btManager.getGSRRange(bluetoothAddress);
 	}
 
 	/**

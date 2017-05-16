@@ -12,6 +12,15 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\Jos\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.5f\3e0f6a39a5c55260c8075f0608908ba47d3c0677\ShimmerDriver-0.5f.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3e0f6a39a5c55260c8075f0608908ba47d3c0677">
+        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.5f_3e266886485f43efac2f5b48e9b86adef01a2df4\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"

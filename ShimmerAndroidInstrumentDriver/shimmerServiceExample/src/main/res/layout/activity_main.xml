@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.shimmerresearch.shimmerserviceexample.MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/content_frame">
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="Shimmer Service Example" app:layout_constraintBottom_toBottomOf="parent"
@@ -17,21 +18,52 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:text="Menu"
-        android:onClick="openMenu"/>
+        android:onClick="openMenu"
+        android:text="Menu" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connect Shimmer"
-        android:onClick="connectShimmer"/>
+        android:onClick="connectShimmer"
+        android:text="Connect Shimmer" />
 
     <Button
         android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="testButton"
+        android:text="Test Button" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test Button 2"
+        android:onClick="testButton2"/>
+
+    <Button
+        android:id="@+id/button5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Test Button"
-        android:onClick="testButton"/>
+        android:text="Fragment Button"
+        android:onClick="testButton3"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/pager_title_strip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="#33b5e5"
+            android:textColor="#fff"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
+    </android.support.v4.view.ViewPager>
 
 </android.widget.LinearLayout>

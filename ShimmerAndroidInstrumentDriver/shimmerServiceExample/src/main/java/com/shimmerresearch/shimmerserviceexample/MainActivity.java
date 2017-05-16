@@ -1,6 +1,11 @@
 package com.shimmerresearch.shimmerserviceexample;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.net.Uri;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +15,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.renderscript.ScriptGroup;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +37,22 @@ public class MainActivity extends AppCompatActivity {
     ShimmerService mService;
     Handler mHandler;
 
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
+
+
     //Extra for intent from ShimmerBluetoothDialog
     public static final String EXTRA_DEVICE_ADDRESS = "device_address";
 
@@ -44,6 +67,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //To set the action bar tabs for the swipe view
+        final ActionBar actionBar = getActionBar();
+        // Specify that tabs should be displayed in the action bar.
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
     }
@@ -155,5 +193,62 @@ public class MainActivity extends AppCompatActivity {
         dialog.buildShimmersConnectedList(mService.getBluetoothManager().getListOfConnectedDevices(), this);
         //dialog.buildShimmerConfigOptions(sDevice, this);
     }
+
+    //TODO: Remove this
+    void testButton2 (View view) {
+        mService.setBlinkLEDCMD("00:06:66:66:96:86");
+        Toast.makeText(this, "ToggleAllLEDS", Toast.LENGTH_LONG).show();
+    }
+
+    //TODO: Remove this
+    void testButton3(View view) {
+        Fragment fragment = new PlotFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_frame, fragment, "Plot");
+        transaction.commit();
+    }
+
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            if(position==2) {
+                return PlotFragment.newInstance("Hi", "Hello");
+            }
+            else {
+                return PlaceholderFragment.newInstance(position);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Sensors";
+                case 1:
+                    return "Device Configuration";
+                case 2:
+                    return "Plot";
+            }
+            return null;
+        }
+    }
+
 
 }
