@@ -42,13 +42,6 @@
         android:text="Test Button 2"
         android:onClick="testButton2"/>
 
-    <Button
-        android:id="@+id/button5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Fragment Button"
-        android:onClick="testButton3"/>
-
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"

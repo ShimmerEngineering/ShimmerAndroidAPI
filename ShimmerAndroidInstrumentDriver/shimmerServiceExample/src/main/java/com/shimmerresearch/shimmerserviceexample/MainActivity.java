@@ -20,6 +20,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -68,11 +71,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //To set the action bar tabs for the swipe view
-        final ActionBar actionBar = getActionBar();
-        // Specify that tabs should be displayed in the action bar.
-        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
+//        //To set the action bar tabs for the swipe view
+//        final ActionBar actionBar = getActionBar();
+//        // Specify that tabs should be displayed in the action bar.
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -85,6 +87,26 @@ public class MainActivity extends AppCompatActivity {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
     }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.paired_devices:
+                return true;
+            case R.id.test_button:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     @Override
     protected void onStart() {
@@ -200,14 +222,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "ToggleAllLEDS", Toast.LENGTH_LONG).show();
     }
 
-    //TODO: Remove this
-    void testButton3(View view) {
-        Fragment fragment = new PlotFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_frame, fragment, "Plot");
-        transaction.commit();
-    }
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -225,8 +239,11 @@ public class MainActivity extends AppCompatActivity {
             if(position==2) {
                 return PlotFragment.newInstance("Hi", "Hello");
             }
+            else if(position==0){
+                return EnabledSensorsFragment.newInstance();
+            }
             else {
-                return PlaceholderFragment.newInstance(position);
+                return DeviceConfigFragment.newInstance();
             }
         }
 
