@@ -4,4 +4,6 @@
             android:title="Paired Bluetooth devices"></item>
     <item   android:id="@+id/test_button"
             android:title="Test Button" ></item>
+    <item   android:id="@+id/connect_shimmer"
+            android:title="Connect Shimmer (Test)" ></item>
 </menu>

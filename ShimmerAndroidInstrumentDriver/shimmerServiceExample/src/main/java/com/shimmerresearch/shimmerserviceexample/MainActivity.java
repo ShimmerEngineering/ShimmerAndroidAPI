@@ -17,6 +17,8 @@ import android.os.IBinder;
 import android.renderscript.ScriptGroup;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
@@ -39,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
     BluetoothAdapter btAdapter;
     ShimmerService mService;
     Handler mHandler;
+
+    //Drawer stuff
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private String mActivityTitle;
+
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -71,6 +83,41 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDrawerList = (ListView)findViewById(R.id.left_drawer);
+        String[] osArray = {"Android", "iOS", "Windows", "OS X", "Linux"};
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
+        mDrawerList.setAdapter(mAdapter);
+
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.content_frame);
+        mActivityTitle = getTitle().toString();
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle("Navigation!");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+
+
+
 //        //To set the action bar tabs for the swipe view
 //        final ActionBar actionBar = getActionBar();
 //        // Specify that tabs should be displayed in the action bar.
@@ -102,11 +149,18 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.test_button:
                 return true;
+            case R.id.connect_shimmer:
+                if(isServiceStarted) {
+                    mService.connectShimmer("00:06:66:66:96:86");
+                }
+                else {
+                    Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     @Override
     protected void onStart() {
@@ -200,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /*
     void connectShimmer(View view) {
         if(isServiceStarted) {
             mService.connectShimmer("00:06:66:66:96:86");
@@ -208,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
         }
     }
+
 
     //TODO: Remove this
     void testButton(View view) {
@@ -221,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
         mService.setBlinkLEDCMD("00:06:66:66:96:86");
         Toast.makeText(this, "ToggleAllLEDS", Toast.LENGTH_LONG).show();
     }
+*/
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
