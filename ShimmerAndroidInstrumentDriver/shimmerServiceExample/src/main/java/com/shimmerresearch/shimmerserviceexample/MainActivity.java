@@ -2,7 +2,9 @@ package com.shimmerresearch.shimmerserviceexample;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -16,6 +18,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.renderscript.ScriptGroup;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -34,15 +38,18 @@ import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.CallbackObject;
+import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
 
-    ShimmerBluetoothManagerAndroid btManager;
+public class MainActivity extends AppCompatActivity implements Handler.Callback {
+
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
     ShimmerService mService;
-    Handler mHandler;
 
     //Drawer stuff
     private ListView mDrawerList;
@@ -50,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
+    public String selectedDeviceAdd;
 
 
     /**
@@ -83,21 +91,68 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDrawerList = (ListView)findViewById(R.id.left_drawer);
-        String[] osArray = {"Android", "iOS", "Windows", "OS X", "Linux"};
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
-        mDrawerList.setAdapter(mAdapter);
-
-        mDrawerLayout = (DrawerLayout)findViewById(R.id.content_frame);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.content_frame);
         mActivityTitle = getTitle().toString();
 
+        String[] startArray = {""};
+        addDrawerItems(startArray);
+        setupDrawer();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        dialog = new ShimmerDialogConfigurations();
+    }
+
+    private void addDrawerItems(String[] stringArray) {
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stringArray);
+        mDrawerList.setAdapter(mAdapter);
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String viewText = (String) mDrawerList.getItemAtPosition(position);
+                if (viewText.contains("\n")) {
+                    selectedDeviceAdd = viewText.substring(viewText.indexOf("\n"));
+                    Toast.makeText(MainActivity.this, "Selected device: " + viewText, Toast.LENGTH_SHORT).show();
+                }
+                //Highlight the selected device
+                view.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.holo_orange_light));
+                //Set all other backgrounds to white (clearing previous highlight, if any)
+                for (int i = 0; i < mDrawerList.getAdapter().getCount(); i++) {
+                    if (i != position) {
+                        View v = mDrawerList.getChildAt(i);
+                        v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
+                        Log.e(SERVICE_TAG, "Cleared background color...");
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
+                String[] list = getStringListOfDevicesConnected();
+                if (list != null) {
+                    addDrawerItems(list);
+                }
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation!");
+                getSupportActionBar().setTitle("Connected Shimmers");
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
@@ -108,33 +163,36 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
-
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-
-
-
-//        //To set the action bar tabs for the swipe view
-//        final ActionBar actionBar = getActionBar();
-//        // Specify that tabs should be displayed in the action bar.
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        dialog = new ShimmerDialogConfigurations();
     }
 
+    private String[] getStringListOfDevicesConnected() {
+        List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
+        if (deviceList != null) {
+            String[] nameList = new String[deviceList.size()];
+            for (int i = 0; i < deviceList.size(); i++) {
+                ShimmerDevice device = deviceList.get(i);
+                nameList[i] = device.getShimmerUserAssignedName() + "\n" + device.getMacId();
+            }
+            return nameList;
+        } else {
+            Log.w(SERVICE_TAG, "Error! No Shimmers connected. Cannot retrieve List of devices");
+            return null;
+        }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -144,16 +202,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
             case R.id.paired_devices:
+                Intent serverIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
+                startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);
                 return true;
             case R.id.test_button:
                 return true;
             case R.id.connect_shimmer:
-                if(isServiceStarted) {
+                if (isServiceStarted) {
                     mService.connectShimmer("00:06:66:66:96:86");
-                }
-                else {
+                } else {
                     Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
                 }
                 return true;
@@ -189,11 +252,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    void openMenu(View view) {
-        Intent serverIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
-        startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);
-    }
-
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             // This is called when the connection with the service has been
@@ -201,8 +259,10 @@ public class MainActivity extends AppCompatActivity {
             // interact with the service.  Because we have bound to a explicit
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
-            mService = ((ShimmerService.LocalBinder)service).getService();
+            mService = ((ShimmerService.LocalBinder) service).getService();
             isServiceStarted = true;
+            mHandler = mService.getHandler();
+
             // Tell the user about this for our demo.
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
         }
@@ -221,24 +281,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) { //The system Bluetooth enable dialog has returned a result
-            if(resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, ShimmerService.class);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                 Log.d(LOG_TAG, "Shimmer Service started");
                 Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
-            }
-            else if(resultCode == RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Please enable Bluetooth to proceed.", Toast.LENGTH_LONG).show();
                 int REQUEST_ENABLE_BT = 1;
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            }
-            else {
+            } else {
                 Toast.makeText(this, "Unknown Error! Your device may not support Bluetooth!", Toast.LENGTH_LONG).show();
             }
-        }
-        else if(requestCode == 2) { //The devices paired list has returned a result
-            if(resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == 2) { //The devices paired list has returned a result
+            if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 mService.connectShimmer(macAdd);    //Connect to the selected device
@@ -248,36 +305,17 @@ public class MainActivity extends AppCompatActivity {
 
     boolean checkBtEnabled() {
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(!btAdapter.isEnabled()) {
+        if (!btAdapter.isEnabled()) {
             return false;
         }
         return true;
     }
 
-    /*
-    void connectShimmer(View view) {
-        if(isServiceStarted) {
-            mService.connectShimmer("00:06:66:66:96:86");
-        }
-        else {
-            Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-    //TODO: Remove this
     void testButton(View view) {
         ShimmerDevice sDevice = mService.getShimmer("00:06:66:66:96:86");
         dialog.buildShimmersConnectedList(mService.getBluetoothManager().getListOfConnectedDevices(), this);
         //dialog.buildShimmerConfigOptions(sDevice, this);
     }
-
-    //TODO: Remove this
-    void testButton2 (View view) {
-        mService.setBlinkLEDCMD("00:06:66:66:96:86");
-        Toast.makeText(this, "ToggleAllLEDS", Toast.LENGTH_LONG).show();
-    }
-*/
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -293,13 +331,11 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if(position==2) {
+            if (position == 2) {
                 return PlotFragment.newInstance("Hi", "Hello");
-            }
-            else if(position==0){
+            } else if (position == 0) {
                 return EnabledSensorsFragment.newInstance();
-            }
-            else {
+            } else {
                 return DeviceConfigFragment.newInstance();
             }
         }
@@ -323,6 +359,45 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    public boolean handleMessage(Message msg) {
+        Toast.makeText(this, "Message received", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if(msg.what == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE) {
+                ShimmerBluetooth.BT_STATE state = null;
+                String macAddress = "";
+                String shimmerName = "";
+                if (msg.obj instanceof ObjectCluster){
+                    state = ((ObjectCluster)msg.obj).mState;
+                    macAddress = ((ObjectCluster)msg.obj).getMacAddress();
+                    shimmerName = ((ObjectCluster) msg.obj).getShimmerName();
+                } else if(msg.obj instanceof CallbackObject){
+                    state = ((CallbackObject)msg.obj).mState;
+                    macAddress = ((CallbackObject)msg.obj).mBluetoothAddress;
+                    shimmerName = "";
+                }
+                switch (state) {
+                    case CONNECTED:
+                        Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
+                        break;
+                    case CONNECTING:
+                        break;
+                    case STREAMING:
+                        break;
+                    case STREAMING_AND_SDLOGGING:
+                        break;
+                    case SDLOGGING:
+                        break;
+                    case DISCONNECTED:
+                        break;
+                }
+            }
+        }
+    };
 
 
 }
