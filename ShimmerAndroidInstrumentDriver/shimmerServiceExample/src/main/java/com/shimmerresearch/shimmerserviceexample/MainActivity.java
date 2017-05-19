@@ -212,6 +212,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                 startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);
                 return true;
             case R.id.test_button:
+                ShimmerBluetoothManagerAndroid btManager2 = mService.getBluetoothManager();
+                btManager2.startStreamingAllDevices();
                 return true;
             case R.id.connect_shimmer:
                 if (isServiceStarted) {
@@ -220,6 +222,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                     Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
                 }
                 return true;
+            case R.id.add_handler:
+                ShimmerBluetoothManagerAndroid btManager = mService.getBluetoothManager();
+                btManager.addHandler(mHandler);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -261,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             // cast its IBinder to a concrete class and directly access it.
             mService = ((ShimmerService.LocalBinder) service).getService();
             isServiceStarted = true;
-            mHandler = mService.getHandler();
 
             // Tell the user about this for our demo.
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
@@ -387,12 +391,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                     case CONNECTING:
                         break;
                     case STREAMING:
+                        Toast.makeText(getApplicationContext(), "Device streaming: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         break;
                     case STREAMING_AND_SDLOGGING:
                         break;
                     case SDLOGGING:
                         break;
                     case DISCONNECTED:
+                        Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         break;
                 }
             }

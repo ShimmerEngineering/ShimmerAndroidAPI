@@ -6,4 +6,6 @@
             android:title="Test Button" ></item>
     <item   android:id="@+id/connect_shimmer"
             android:title="Connect Shimmer (Test)" ></item>
+    <item   android:id="@+id/add_handler"
+            android:title="Add Handler (Test)"></item>
 </menu>

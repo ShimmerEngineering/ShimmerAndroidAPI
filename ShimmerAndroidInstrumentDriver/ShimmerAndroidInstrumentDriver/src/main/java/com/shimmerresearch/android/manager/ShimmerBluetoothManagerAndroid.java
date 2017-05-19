@@ -289,6 +289,21 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         return mMultiShimmer;
     }
 
+    public void addHandler(Handler handler) {
+        //Add the Handler to each connected Shimmer device
+        HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
+        Collection<Object> colS=mMultiShimmer.values();
+        Iterator<Object> iterator = colS.iterator();
+
+        while (iterator.hasNext()) {
+            Shimmer stemp=(Shimmer) iterator.next();
+            if ((stemp.getBluetoothRadioState()!= ShimmerBluetooth.BT_STATE.DISCONNECTED)){
+                stemp.addHandler(handler);
+            }
+        }
+    }
+
+
     /*
        ------------------- Methods from ShimmerService below -------------------
      */

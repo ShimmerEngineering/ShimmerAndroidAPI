@@ -115,8 +115,8 @@
     <orderEntry type="library" exported="" name="commons-math3-3.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-core-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="AndroidBluetoothLibrary" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="protobuf-lite-3.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="grpc-netty-1.0.0-pre1" level="project" />

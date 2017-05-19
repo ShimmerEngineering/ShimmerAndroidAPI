@@ -157,6 +157,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -216,6 +218,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
 	transient private BluetoothAdapter mBluetoothAdapter = null;
+	List<Handler> mHandlerList = new ArrayList<Handler>();
 
 
 	{
@@ -223,14 +226,29 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	/**
+	 * This constructor is for applications that only require one Handler.
 	 * @param handler add handler to receive msgs from the shimmer class
 	 */
 	public Shimmer(Handler handler) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handler;
+		mHandlerList.add(0, mHandler);
 //		mContinousSync=continousSync;
 		mSetupDevice=false;
+	}
+
+	/**
+	 * This constructor is for applications requiring more than one Handler so as to receive the msg
+	 * in multiple threads.
+	 * @param handlerList this is an ArrayList containing multiple Handlers
+	 */
+	public Shimmer(ArrayList<Handler> handlerList) {
+		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothRadioState = BT_STATE.DISCONNECTED;
+		mHandler = handlerList.get(0);
+		mHandlerList = handlerList;
+		mSetupDevice = false;
 	}
 
 	/**
@@ -470,8 +488,11 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		// Send the name of the connected device back to the UI Activity
-		Message msg = mHandler.obtainMessage(Shimmer.MESSAGE_DEVICE_NAME);
-		mHandler.sendMessage(msg);
+		//TODO: Delete this...
+//		Message msg = mHandler.obtainMessage(Shimmer.MESSAGE_DEVICE_NAME);
+//		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(Shimmer.MESSAGE_DEVICE_NAME);
+
 		//setState(BT_STATE.CONNECTED);
 		initialize();
 	}
@@ -548,11 +569,13 @@ public class Shimmer extends ShimmerBluetooth{
 		setBluetoothRadioState(BT_STATE.DISCONNECTED);
 		mIsInitialised = false;
 		// Send a failure message back to the Activity
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		//TODO: Delete this...
+		//Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Unable to connect device");
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+//		msg.setData(bundle);
+//		mHandler.sendMessage(msg);
 	}
 
 	/**
@@ -571,11 +594,13 @@ public class Shimmer extends ShimmerBluetooth{
 		setBluetoothRadioState(BT_STATE.DISCONNECTED);
 		mIsInitialised = false;
 		// Send a failure message back to the Activity
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		//TODO: Delete this...
+		//Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Device connection was lost");
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+//		msg.setData(bundle);
+//		mHandler.sendMessage(msg);
 	}
 
 	/**
@@ -737,8 +762,10 @@ public class Shimmer extends ShimmerBluetooth{
 			}
 			// Send the name of the connected device back to the UI Activity
 			mMyBluetoothAddress = mDevice.getAddress();
-			Message msg = mHandler.obtainMessage(Shimmer.MESSAGE_DEVICE_NAME);
-			mHandler.sendMessage(msg);
+			//TODO: Delete this...
+//			Message msg = mHandler.obtainMessage(Shimmer.MESSAGE_DEVICE_NAME);
+//			mHandler.sendMessage(msg);
+			sendMsgToHandlerList(Shimmer.MESSAGE_DEVICE_NAME);
 			// Send the name of the connected device back to the UI Activity
 			while(!mIOThread.isAlive()){}; 
 			Log.d(mClassName, "alive!!");
@@ -846,20 +873,24 @@ public class Shimmer extends ShimmerBluetooth{
 
 
 	protected void inquiryDone() {
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		//TODO: Delete this...
+//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Inquiry done for device-> " + mMyBluetoothAddress);
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+//		msg.setData(bundle);
+//		mHandler.sendMessage(msg);
 		isReadyForStreaming();
 	}   
 
 	protected void isReadyForStreaming(){
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		//TODO: Delete this...
+//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" is ready for Streaming");
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+//		msg.setData(bundle);
+//		mHandler.sendMessage(msg);
 		if (mIsInitialised == false){
 			//only do this during the initialization process to indicate that it is fully initialized, dont do this for a normal inqiuiry
 			mIsInitialised = true;
@@ -873,17 +904,21 @@ public class Shimmer extends ShimmerBluetooth{
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
-		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
+		//TODO: Delete this...
+		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
 	}
 
 	protected void isNowStreaming() {
-
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		//TODO: Delete this...
+//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Device " + mMyBluetoothAddress + " is now Streaming");
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+//		msg.setData(bundle);
+//		mHandler.sendMessage(msg);
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" is now Streaming");
 		if (isSDLogging()){
 			setBluetoothRadioState(BT_STATE.STREAMING_AND_SDLOGGING);
@@ -892,7 +927,10 @@ public class Shimmer extends ShimmerBluetooth{
 			setBluetoothRadioState(BT_STATE.STREAMING);
 				
 		}
-		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1,
+				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
+		//TODO: Delete this...
+		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		
 	}
 
@@ -950,8 +988,10 @@ public class Shimmer extends ShimmerBluetooth{
 	
 	@Override
 	protected void sendStatusMsgPacketLossDetected() {
-		// TODO Auto-generated method stub
-		mHandler.obtainMessage(Shimmer.MESSAGE_PACKET_LOSS_DETECTED,  new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress())).sendToTarget();
+		//TODO: Delete this...
+		//mHandler.obtainMessage(Shimmer.MESSAGE_PACKET_LOSS_DETECTED,  new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress())).sendToTarget();
+		sendMsgToHandlerListTarget(Shimmer.MESSAGE_PACKET_LOSS_DETECTED,
+				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress()));
 	}
 	
 
@@ -1053,18 +1093,20 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void dataHandler(ObjectCluster ojc) {
-		// TODO Auto-generated method stub
-		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc).sendToTarget();
+		// TODO: Delete this...
+		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc).sendToTarget();
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc);
 	}
 
 	@Override
 	protected void sendStatusMSGtoUI(String smsg) {
-		// TODO Auto-generated method stub
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		// TODO: Delete this...
+//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, smsg);
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+//		msg.setData(bundle);
+//		mHandler.sendMessage(msg);
 	}
 
 	@Override
@@ -1076,17 +1118,22 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	protected void hasStopStreaming() {
 		startTimerReadStatus();
-		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+		//TODO: Delete out commented lines
+//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" stopped streaming");
-		msg.setData(bundle);
+//		msg.setData(bundle);
 		if (isSDLogging()){
 			setBluetoothRadioState(BT_STATE.SDLOGGING);
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
-		mHandler.sendMessage(msg);
-		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+//		mHandler.sendMessage(msg);
+		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+		//TODO: Delete this...
+//		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1,
+				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
 		
 	}
 
@@ -1127,7 +1174,10 @@ public class Shimmer extends ShimmerBluetooth{
 //					setState(BT_STATE.CONNECTED);
 //				}
 				setBluetoothRadioState(BT_STATE.CONNECTED);
-				mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),getBluetoothRadioState())).sendToTarget();
+				//TODO: Delete this...
+//				mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),getBluetoothRadioState())).sendToTarget();
+				sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+						new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), getBluetoothRadioState()));
 				
 			}
 		}
@@ -1160,8 +1210,9 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void sendProgressReport(BluetoothProgressReportPerCmd pr) {
-		// TODO Auto-generated method stub
-		mHandler.obtainMessage(MESSAGE_PROGRESS_REPORT, pr).sendToTarget();
+		// TODO: Delete this...
+//		mHandler.obtainMessage(MESSAGE_PROGRESS_REPORT, pr).sendToTarget();
+		sendMsgToHandlerListTarget(MESSAGE_PROGRESS_REPORT, pr);
 	}
 	
 	public BT_STATE getState() {
@@ -1197,7 +1248,10 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		
 		// Give the new state to the Handler so the UI Activity can update
-		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),state)).sendToTarget();
+		//TODO: Delete this...
+//		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),state)).sendToTarget();
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), state));
 	}
 
 	public boolean isConnected(){
@@ -1330,6 +1384,37 @@ public void setRadio(BluetoothSocket socket){
 
 
 }
+
+	private void sendMsgToHandlerList(int obtainMessage) {
+		for(Handler handler : mHandlerList) {
+			Message msg = handler.obtainMessage(obtainMessage);
+			handler.sendMessage(msg);
+		}
+	}
+
+	private void sendMsgToHandlerList(int obtainMessage, Bundle bundle) {
+		for(Handler handler : mHandlerList) {
+			Message msg = handler.obtainMessage(obtainMessage);
+			msg.setData(bundle);
+			handler.sendMessage(msg);
+		}
+	}
+
+	private void sendMsgToHandlerListTarget(int what, Object object) {
+		for(Handler handler : mHandlerList) {
+			handler.obtainMessage(what, object).sendToTarget();
+		}
+	}
+
+	private void sendMsgToHandlerListTarget(int what, int arg1, int arg2, Object object) {
+		for(Handler handler : mHandlerList) {
+			handler.obtainMessage(what, arg1, arg2, object).sendToTarget();
+		}
+	}
+
+	public void addHandler(Handler handler) {
+		mHandlerList.add(handler);
+	}
 
 	
 }
