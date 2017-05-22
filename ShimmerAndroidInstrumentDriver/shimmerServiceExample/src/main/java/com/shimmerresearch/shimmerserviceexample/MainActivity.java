@@ -2,6 +2,7 @@ package com.shimmerresearch.shimmerserviceexample;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Message;
@@ -42,14 +43,18 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.SensorDetails;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements Handler.Callback {
+public class MainActivity extends AppCompatActivity {
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
     ShimmerService mService;
+    SensorsEnabledFragment sensorsEnabledFragment;
 
     //Drawer stuff
     private ListView mDrawerList;
@@ -113,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
+
+        sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
     }
 
     private void addDrawerItems(String[] stringArray) {
@@ -225,6 +232,37 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             case R.id.add_handler:
                 ShimmerBluetoothManagerAndroid btManager = mService.getBluetoothManager();
                 btManager.addHandler(mHandler);
+                return true;
+            case R.id.sensors_enabled_fragment_test:
+                ShimmerDevice device = mService.getShimmer("00:06:66:66:96:86");
+//                final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
+//                Map<Integer,SensorDetails> sensorMap = device.getSensorMap();
+//                int count = 0;
+//                for (SensorDetails sd:sensorMap.values()){
+//                    if (device.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+//                        count++;
+//                    }
+//                }
+//                String[] arraySensors = new String[count];
+//                final boolean[] listEnabled = new boolean[count];
+//                final int[] sensorKeys = new int[count];
+//                count = 0;
+//
+//                for (int key:sensorMap.keySet()){
+//                    SensorDetails sd = sensorMap.get(key);
+//                    if (device.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+//                        arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
+//                        listEnabled[count] = sd.isEnabled();
+//                        sensorKeys[count] = key;
+//                        count++;
+//                    }
+//                }
+//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+//                        android.R.layout.simple_list_item_1, arraySensors);
+                sensorsEnabledFragment.setShimmerDevice(device, getApplicationContext());
+                //sensorsEnabledFragment.setListAdapter(adapter);
+                //sensorsEnabledFragment.setListShown(true);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -338,7 +376,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             if (position == 2) {
                 return PlotFragment.newInstance("Hi", "Hello");
             } else if (position == 0) {
-                return EnabledSensorsFragment.newInstance();
+                //Sensors fragment
+                return sensorsEnabledFragment;
             } else {
                 return DeviceConfigFragment.newInstance();
             }
