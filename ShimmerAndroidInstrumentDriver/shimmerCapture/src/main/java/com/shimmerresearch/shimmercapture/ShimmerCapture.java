@@ -1080,7 +1080,7 @@ public class ShimmerCapture extends ServiceActivity {
                 String address = data.getExtras()
                         .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
                 Log.d("ShimmerActivity",address);
-          		mService.connectShimmer(address, "Device");
+          		mService.connectShimmer(address);
           		mBluetoothAddress = address;
           		mService.setGraphHandler(mHandler);
                 buttonMenu.setEnabled(false);

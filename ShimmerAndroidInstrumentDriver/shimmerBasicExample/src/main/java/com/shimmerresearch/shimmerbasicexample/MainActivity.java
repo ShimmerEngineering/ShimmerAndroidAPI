@@ -30,10 +30,10 @@ public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
     ShimmerDevice shimmerDevice;
-    //final static String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
+    final static String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
     //00:06:66:43:b4:8b
     //final static String shimmerBtAdd = "00:06:66:66:96:A9";  //Put the address of the Shimmer device you want to connect here
-    final static String shimmerBtAdd = "00:06:66:43:B4:8B";  //Put the address of the Shimmer device you want to connect here
+    //final static String shimmerBtAdd = "00:06:66:43:B4:8B";  //Put the address of the Shimmer device you want to connect here
 
     //TODO: Add this into the ShimmerBluetoothDialog class
     final static int REQUEST_CONNECT_SHIMMER = 2;
