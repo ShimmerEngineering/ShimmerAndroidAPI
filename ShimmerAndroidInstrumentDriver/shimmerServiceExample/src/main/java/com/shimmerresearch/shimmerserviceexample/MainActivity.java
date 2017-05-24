@@ -49,12 +49,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener {
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
     ShimmerService mService;
     SensorsEnabledFragment sensorsEnabledFragment;
+    ConnectedShimmersListFragment connectedShimmersListFragment;
 
     //Drawer stuff
     private ListView mDrawerList;
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         dialog = new ShimmerDialogConfigurations();
 
         sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
+        connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
     }
 
     private void addDrawerItems(String[] stringArray) {
@@ -235,34 +237,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.sensors_enabled_fragment_test:
                 ShimmerDevice device = mService.getShimmer("00:06:66:66:96:86");
-//                final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
-//                Map<Integer,SensorDetails> sensorMap = device.getSensorMap();
-//                int count = 0;
-//                for (SensorDetails sd:sensorMap.values()){
-//                    if (device.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-//                        count++;
-//                    }
-//                }
-//                String[] arraySensors = new String[count];
-//                final boolean[] listEnabled = new boolean[count];
-//                final int[] sensorKeys = new int[count];
-//                count = 0;
-//
-//                for (int key:sensorMap.keySet()){
-//                    SensorDetails sd = sensorMap.get(key);
-//                    if (device.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-//                        arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
-//                        listEnabled[count] = sd.isEnabled();
-//                        sensorKeys[count] = key;
-//                        count++;
-//                    }
-//                }
-//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-//                        android.R.layout.simple_list_item_1, arraySensors);
                 sensorsEnabledFragment.setShimmerDevice(device, getApplicationContext());
-                //sensorsEnabledFragment.setListAdapter(adapter);
-                //sensorsEnabledFragment.setListShown(true);
                 return true;
+            case R.id.connected_shimmers_fragment_test:
+                List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
+                connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -376,10 +355,17 @@ public class MainActivity extends AppCompatActivity {
             if (position == 2) {
                 return PlotFragment.newInstance("Hi", "Hello");
             } else if (position == 0) {
+                if(isServiceStarted) {
+                    connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                    Log.e("JOS", "Service started, returning fragment");
+                } else {
+                    connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                    Log.e("JOS", "Service not started, can't return fragment");
+                }
+                return connectedShimmersListFragment;
+            } else {
                 //Sensors fragment
                 return sensorsEnabledFragment;
-            } else {
-                return DeviceConfigFragment.newInstance();
             }
         }
 
@@ -393,9 +379,9 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Sensors";
+                    return "Connected Shimmers";
                 case 1:
-                    return "Device Configuration";
+                    return "Enable Sensors";
                 case 2:
                     return "Plot";
             }
@@ -443,6 +429,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    /**
+     * This method is called when the ConnectedShimmersListFragment returns a selected Shimmer
+     * @param macAddress
+     */
+    @Override
+    public void onShimmerDeviceSelected(String macAddress, String deviceName) {
+        Toast.makeText(this, "Selected Shimmer: " + deviceName + "\n" + macAddress, Toast.LENGTH_SHORT).show();
+    }
 
 
 }

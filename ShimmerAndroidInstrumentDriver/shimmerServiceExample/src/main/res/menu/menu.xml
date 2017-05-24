@@ -10,4 +10,6 @@
             android:title="Add Handler (Test)"></item>
     <item   android:id="@+id/sensors_enabled_fragment_test"
             android:title="Sensors Enabled Fragment (Test)"></item>
+    <item   android:id="@+id/connected_shimmers_fragment_test"
+            android:title="Connected Shimmers Fragment (Test)"></item>
 </menu>

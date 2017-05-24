@@ -392,33 +392,5 @@ public class SensorsEnabledFragment extends ListFragment {
         }
     }
 
-//    private boolean[] listEnabled2 (ShimmerDevice clone) {
-//        Map<Integer, SensorDetails> sensorMap = clone.getSensorMap();
-//        int count = 0;
-//        for (SensorDetails sd : sensorMap.values()) {
-//            if (clone.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-//                count++;
-//            }
-//
-//        }
-//        String[] arraySensors = new String[count];
-//        final boolean[] listEnabled = new boolean[count];
-//        final int[] sensorKeys = new int[count];
-//        count = 0;
-//
-//        for (int key : sensorMap.keySet()) {
-//            SensorDetails sd = sensorMap.get(key);
-//            if (clone.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-//                arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
-//                listEnabled[count] = sd.isEnabled();
-//                sensorKeys[count] = key;
-//                count++;
-//            }
-//        }
-//
-//        return listEnabled;
-//    }
-
-
 
 }
