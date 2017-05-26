@@ -12,4 +12,6 @@
             android:title="Sensors Enabled Fragment (Test)"></item>
     <item   android:id="@+id/connected_shimmers_fragment_test"
             android:title="Connected Shimmers Fragment (Test)"></item>
+    <item   android:id="@+id/device_configuration_fragment_test"
+            android:title="Device Configuration Fragment Test"></item>
 </menu>

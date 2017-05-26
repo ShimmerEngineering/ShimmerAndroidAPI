@@ -1,23 +1,18 @@
 package com.shimmerresearch.shimmerserviceexample;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.bluetooth.BluetoothClass;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.renderscript.ScriptGroup;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -43,11 +38,8 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
-import com.shimmerresearch.driverUtilities.SensorDetails;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener {
 
@@ -56,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     ShimmerService mService;
     SensorsEnabledFragment sensorsEnabledFragment;
     ConnectedShimmersListFragment connectedShimmersListFragment;
+    DeviceConfigFragment deviceConfigFragment;
 
     //Drawer stuff
     private ListView mDrawerList;
@@ -63,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
-    public String selectedDeviceAdd;
+    public String selectedDeviceAddress, selectedDeviceName;
+    private boolean showPlotFragments = false;
 
 
     /**
@@ -74,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private SectionsPagerAdapter1 mSectionsPagerAdapter1;
+    private SectionsPagerAdapter2 mSectionsPagerAdapter2;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -101,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         mDrawerLayout = (DrawerLayout) findViewById(R.id.content_frame);
         mActivityTitle = getTitle().toString();
 
-        String[] startArray = {""};
+        String[] startArray = {"Configuration", "Plot"};
         addDrawerItems(startArray);
         setupDrawer();
 
@@ -112,16 +107,18 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
+        mSectionsPagerAdapter2 = new SectionsPagerAdapter2(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(mSectionsPagerAdapter1);
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
 
         sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
         connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
+        deviceConfigFragment = DeviceConfigFragment.newInstance();
     }
 
     private void addDrawerItems(String[] stringArray) {
@@ -131,19 +128,28 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String viewText = (String) mDrawerList.getItemAtPosition(position);
-                if (viewText.contains("\n")) {
-                    selectedDeviceAdd = viewText.substring(viewText.indexOf("\n"));
-                    Toast.makeText(MainActivity.this, "Selected device: " + viewText, Toast.LENGTH_SHORT).show();
+//                String viewText = (String) mDrawerList.getItemAtPosition(position);
+//                if (viewText.contains("\n")) {
+//                    selectedDeviceAdd = viewText.substring(viewText.indexOf("\n"));
+//                    Toast.makeText(MainActivity.this, "Selected device: " + viewText, Toast.LENGTH_SHORT).show();
+//                }
+                if(position == 0) {
+                    showPlotFragments = false;
+                    mViewPager = (ViewPager) findViewById(R.id.container);
+                    mViewPager.setAdapter(mSectionsPagerAdapter1);
+                } else {
+                    showPlotFragments = true;
+                    mViewPager = (ViewPager) findViewById(R.id.container);
+                    mViewPager.setAdapter(mSectionsPagerAdapter2);
                 }
-                //Highlight the selected device
+                //Highlight the selected item
                 view.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.holo_orange_light));
                 //Set all other backgrounds to white (clearing previous highlight, if any)
                 for (int i = 0; i < mDrawerList.getAdapter().getCount(); i++) {
                     if (i != position) {
                         View v = mDrawerList.getChildAt(i);
                         v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
-                        Log.e(SERVICE_TAG, "Cleared background color...");
+//                        Log.e(SERVICE_TAG, "Cleared background color...");
                     }
                 }
             }
@@ -156,12 +162,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-                String[] list = getStringListOfDevicesConnected();
-                if (list != null) {
-                    addDrawerItems(list);
-                }
+//                String[] list = getStringListOfDevicesConnected();
+//                if (list != null) {
+//                    addDrawerItems(list);
+//                }
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Connected Shimmers");
+                getSupportActionBar().setTitle("Navigation");
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
@@ -242,6 +248,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.connected_shimmers_fragment_test:
                 List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
                 connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
+                return true;
+            case R.id.device_configuration_fragment_test:
+                ShimmerDevice device2 = mService.getShimmer("00:06:66:66:96:86");
+                deviceConfigFragment.buildDeviceConfigList(device2, getApplicationContext());
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -342,9 +352,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter1 extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
         }
 
@@ -353,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 2) {
-                return PlotFragment.newInstance("Hi", "Hello");
+                return deviceConfigFragment;
             } else if (position == 0) {
                 if(isServiceStarted) {
                     connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
@@ -383,11 +393,59 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 case 1:
                     return "Enable Sensors";
                 case 2:
-                    return "Plot";
+                    return "Device Configuration";
             }
             return null;
         }
     }
+
+    public class SectionsPagerAdapter2 extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter2(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            if (position == 0) {
+                return PlotFragment.newInstance("Hi", "Hello");
+            } else if (position == 1) {
+                if(isServiceStarted) {
+                    connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                    Log.e("JOS", "Service started, returning fragment");
+                } else {
+                    connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                    Log.e("JOS", "Service not started, can't return fragment");
+                }
+                return connectedShimmersListFragment;
+            } else {
+                //Sensors fragment
+                return sensorsEnabledFragment;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Plot";
+                case 1:
+                    return "Connected Shimmers";
+                case 2:
+                    return "Plot Signals";
+            }
+            return null;
+        }
+    }
+
 
     public boolean handleMessage(Message msg) {
         Toast.makeText(this, "Message received", Toast.LENGTH_SHORT).show();
@@ -437,6 +495,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     public void onShimmerDeviceSelected(String macAddress, String deviceName) {
         Toast.makeText(this, "Selected Shimmer: " + deviceName + "\n" + macAddress, Toast.LENGTH_SHORT).show();
+        selectedDeviceAddress = macAddress;
+        selectedDeviceName = deviceName;
     }
 
 

@@ -337,7 +337,7 @@ public class SensorsEnabledFragment extends ListFragment {
             }
         });
         button.setText("Write config");
-        button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.WRAP_CONTENT, ListView.LayoutParams.WRAP_CONTENT));
+        //button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.FILL_PARENT, ListView.LayoutParams.FILL_PARENT));
         listView.addFooterView(button);
 
         //Set sensors which are already enabled in the Shimmer to be checked in the ListView
