@@ -71,7 +71,14 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         }
         CheckedTextView expandedListTextView = (CheckedTextView) convertView.findViewById(R.id.expandedListItem);
         expandedListTextView.setText(expandedListText);
-        Log.i("JOS", "Set the CheckedTextBox: " + expandedListText);
+
+        if(currentSettingsMap.get(getGroup(groupPosition)) == expandedListText) {
+            Log.i("JOS", currentSettingsMap.get(getGroup(groupPosition)) + " == " + expandedListText);
+            Log.i("JOS", "groupPosition: " + groupPosition + "\tchildPosition: " + childPosition);
+            expandedListTextView.setChecked(true);
+        } else {
+            expandedListTextView.setChecked(false);
+        }
         return convertView;
     }
 
