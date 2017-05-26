@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.bluetooth.BluetoothClass;
 import android.content.res.Configuration;
 import android.os.Message;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.bluetooth.BluetoothAdapter;
@@ -259,6 +261,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     @Override
     protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         //Check if Bluetooth is enabled
         if (!btAdapter.isEnabled()) {
             int REQUEST_ENABLE_BT = 1;
@@ -271,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             Log.d(LOG_TAG, "Shimmer Service started");
             Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
         }
-        super.onStart();
+        super.onCreate(savedInstanceState, persistentState);
     }
 
     @Override
