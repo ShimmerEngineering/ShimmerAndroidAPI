@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.shimmerresearch.driver.ShimmerDevice;
@@ -27,6 +28,9 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
     List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
 
+    //HashMap where <Key(sensor config option), Current setting>
+    private HashMap<String, String> currentSettingsMap = new HashMap<String, String>();
+
 
     public DeviceConfigListAdapter(Context activityContext, List<String> list, Map<String, ConfigOptionDetailsSensor> configOptionsMap, ShimmerDevice shimmerDevice, ShimmerDevice shimmerDeviceClone) {
         context = activityContext;
@@ -36,8 +40,20 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
             String[] cs = cods.getGuiValues();
             if(cs != null) {
+                //Put the expandable list child values in the HashMap
                 List<String> csList = Arrays.asList(cs);
                 expandableListDetail.put(key, csList);
+
+                //Get the current setting from the configOptionsMap
+                Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
+                if(returnedValue != null) {
+                    int configValue = (int) returnedValue;
+                    int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+                    String currentSetting = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                    currentSettingsMap.put(key, currentSetting);
+                }
+
+
             } else {
                 Log.e("SHIMMER", "cs is null!!! with key " + key);
             }
@@ -53,8 +69,9 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.list_item, null);
         }
-        TextView expandedListTextView = (TextView) convertView.findViewById(R.id.expandedListItem);
+        CheckedTextView expandedListTextView = (CheckedTextView) convertView.findViewById(R.id.expandedListItem);
         expandedListTextView.setText(expandedListText);
+        expandedListTextView.setChecked(true);
         return convertView;
     }
 
