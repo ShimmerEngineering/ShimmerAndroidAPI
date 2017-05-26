@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -166,24 +168,56 @@ public class ShimmerDialogConfigurations {
                 int configValue = (int) returnedValue;
                 int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
                 title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                shimmerDevice.getConfigValueUsingConfigLabel(key);
+                builder.setTitle(title);
+                builder.setItems(cs,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                                Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
+                                shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
+
+                                //shimmerDeviceClone.refreshShimmerInfoMemBytes();
+                                List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                                cloneList.add(0, shimmerDeviceClone);
+                                AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
+                                if (shimmerDevice instanceof Shimmer) {
+                                    ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                                } else if (shimmerDevice instanceof Shimmer4Android){
+                                    ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                                }
+                            }
+                        });
+                builder.create().show();
             }
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        shimmerDevice.getConfigValueUsingConfigLabel(key);
-        builder.setTitle(title);
-        builder.setItems(cs,
-                new DialogInterface.OnClickListener() {
+        } else if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD){
+            Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
+
+            if(returnedValue != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle((String)returnedValue);
+                LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                final EditText et = new EditText(context);
+                et.setText((String)returnedValue);
+                LinearLayout layout = new LinearLayout(context);
+                LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setLayoutParams(parms);
+                layout.setGravity(Gravity.CLIP_VERTICAL);
+                layout.setPadding(2, 2, 2, 2);
+                layout.addView(et, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                builder.setView(layout);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // The 'which' argument contains the index position
-                        // of the selected item
-                        Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
-                        shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
+                        shimmerDeviceClone.setConfigValueUsingConfigLabel(key,et.getText().toString());
 
                         //shimmerDeviceClone.refreshShimmerInfoMemBytes();
                         List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
                         cloneList.add(0, shimmerDeviceClone);
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-
                         if (shimmerDevice instanceof Shimmer) {
                             ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                         } else if (shimmerDevice instanceof Shimmer4Android){
@@ -191,7 +225,9 @@ public class ShimmerDialogConfigurations {
                         }
                     }
                 });
-        builder.create().show();
+                builder.create().show();
+            }
+        }
     }
     public static void showSelectSensorPlot(Context context,final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot){
         final Dialog dialog = new Dialog(context);
