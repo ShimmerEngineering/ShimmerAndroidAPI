@@ -121,6 +121,20 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
         connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
         deviceConfigFragment = DeviceConfigFragment.newInstance();
+
+        //Check if Bluetooth is enabled
+        if (!btAdapter.isEnabled()) {
+            int REQUEST_ENABLE_BT = 1;
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            //Start the Shimmer service
+            Intent intent = new Intent(this, ShimmerService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            Log.d(LOG_TAG, "Shimmer Service started");
+            Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void addDrawerItems(String[] stringArray) {
@@ -264,22 +278,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         super.onStart();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        //Check if Bluetooth is enabled
-        if (!btAdapter.isEnabled()) {
-            int REQUEST_ENABLE_BT = 1;
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            //Start the Shimmer service
-            Intent intent = new Intent(this, ShimmerService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            Log.d(LOG_TAG, "Shimmer Service started");
-            Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
-        }
-        super.onCreate(savedInstanceState, persistentState);
-    }
 
     @Override
     protected void onDestroy() {
