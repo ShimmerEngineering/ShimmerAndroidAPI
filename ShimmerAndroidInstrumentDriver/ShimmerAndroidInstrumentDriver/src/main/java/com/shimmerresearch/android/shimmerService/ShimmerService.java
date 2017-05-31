@@ -423,7 +423,7 @@ public class ShimmerService extends Service {
 	                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
 	                	 Intent intent = new Intent("com.shimmerresearch.service.ShimmerService");
 	                	 Log.d("ShimmerGraph","Sending");
-//TODO						 mHandlerGraph.obtainMessage(msg.what, msg.arg1, -1, msg.obj).sendToTarget();
+//TODO:						 mHandlerGraph.obtainMessage(msg.what, msg.arg1, -1, msg.obj).sendToTarget();
 	            		   if(msg.arg1==Shimmer.MSG_STATE_STOP_STREAMING){ //deprecated shimmer
 	            			     closeAndRemoveFile(((ObjectCluster)msg.obj).getMacAddress());
 	            		   } else {
