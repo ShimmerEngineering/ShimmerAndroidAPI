@@ -1,6 +1,7 @@
 package com.shimmerresearch.shimmerserviceexample;
 
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Bundle;
@@ -17,10 +18,12 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ public class DeviceConfigFragment extends Fragment {
 
     DeviceConfigListAdapter expandListAdapter;
     ExpandableListView expandListView;
+    ShimmerDevice shimmerDeviceClone;
 
     public DeviceConfigFragment() {
         // Required empty public constructor
@@ -51,10 +55,10 @@ public class DeviceConfigFragment extends Fragment {
         return fragment;
     }
 
-    public void buildDeviceConfigList(ShimmerDevice shimmerDevice, final Context context) {
+    public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context) {
 
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
-        final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
+        shimmerDeviceClone = shimmerDevice.deepClone();
         Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
         List<String> listOfKeys = new ArrayList<String>();
         for (SensorDetails sd:sensorMap.values()) {
@@ -83,13 +87,17 @@ public class DeviceConfigFragment extends Fragment {
 
                     String newSetting = (String) expandListAdapter.getChild(groupPosition, childPosition);
                     String keySetting = (String) expandListAdapter.getGroup(groupPosition);
+
                     //Write the setting to the Shimmer Clone
-                    shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, newSetting);
+                    final ConfigOptionDetailsSensor cods = configOptionsMap.get(keySetting);
+                    Log.d("JOS", "The childPosition is: " + childPosition);
+                    Toast.makeText(context, "keySetting: " + keySetting + " value: " + cods.mConfigValues[childPosition], Toast.LENGTH_SHORT).show();
+                    shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, cods.mConfigValues[childPosition]);
+
                     expandListAdapter.replaceCurrentSetting(keySetting, newSetting);
                     expandListAdapter.notifyDataSetChanged();   //Tells the list to redraw itself with the new information
 
                     int selectedIndex = parent.indexOfChild(v);
-                    Toast.makeText(context, "Selected Child at index: " + selectedIndex, Toast.LENGTH_SHORT).show();
 //                    expandListAdapter.getChildrenCount(groupPosition);
 
 //                    for(int i=expandListView.getFirstVisiblePosition(); i<expandListView.getLastVisiblePosition(); i++) {
@@ -106,22 +114,75 @@ public class DeviceConfigFragment extends Fragment {
                 else if(v.findViewById(R.id.editText) != null){    //The item that was clicked is a text field
                     final EditText editText = (EditText) v.findViewById(R.id.editText);
                     final String keySetting = (String) expandListAdapter.getGroup(groupPosition);
-                    editText.setOnKeyListener(new View.OnKeyListener() {
-                        @Override
-                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-                            if(keyCode == KEYCODE_ENTER) {
-                                expandListAdapter.replaceCurrentSetting(keySetting, editText.getText().toString());
-                                expandListAdapter.notifyDataSetChanged();
-                            }
-                            return false;
-                        }
-                    });
+//                    editText.setOnKeyListener(new View.OnKeyListener() {
+//                        @Override
+//                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                            if(keyCode == KEYCODE_ENTER) {
+//                                expandListAdapter.replaceCurrentSetting(keySetting, editText.getText().toString());
+//                                expandListAdapter.notifyDataSetChanged();
+//                            }
+//                            return false;
+//                        }
+//                    });
 
                 }
                 return false;
             }
         });
 
+        expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                Log.e("JOS", "Group " + groupPosition + " clicked");
+                if (v.findViewById(R.id.saveButton) != null) {
+                    Button writeConfigButton = (Button) v.findViewById(R.id.saveButton);
+                    Button resetListButton = (Button) v.findViewById(R.id.resetButton);
+
+                    writeConfigButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    resetListButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            shimmerDeviceClone = shimmerDevice.deepClone();
+                            expandListAdapter.updateCloneDevice(shimmerDeviceClone);
+                            expandListAdapter.notifyDataSetChanged();
+                            Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                return false;
+            }
+        });
+
+        LinearLayout buttonLayout = new LinearLayout(context);
+        buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        Button writeConfigButton = new Button(context);
+        Button resetListButton = new Button(context);
+        writeConfigButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        resetListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shimmerDeviceClone = shimmerDevice.deepClone();
+                expandListAdapter.updateCloneDevice(shimmerDeviceClone);
+                expandListAdapter.notifyDataSetChanged();
+                Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
+            }
+        });
+        buttonLayout.addView(resetListButton);
+        buttonLayout.addView(writeConfigButton);
+        expandListView.addFooterView(buttonLayout);
 
     }
 

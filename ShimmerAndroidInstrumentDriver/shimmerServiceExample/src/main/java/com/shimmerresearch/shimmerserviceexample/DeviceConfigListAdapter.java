@@ -37,15 +37,20 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     List<String> expandableListTitle;
+    ShimmerDevice cloneDevice;
+    ShimmerDevice shimmerDevice;
     private HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
+    Button writeConfigButton, resetListButton;
 
     //HashMap where <Key(sensor option name), Current setting>
     private HashMap<String, String> currentSettingsMap = new HashMap<String, String>();
 
 
-    public DeviceConfigListAdapter(Context activityContext, List<String> list, Map<String, ConfigOptionDetailsSensor> configOptionsMap, ShimmerDevice shimmerDevice, ShimmerDevice shimmerDeviceClone) {
+    public DeviceConfigListAdapter(Context activityContext, List<String> list, Map<String, ConfigOptionDetailsSensor> configOptionsMap, ShimmerDevice device, ShimmerDevice shimmerDeviceClone) {
         context = activityContext;
         expandableListTitle = list;
+        cloneDevice = shimmerDeviceClone;
+        shimmerDevice = device;
         //TODO: expandableListTitle.add(index, "FOOTER");
 
         for(String key : list) {    //TODO: Place this in DeviceConfigFragment
@@ -98,9 +103,13 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
                     convertView = layoutInflater.inflate(R.layout.list_item_textfield, null);
                 }
             }
-            String textFieldValue = (String) currentSettingsMap.get(getGroup(groupPosition));
             final EditText editText = (EditText) convertView.findViewById(R.id.editText);
-            editText.setText(textFieldValue);
+//            String textFieldValue = (String) currentSettingsMap.get(getGroup(groupPosition));
+//            editText.setText(textFieldValue);
+//            editText.append("");
+
+            Object textFieldValue = cloneDevice.getConfigValueUsingConfigLabel((String)getGroup(groupPosition));
+            editText.setText((String)textFieldValue);
             editText.append("");
 
             editText.setOnKeyListener(new View.OnKeyListener() {
@@ -109,8 +118,8 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
                     Log.i("JOS", "Key presssed");
                     Log.i("Key pressed", "Key pressed");
                     if(keyCode == KEYCODE_ENTER) {
-                        String key = (String) getGroup(groupPosition);
-                        replaceCurrentSetting(key, editText.getText().toString());
+                        cloneDevice.setConfigValueUsingConfigLabel((String)getGroup(groupPosition), editText.getText().toString());
+                        Log.e("JOS", "getText().toString()  " + editText.getText().toString());
                         notifyDataSetChanged();
                     }
                     return false;
@@ -128,15 +137,26 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             }
             CheckedTextView expandedListTextView = (CheckedTextView) convertView.findViewById(R.id.expandedListItem);
             expandedListTextView.setText(expandedListText);
+            String configValueLabel = (String) getGroup(groupPosition);
+            int currentConfigInt = (int) cloneDevice.getConfigValueUsingConfigLabel(configValueLabel);
+            String currentConfigValue = Integer.toString(currentConfigInt);
+            Log.e("JOS", "currentConfigValue: " + currentConfigValue);
 
-            if (currentSettingsMap.get(getGroup(groupPosition)) == expandedListText) {
-                Log.i("JOS", currentSettingsMap.get(getGroup(groupPosition)) + " == " + expandedListText);
-                Log.i("JOS", "groupPosition: " + groupPosition + "\tchildPosition: " + childPosition);
+            if(currentConfigInt == childPosition) {
                 expandedListTextView.setChecked(true);
             } else {
                 expandedListTextView.setChecked(false);
             }
 
+
+//            if (currentSettingsMap.get(getGroup(groupPosition)) == expandedListText) {
+//                Log.i("JOS", currentSettingsMap.get(getGroup(groupPosition)) + " == " + expandedListText);
+//                Log.i("JOS", "groupPosition: " + groupPosition + "\tchildPosition: " + childPosition);
+//                expandedListTextView.setChecked(true);
+//            } else {
+//                expandedListTextView.setChecked(false);
+//            }
+//
 //            expandedListTextView.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
@@ -214,20 +234,8 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             }  else if(convertView.findViewById(R.id.saveButton) == null) {
                 convertView = layoutInflater.inflate(R.layout.list_group_button, null);
             }
-            Button saveButton = (Button) convertView.findViewById(R.id.saveButton);
-            Button resetButton = (Button) convertView.findViewById(R.id.resetButton);
-            saveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-                }
-            });
-            resetButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
-                }
-            });
+            writeConfigButton = (Button) convertView.findViewById(R.id.saveButton);
+            resetListButton = (Button) convertView.findViewById(R.id.resetButton);
         } else {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.list_group, null);
@@ -251,4 +259,14 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         currentSettingsMap.remove(key);
         currentSettingsMap.put(key, newSetting);
     }
+
+    public void setButtonsOnClickListener(View.OnClickListener writeButtonListener, View.OnClickListener resetButtonListener) {
+        writeConfigButton.setOnClickListener(writeButtonListener);
+        resetListButton.setOnClickListener(resetButtonListener);
+    }
+
+    public void updateCloneDevice(ShimmerDevice newShimmerCloneDevice) {
+        cloneDevice = newShimmerCloneDevice;
+    }
+
 }
