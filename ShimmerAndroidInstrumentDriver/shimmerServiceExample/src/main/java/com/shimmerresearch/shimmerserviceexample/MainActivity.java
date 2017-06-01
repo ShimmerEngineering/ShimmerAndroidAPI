@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     SensorsEnabledFragment sensorsEnabledFragment;
     ConnectedShimmersListFragment connectedShimmersListFragment;
     DeviceConfigFragment deviceConfigFragment;
+    PlotFragment plotFragment;
 
     //Drawer stuff
     private ListView mDrawerList;
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
         connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
         deviceConfigFragment = DeviceConfigFragment.newInstance();
+        plotFragment = PlotFragment.newInstance(null, null);
 
         //Check if Bluetooth is enabled
         if (!btAdapter.isEnabled()) {
@@ -368,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 2) {
+                //return deviceConfigFragment;
                 return deviceConfigFragment;
             } else if (position == 0) {
                 if(isServiceStarted) {

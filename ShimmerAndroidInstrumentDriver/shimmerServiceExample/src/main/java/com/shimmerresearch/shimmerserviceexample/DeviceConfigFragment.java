@@ -91,7 +91,14 @@ public class DeviceConfigFragment extends Fragment {
                     //Write the setting to the Shimmer Clone
                     final ConfigOptionDetailsSensor cods = configOptionsMap.get(keySetting);
                     Log.d("JOS", "The childPosition is: " + childPosition);
+//                    if(keySetting == "Wide Range Accel Rate") {
+//                        if(childPosition == 8) {
+//                            Log.e("JOS", "childPosition has been changed to 9");
+//                            childPosition = 9;
+//                        }
+//                    }
                     Toast.makeText(context, "keySetting: " + keySetting + " value: " + cods.mConfigValues[childPosition], Toast.LENGTH_SHORT).show();
+
                     shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, cods.mConfigValues[childPosition]);
 
                     expandListAdapter.replaceCurrentSetting(keySetting, newSetting);

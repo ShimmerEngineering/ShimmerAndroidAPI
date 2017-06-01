@@ -142,6 +142,12 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             String currentConfigValue = Integer.toString(currentConfigInt);
             Log.e("JOS", "currentConfigValue: " + currentConfigValue);
 
+            if(configValueLabel == "Wide Range Accel Rate") {
+                if(currentConfigInt == 9) {
+                    currentConfigInt = 8;
+                }
+            }
+
             if(currentConfigInt == childPosition) {
                 expandedListTextView.setChecked(true);
             } else {
