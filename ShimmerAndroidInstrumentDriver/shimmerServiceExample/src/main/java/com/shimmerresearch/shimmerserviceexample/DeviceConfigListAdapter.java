@@ -46,6 +46,24 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
     private HashMap<String, String> currentSettingsMap = new HashMap<String, String>();
 
 
+    private String getConfigValueLabelFromConfigLabel(String label){
+        ConfigOptionDetailsSensor cods = cloneDevice.getConfigOptionsMap().get(label);
+        int currentConfigInt = (int) cloneDevice.getConfigValueUsingConfigLabel(label);
+        int index = -1;
+        Integer[] values = cods.getConfigValues();
+        String[] valuelabels = cods.getGuiValues();
+        for (int i=0;i<values.length;i++){
+            if (currentConfigInt==values[i]){
+                index=i;
+            }
+        }
+        if (index==-1){
+            System.out.println();
+            return "";
+        }
+        return valuelabels[index];
+    }
+
     public DeviceConfigListAdapter(Context activityContext, List<String> list, Map<String, ConfigOptionDetailsSensor> configOptionsMap, ShimmerDevice device, ShimmerDevice shimmerDeviceClone) {
         context = activityContext;
         expandableListTitle = list;
@@ -142,13 +160,21 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             String currentConfigValue = Integer.toString(currentConfigInt);
             Log.e("JOS", "currentConfigValue: " + currentConfigValue);
 
-            if(configValueLabel == "Wide Range Accel Rate") {
+            String valuelabel = getConfigValueLabelFromConfigLabel(configValueLabel);
+
+            /*if(configValueLabel == "Wide Range Accel Rate") {
                 if(currentConfigInt == 9) {
                     currentConfigInt = 8;
                 }
             }
 
-            if(currentConfigInt == childPosition) {
+            if(expandedListText == childPosition) {
+                expandedListTextView.setChecked(true);
+            } else {
+                expandedListTextView.setChecked(false);
+            }*/
+
+            if(valuelabel.equals(expandedListText)) {
                 expandedListTextView.setChecked(true);
             } else {
                 expandedListTextView.setChecked(false);
