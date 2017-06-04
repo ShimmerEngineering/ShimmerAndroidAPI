@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetails;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
@@ -41,6 +42,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
     ShimmerDevice shimmerDevice;
     private HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
     Button writeConfigButton, resetListButton;
+    ShimmerBluetoothManagerAndroid shimmerBluetoothManagerAndroid;
 
     //HashMap where <Key(sensor option name), Current setting>
     private HashMap<String, String> currentSettingsMap = new HashMap<String, String>();
@@ -51,7 +53,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         int currentConfigInt = (int) cloneDevice.getConfigValueUsingConfigLabel(label);
         int index = -1;
         Integer[] values = cods.getConfigValues();
-        String[] valuelabels = cods.getGuiValues();
+        String[] valueLabels = cods.getGuiValues();
         for (int i=0;i<values.length;i++){
             if (currentConfigInt==values[i]){
                 index=i;
@@ -61,7 +63,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             System.out.println();
             return "";
         }
-        return valuelabels[index];
+        return valueLabels[index];
     }
 
     public DeviceConfigListAdapter(Context activityContext, List<String> list, Map<String, ConfigOptionDetailsSensor> configOptionsMap, ShimmerDevice device, ShimmerDevice shimmerDeviceClone) {

@@ -18,10 +18,13 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +51,7 @@ public class SensorsEnabledFragment extends ListFragment {
     private OnFragmentInteractionListener mListener;
 
     Context context;
-    ShimmerDevice sDevice;
+    ShimmerDevice cloneDevice;
     ListView lv;
 
 
@@ -156,6 +159,8 @@ public class SensorsEnabledFragment extends ListFragment {
         //context = activityContext;
         //buildSensorsEnabled(device);
 
+        cloneDevice = device.deepClone();
+
         final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
         AlertDialog.Builder builder = new AlertDialog.Builder(activityContext);
         Map<Integer, SensorDetails> sensorMap = device.getSensorMap();
@@ -212,6 +217,7 @@ public class SensorsEnabledFragment extends ListFragment {
                                 e.printStackTrace();
                             }*/
                         ((Shimmer) device).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
+
                     } else if (device instanceof Shimmer4Android) {
                         //((Shimmer4Android)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                     }
@@ -243,6 +249,22 @@ public class SensorsEnabledFragment extends ListFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                cloneDevice.getEnabledSensors();
+                List<SensorDetails> enabledSensorsList = cloneDevice.getListOfEnabledSensors();
+                CheckedTextView checkedTextView = (CheckedTextView) view.findViewById(android.R.id.text1);
+                CharSequence cs = checkedTextView.getText();
+                String sensorName = cs.toString();
+
+                for(SensorDetails sd : enabledSensorsList) {
+                    if(sensorName == sd.toString()) {
+                        Log.e("JOS", "Sensor you clicked is already enabled!");
+                    }
+                }
+
+
+
                 if(mSelectedItems.contains(position)) {
                     mSelectedItems.remove(Integer.valueOf(position));
                 } else {
@@ -259,118 +281,118 @@ public class SensorsEnabledFragment extends ListFragment {
 
     }
 
-    private void buildSensorsEnabled(final ShimmerDevice shimmerDevice) {
-
-        final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
-        int count = 0;
-        for (SensorDetails sd : sensorMap.values()) {
-            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-                count++;
-            }
-
-        }
-        String[] arraySensors = new String[count];
-        final boolean[] listEnabled = new boolean[count];
-        final int[] sensorKeys = new int[count];
-        count = 0;
-
-        for (int key : sensorMap.keySet()) {
-            SensorDetails sd = sensorMap.get(key);
-            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-                arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
-                listEnabled[count] = sd.isEnabled();
-                sensorKeys[count] = key;
-                count++;
-            }
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, arraySensors);
-        setListAdapter(adapter);
-
-        ListView listView = getListView();
-        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-
-        //Create button in the ListView footer
-        Button button = new Button(context);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-                ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
-                if(shimmerDevice == null) { Toast.makeText(context, "Error! ShimmerDevice is null!", Toast.LENGTH_SHORT).show(); }
-                if(shimmerDeviceClone != null) {
-                    for (int selected : mSelectedItems) {
-                        shimmerDeviceClone.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
-                    }
-
-
-//                    for(int i=0; i<mSelectedItems.size(); i++) {
-//                        shimmerDeviceClone.setSensorEnabledState((int) sensorKeys[mSelectedItems.get(i)], listEnabled[mSelectedItems.get(i)]);
+//    private void buildSensorsEnabled(final ShimmerDevice shimmerDevice) {
+//
+//        final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
+//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
+//        int count = 0;
+//        for (SensorDetails sd : sensorMap.values()) {
+//            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+//                count++;
+//            }
+//
+//        }
+//        String[] arraySensors = new String[count];
+//        final boolean[] listEnabled = new boolean[count];
+//        final int[] sensorKeys = new int[count];
+//        count = 0;
+//
+//        for (int key : sensorMap.keySet()) {
+//            SensorDetails sd = sensorMap.get(key);
+//            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+//                arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
+//                listEnabled[count] = sd.isEnabled();
+//                sensorKeys[count] = key;
+//                count++;
+//            }
+//        }
+//
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, arraySensors);
+//        setListAdapter(adapter);
+//
+//        ListView listView = getListView();
+//        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+//
+//        //Create button in the ListView footer
+//        Button button = new Button(context);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//
+//                Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
+//                ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
+//                if(shimmerDevice == null) { Toast.makeText(context, "Error! ShimmerDevice is null!", Toast.LENGTH_SHORT).show(); }
+//                if(shimmerDeviceClone != null) {
+//                    for (int selected : mSelectedItems) {
+//                        shimmerDeviceClone.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
 //                    }
-
-
-                    List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                    cloneList.add(0, shimmerDeviceClone);
-                    AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-
-//                    final boolean[] listEnabled3 = listEnabled2(shimmerDeviceClone);
-//                    final boolean[] listEnabled4 = listEnabled3;
-
-
-                    if (shimmerDevice instanceof Shimmer) {
-                        //((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
-                            /*try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }*/
-                        ((Shimmer) shimmerDevice).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
-                    } else if (shimmerDevice instanceof Shimmer4Android) {
-                        //((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
-                    }
-                }
-                else {
-                    Toast.makeText(context, "Error! shimmerDeviceClone is null!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        button.setText("Write config");
-        //button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.FILL_PARENT, ListView.LayoutParams.FILL_PARENT));
-        listView.addFooterView(button);
-
-        //Set sensors which are already enabled in the Shimmer to be checked in the ListView
-        for(int i=0; i<count; i++) {
-            View v = getViewByPosition(i, listView);
-            CheckedTextView cTextView = (CheckedTextView) v.findViewById(android.R.id.text1);
-            if(listEnabled[i]) {
-                if(cTextView != null) {
-                    listView.setItemChecked(i, true);
-                }
-                else {
-                    Log.e("SHIMMER", "CheckedTextView is null!");
-                }
-            }
-        }
-
-        //Set the listener for ListView item clicks
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(mSelectedItems.contains(position)) {
-                    mSelectedItems.remove(Integer.valueOf(position));
-                } else {
-                    mSelectedItems.add(position);
-                }
-                if(listEnabled[position] == true) {
-                    listEnabled[position] = false;
-                } else {
-                    listEnabled[position] = true;
-                }
-            }
-        });
-    }
+//
+//
+////                    for(int i=0; i<mSelectedItems.size(); i++) {
+////                        shimmerDeviceClone.setSensorEnabledState((int) sensorKeys[mSelectedItems.get(i)], listEnabled[mSelectedItems.get(i)]);
+////                    }
+//
+//
+//                    List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+//                    cloneList.add(0, shimmerDeviceClone);
+//                    AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+//
+////                    final boolean[] listEnabled3 = listEnabled2(shimmerDeviceClone);
+////                    final boolean[] listEnabled4 = listEnabled3;
+//
+//
+//                    if (shimmerDevice instanceof Shimmer) {
+//                        //((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+//                            /*try {
+//                                Thread.sleep(1000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }*/
+//                        ((Shimmer) shimmerDevice).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
+//                    } else if (shimmerDevice instanceof Shimmer4Android) {
+//                        //((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+//                    }
+//                }
+//                else {
+//                    Toast.makeText(context, "Error! shimmerDeviceClone is null!", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//        button.setText("Write config");
+//        //button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.FILL_PARENT, ListView.LayoutParams.FILL_PARENT));
+//        listView.addFooterView(button);
+//
+//        //Set sensors which are already enabled in the Shimmer to be checked in the ListView
+//        for(int i=0; i<count; i++) {
+//            View v = getViewByPosition(i, listView);
+//            CheckedTextView cTextView = (CheckedTextView) v.findViewById(android.R.id.text1);
+//            if(listEnabled[i]) {
+//                if(cTextView != null) {
+//                    listView.setItemChecked(i, true);
+//                }
+//                else {
+//                    Log.e("SHIMMER", "CheckedTextView is null!");
+//                }
+//            }
+//        }
+//
+//        //Set the listener for ListView item clicks
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if(mSelectedItems.contains(position)) {
+//                    mSelectedItems.remove(Integer.valueOf(position));
+//                } else {
+//                    mSelectedItems.add(position);
+//                }
+//                if(listEnabled[position] == true) {
+//                    listEnabled[position] = false;
+//                } else {
+//                    listEnabled[position] = true;
+//                }
+//            }
+//        });
+//    }
 
 
     /**

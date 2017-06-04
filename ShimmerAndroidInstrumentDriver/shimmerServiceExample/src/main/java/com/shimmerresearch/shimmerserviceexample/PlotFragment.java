@@ -23,6 +23,10 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.List;
+
+import pl.flex_it.androidplot.XYSeriesShimmer;
 
 import static android.R.attr.width;
 
@@ -48,6 +52,8 @@ public class PlotFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     private static XYPlot dynamicPlot;
+    public static HashMap<String, List<Number>> mPlotDataMap = new HashMap<String, List<Number>>(4);
+    public static HashMap<String, XYSeriesShimmer> mPlotSeriesMap = new HashMap<String, XYSeriesShimmer>(4);
     public static int X_AXIS_LENGTH = 500;
     private Paint transparentPaint, outlinePaint;
     static LineAndPointFormatter lineAndPointFormatter1, lineAndPointFormatter2, lineAndPointFormatter3;
@@ -209,6 +215,7 @@ public class PlotFragment extends Fragment {
         dynamicPlot.getLayoutManager().remove(dynamicPlot.getDomainLabelWidget());
 
     }
+
 
 
 }
