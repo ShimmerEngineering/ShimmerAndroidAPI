@@ -222,12 +222,6 @@ public class SensorsEnabledFragment extends ListFragment {
 
                         configureShimmers(cloneList);
 
-                        //TODO: Not working!
-//                        if(shimmerService != null) {
-//                            shimmerService.configureShimmers(cloneList);
-//                        }
-
-
                     } else if (device instanceof Shimmer4Android) {
                         //((Shimmer4Android)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                     }
