@@ -2,6 +2,7 @@ package com.shimmerresearch.shimmerserviceexample;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.hardware.Sensor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,16 +20,27 @@ import android.widget.Toast;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
+import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.bluetooth.BluetoothProgressReportAll;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
 import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
+import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.driverUtilities.SensorGroupingDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerObject;
+import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,20 +51,15 @@ import java.util.Map;
  * create an instance of this fragment.
  */
 public class SensorsEnabledFragment extends ListFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
-    Context context;
-    ShimmerDevice cloneDevice;
-    ListView lv;
+    ShimmerDevice cloneDevice, originalShimmerDevice;
+    ShimmerService shimmerService = null;
+    TreeMap<Integer, SensorGroupingDetails> compatibleSensorGroupMap;
+    int sensorKeys[];
+
+    final static String LOG_TAG = "SHIMMER";
 
 
     public SensorsEnabledFragment() {
@@ -71,19 +78,8 @@ public class SensorsEnabledFragment extends ListFragment {
     public static SensorsEnabledFragment newInstance(String param1, String param2) {
         SensorsEnabledFragment fragment = new SensorsEnabledFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
 
@@ -155,30 +151,36 @@ public class SensorsEnabledFragment extends ListFragment {
      * @param activityContext
      */
     public void setShimmerDevice(final ShimmerDevice device, final Context activityContext) {
-        //sDevice = device;
-        //context = activityContext;
-        //buildSensorsEnabled(device);
 
+        originalShimmerDevice = device;
         cloneDevice = device.deepClone();
 
+        //Get the list of sensor groups the device is compatible with and store it in an ArrayList
+        compatibleSensorGroupMap = new TreeMap<Integer, SensorGroupingDetails>();
+        TreeMap<Integer, SensorGroupingDetails> groupMap = cloneDevice.getSensorGroupingMap();
+        for(Map.Entry<Integer, SensorGroupingDetails> entry : groupMap.entrySet()) {
+            if(isSensorGroupCompatible(cloneDevice, entry.getValue())) {
+              compatibleSensorGroupMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+
         final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
-        AlertDialog.Builder builder = new AlertDialog.Builder(activityContext);
-        Map<Integer, SensorDetails> sensorMap = device.getSensorMap();
+        Map<Integer, SensorDetails> sensorMap = cloneDevice.getSensorMap();
         int count = 0;
         for (SensorDetails sd : sensorMap.values()) {
-            if (device.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+            if (cloneDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
                 count++;
             }
 
         }
         String[] arraySensors = new String[count];
         final boolean[] listEnabled = new boolean[count];
-        final int[] sensorKeys = new int[count];
+        sensorKeys = new int[count];
         count = 0;
 
         for (int key : sensorMap.keySet()) {
             SensorDetails sd = sensorMap.get(key);
-            if (device.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+            if (cloneDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
                 arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
                 listEnabled[count] = sd.isEnabled();
                 sensorKeys[count] = key;
@@ -198,15 +200,14 @@ public class SensorsEnabledFragment extends ListFragment {
             public void onClick(View v) {
 
                 Toast.makeText(activityContext, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-                ShimmerDevice shimmerDeviceClone = device.deepClone();
-                if(device == null) { Toast.makeText(activityContext, "Error! ShimmerDevice is null!", Toast.LENGTH_SHORT).show(); }
-                if(shimmerDeviceClone != null) {
+                if(device == null) { Toast.makeText(activityContext, "Error! The Shimmer Device is null!", Toast.LENGTH_SHORT).show(); }
+                if(cloneDevice != null) {
                     for (int selected : mSelectedItems) {
-                        shimmerDeviceClone.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
+                        cloneDevice.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
                     }
 
                     List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                    cloneList.add(0, shimmerDeviceClone);
+                    cloneList.add(0, cloneDevice);
                     AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
                     if (device instanceof Shimmer) {
@@ -216,14 +217,23 @@ public class SensorsEnabledFragment extends ListFragment {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }*/
-                        ((Shimmer) device).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
+
+                        //((Shimmer) device).writeEnabledSensors(cloneDevice.getEnabledSensors());
+
+                        configureShimmers(cloneList);
+
+                        //TODO: Not working!
+//                        if(shimmerService != null) {
+//                            shimmerService.configureShimmers(cloneList);
+//                        }
+
 
                     } else if (device instanceof Shimmer4Android) {
                         //((Shimmer4Android)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                     }
                 }
                 else {
-                    Toast.makeText(activityContext, "Error! shimmerDeviceClone is null!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activityContext, "Error! Shimmer Device clone is null!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -231,16 +241,16 @@ public class SensorsEnabledFragment extends ListFragment {
         button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.WRAP_CONTENT, ListView.LayoutParams.WRAP_CONTENT));
         listView.addFooterView(button);
 
-        //Set sensors which are already enabled in the Shimmer to be checked in the ListView
+        //Set sensors which are already enabled in the Shimmer clone to be checked in the ListView
         for(int i=0; i<count; i++) {
             View v = getViewByPosition(i, listView);
             CheckedTextView cTextView = (CheckedTextView) v.findViewById(android.R.id.text1);
-            if(listEnabled[i]) {
+            if(cloneDevice.isSensorEnabled(sensorKeys[i])) {
                 if(cTextView != null) {
                     listView.setItemChecked(i, true);
                 }
                 else {
-                    Log.e("SHIMMER", "CheckedTextView is null!");
+                    Log.e(LOG_TAG, "CheckedTextView is null!");
                 }
             }
         }
@@ -250,31 +260,27 @@ public class SensorsEnabledFragment extends ListFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
-                cloneDevice.getEnabledSensors();
                 List<SensorDetails> enabledSensorsList = cloneDevice.getListOfEnabledSensors();
                 CheckedTextView checkedTextView = (CheckedTextView) view.findViewById(android.R.id.text1);
                 CharSequence cs = checkedTextView.getText();
                 String sensorName = cs.toString();
 
-                for(SensorDetails sd : enabledSensorsList) {
-                    if(sensorName == sd.toString()) {
-                        Log.e("JOS", "Sensor you clicked is already enabled!");
-                    }
-                }
-
-
-
-                if(mSelectedItems.contains(position)) {
-                    mSelectedItems.remove(Integer.valueOf(position));
+                if(checkedTextView.isChecked()) {
+                    cloneDevice.setSensorEnabledState(sensorKeys[position], true);
                 } else {
-                    mSelectedItems.add(position);
+                    cloneDevice.setSensorEnabledState(sensorKeys[position], false);
                 }
-                if(listEnabled[position]) {
-                    listEnabled[position] = false;
-                } else {
-                    listEnabled[position] = true;
-                }
+
+//                if(mSelectedItems.contains(position)) {
+//                    mSelectedItems.remove(Integer.valueOf(position));
+//                } else {
+//                    mSelectedItems.add(position);
+//                }
+//                if(listEnabled[position]) {
+//                    listEnabled[position] = false;
+//                } else {
+//                    listEnabled[position] = true;
+//                }
 
             }
         });
@@ -414,5 +420,103 @@ public class SensorsEnabledFragment extends ListFragment {
         }
     }
 
+    protected boolean isSensorGroupCompatible(ShimmerDevice device, SensorGroupingDetails groupDetails) {
+        List<ShimmerVerObject> listOfCompatibleVersionInfo = groupDetails.mListOfCompatibleVersionInfo;
+        return device.isVerCompatibleWithAnyOf(listOfCompatibleVersionInfo);
+    }
+
+    public void setShimmerService(ShimmerService service) {
+        shimmerService = service;
+    }
+
+    public void configureShimmers(List<ShimmerDevice> listOfShimmerClones){
+
+        for (ShimmerDevice cloneShimmer:listOfShimmerClones){
+            if (cloneShimmer instanceof ShimmerBluetooth){
+                ShimmerBluetooth cloneShimmerCast = (ShimmerBluetooth) cloneShimmer;
+
+                if (cloneShimmerCast.getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3){
+
+                    //ShimmerBluetooth originalShimmer = getShimmerDevice(cloneShimmerCast.getComPort());
+                    if (originalShimmerDevice instanceof ShimmerBluetooth){
+                        ShimmerBluetooth originalShimmer = (ShimmerBluetooth) originalShimmerDevice;
+                        originalShimmer.operationPrepare();
+                        originalShimmer.setSendProgressReport(true);
+
+                        if(originalShimmer.isUseInfoMemConfigMethod()){
+                            originalShimmer.writeConfigBytes(cloneShimmerCast.getShimmerInfoMemBytes());
+                            // Hack because infomem is getting updated but
+                            // enabledsensors aren't getting updated on the Shimmer
+                            // and we need an inquiry() to determine packet format
+                            // for legacy code
+                            originalShimmer.writeEnabledSensors(cloneShimmerCast.getEnabledSensors());
+                        }
+                        else {
+                            //TODO below is writing accel, gyro, mag rate + ExG bytes -> for the moment moved to be the first command and then overwrite other rates below
+                            originalShimmer.writeShimmerAndSensorsSamplingRate(cloneShimmerCast.getSamplingRateShimmer());// s3 = 4
+
+                            originalShimmer.writeAccelRange(cloneShimmerCast.getAccelRange());
+                            originalShimmer.writeGSRRange(cloneShimmerCast.getGSRRange());
+                            originalShimmer.writeGyroRange(cloneShimmerCast.getGyroRange());
+                            originalShimmer.writeMagRange(cloneShimmerCast.getMagRange());
+                            originalShimmer.writePressureResolution(cloneShimmerCast.getPressureResolution());
+
+                            //set the low power modes here
+                            originalShimmer.enableLowPowerAccel(cloneShimmerCast.isLowPowerAccelWR());//3
+                            originalShimmer.enableLowPowerGyro(cloneShimmerCast.isLowPowerGyroEnabled());
+                            originalShimmer.enableLowPowerMag(cloneShimmerCast.isLowPowerMagEnabled());
+
+                            //TODO Already done in enableLowPowerAccel, enableLowPowerMag and enableLowPowerGyro
+                            originalShimmer.writeAccelSamplingRate(cloneShimmerCast.getLSM303DigitalAccelRate());
+                            originalShimmer.writeGyroSamplingRate(cloneShimmerCast.getMPU9150GyroAccelRate());
+                            originalShimmer.writeMagSamplingRate(cloneShimmerCast.getLSM303MagRate());
+
+                            //						System.out.println("Register1\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(cloneShimmerCast.getEXG1RegisterArray()));
+                            //						System.out.println("Register2\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(cloneShimmerCast.getEXG2RegisterArray()));
+
+                            originalShimmer.writeEXGConfiguration(cloneShimmerCast.getEXG1RegisterArray(), ExGConfigOptionDetails.EXG_CHIP_INDEX.CHIP1);
+                            originalShimmer.writeEXGConfiguration(cloneShimmerCast.getEXG2RegisterArray(), ExGConfigOptionDetails.EXG_CHIP_INDEX.CHIP2);
+
+                            originalShimmer.writeInternalExpPower(cloneShimmerCast.getInternalExpPower());
+                            originalShimmer.writeShimmerUserAssignedName(cloneShimmerCast.getShimmerUserAssignedName());
+                            originalShimmer.writeExperimentName(cloneShimmerCast.getTrialName());
+                            originalShimmer.writeConfigTime(cloneShimmerCast.getConfigTime());
+
+                            originalShimmer.writeDerivedChannels(cloneShimmerCast.getDerivedSensors());
+                            //originalShimmer.writeDerivedChannels(BTStreamDerivedSensors.ECG2HR_CHIP1_CH2|BTStreamDerivedSensors.ECG2HR_CHIP1_CH1);
+                            //setContinuousSync(mContinousSync);
+
+                            originalShimmer.writeEnabledSensors(cloneShimmerCast.getEnabledSensors()); //this should always be the last command
+                            //						System.out.println(cloneShimmerCast.getEnabledSensors());
+                        }
+
+                        originalShimmer.writeCalibrationDump(cloneShimmerCast.calibByteDumpGenerate());
+
+                        //get instruction stack size
+                        originalShimmer.operationStart(ShimmerBluetooth.BT_STATE.CONFIGURING);
+                    }
+                }
+            }
+            else if(cloneShimmer instanceof Shimmer4){
+                Shimmer4 cloneShimmerCast = (Shimmer4) cloneShimmer;
+                if(originalShimmerDevice instanceof Shimmer4){
+                    Shimmer4 originalShimmer = (Shimmer4) originalShimmerDevice;
+
+                    originalShimmer.operationPrepare();
+//					originalShimmer.setSendProgressReport(true);
+
+                    originalShimmer.writeConfigBytes(cloneShimmerCast.getShimmerInfoMemBytes());
+                    originalShimmer.writeCalibrationDump(cloneShimmerCast.calibByteDumpGenerate());
+
+                    originalShimmer.operationStart(ShimmerBluetooth.BT_STATE.CONFIGURING);
+                }
+            }
+        }
+    }
+
+
+//    private SensorDetails getAssociatedSensorDetails(TreeMap<Integer, SensorGroupingDetails> groupMap, Map<Integer, SensorDetails> sensorMap) {
+//
+//    }
 
 }

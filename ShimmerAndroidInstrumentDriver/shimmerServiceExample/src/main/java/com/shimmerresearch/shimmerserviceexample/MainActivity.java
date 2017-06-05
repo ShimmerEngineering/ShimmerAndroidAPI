@@ -261,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.sensors_enabled_fragment_test:
                 ShimmerDevice device = mService.getShimmer("00:06:66:66:96:86");
+                sensorsEnabledFragment.setShimmerService(mService);
                 sensorsEnabledFragment.setShimmerDevice(device, getApplicationContext());
                 return true;
             case R.id.connected_shimmers_fragment_test:
