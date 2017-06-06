@@ -191,7 +191,7 @@ public class SensorsEnabledFragment extends ListFragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(activityContext, android.R.layout.simple_list_item_multiple_choice, arraySensors);
         setListAdapter(adapter);
 
-        ListView listView = getListView();
+        final ListView listView = getListView();
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
         //Create button in the ListView footer
@@ -236,18 +236,8 @@ public class SensorsEnabledFragment extends ListFragment {
         listView.addFooterView(button);
 
         //Set sensors which are already enabled in the Shimmer clone to be checked in the ListView
-        for(int i=0; i<count; i++) {
-            View v = getViewByPosition(i, listView);
-            CheckedTextView cTextView = (CheckedTextView) v.findViewById(android.R.id.text1);
-            if(cloneDevice.isSensorEnabled(sensorKeys[i])) {
-                if(cTextView != null) {
-                    listView.setItemChecked(i, true);
-                }
-                else {
-                    Log.e(LOG_TAG, "CheckedTextView is null!");
-                }
-            }
-        }
+        updateCheckboxes(listView, count);
+        final int countUpdate = count;
 
         //Set the listener for ListView item clicks
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -264,6 +254,8 @@ public class SensorsEnabledFragment extends ListFragment {
                 } else {
                     cloneDevice.setSensorEnabledState(sensorKeys[position], false);
                 }
+
+                updateCheckboxes(listView, countUpdate);
 
 //                if(mSelectedItems.contains(position)) {
 //                    mSelectedItems.remove(Integer.valueOf(position));
@@ -421,6 +413,28 @@ public class SensorsEnabledFragment extends ListFragment {
 
     public void setShimmerService(ShimmerService service) {
         shimmerService = service;
+    }
+
+    /**
+     * Updates the state of the checkboxes in the ListView
+     * @param listView
+     * @param count
+     */
+    private void updateCheckboxes(ListView listView, int count) {
+        for(int i=0; i<count; i++) {
+            View v = getViewByPosition(i, listView);
+            CheckedTextView cTextView = (CheckedTextView) v.findViewById(android.R.id.text1);
+            if(cTextView != null) {
+                if (cloneDevice.isSensorEnabled(sensorKeys[i])) {
+                    listView.setItemChecked(i, true);
+                }
+                else {
+                    listView.setItemChecked(i, false);
+                }
+            } else {
+                Log.e(LOG_TAG, "CheckedTextView is null!");
+            }
+        }
     }
 
     public void configureShimmers(List<ShimmerDevice> listOfShimmerClones){

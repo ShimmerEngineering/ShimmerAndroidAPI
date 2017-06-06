@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
         connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
         deviceConfigFragment = DeviceConfigFragment.newInstance();
-        plotFragment = PlotFragment.newInstance(null, null);
+        plotFragment = PlotFragment.newInstance();
 
         //Check if Bluetooth is enabled
         if (!btAdapter.isEnabled()) {
@@ -285,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onDestroy() {
         //Stop the Shimmer service
+        //mService.unbindService(mConnection);
         Intent intent = new Intent(this, ShimmerService.class);
         stopService(intent);
         Log.d(LOG_TAG, "Shimmer Service stopped");
@@ -372,7 +373,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 2) {
                 //return deviceConfigFragment;
-                return deviceConfigFragment;
+                plotFragment.setShimmerService(mService);
+                return plotFragment;
             } else if (position == 0) {
                 if(isServiceStarted) {
                     connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
@@ -419,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 0) {
-                return PlotFragment.newInstance("Hi", "Hello");
+                return PlotFragment.newInstance();
             } else if (position == 1) {
                 if(isServiceStarted) {
                     connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
@@ -507,7 +509,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         selectedDeviceAddress = macAddress;
         selectedDeviceName = deviceName;
     }
-
 
 
 
