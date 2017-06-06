@@ -350,63 +350,6 @@ public class PlotFragment extends Fragment {
                             textViewDeviceState.setText(deviceState);
                             //TODO: set the enable logging regarding the user selection
                             //shimmerService.setEnableLogging(mEnableLogging);
-                    /*if(!mSensorView.equals(""))
-                    	setLegend();
-                    else{
-                    	List<String> sensorList = mService.getListofEnabledSensors(mBluetoothAddress);
-                    	if(sensorList!=null){
-    	            		if(mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-    	            			sensorList.remove("ECG");
-    	            			sensorList.remove("EMG");
-    	            			if(sensorList.contains("EXG1")){
-    	            				sensorList.remove("EXG1");
-    	            				sensorList.remove("EXG2");
-    	            				if(mService.isEXGUsingECG24Configuration(mBluetoothAddress)){
-    	            					sensorList.add("ECG");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
-    	            					//sensorName[0] = "ECG LL-RA";
-    	                    			//sensorName[1] = "ECG LA-RA";
-    	                    			//sensorName[2] = "EXG2 CH1";
-    	                    			//sensorName[3] = "ECG Vx-RL";
-    	            				}
-
-    	            				else if(mService.isEXGUsingEMG24Configuration(mBluetoothAddress)){
-    	            					sensorList.add("EMG");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT);
-    	            				}
-
-    	            				else if(mService.isEXGUsingTestSignal24Configuration(mBluetoothAddress))
-    	            					sensorList.add("ExG Test Signal");
-    	            			}
-    	            			if(sensorList.contains("EXG1 16Bit")){
-    	            				sensorList.remove("EXG1 16Bit");
-    	            				sensorList.remove("EXG2 16Bit");
-    	            				if(mService.isEXGUsingECG16Configuration(mBluetoothAddress)){
-    	            					sensorList.add("ECG 16Bit");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT);
-    	            				}
-    	            				else if(mService.isEXGUsingEMG16Configuration(mBluetoothAddress)){
-    	            					sensorList.add("EMG 16Bit");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT);
-    	            				}
-    	            				else if(mService.isEXGUsingTestSignal16Configuration(mBluetoothAddress))
-    	            					sensorList.add("ExG Test Signal 16Bit");
-    	            			}
-    	            		}
-                    	}
-
-                		sensorList.add("Timestamp");
-                    	mSensorView = sensorList.get(0);
-                    	setLegend();
-                    }*/
                             break;
                         case DISCONNECTED:
                             Log.d(LOG_TAG,"Shimmer No State");
@@ -462,7 +405,6 @@ public class PlotFragment extends Fragment {
             }
         }
     };
-
 
 
 

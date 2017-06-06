@@ -238,7 +238,11 @@ public class ShimmerDialogConfigurations {
         final EditText editTextSignalFilter = (EditText) dialog.findViewById(R.id.editTextFilterPlotSignal);
         dialog.setCanceledOnTouchOutside(true);
         TextView title = (TextView) dialog.findViewById(android.R.id.title);
-        //title.setText("Select Signal");
+        if(title != null) {
+            title.setText("Select Signal");
+        } else {
+            Log.e("DialogConfigurations", "Title TextView is null!");
+        }
         final ListView listView = (ListView) dialog.findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
