@@ -14,4 +14,6 @@
             android:title="Connected Shimmers Fragment (Test)"></item>
     <item   android:id="@+id/device_configuration_fragment_test"
             android:title="Device Configuration Fragment Test"></item>
+    <item   android:id="@+id/signals_to_plot_fragment_test"
+            android:title="Signals To Plot Fragment Test"></item>
 </menu>

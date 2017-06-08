@@ -103,13 +103,13 @@ public class PlotFragment extends Fragment {
         initPlot();
         textViewDeviceName = (TextView) getView().findViewById(R.id.textViewDeviceName);
         textViewDeviceState = (TextView) getView().findViewById(R.id.textViewDeviceState);
-        signalsToPlotButton = (Button) getView().findViewById(R.id.button);
-        signalsToPlotButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ShimmerDialogConfigurations.showSelectSensorPlot(getActivity(), shimmerService, mBluetoothAddress, dynamicPlot);
-            }
-        });
+//        signalsToPlotButton = (Button) getView().findViewById(R.id.button);
+//        signalsToPlotButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                ShimmerDialogConfigurations.showSelectSensorPlot(getActivity(), shimmerService, mBluetoothAddress, dynamicPlot);
+//            }
+//        });
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -406,6 +406,8 @@ public class PlotFragment extends Fragment {
         }
     };
 
-
+    public XYPlot getDynamicPlot() {
+        return dynamicPlot;
+    }
 
 }

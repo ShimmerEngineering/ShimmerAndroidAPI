@@ -15,8 +15,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
@@ -167,8 +165,9 @@ public class DeviceConfigFragment extends Fragment {
             }
         });
 
+/*
         LinearLayout buttonLayout = new LinearLayout(context);
-        buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
         Button writeConfigButton = new Button(context);
         Button resetListButton = new Button(context);
@@ -187,9 +186,12 @@ public class DeviceConfigFragment extends Fragment {
                 Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
             }
         });
+        writeConfigButton.setText("Write config to Shimmer");
+        resetListButton.setText("Reset settings");
         buttonLayout.addView(resetListButton);
         buttonLayout.addView(writeConfigButton);
         expandListView.addFooterView(buttonLayout);
+*/
 
     }
 

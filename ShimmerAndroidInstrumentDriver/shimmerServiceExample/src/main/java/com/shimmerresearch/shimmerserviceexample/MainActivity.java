@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     ConnectedShimmersListFragment connectedShimmersListFragment;
     DeviceConfigFragment deviceConfigFragment;
     PlotFragment plotFragment;
+    SignalsToPlotFragment signalsToPlotFragment;
 
     //Drawer stuff
     private ListView mDrawerList;
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     private String mActivityTitle;
     public String selectedDeviceAddress, selectedDeviceName;
     private boolean showPlotFragments = false;
+
+    XYPlot dynamicPlot; //TODO: Remove this when done testing
 
 
     /**
@@ -123,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
         deviceConfigFragment = DeviceConfigFragment.newInstance();
         plotFragment = PlotFragment.newInstance();
+        signalsToPlotFragment = SignalsToPlotFragment.newInstance();
 
         //Check if Bluetooth is enabled
         if (!btAdapter.isEnabled()) {
@@ -271,6 +276,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.device_configuration_fragment_test:
                 ShimmerDevice device2 = mService.getShimmer("00:06:66:66:96:86");
                 deviceConfigFragment.buildDeviceConfigList(device2, getApplicationContext());
+                return true;
+            case R.id.signals_to_plot_fragment_test:
+                ShimmerDevice device3 = mService.getShimmer("00:06:66:66:96:86");
+                signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, "00:06:66:66:96:86", plotFragment.getDynamicPlot());
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -374,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if (position == 2) {
                 //return deviceConfigFragment;
                 plotFragment.setShimmerService(mService);
+                dynamicPlot = plotFragment.getDynamicPlot();
                 return plotFragment;
             } else if (position == 0) {
                 if(isServiceStarted) {
@@ -384,9 +394,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     Log.e("JOS", "Service not started, can't return fragment");
                 }
                 return connectedShimmersListFragment;
+                //return signalsToPlotFragment;
             } else {
                 //Sensors fragment
-                return sensorsEnabledFragment;
+                return signalsToPlotFragment;
             }
         }
 
@@ -400,11 +411,13 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Connected Shimmers";
+                    //return "Connected Shimmers";
+                    return "Connected Devices";
                 case 1:
-                    return "Enable Sensors";
+                    //return "Enable Sensors";
+                    return "Signals to Plot";
                 case 2:
-                    return "Device Configuration";
+                    return "Plot";
             }
             return null;
         }
