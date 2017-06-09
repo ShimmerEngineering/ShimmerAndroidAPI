@@ -66,15 +66,6 @@ public class SensorsEnabledFragment extends ListFragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SensorsEnabledFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static SensorsEnabledFragment newInstance(String param1, String param2) {
         SensorsEnabledFragment fragment = new SensorsEnabledFragment();
         Bundle args = new Bundle();
@@ -90,7 +81,6 @@ public class SensorsEnabledFragment extends ListFragment {
 //    }
 
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -150,7 +140,7 @@ public class SensorsEnabledFragment extends ListFragment {
      * @param device
      * @param activityContext
      */
-    public void setShimmerDevice(final ShimmerDevice device, final Context activityContext) {
+    public void buildSensorsList(final ShimmerDevice device, final Context activityContext) {
 
         originalShimmerDevice = device;
         cloneDevice = device.deepClone();
@@ -194,46 +184,49 @@ public class SensorsEnabledFragment extends ListFragment {
         final ListView listView = getListView();
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
-        //Create button in the ListView footer
-        Button button = new Button(activityContext);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        if(listView.getFooterViewsCount() == 0) {   //Only add the button if there is no existing button
+            //Create button in the ListView footer
+            Button button = new Button(activityContext);
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
 
-                Toast.makeText(activityContext, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-                if(device == null) { Toast.makeText(activityContext, "Error! The Shimmer Device is null!", Toast.LENGTH_SHORT).show(); }
-                if(cloneDevice != null) {
-                    for (int selected : mSelectedItems) {
-                        cloneDevice.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
+                    Toast.makeText(activityContext, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
+                    if (device == null) {
+                        Toast.makeText(activityContext, "Error! The Shimmer Device is null!", Toast.LENGTH_SHORT).show();
                     }
+                    if (cloneDevice != null) {
+                        for (int selected : mSelectedItems) {
+                            cloneDevice.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
+                        }
 
-                    List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                    cloneList.add(0, cloneDevice);
-                    AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, cloneDevice);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                    if (device instanceof Shimmer) {
-                        //((Shimmer)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                        if (device instanceof Shimmer) {
+                            //((Shimmer)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                             /*try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }*/
 
-                        //((Shimmer) device).writeEnabledSensors(cloneDevice.getEnabledSensors());
+                            //((Shimmer) device).writeEnabledSensors(cloneDevice.getEnabledSensors());
 
-                        configureShimmers(cloneList);
+                            configureShimmers(cloneList);
 
-                    } else if (device instanceof Shimmer4Android) {
-                        //((Shimmer4Android)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                        } else if (device instanceof Shimmer4Android) {
+                            //((Shimmer4Android)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                        }
+                    } else {
+                        Toast.makeText(activityContext, "Error! Shimmer Device clone is null!", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else {
-                    Toast.makeText(activityContext, "Error! Shimmer Device clone is null!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        button.setText("Write config");
-        button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.WRAP_CONTENT, ListView.LayoutParams.WRAP_CONTENT));
-        listView.addFooterView(button);
+            });
+            button.setText("Write config");
+            button.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.WRAP_CONTENT, ListView.LayoutParams.WRAP_CONTENT));
+            listView.addFooterView(button);
+        }
 
         //Set sensors which are already enabled in the Shimmer clone to be checked in the ListView
         updateCheckboxes(listView, count);
@@ -523,8 +516,5 @@ public class SensorsEnabledFragment extends ListFragment {
     }
 
 
-//    private SensorDetails getAssociatedSensorDetails(TreeMap<Integer, SensorGroupingDetails> groupMap, Map<Integer, SensorDetails> sensorMap) {
-//
-//    }
 
 }

@@ -104,9 +104,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             }
         }
 
-        int index = expandableListTitle.size();
-        expandableListTitle.add(index, "BUTTON");
-
     }
 
     @Override
@@ -262,15 +259,15 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         String listTitle = (String) getGroup(groupPosition);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if(listTitle == "BUTTON") {
-            if(convertView == null) {
-                convertView = layoutInflater.inflate(R.layout.list_group_button, null);
-            }  else if(convertView.findViewById(R.id.saveButton) == null) {
-                convertView = layoutInflater.inflate(R.layout.list_group_button, null);
-            }
-            writeConfigButton = (Button) convertView.findViewById(R.id.saveButton);
-            resetListButton = (Button) convertView.findViewById(R.id.resetButton);
-        } else {
+//        if(listTitle == "BUTTON") {
+//            if(convertView == null) {
+//                convertView = layoutInflater.inflate(R.layout.list_group_button, null);
+//            }  else if(convertView.findViewById(R.id.saveButton) == null) {
+//                convertView = layoutInflater.inflate(R.layout.list_group_button, null);
+//            }
+//            writeConfigButton = (Button) convertView.findViewById(R.id.saveButton);
+//            resetListButton = (Button) convertView.findViewById(R.id.resetButton);
+//        } else {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.list_group, null);
             } else if(convertView.findViewById(R.id.listTitle) == null) {
@@ -279,7 +276,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
             listTitleTextView.setTypeface(null, Typeface.BOLD);
             listTitleTextView.setText(listTitle);
-        }
+//        }
 
         return convertView;
     }

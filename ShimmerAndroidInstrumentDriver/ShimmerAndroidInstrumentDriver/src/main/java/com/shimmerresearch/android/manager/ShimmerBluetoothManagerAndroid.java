@@ -82,15 +82,15 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     @Override
-    public void connectShimmerTroughBTAddress(String blueoothAddress) {
+    public void connectShimmerTroughBTAddress(String bluetoothAddress) {
 
-        if(isDevicePaired(blueoothAddress)) {
-            addDiscoveredDevice(blueoothAddress);
-            super.connectShimmerTroughBTAddress(blueoothAddress);
+        if(isDevicePaired(bluetoothAddress)) {
+            addDiscoveredDevice(bluetoothAddress);
+            super.connectShimmerTroughBTAddress(bluetoothAddress);
         }
         else{
-            String msg = "Device " + blueoothAddress + " not paired";
-            throw new DeviceNotPairedException(blueoothAddress, msg);
+            String msg = "Device " + bluetoothAddress + " not paired";
+            throw new DeviceNotPairedException(bluetoothAddress, msg);
         }
     }
 

@@ -40,6 +40,9 @@ public class SignalsToPlotFragment extends ListFragment {
     List<String[]> mList = new ArrayList<String[]>();
     ShimmerService shimmerService;
     XYPlot dynamicPlot;
+    Context context;
+    String bluetoothAddress;
+    ShimmerDevice shimmerDevice = null;
 
     final static String LOG_TAG = "SignalsToPlotFragment";
 
@@ -60,6 +63,15 @@ public class SignalsToPlotFragment extends ListFragment {
         SignalsToPlotFragment fragment = new SignalsToPlotFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        if(shimmerDevice != null) {
+
+        }
+
+        super.onResume();
     }
 
     public void buildSignalsToPlotList(Context context, final ShimmerService service, final String bluetoothAddress, final XYPlot plot) {
@@ -86,14 +98,6 @@ public class SignalsToPlotFragment extends ListFragment {
             for(int i=0;i<listOfChannels.size();i++) {
                 sensorList2.add(joinStrings(listOfChannels.get(i)));
             }
-
-//            for(String key : channelsMap.keySet()) {
-//                sensorList.add(key);
-//            }
-
-//            for(int i=0; i<listOfEnabledChannelsAndFormats.size(); i++) {
-//                sensorList.add(joinStrings(listOfEnabledChannelsAndFormats.get(i)));
-//            }
 
             int p=0;
             String deviceName = device.getShimmerUserAssignedName();
@@ -136,20 +140,6 @@ public class SignalsToPlotFragment extends ListFragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    CheckedTextView cTextView = (CheckedTextView) view;
-//                    String channelName = cTextView.getText().toString();
-//                    String[] channelNameArray = new String[]{channelName};
-//                    if(!shimmerService.mPlotManager.checkIfPropertyExist(channelNameArray)) {
-//                        try {
-//                            shimmerService.mPlotManager.addSignal(channelNameArray, dynamicPlot);
-//                        } catch (Exception e) {
-//                            Log.e(LOG_TAG, "Error! Could not add signal: " + e);
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    else {
-//                        shimmerService.mPlotManager.removeSignal(channelNameArray);
-//                    }
 
                     if(!shimmerService.mPlotManager.checkIfPropertyExist(mList.get(position))) {
                         try {
@@ -176,20 +166,6 @@ public class SignalsToPlotFragment extends ListFragment {
 
     }
 
-//    public void updateCheckboxes() {
-//        int i=0;
-//        for(String key : channelsMap.keySet()) {
-//            String[] keyArray = new String[1];
-//            keyArray[0] = key;
-//            if(shimmerService.mPlotManager.checkIfPropertyExist(keyArray)) {
-//                listView.setItemChecked(i, true);
-//            } else {
-//                listView.setItemChecked(i, false);
-//            }
-//            i++;
-//        }
-//    }
-
     public void updateCheckboxes() {
         for(int i=0; i<mList.size(); i++) {
             if(shimmerService.mPlotManager.checkIfPropertyExist(mList.get(i))) {
@@ -210,6 +186,19 @@ public class SignalsToPlotFragment extends ListFragment {
             }
         }
         return js;
+    }
+
+    public void setSelectedDeviceAndPlot(Context activityContext, ShimmerService service, String btAddress, XYPlot plot) {
+        context = activityContext;
+        shimmerService = service;
+        bluetoothAddress = btAddress;
+        dynamicPlot = plot;
+        shimmerDevice = shimmerService.getShimmer(bluetoothAddress);
+    }
+
+    public void removeSelectedDevice() {
+        bluetoothAddress = null;
+        shimmerDevice = null;
     }
 
 

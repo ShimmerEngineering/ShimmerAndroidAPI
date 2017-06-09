@@ -86,6 +86,7 @@ public class ShimmerService extends Service {
 	private final IBinder mBinder = new LocalBinder();
 	public HashMap<String, Object> mMultiShimmer = new HashMap<String, Object>(7);
 	public HashMap<String, Logging> mLogShimmer = new HashMap<String, Logging>(7);
+	private List<Handler> mHandlerList = new ArrayList<Handler>();
 	private Handler mHandlerGraph=null;
 	private boolean mGraphing=false;
 	public String mLogFileName="Default";
@@ -297,6 +298,10 @@ public class ShimmerService extends Service {
 
 	  public final Handler mHandler = new Handler() {
 	        public void handleMessage(Message msg) {
+				for(Handler handler : mHandlerList) {
+					//Rebroadcast the message received to the List of Handlers
+					handler.obtainMessage(msg.what, msg.arg1, msg.arg2, msg.obj).sendToTarget();
+				}
 	            switch (msg.what) { // handlers have a what identifier which is used to identify the type of msg
 	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
@@ -1034,6 +1039,10 @@ public class ShimmerService extends Service {
 	public void setGraphHandler(Handler handler){
 		mHandlerGraph=handler;
 
+	}
+
+	public void addHandlerToList(Handler handler) {
+		mHandlerList.add(handler);
 	}
 
 	public void enableGraphingHandler(boolean setting){
