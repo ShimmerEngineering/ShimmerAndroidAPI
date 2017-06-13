@@ -30,6 +30,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.androidplot.xy.XYPlot;
+import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
@@ -281,6 +282,22 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.signals_to_plot_fragment_test:
                 ShimmerDevice device3 = mService.getShimmer("00:06:66:66:96:86");
                 signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, "00:06:66:66:96:86", plotFragment.getDynamicPlot());
+                return true;
+            case R.id.start_streaming:
+                if(selectedDeviceAddress != null) {
+                    ShimmerDevice mDevice1 = mService.getShimmer(selectedDeviceAddress);
+                    mDevice1.startStreaming();
+                    signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
+                }
+                return true;
+            case R.id.stop_streaming:
+                if(selectedDeviceAddress != null) {
+                    ShimmerDevice mDevice2 = mService.getShimmer(selectedDeviceAddress);
+                    mDevice2.stopStreaming();
+                    sensorsEnabledFragment.buildSensorsList(mDevice2, this);
+                    deviceConfigFragment.buildDeviceConfigList(mDevice2, this);
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -295,12 +312,15 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onDestroy() {
         //Stop the Shimmer service
-        //mService.unbindService(mConnection);
+        super.onDestroy();
+        mHandler = null;
+        if(isServiceStarted) {
+            this.unbindService(mConnection);
+        }
         Intent intent = new Intent(this, ShimmerService.class);
         stopService(intent);
         Log.d(LOG_TAG, "Shimmer Service stopped");
         Toast.makeText(this, "Shimmer Service stopped", Toast.LENGTH_SHORT).show();
-        super.onDestroy();
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -312,9 +332,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             // cast its IBinder to a concrete class and directly access it.
             mService = ((ShimmerService.LocalBinder) service).getService();
             isServiceStarted = true;
-            //Add this activity's Handler to the List of Handlers so we know when a Shimmer is connected
-//            mService.getBluetoothManager().addHandler(mHandler);
+            //Add this activity's Handler to the service's list of Handlers so we know when a Shimmer is connected/disconnected
+            mService.addHandlerToList(mHandler);
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
+            //TODO: connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
 
 //            mHandler = mService.getHandler();
         }
@@ -588,9 +609,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 }
                 switch (state) {
                     case CONNECTED:
-                        Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
                         connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
+                        //TODO: connectedShimmersListFragment.addDeviceToList(macAddress, shimmerName);
+                        Log.e("JOS", "Device now connected");
                         break;
                     case CONNECTING:
                         break;
@@ -600,6 +623,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             //If the selected device is the one that is now streaming, then show the list of signals available to be plotted
                             signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, macAddress, dynamicPlot);
                         }
+                        Log.e("JOS", "Device now streaming");
                         break;
                     case STREAMING_AND_SDLOGGING:
                         if(selectedDeviceAddress.contains(macAddress) && dynamicPlot != null) {
@@ -610,9 +634,23 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
+                        //TODO: connectedShimmersListFragment.removeDeviceFromList(macAddress);
                         break;
                 }
+
             }
+
+            if(msg.what == ShimmerBluetooth.NOTIFICATION_SHIMMER_STOP_STREAMING) {
+                Log.e("JOS", "Shimmer has stopped streaming using ShimmerBluetooth class");
+            }
+
+            if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
+                Log.e("JOS", "Shimmer has stopped streaming using Shimmer class");
+                signalsToPlotFragment.setDeviceNotStreamingView();
+            }
+
+
+
         }
     };
 
@@ -637,7 +675,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         plotFragment.setShimmerService(mService);
         dynamicPlot = plotFragment.getDynamicPlot();
 
-        signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
+        //signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
 
     }
 

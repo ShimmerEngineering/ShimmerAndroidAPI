@@ -14,13 +14,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.shimmerresearch.driver.ShimmerDevice;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,9 +40,13 @@ public class ConnectedShimmersListFragment extends ListFragment {
     final static String LOG_TAG = "SHIMMER";
     ListView savedListView = null;
     ArrayAdapter<String> savedListAdapter = null;
-    int selectedItemPos = 10;
+    int selectedItemPos = -1;
     List<ShimmerDevice> shimmerDeviceList;
     Context context;
+    int selectedDevicePos = -1;
+    List<String> arrayList = new ArrayList<String>();
+    ArrayAdapter<String> mArrayAdapter;
+
 
     public ConnectedShimmersListFragment() {
         // Required empty public constructor
@@ -61,6 +69,8 @@ public class ConnectedShimmersListFragment extends ListFragment {
         mActivity = activity;
     }
 
+
+
     public static ConnectedShimmersListFragment newInstance() {
         ConnectedShimmersListFragment fragment = new ConnectedShimmersListFragment();
         Bundle args = new Bundle();
@@ -69,6 +79,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
     }
 
     public void buildShimmersConnectedListView(final List<ShimmerDevice> deviceList, final Context context) {
+        Log.e("JOS", "buildShimmersConnectedListView has been called");
         shimmerDeviceList = deviceList;
         this.context = context;
         if(deviceList == null) {    //No Shimmers connected
@@ -92,16 +103,22 @@ public class ConnectedShimmersListFragment extends ListFragment {
                 displayList[i] = nameList[i] + "\n" + macList[i];
             }
 
-            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, displayList);
+//TODO:            for(int i=0; i<displayList.length; i++) {
+//                arrayList.add(i, displayList[i]);
+//            }
+            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, displayList);
 
             //Set the list of devices to be displayed in the Fragment
             setListAdapter(listAdapter);
+            //TODO: mArrayAdapter = listAdapter;
 
             final ListView listView = getListView();
+            listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     selectedItemPos = position;
+/*
                     //Highlight the currently selected ShimmerDevice
                     view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
 
@@ -112,9 +129,11 @@ public class ConnectedShimmersListFragment extends ListFragment {
                             v.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
                         }
                     }
+*/
 
                     selectedDeviceAddress = macList[position];
-                    selectedDeviceName = macList[position];
+                    selectedDeviceName = nameList[position];
+                    selectedDevicePos = position;
 
                     try {
                         mCallBack.onShimmerDeviceSelected(macList[position], nameList[position]);
@@ -127,20 +146,43 @@ public class ConnectedShimmersListFragment extends ListFragment {
             //Save the listView so that it can be restored in onCreateView when returning to the Fragment.
             savedListView = listView;
             savedListAdapter = listAdapter;
+
+            //Ensure that the selected item's checkbox is checked
+            if(selectedDeviceAddress != null) {
+                for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+
+                    View view = getViewByPosition(i, listView);
+                    CheckedTextView checkedTextView = (CheckedTextView) view.findViewById(android.R.id.text1);
+                    if (checkedTextView != null) {
+                        String text = checkedTextView.getText().toString();
+                        Log.e("JOS", "text: " + text);
+                        if (text.contains(selectedDeviceAddress)) {
+                            listView.setItemChecked(i, true);
+                        } else {
+                            listView.setItemChecked(i, false);
+                        }
+                    }
+
+                }
+            }
+
+
+/*
             //Restore the selected item position, if any:
             Log.e(LOG_TAG, "selectedItemPos: " + selectedItemPos);
-            if(selectedItemPos != 10) {
+            if(selectedItemPos != -1) {
                 View v = getViewByPosition(selectedItemPos, listView);
                 if(v != null) {
                     TextView textView = (TextView) v.findViewById(android.R.id.text1);
                     Log.e(LOG_TAG, "v is " + textView.getText());
-                    textView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_orange_light));
-                    v.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_orange_light));
+                    textView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
+                    v.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
                     textView.setText("Selected!");
                 } else {
                     Log.e(LOG_TAG, "v is null!");
                 }
             }
+*/
         }
     }
 
@@ -181,6 +223,8 @@ public class ConnectedShimmersListFragment extends ListFragment {
     public void onResume() {
         if(savedListView != null && savedListAdapter != null) {
             buildShimmersConnectedListView(shimmerDeviceList, context);
+        } else {
+            buildShimmersConnectedListView(null, getActivity().getApplicationContext());
         }
         Log.e(LOG_TAG, "ConnectedShimmersListFragment onResume()");
         super.onResume();
@@ -197,5 +241,53 @@ public class ConnectedShimmersListFragment extends ListFragment {
             return listView.getChildAt(childIndex);
         }
     }
+
+//    public void removeDeviceFromList(String deviceAddress) {
+//        ListView listView = getListView();
+//        for(int i=0; i<listView.getChildCount(); i++) {
+//            TextView textView = (TextView) listView.getChildAt(i);
+//            if(textView.getText().toString().contains(deviceAddress)) {
+//                listView.removeViewAt(i);
+//            }
+//        }
+//
+//        if(selectedDeviceAddress.contains(deviceAddress)) {
+//            //The device which has been removed is the one that is currently selected
+//            selectedDeviceAddress = ""; //Reset selected device address
+//        }
+//    }
+
+    public void removeDeviceFromList(String deviceAddress) {
+
+        for(int i=0; i<arrayList.size(); i++) {
+            String listDevice = arrayList.get(i);
+            if(listDevice.contains(deviceAddress)) {
+                arrayList.remove(i);
+            }
+        }
+
+        mArrayAdapter.notifyDataSetChanged();
+
+    }
+
+    public void addDeviceToList(String deviceAddress, String deviceName) {
+        ListView listView = getListView();
+
+        String s = deviceAddress + "\n" + deviceName;
+
+        //Check if the device is already in the list
+        for(int i=0; i<arrayList.size(); i++) {
+            String currentDevice = arrayList.get(i);
+            if(currentDevice.contains(deviceAddress)) {
+                return;
+            }
+        }
+
+        arrayList.add(s);
+        mArrayAdapter.notifyDataSetChanged();
+    }
+
+
+
 
 }

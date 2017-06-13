@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
@@ -76,6 +77,7 @@ public class SignalsToPlotFragment extends ListFragment {
 
     public void buildSignalsToPlotList(Context context, final ShimmerService service, final String bluetoothAddress, final XYPlot plot) {
 
+        this.context = context;
         shimmerService = service;
         dynamicPlot = plot;
         ShimmerBluetoothManagerAndroid btManager = shimmerService.getBluetoothManager();
@@ -199,6 +201,12 @@ public class SignalsToPlotFragment extends ListFragment {
     public void removeSelectedDevice() {
         bluetoothAddress = null;
         shimmerDevice = null;
+    }
+
+    public void setDeviceNotStreamingView() {
+        String[] notStreamingMsg = new String[]{"Device not streaming", "Signals to plot can only be displayed when device is streaming"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, notStreamingMsg);
+        setListAdapter(adapter);
     }
 
 
