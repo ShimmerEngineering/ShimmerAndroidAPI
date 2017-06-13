@@ -162,9 +162,11 @@ public class SignalsToPlotFragment extends ListFragment {
 
         }
 
+/*
         else {
             Toast.makeText(context, "Error! Device is not streaming!", Toast.LENGTH_SHORT).show();
         }
+*/
 
     }
 
