@@ -306,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         //Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
                         connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
+                        Log.e("JOS", "Shimmer device has been CONNECTED!!!!");
                         break;
                     case CONNECTING:
                         break;

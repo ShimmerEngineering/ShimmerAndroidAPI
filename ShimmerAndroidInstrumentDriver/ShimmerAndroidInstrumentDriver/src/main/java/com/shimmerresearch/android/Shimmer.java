@@ -220,6 +220,8 @@ public class Shimmer extends ShimmerBluetooth{
 	transient private BluetoothAdapter mBluetoothAdapter = null;
 	transient List<Handler> mHandlerList = new ArrayList<Handler>();
 
+	private boolean mContinuousStateUpdates = false;
+
 
 	{
 		setUseInfoMemConfigMethod(true);
@@ -1176,9 +1178,11 @@ public class Shimmer extends ShimmerBluetooth{
 				setBluetoothRadioState(BT_STATE.CONNECTED);
 				//TODO: Delete this...
 //				mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),getBluetoothRadioState())).sendToTarget();
-				sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-						new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), getBluetoothRadioState()));
-				
+
+				if(mContinuousStateUpdates) {
+					sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+							new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), getBluetoothRadioState()));
+				}
 			}
 		}
 		
@@ -1250,8 +1254,11 @@ public class Shimmer extends ShimmerBluetooth{
 		// Give the new state to the Handler so the UI Activity can update
 		//TODO: Delete this...
 //		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),state)).sendToTarget();
-		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), state));
+
+		if(mContinuousStateUpdates) {
+			sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+					new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), state));
+		}
 	}
 
 	public boolean isConnected(){
@@ -1414,6 +1421,16 @@ public void setRadio(BluetoothSocket socket){
 
 	public void addHandler(Handler handler) {
 		mHandlerList.add(handler);
+	}
+
+	/**
+	 * If true, Handlers associated with this device will receive continuous status updates
+	 * @param status
+	 */
+	public void setContinuousStateUpdates(boolean status) {
+
+		mContinuousStateUpdates = status;
+
 	}
 
 	
