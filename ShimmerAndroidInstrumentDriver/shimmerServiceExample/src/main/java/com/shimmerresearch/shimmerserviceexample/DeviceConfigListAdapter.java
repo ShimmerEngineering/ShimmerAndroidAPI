@@ -161,53 +161,11 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
 
             String valuelabel = getConfigValueLabelFromConfigLabel(configValueLabel);
 
-            /*if(configValueLabel == "Wide Range Accel Rate") {
-                if(currentConfigInt == 9) {
-                    currentConfigInt = 8;
-                }
-            }
-
-            if(expandedListText == childPosition) {
-                expandedListTextView.setChecked(true);
-            } else {
-                expandedListTextView.setChecked(false);
-            }*/
-
             if(valuelabel.equals(expandedListText)) {
                 expandedListTextView.setChecked(true);
             } else {
                 expandedListTextView.setChecked(false);
             }
-
-
-//            if (currentSettingsMap.get(getGroup(groupPosition)) == expandedListText) {
-//                Log.i("JOS", currentSettingsMap.get(getGroup(groupPosition)) + " == " + expandedListText);
-//                Log.i("JOS", "groupPosition: " + groupPosition + "\tchildPosition: " + childPosition);
-//                expandedListTextView.setChecked(true);
-//            } else {
-//                expandedListTextView.setChecked(false);
-//            }
-//
-//            expandedListTextView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    CheckedTextView checkedTextView = (CheckedTextView) v.findViewById(R.id.expandedListItem);
-//                    if(checkedTextView.isChecked()) {
-//                        checkedTextView.setChecked(false);
-//                    } else {
-//                        checkedTextView.setChecked(true);
-//                    }
-//                    String groupName = (String) getGroup(groupPosition);
-//                    //An item is selected, so reset the state of the other checkboxes
-////                    for(int i=0; i<getChildrenCount(groupPosition); i++) {
-////                        View childView = parentView.getChildAt(i);
-////                        CheckedTextView childCheckedTextView =  (CheckedTextView) childView.findViewById(R.id.expandedListItem);
-////                        childCheckedTextView.setChecked(false);
-////                    }
-//                    int num = parentView.indexOfChild(v);
-//                    Toast.makeText(context, "You clicked on group??!! " + groupName + " Index " + num, Toast.LENGTH_SHORT).show();
-//                }
-//            });
 
         }
 
@@ -259,15 +217,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         String listTitle = (String) getGroup(groupPosition);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-//        if(listTitle == "BUTTON") {
-//            if(convertView == null) {
-//                convertView = layoutInflater.inflate(R.layout.list_group_button, null);
-//            }  else if(convertView.findViewById(R.id.saveButton) == null) {
-//                convertView = layoutInflater.inflate(R.layout.list_group_button, null);
-//            }
-//            writeConfigButton = (Button) convertView.findViewById(R.id.saveButton);
-//            resetListButton = (Button) convertView.findViewById(R.id.resetButton);
-//        } else {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.list_group, null);
             } else if(convertView.findViewById(R.id.listTitle) == null) {
@@ -276,7 +225,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
             listTitleTextView.setTypeface(null, Typeface.BOLD);
             listTitleTextView.setText(listTitle);
-//        }
 
         return convertView;
     }
@@ -289,11 +237,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
     public void replaceCurrentSetting(String key, String newSetting) {
         currentSettingsMap.remove(key);
         currentSettingsMap.put(key, newSetting);
-    }
-
-    public void setButtonsOnClickListener(View.OnClickListener writeButtonListener, View.OnClickListener resetButtonListener) {
-        writeConfigButton.setOnClickListener(writeButtonListener);
-        resetListButton.setOnClickListener(resetButtonListener);
     }
 
     public void updateCloneDevice(ShimmerDevice newShimmerCloneDevice) {

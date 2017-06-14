@@ -42,9 +42,6 @@ import java.util.Map;
 
 import static android.view.KeyEvent.KEYCODE_ENTER;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class DeviceConfigFragment extends Fragment {
 
     DeviceConfigListAdapter expandListAdapter;
@@ -71,7 +68,7 @@ public class DeviceConfigFragment extends Fragment {
                 listOfKeys.addAll(sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated);
             }
         }
-        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
+//        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
 
         expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmerDevice, shimmerDeviceClone);
         expandListView = (ExpandableListView) getView().findViewById(R.id.expandable_listview);
@@ -94,47 +91,11 @@ public class DeviceConfigFragment extends Fragment {
 
                     //Write the setting to the Shimmer Clone
                     final ConfigOptionDetailsSensor cods = configOptionsMap.get(keySetting);
-                    Log.d("JOS", "The childPosition is: " + childPosition);
-//                    if(keySetting == "Wide Range Accel Rate") {
-//                        if(childPosition == 8) {
-//                            Log.e("JOS", "childPosition has been changed to 9");
-//                            childPosition = 9;
-//                        }
-//                    }
-//                    Toast.makeText(context, "keySetting: " + keySetting + " value: " + cods.mConfigValues[childPosition], Toast.LENGTH_SHORT).show();
 
                     shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, cods.mConfigValues[childPosition]);
 
                     expandListAdapter.replaceCurrentSetting(keySetting, newSetting);
                     expandListAdapter.notifyDataSetChanged();   //Tells the list to redraw itself with the new information
-
-                    int selectedIndex = parent.indexOfChild(v);
-//                    expandListAdapter.getChildrenCount(groupPosition);
-
-//                    for(int i=expandListView.getFirstVisiblePosition(); i<expandListView.getLastVisiblePosition(); i++) {
-//                        View child = expandListView.getChildAt(i);
-//                        CheckedTextView cTextView = ((CheckedTextView) child.findViewById(R.id.expandedListItem));
-//                        if (cTextView != null) {
-//                            cTextView.setChecked(false);
-//                        }
-//                    }
-
-                    //parent.getCheckedItemPositions();
-
-                }
-                else if(v.findViewById(R.id.editText) != null){    //The item that was clicked is a text field
-                    final EditText editText = (EditText) v.findViewById(R.id.editText);
-                    final String keySetting = (String) expandListAdapter.getGroup(groupPosition);
-//                    editText.setOnKeyListener(new View.OnKeyListener() {
-//                        @Override
-//                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                            if(keyCode == KEYCODE_ENTER) {
-//                                expandListAdapter.replaceCurrentSetting(keySetting, editText.getText().toString());
-//                                expandListAdapter.notifyDataSetChanged();
-//                            }
-//                            return false;
-//                        }
-//                    });
 
                 }
                 return false;
@@ -144,7 +105,6 @@ public class DeviceConfigFragment extends Fragment {
         expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                Log.e("JOS", "Group " + groupPosition + " clicked");
                 if (v.findViewById(R.id.saveButton) != null) {
                     Button writeConfigButton = (Button) v.findViewById(R.id.saveButton);
                     Button resetListButton = (Button) v.findViewById(R.id.resetButton);
@@ -216,21 +176,11 @@ public class DeviceConfigFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_device_config, null);
     }
 
-
-
-
-    public View getViewByPosition(int pos, ExpandableListView listView) {
-        final int firstListItemPosition = listView.getFirstVisiblePosition();
-        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
-
-        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
-            return listView.getAdapter().getView(pos, null, listView);
-        } else {
-            final int childIndex = pos - firstListItemPosition;
-            return listView.getChildAt(childIndex);
-        }
-    }
-
+    /**
+     * Writes the config from the clone device to the physical device
+     * @param listOfShimmerClones
+     * @param originalShimmerDevice
+     */
     public void configureShimmers(List<ShimmerDevice> listOfShimmerClones, ShimmerDevice originalShimmerDevice){
 
         for (ShimmerDevice cloneShimmer:listOfShimmerClones){

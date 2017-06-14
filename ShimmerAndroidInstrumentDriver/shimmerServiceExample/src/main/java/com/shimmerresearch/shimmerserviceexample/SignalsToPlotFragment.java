@@ -192,19 +192,6 @@ public class SignalsToPlotFragment extends ListFragment {
         return js;
     }
 
-    public void setSelectedDeviceAndPlot(Context activityContext, ShimmerService service, String btAddress, XYPlot plot) {
-        context = activityContext;
-        shimmerService = service;
-        bluetoothAddress = btAddress;
-        dynamicPlot = plot;
-        shimmerDevice = shimmerService.getShimmer(bluetoothAddress);
-    }
-
-    public void removeSelectedDevice() {
-        bluetoothAddress = null;
-        shimmerDevice = null;
-    }
-
     public void setDeviceNotStreamingView() {
         String[] notStreamingMsg = new String[]{"Device not streaming", "Signals to plot can only be displayed when device is streaming"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, notStreamingMsg);

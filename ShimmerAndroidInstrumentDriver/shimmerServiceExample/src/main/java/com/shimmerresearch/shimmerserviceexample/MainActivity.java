@@ -124,21 +124,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     }
 
-    private String[] getStringListOfDevicesConnected() {
-        List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
-        if (deviceList != null) {
-            String[] nameList = new String[deviceList.size()];
-            for (int i = 0; i < deviceList.size(); i++) {
-                ShimmerDevice device = deviceList.get(i);
-                nameList[i] = device.getShimmerUserAssignedName() + "\n" + device.getMacId();
-            }
-            return nameList;
-        } else {
-            Log.w(SERVICE_TAG, "Error! No Shimmers connected. Cannot retrieve List of devices");
-            return null;
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -255,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             Log.i("JOS", "Position is: " + position);
                 if(position == 0) {
                     if(isServiceStarted) {

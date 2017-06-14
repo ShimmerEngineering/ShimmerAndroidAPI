@@ -36,7 +36,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
 
     OnShimmerDeviceSelectedListener mCallBack;
     String selectedDeviceAddress, selectedDeviceName;
-    Activity mActivity;
     final static String LOG_TAG = "SHIMMER";
     ListView savedListView = null;
     ArrayAdapter<String> savedListAdapter = null;
@@ -66,10 +65,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnShimmerDeviceSelectedListener");
         }
-        mActivity = activity;
     }
-
-
 
     public static ConnectedShimmersListFragment newInstance() {
         ConnectedShimmersListFragment fragment = new ConnectedShimmersListFragment();
@@ -79,7 +75,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
     }
 
     public void buildShimmersConnectedListView(final List<ShimmerDevice> deviceList, final Context context) {
-        Log.e("JOS", "buildShimmersConnectedListView has been called");
+
         shimmerDeviceList = deviceList;
         this.context = context;
         if(deviceList == null) {    //No Shimmers connected
@@ -103,14 +99,10 @@ public class ConnectedShimmersListFragment extends ListFragment {
                 displayList[i] = nameList[i] + "\n" + macList[i];
             }
 
-//TODO:            for(int i=0; i<displayList.length; i++) {
-//                arrayList.add(i, displayList[i]);
-//            }
             ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, displayList);
 
             //Set the list of devices to be displayed in the Fragment
             setListAdapter(listAdapter);
-            //TODO: mArrayAdapter = listAdapter;
 
             final ListView listView = getListView();
             listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
@@ -118,18 +110,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     selectedItemPos = position;
-/*
-                    //Highlight the currently selected ShimmerDevice
-                    view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
-
-                    //Set all other backgrounds to white (clearing previous highlight, if any)
-                    for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-                        if (i != position) {
-                            View v = listView.getChildAt(i);
-                            v.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
-                        }
-                    }
-*/
 
                     selectedDeviceAddress = macList[position];
                     selectedDeviceName = nameList[position];
@@ -167,22 +147,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
             }
 
 
-/*
-            //Restore the selected item position, if any:
-            Log.e(LOG_TAG, "selectedItemPos: " + selectedItemPos);
-            if(selectedItemPos != -1) {
-                View v = getViewByPosition(selectedItemPos, listView);
-                if(v != null) {
-                    TextView textView = (TextView) v.findViewById(android.R.id.text1);
-                    Log.e(LOG_TAG, "v is " + textView.getText());
-                    textView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
-                    v.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
-                    textView.setText("Selected!");
-                } else {
-                    Log.e(LOG_TAG, "v is null!");
-                }
-            }
-*/
         }
     }
 
@@ -241,53 +205,5 @@ public class ConnectedShimmersListFragment extends ListFragment {
             return listView.getChildAt(childIndex);
         }
     }
-
-//    public void removeDeviceFromList(String deviceAddress) {
-//        ListView listView = getListView();
-//        for(int i=0; i<listView.getChildCount(); i++) {
-//            TextView textView = (TextView) listView.getChildAt(i);
-//            if(textView.getText().toString().contains(deviceAddress)) {
-//                listView.removeViewAt(i);
-//            }
-//        }
-//
-//        if(selectedDeviceAddress.contains(deviceAddress)) {
-//            //The device which has been removed is the one that is currently selected
-//            selectedDeviceAddress = ""; //Reset selected device address
-//        }
-//    }
-
-    public void removeDeviceFromList(String deviceAddress) {
-
-        for(int i=0; i<arrayList.size(); i++) {
-            String listDevice = arrayList.get(i);
-            if(listDevice.contains(deviceAddress)) {
-                arrayList.remove(i);
-            }
-        }
-
-        mArrayAdapter.notifyDataSetChanged();
-
-    }
-
-    public void addDeviceToList(String deviceAddress, String deviceName) {
-        ListView listView = getListView();
-
-        String s = deviceAddress + "\n" + deviceName;
-
-        //Check if the device is already in the list
-        for(int i=0; i<arrayList.size(); i++) {
-            String currentDevice = arrayList.get(i);
-            if(currentDevice.contains(deviceAddress)) {
-                return;
-            }
-        }
-
-        arrayList.add(s);
-        mArrayAdapter.notifyDataSetChanged();
-    }
-
-
-
 
 }

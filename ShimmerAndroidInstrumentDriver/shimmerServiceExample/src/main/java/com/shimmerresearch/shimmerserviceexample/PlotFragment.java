@@ -103,13 +103,6 @@ public class PlotFragment extends Fragment {
         initPlot();
         textViewDeviceName = (TextView) getView().findViewById(R.id.textViewDeviceName);
         textViewDeviceState = (TextView) getView().findViewById(R.id.textViewDeviceState);
-//        signalsToPlotButton = (Button) getView().findViewById(R.id.button);
-//        signalsToPlotButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ShimmerDialogConfigurations.showSelectSensorPlot(getActivity(), shimmerService, mBluetoothAddress, dynamicPlot);
-//            }
-//        });
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -223,26 +216,6 @@ public class PlotFragment extends Fragment {
                             deviceState = "Connected";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
-                            //buttonMenu.setEnabled(true);
-                    /*
-                    if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-                    	mService.readStatusLogAndStream(mBluetoothAddress);
-                    	try {
-    						Thread.sleep(300);
-    					} catch (InterruptedException e) {
-    						e.printStackTrace();
-    					}
-                    	logAndStreamStatusLayout.setVisibility(View.VISIBLE);
-                    	if(mService.isDocked(mBluetoothAddress))
-                    		textDockedStatus.setText("Yes");
-                    	else
-                    		textDockedStatus.setText("No");
-
-                    	if(mService.isSensing(mBluetoothAddress))
-                    		textSensingStatus.setText("Yes");
-                    	else
-                    		textSensingStatus.setText("No");
-                    }*/
                             break;
                         case SDLOGGING:
                             Log.d(LOG_TAG,"Message Fully Initialized Received from Shimmer driver");
@@ -250,26 +223,6 @@ public class PlotFragment extends Fragment {
                             deviceState = "Connected";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
-                            //buttonMenu.setEnabled(true);
-                    /*
-                    if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-                    	mService.readStatusLogAndStream(mBluetoothAddress);
-                    	try {
-    						Thread.sleep(300);
-    					} catch (InterruptedException e) {
-    						e.printStackTrace();
-    					}
-                    	logAndStreamStatusLayout.setVisibility(View.VISIBLE);
-                    	if(mService.isDocked(mBluetoothAddress))
-                    		textDockedStatus.setText("Yes");
-                    	else
-                    		textDockedStatus.setText("No");
-
-                    	if(mService.isSensing(mBluetoothAddress))
-                    		textSensingStatus.setText("Yes");
-                    	else
-                    		textSensingStatus.setText("No");
-                    }*/
                             break;
                         case CONNECTING:
                             Log.d(LOG_TAG,"Driver is attempting to establish connection with Shimmer device");
@@ -278,15 +231,9 @@ public class PlotFragment extends Fragment {
                             textViewDeviceState.setText(deviceState);
                             break;
                         case STREAMING:
-                            //textViewSensingStatus.setText("Yes");
                             deviceState="Streaming";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
-                            //TODO: set the enable logging regarding the user selection
-                            //shimmerService.setEnableLogging(mEnableLogging);
-                            //TODO: if(!mSensorView.equals(""))
-                            //TODO:	setLegend();
-                            //TODO: else{
                             List<String> sensorList = shimmerService.getBluetoothManager().getListofEnabledSensors(mBluetoothAddress);
                             if(sensorList!=null){
                                 if(shimmerService.getBluetoothManager().getShimmerVersion(mBluetoothAddress)== ShimmerVerDetails.HW_ID.SHIMMER_3){
@@ -301,10 +248,6 @@ public class PlotFragment extends Fragment {
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
-                                            //sensorName[0] = "ECG LL-RA";
-                                            //sensorName[1] = "ECG LA-RA";
-                                            //sensorName[2] = "EXG2 CH1";
-                                            //sensorName[3] = "ECG Vx-RL";
                                         }
 
                                         else if(shimmerService.isEXGUsingEMG24Configuration(mBluetoothAddress)){
@@ -344,23 +287,17 @@ public class PlotFragment extends Fragment {
                             //}
                             break;
                         case STREAMING_AND_SDLOGGING:
-                            //textViewSensingStatus.setText("Yes");
                             deviceState="Streaming";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
                             //TODO: set the enable logging regarding the user selection
-                            //shimmerService.setEnableLogging(mEnableLogging);
                             break;
                         case DISCONNECTED:
                             Log.d(LOG_TAG,"Shimmer No State");
                             mBluetoothAddress=null;
-                            // this also stops streaming
                             deviceState = "Disconnected";
                             textViewDeviceName.setText("Unknown");
                             textViewDeviceState.setText(deviceState);
-                            //buttonMenu.setEnabled(true);
-                            //TODO: Set LogAndStreamStatusLayout
-                            //logAndStreamStatusLayout.setVisibility(View.INVISIBLE);
                             break;
                     }
 
@@ -377,7 +314,6 @@ public class PlotFragment extends Fragment {
 
                     break;
                 case Shimmer.MESSAGE_DEVICE_NAME:
-                    // save the connected device's name
 
                     Toast.makeText(context, "Connected to "
                             + mBluetoothAddress, Toast.LENGTH_SHORT).show();
@@ -391,16 +327,6 @@ public class PlotFragment extends Fragment {
 
                 case Shimmer.MESSAGE_LOG_AND_STREAM_STATUS_CHANGED:
                     int docked = msg.arg1;
-//                    int sensing = msg.arg2;
-//                    if(docked==1)
-//                        textViewDockedStatus.setText("Yes");
-//                    else
-//                        textViewDockedStatus.setText("No");
-//
-//                    if(sensing==1)
-//                        textViewSensingStatus.setText("Yes");
-//                    else
-//                        textViewSensingStatus.setText("No");
                     break;
             }
         }
