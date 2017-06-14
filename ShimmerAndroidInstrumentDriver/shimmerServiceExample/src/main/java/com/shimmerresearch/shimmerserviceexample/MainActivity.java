@@ -52,17 +52,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     DeviceConfigFragment deviceConfigFragment;
     PlotFragment plotFragment;
     SignalsToPlotFragment signalsToPlotFragment;
-
-    //Drawer stuff
-    private ListView mDrawerList;
-    private ArrayAdapter<String> mAdapter;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerLayout mDrawerLayout;
-    private String mActivityTitle;
     public String selectedDeviceAddress, selectedDeviceName;
-    private boolean showPlotFragments = false;
 
-    XYPlot dynamicPlot; //TODO: Remove this when done testing
+    XYPlot dynamicPlot;
 
 
     /**
@@ -74,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter1 mSectionsPagerAdapter1;
-    private SectionsPagerAdapter2 mSectionsPagerAdapter2;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -97,23 +88,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-//        mDrawerLayout = (DrawerLayout) findViewById(R.id.content_frame);
-//        mActivityTitle = getTitle().toString();
-
-//        String[] startArray = {"Configuration", "Plot"};
-//        addDrawerItems(startArray);
-//        setupDrawer();
-
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        mDrawerToggle.setDrawerIndicatorEnabled(true);
-//        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
-        mSectionsPagerAdapter2 = new SectionsPagerAdapter2(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter1);
@@ -147,64 +124,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     }
 
-    private void addDrawerItems(String[] stringArray) {
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stringArray);
-        mDrawerList.setAdapter(mAdapter);
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-//                String viewText = (String) mDrawerList.getItemAtPosition(position);
-//                if (viewText.contains("\n")) {
-//                    selectedDeviceAdd = viewText.substring(viewText.indexOf("\n"));
-//                    Toast.makeText(MainActivity.this, "Selected device: " + viewText, Toast.LENGTH_SHORT).show();
-//                }
-                if(position == 0) {
-                    mSectionsPagerAdapter1.setPlotView(false);
-                    mSectionsPagerAdapter1.notifyDataSetChanged();
-
-                } else {
-                    mSectionsPagerAdapter1.setPlotView(true);
-                    mSectionsPagerAdapter1.notifyDataSetChanged();
-                }
-                //Highlight the selected item
-                view.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.holo_orange_light));
-                //Set all other backgrounds to white (clearing previous highlight, if any)
-                for (int i = 0; i < mDrawerList.getAdapter().getCount(); i++) {
-                    if (i != position) {
-                        View v = mDrawerList.getChildAt(i);
-                        v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
-//                        Log.e(SERVICE_TAG, "Cleared background color...");
-                    }
-                }
-            }
-        });
-    }
-
-    private void setupDrawer() {
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.string.drawer_open, R.string.drawer_close) {
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-//                String[] list = getStringListOfDevicesConnected();
-//                if (list != null) {
-//                    addDrawerItems(list);
-//                }
-                super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation");
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                getSupportActionBar().setTitle(mActivityTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-    }
-
     private String[] getStringListOfDevicesConnected() {
         List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
         if (deviceList != null) {
@@ -221,18 +140,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-//        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-//        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -242,47 +149,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
 
         switch (item.getItemId()) {
             case R.id.paired_devices:
                 Intent serverIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);
                 return true;
-//            case R.id.test_button:
-//                ShimmerBluetoothManagerAndroid btManager2 = mService.getBluetoothManager();
-//                btManager2.startStreamingAllDevices();
-//                return true;
-//            case R.id.connect_shimmer:
-//                if (isServiceStarted) {
-//                    mService.connectShimmer("00:06:66:66:96:86");
-//                } else {
-//                    Toast.makeText(this, "ERROR! Service not started.", Toast.LENGTH_LONG).show();
-//                }
-//                return true;
-//            case R.id.add_handler:
-//                ShimmerBluetoothManagerAndroid btManager = mService.getBluetoothManager();
-//                btManager.addHandler(mHandler);
-//                return true;
-//            case R.id.sensors_enabled_fragment_test:
-//                ShimmerDevice device = mService.getShimmer("00:06:66:66:96:86");
-//                sensorsEnabledFragment.setShimmerService(mService);
-//                sensorsEnabledFragment.buildSensorsList(device, getApplicationContext());
-//                return true;
-//            case R.id.connected_shimmers_fragment_test:
-//                List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
-//                connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
-//                return true;
-//            case R.id.device_configuration_fragment_test:
-//                ShimmerDevice device2 = mService.getShimmer("00:06:66:66:96:86");
-//                deviceConfigFragment.buildDeviceConfigList(device2, getApplicationContext());
-//                return true;
-//            case R.id.signals_to_plot_fragment_test:
-//                ShimmerDevice device3 = mService.getShimmer("00:06:66:66:96:86");
-//                signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, "00:06:66:66:96:86", plotFragment.getDynamicPlot());
-//                return true;
             case R.id.start_streaming:
                 if(selectedDeviceAddress != null) {
                     ShimmerDevice mDevice1 = mService.getShimmer(selectedDeviceAddress);
@@ -335,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             //Add this activity's Handler to the service's list of Handlers so we know when a Shimmer is connected/disconnected
             mService.addHandlerToList(mHandler);
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
-            //TODO: connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
 
 //            mHandler = mService.getHandler();
         }
@@ -376,110 +247,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         }
     }
 
-    boolean checkBtEnabled() {
-        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!btAdapter.isEnabled()) {
-            return false;
-        }
-        return true;
-    }
-
-    void testButton(View view) {
-        ShimmerDevice sDevice = mService.getShimmer("00:06:66:66:96:86");
-        dialog.buildShimmersConnectedList(mService.getBluetoothManager().getListOfConnectedDevices(), this);
-        //dialog.buildShimmerConfigOptions(sDevice, this);
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-/*
     public class SectionsPagerAdapter1 extends FragmentPagerAdapter {
-
-        private boolean isPlotSet = false;
-
-        public SectionsPagerAdapter1(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            Log.i("JOS", "Position is: " + position);
-            if(isPlotSet) {
-                if(position == 0) {
-                    if(isServiceStarted) {
-                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-                    } else {
-                        connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                    }
-                    return connectedShimmersListFragment;
-                } else if(position == 1) {
-                    plotFragment.setShimmerService(mService);
-                    dynamicPlot = plotFragment.getDynamicPlot();
-                    return plotFragment;
-                } else {
-                    return signalsToPlotFragment;
-                }
-            } else {
-                if(position == 0) {
-                    if(isServiceStarted) {
-                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-                    } else {
-                        connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                    }
-                    return connectedShimmersListFragment;
-                } else if(position == 1) {
-                    return sensorsEnabledFragment;
-                } else {
-                    return deviceConfigFragment;
-                }
-            }
-
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            if (isPlotSet) {
-                switch (position) {
-                    case 0:
-                        return "Connected Devices";
-                    case 1:
-                        return "Signals to Plot";
-                    case 2:
-                        return "Plot";
-                }
-                return null;
-            } else {
-                switch (position) {
-                    case 0:
-                        return "Connected Devices";
-                    case 1:
-                        return "Plot";
-                    case 2:
-                        return "Signals to Plot";
-                }
-                return null;
-            }
-        }
-
-        public void setPlotView(boolean plotSet) {
-            isPlotSet = plotSet;
-        }
-    }
-*/
-
-    public class SectionsPagerAdapter1 extends FragmentPagerAdapter {
-
-        private boolean isPlotSet = false;
 
         public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
@@ -533,63 +301,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             }
         }
 
-        public void setPlotView(boolean plotSet) {
-            isPlotSet = plotSet;
-        }
-    }
-
-
-    public class SectionsPagerAdapter2 extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter2(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position == 0) {
-                return PlotFragment.newInstance();
-            } else if (position == 1) {
-                if(isServiceStarted) {
-                    connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-                    Log.e("JOS", "Service started, returning fragment");
-                } else {
-                    connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                    Log.e("JOS", "Service not started, can't return fragment");
-                }
-                return connectedShimmersListFragment;
-            } else {
-                //Sensors fragment
-                return sensorsEnabledFragment;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Plot";
-                case 1:
-                    return "Connected Shimmers";
-                case 2:
-                    return "Plot Signals";
-            }
-            return null;
-        }
-    }
-
-
-    public boolean handleMessage(Message msg) {
-        Toast.makeText(this, "Message received", Toast.LENGTH_SHORT).show();
-        return true;
     }
 
     private Handler mHandler = new Handler() {
@@ -612,8 +323,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         //Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
                         connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
-                        //TODO: connectedShimmersListFragment.addDeviceToList(macAddress, shimmerName);
-                        Log.e("JOS", "Device now connected");
                         break;
                     case CONNECTING:
                         break;
@@ -623,7 +332,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             //If the selected device is the one that is now streaming, then show the list of signals available to be plotted
                             signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, macAddress, dynamicPlot);
                         }
-                        Log.e("JOS", "Device now streaming");
                         break;
                     case STREAMING_AND_SDLOGGING:
                         if(selectedDeviceAddress.contains(macAddress) && dynamicPlot != null) {
@@ -634,18 +342,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
-                        //TODO: connectedShimmersListFragment.removeDeviceFromList(macAddress);
                         break;
                 }
 
             }
 
-            if(msg.what == ShimmerBluetooth.NOTIFICATION_SHIMMER_STOP_STREAMING) {
-                Log.e("JOS", "Shimmer has stopped streaming using ShimmerBluetooth class");
-            }
-
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
-                Log.e("JOS", "Shimmer has stopped streaming using Shimmer class");
                 signalsToPlotFragment.setDeviceNotStreamingView();
             }
 
@@ -674,8 +376,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         plotFragment.setShimmerService(mService);
         dynamicPlot = plotFragment.getDynamicPlot();
-
-        //signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
 
     }
 
