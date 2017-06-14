@@ -54,8 +54,6 @@ public class PlotFragment extends Fragment {
     static String deviceState = "";
     static TextView textViewDeviceName;
     static TextView textViewDeviceState;
-    static TextView textViewSensingStatus;
-    static TextView textViewDockedStatus;
 
     private static String LOG_TAG = "PlotFragment";
     Button signalsToPlotButton;
@@ -76,12 +74,6 @@ public class PlotFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment PlotFragment.
-     */
     public static PlotFragment newInstance() {
         PlotFragment fragment = new PlotFragment();
         Bundle args = new Bundle();
