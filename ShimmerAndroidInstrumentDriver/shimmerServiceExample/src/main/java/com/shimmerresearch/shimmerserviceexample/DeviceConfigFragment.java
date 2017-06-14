@@ -101,7 +101,7 @@ public class DeviceConfigFragment extends Fragment {
 //                            childPosition = 9;
 //                        }
 //                    }
-                    Toast.makeText(context, "keySetting: " + keySetting + " value: " + cods.mConfigValues[childPosition], Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "keySetting: " + keySetting + " value: " + cods.mConfigValues[childPosition], Toast.LENGTH_SHORT).show();
 
                     shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, cods.mConfigValues[childPosition]);
 

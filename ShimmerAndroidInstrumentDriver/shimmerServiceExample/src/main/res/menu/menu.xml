@@ -2,6 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item   android:id="@+id/paired_devices"
             android:title="Paired Bluetooth devices"></item>
+<!--
     <item   android:id="@+id/test_button"
             android:title="Test Button" ></item>
     <item   android:id="@+id/connect_shimmer"
@@ -16,6 +17,7 @@
             android:title="Device Configuration Fragment Test"></item>
     <item   android:id="@+id/signals_to_plot_fragment_test"
             android:title="Signals To Plot Fragment Test"></item>
+-->
     <item   android:title="Start streaming selected device"
             android:id="@+id/start_streaming"></item>
     <item   android:title="Stop streaming selected device"
