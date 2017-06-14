@@ -43,8 +43,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
     List<ShimmerDevice> shimmerDeviceList;
     Context context;
     int selectedDevicePos = -1;
-    List<String> arrayList = new ArrayList<String>();
-    ArrayAdapter<String> mArrayAdapter;
 
 
     public ConnectedShimmersListFragment() {
