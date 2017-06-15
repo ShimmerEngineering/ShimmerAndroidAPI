@@ -158,6 +158,11 @@ public class SensorsEnabledFragment extends ListFragment {
                             }*/
 
                             //((Shimmer) device).writeEnabledSensors(cloneDevice.getEnabledSensors());
+                            //TODO: Remove this
+//                            if(cloneDevice instanceof ShimmerBluetooth) {
+//                                ShimmerBluetooth cloneCast = (ShimmerBluetooth) cloneDevice;
+//                                cloneCast.getComPort();
+//                            }
 
                             configureShimmers(cloneList);
 
