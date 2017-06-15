@@ -1,5 +1,6 @@
 package com.shimmerresearch.shimmerbasicexample;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -24,6 +25,8 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -89,7 +92,9 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    //Handles the messages from the BluetoothManager
+    /**
+     * Messages from the Shimmer device including sensor data are received here
+     */
     Handler mHandler = new Handler() {
 
         @Override
@@ -167,6 +172,10 @@ public class MainActivity extends AppCompatActivity {
         shimmerDevice.startStreaming();
     }
 
+    /**
+     * Called when the configurations button is clicked
+     * @param v
+     */
     public void openConfigMenu(View v){
         if(shimmerDevice != null) {
             if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
@@ -183,7 +192,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Called when the menu button is pressed
+    /**
+     * Called when the menu button is clicked
+     * @param v
+     * @throws IOException
+     */
     public void openMenu(View v) throws IOException {
 
         if(shimmerDevice != null) {
@@ -201,10 +214,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Called when the paired devices button is clicked
+     * @param v
+     */
     public void pairedDevices(View v) {
         Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
         startActivityForResult(intent, REQUEST_CONNECT_SHIMMER);
     }
 
+    /**
+     * Get the result from the paired devices dialog
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 2) {
+            if (resultCode == Activity.RESULT_OK) {
+                //Get the Bluetooth mac address of the selected device:
+                String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
+                btManager.connectShimmerTroughBTAddress(macAdd);   //Connect to the selected device
+            }
 
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
