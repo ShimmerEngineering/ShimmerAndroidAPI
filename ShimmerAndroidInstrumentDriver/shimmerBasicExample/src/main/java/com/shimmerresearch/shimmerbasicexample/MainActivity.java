@@ -201,7 +201,8 @@ public class MainActivity extends AppCompatActivity {
 
         if(shimmerDevice != null) {
             if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
-                ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(shimmerDevice, MainActivity.this);
+                //ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(shimmerDevice, MainActivity.this);
+                ShimmerDialogConfigurations.buildShimmerSensorEnableDetails2(shimmerDevice, MainActivity.this);
             }
             else {
                 Log.e(LOG_TAG, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING");
@@ -233,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
+                btManager.disconnectAllDevices();   //Disconnect all devices first
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 btManager.connectShimmerTroughBTAddress(macAdd);   //Connect to the selected device

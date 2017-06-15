@@ -220,7 +220,7 @@ public class Shimmer extends ShimmerBluetooth{
 	transient private BluetoothAdapter mBluetoothAdapter = null;
 	transient List<Handler> mHandlerList = new ArrayList<Handler>();
 
-	private boolean mContinuousStateUpdates = false;
+	private boolean mContinuousStateUpdates = true;
 
 
 	{
