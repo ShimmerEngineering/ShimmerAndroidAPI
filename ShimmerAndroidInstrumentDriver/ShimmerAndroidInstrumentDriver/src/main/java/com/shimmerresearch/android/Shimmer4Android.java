@@ -2,6 +2,8 @@ package com.shimmerresearch.android;
 
 import android.os.Handler;
 
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
 
 /**
@@ -21,6 +23,15 @@ public class Shimmer4Android extends Shimmer4 {
         mHandler = handler;
     }
 
+    public void configureShimmer(ShimmerDevice cloneShimmer) {
+
+        Shimmer4 cloneShimmerCast = (Shimmer4) cloneShimmer;
+        operationPrepare();
+        writeConfigBytes(cloneShimmerCast.getShimmerInfoMemBytes());
+        writeCalibrationDump(cloneShimmerCast.calibByteDumpGenerate());
+        operationStart(ShimmerBluetooth.BT_STATE.CONFIGURING);
+
+    }
 
 
 }

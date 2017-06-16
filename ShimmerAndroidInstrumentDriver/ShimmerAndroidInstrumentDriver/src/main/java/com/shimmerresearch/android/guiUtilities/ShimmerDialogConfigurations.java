@@ -130,7 +130,7 @@ public class ShimmerDialogConfigurations {
         ad.show();
     }
 
-    public static void buildShimmerSensorEnableDetails2(final ShimmerDevice shimmerDevice, final Context context, final ShimmerBluetoothManagerAndroid btManager) {
+    public static void buildShimmerSensorEnableDetails2(final ShimmerDevice shimmerDevice, final Context context) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
@@ -185,7 +185,7 @@ public class ShimmerDialogConfigurations {
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
                         if (shimmerDevice instanceof Shimmer) {
-                            btManager.configureShimmers(cloneList);
+                            ((Shimmer) shimmerDevice).configureShimmer(shimmerDeviceClone);
                         }
                     }
                 })

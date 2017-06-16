@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         if(shimmerDevice != null) {
             if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
                 //ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(shimmerDevice, MainActivity.this);
-                ShimmerDialogConfigurations.buildShimmerSensorEnableDetails2(shimmerDevice, MainActivity.this, btManager);
+                ShimmerDialogConfigurations.buildShimmerSensorEnableDetails2(shimmerDevice, MainActivity.this);
             }
             else {
                 Log.e(LOG_TAG, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING");
