@@ -51,10 +51,18 @@ public class SignalsToPlotFragment extends ListFragment {
         // Required empty public constructor
     }
 
+    /**
+     * Display a default message when the fragment is first created
+     * @param savedInstanceState
+     */
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         listView = getListView();
         super.onActivityCreated(savedInstanceState);
+        String[] defaultMessage = {"No device selected, signals unavailable"};
+        ArrayAdapter<String> defaultAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, defaultMessage);
+        setListAdapter(defaultAdapter);
     }
 
     public static SignalsToPlotFragment newInstance() {

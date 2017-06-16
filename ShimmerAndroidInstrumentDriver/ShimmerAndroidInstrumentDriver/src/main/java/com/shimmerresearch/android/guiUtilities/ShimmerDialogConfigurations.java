@@ -173,6 +173,7 @@ public class ShimmerDialogConfigurations {
                                 } else {
                                     shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
                                 }
+
                             }
                         })
                 // Set the action buttons
@@ -199,10 +200,9 @@ public class ShimmerDialogConfigurations {
         AlertDialog ad = builder.create();
         ad.show();
 
-
     }
 
-    public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context){
+    public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context, final ShimmerBluetoothManagerAndroid btManager){
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
         final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
         Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
@@ -221,7 +221,8 @@ public class ShimmerDialogConfigurations {
                         // The 'which' argument contains the index position
                         // of the selected item
                         Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
-                        buildConfigOptionDetailsSensor(cs[which].toString(),configOptionsMap,context, shimmerDevice, shimmerDeviceClone);
+                        //buildConfigOptionDetailsSensor(cs[which].toString(),configOptionsMap,context, shimmerDevice, shimmerDeviceClone);
+                        buildConfigOptionDetailsSensor2(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone, btManager);
                     }
                 });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -305,6 +306,80 @@ public class ShimmerDialogConfigurations {
             }
         }
     }
+
+    public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone, final ShimmerBluetoothManagerAndroid btManager) {
+        final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
+        final CharSequence[] cs = cods.getGuiValues();
+        String title = "";
+        if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
+            Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
+
+            if(returnedValue != null) {
+                int configValue = (int) returnedValue;
+                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                shimmerDevice.getConfigValueUsingConfigLabel(key);
+                builder.setTitle(title);
+                builder.setItems(cs,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                                Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
+                                shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
+                                List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                                cloneList.add(0, shimmerDeviceClone);
+                                AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
+                                //shimmerDeviceClone.refreshShimmerInfoMemBytes();
+                                if (shimmerDevice instanceof Shimmer) {
+                                    btManager.configureShimmers(cloneList);
+                                    //((Shimmer)shimmerDevice).configureShimmer(shimmerDeviceClone);
+                                } else if (shimmerDevice instanceof Shimmer4Android){
+                                    ((Shimmer4Android)shimmerDevice).configureShimmer(shimmerDeviceClone);
+                                }
+                            }
+                        });
+                builder.create().show();
+            }
+        } else if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD){
+            Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
+
+            if(returnedValue != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle((String)returnedValue);
+                LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                final EditText et = new EditText(context);
+                et.setText((String)returnedValue);
+                LinearLayout layout = new LinearLayout(context);
+                LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setLayoutParams(parms);
+                layout.setGravity(Gravity.CLIP_VERTICAL);
+                layout.setPadding(2, 2, 2, 2);
+                layout.addView(et, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                builder.setView(layout);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        shimmerDeviceClone.setConfigValueUsingConfigLabel(key,et.getText().toString());
+
+                        //shimmerDeviceClone.refreshShimmerInfoMemBytes();
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, shimmerDeviceClone);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+                        if (shimmerDevice instanceof Shimmer) {
+                            ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                        } else if (shimmerDevice instanceof Shimmer4Android){
+                            ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                        }
+                    }
+                });
+                builder.create().show();
+            }
+        }
+    }
+
     public static void showSelectSensorPlot(Context context,final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot){
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_sensor_view);
@@ -527,7 +602,8 @@ public class ShimmerDialogConfigurations {
                     buildShimmerSensorEnableDetails(shimmerDevice, context);
                 }
                 else if(i == 1) {
-                    buildShimmerConfigOptions(shimmerDevice, context);
+                    //TODO: remove the null input argument
+                    buildShimmerConfigOptions(shimmerDevice, context, null);
                 }
             }
         });
@@ -546,97 +622,6 @@ public class ShimmerDialogConfigurations {
         }
         return js;
     }
-
-    /**
-     * Writes the config from the clone device to the physical device
-     * @param listOfShimmerClones
-     */
-/*
-    public static void configureShimmers(List<ShimmerDevice> listOfShimmerClones, ShimmerDevice originalShimmerDevice){
-
-        for (ShimmerDevice cloneShimmer:listOfShimmerClones){
-            if (cloneShimmer instanceof ShimmerBluetooth){
-                ShimmerBluetooth cloneShimmerCast = (ShimmerBluetooth) cloneShimmer;
-
-                if (cloneShimmerCast.getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3){
-
-                    //ShimmerBluetooth originalShimmer = getShimmerDevice(cloneShimmerCast.getComPort());
-                    if (originalShimmerDevice instanceof ShimmerBluetooth){
-                        ShimmerBluetooth originalShimmer = (ShimmerBluetooth) originalShimmerDevice;
-                        originalShimmer.operationPrepare();
-                        originalShimmer.setSendProgressReport(true);
-
-                        if(originalShimmer.isUseInfoMemConfigMethod()){
-                            originalShimmer.writeConfigBytes(cloneShimmerCast.getShimmerInfoMemBytes());
-                            // Hack because infomem is getting updated but
-                            // enabledsensors aren't getting updated on the Shimmer
-                            // and we need an inquiry() to determine packet format
-                            // for legacy code
-                            originalShimmer.writeEnabledSensors(cloneShimmerCast.getEnabledSensors());
-                        }
-                        else {
-                            //TODO below is writing accel, gyro, mag rate + ExG bytes -> for the moment moved to be the first command and then overwrite other rates below
-                            originalShimmer.writeShimmerAndSensorsSamplingRate(cloneShimmerCast.getSamplingRateShimmer());// s3 = 4
-
-                            originalShimmer.writeAccelRange(cloneShimmerCast.getAccelRange());
-                            originalShimmer.writeGSRRange(cloneShimmerCast.getGSRRange());
-                            originalShimmer.writeGyroRange(cloneShimmerCast.getGyroRange());
-                            originalShimmer.writeMagRange(cloneShimmerCast.getMagRange());
-                            originalShimmer.writePressureResolution(cloneShimmerCast.getPressureResolution());
-
-                            //set the low power modes here
-                            originalShimmer.enableLowPowerAccel(cloneShimmerCast.isLowPowerAccelWR());//3
-                            originalShimmer.enableLowPowerGyro(cloneShimmerCast.isLowPowerGyroEnabled());
-                            originalShimmer.enableLowPowerMag(cloneShimmerCast.isLowPowerMagEnabled());
-
-                            //TODO Already done in enableLowPowerAccel, enableLowPowerMag and enableLowPowerGyro
-                            originalShimmer.writeAccelSamplingRate(cloneShimmerCast.getLSM303DigitalAccelRate());
-                            originalShimmer.writeGyroSamplingRate(cloneShimmerCast.getMPU9150GyroAccelRate());
-                            originalShimmer.writeMagSamplingRate(cloneShimmerCast.getLSM303MagRate());
-
-                            //						System.out.println("Register1\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(cloneShimmerCast.getEXG1RegisterArray()));
-                            //						System.out.println("Register2\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(cloneShimmerCast.getEXG2RegisterArray()));
-
-                            originalShimmer.writeEXGConfiguration(cloneShimmerCast.getEXG1RegisterArray(), ExGConfigOptionDetails.EXG_CHIP_INDEX.CHIP1);
-                            originalShimmer.writeEXGConfiguration(cloneShimmerCast.getEXG2RegisterArray(), ExGConfigOptionDetails.EXG_CHIP_INDEX.CHIP2);
-
-                            originalShimmer.writeInternalExpPower(cloneShimmerCast.getInternalExpPower());
-                            originalShimmer.writeShimmerUserAssignedName(cloneShimmerCast.getShimmerUserAssignedName());
-                            originalShimmer.writeExperimentName(cloneShimmerCast.getTrialName());
-                            originalShimmer.writeConfigTime(cloneShimmerCast.getConfigTime());
-
-                            originalShimmer.writeDerivedChannels(cloneShimmerCast.getDerivedSensors());
-                            //originalShimmer.writeDerivedChannels(BTStreamDerivedSensors.ECG2HR_CHIP1_CH2|BTStreamDerivedSensors.ECG2HR_CHIP1_CH1);
-                            //setContinuousSync(mContinousSync);
-
-                            originalShimmer.writeEnabledSensors(cloneShimmerCast.getEnabledSensors()); //this should always be the last command
-                            //						System.out.println(cloneShimmerCast.getEnabledSensors());
-                        }
-
-                        originalShimmer.writeCalibrationDump(cloneShimmerCast.calibByteDumpGenerate());
-
-                        //get instruction stack size
-                        originalShimmer.operationStart(ShimmerBluetooth.BT_STATE.CONFIGURING);
-                    }
-                }
-            }
-            else if(cloneShimmer instanceof Shimmer4){
-                Shimmer4 cloneShimmerCast = (Shimmer4) cloneShimmer;
-                if(originalShimmerDevice instanceof Shimmer4){
-                    Shimmer4 originalShimmer = (Shimmer4) originalShimmerDevice;
-
-                    originalShimmer.operationPrepare();
-//					originalShimmer.setSendProgressReport(true);
-
-                    originalShimmer.writeConfigBytes(cloneShimmerCast.getShimmerInfoMemBytes());
-                    originalShimmer.writeCalibrationDump(cloneShimmerCast.calibByteDumpGenerate());
-
-                    originalShimmer.operationStart(ShimmerBluetooth.BT_STATE.CONFIGURING);
-                }
-            }
-        }
-    }
-*/
 
 
 }

@@ -75,7 +75,7 @@ public class SensorsEnabledFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String[] values = new String[] {"No Shimmer selected", "Sensors unavailable"};
+        String[] values = new String[] {"No device selected, sensors unavailable"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, values);
         setListAdapter(adapter);
