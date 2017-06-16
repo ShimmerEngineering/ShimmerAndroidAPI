@@ -1,4 +1,4 @@
-package com.shimmerresearch.shimmerserviceexample;
+package com.shimmerresearch.android.guiUtilities;
 
 import android.content.Context;
 import android.os.Bundle;

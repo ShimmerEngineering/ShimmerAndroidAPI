@@ -202,7 +202,7 @@ public class ShimmerDialogConfigurations {
 
     }
 
-    public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context, final ShimmerBluetoothManagerAndroid btManager){
+    public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context){
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
         final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
         Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
@@ -222,7 +222,7 @@ public class ShimmerDialogConfigurations {
                         // of the selected item
                         Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
                         //buildConfigOptionDetailsSensor(cs[which].toString(),configOptionsMap,context, shimmerDevice, shimmerDeviceClone);
-                        buildConfigOptionDetailsSensor2(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone, btManager);
+                        buildConfigOptionDetailsSensor2(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone);
                     }
                 });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -307,7 +307,7 @@ public class ShimmerDialogConfigurations {
         }
     }
 
-    public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone, final ShimmerBluetoothManagerAndroid btManager) {
+    public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
         String title = "";
@@ -334,7 +334,7 @@ public class ShimmerDialogConfigurations {
 
                                 //shimmerDeviceClone.refreshShimmerInfoMemBytes();
                                 if (shimmerDevice instanceof Shimmer) {
-                                    btManager.configureShimmers(cloneList);
+                                    ((Shimmer) shimmerDevice).configureShimmer(shimmerDeviceClone);
                                     //((Shimmer)shimmerDevice).configureShimmer(shimmerDeviceClone);
                                 } else if (shimmerDevice instanceof Shimmer4Android){
                                     ((Shimmer4Android)shimmerDevice).configureShimmer(shimmerDeviceClone);
@@ -602,8 +602,7 @@ public class ShimmerDialogConfigurations {
                     buildShimmerSensorEnableDetails(shimmerDevice, context);
                 }
                 else if(i == 1) {
-                    //TODO: remove the null input argument
-                    buildShimmerConfigOptions(shimmerDevice, context, null);
+                    buildShimmerConfigOptions(shimmerDevice, context);
                 }
             }
         });
