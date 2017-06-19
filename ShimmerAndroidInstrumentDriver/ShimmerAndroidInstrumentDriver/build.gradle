@@ -30,6 +30,20 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            res.srcDirs =
+                    [
+                            //GUI Utilities Fragments Layouts
+                            'src/main/res/layouts/fragments',
+                            //General layouts
+                            'src/main/res/layouts/general',
+                            'src/main/res/layouts',
+                            'src/main/res'
+                    ]
+        }
+    }
+
     packagingOptions {
         exclude 'APK META-INF/io.netty.versions.properties'
         exclude 'META-INF/LICENSE.txt'

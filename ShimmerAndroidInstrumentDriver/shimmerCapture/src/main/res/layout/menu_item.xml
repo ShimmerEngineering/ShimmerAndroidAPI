@@ -5,9 +5,10 @@
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:textAppearance="?android:attr/textAppearanceLarge"
-    android:textColor="?android:attr/textColorPrimaryInverseDisableOnly"
     android:gravity="center_vertical"
     android:paddingLeft="14dip"
     android:paddingRight="15dip"
     android:ellipsize="marquee"
 />
+    <!--android:textColor="?android:attr/textColorPrimaryInverseDisableOnly"-->
+
