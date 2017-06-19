@@ -365,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         plotFragment.setShimmerService(mService);
         dynamicPlot = plotFragment.getDynamicPlot();
-
     }
 
 
