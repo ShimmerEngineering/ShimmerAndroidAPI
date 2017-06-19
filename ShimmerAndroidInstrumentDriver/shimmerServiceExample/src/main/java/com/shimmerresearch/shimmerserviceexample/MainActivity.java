@@ -31,8 +31,13 @@ import android.widget.Toast;
 
 import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.guiUtilities.ConnectedShimmersListFragment;
+import com.shimmerresearch.android.guiUtilities.DeviceConfigFragment;
+import com.shimmerresearch.android.guiUtilities.PlotFragment;
+import com.shimmerresearch.android.guiUtilities.SensorsEnabledFragment;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
+import com.shimmerresearch.android.guiUtilities.SignalsToPlotFragment;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
