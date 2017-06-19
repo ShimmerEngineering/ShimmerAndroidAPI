@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
@@ -89,34 +90,34 @@ public class DeviceConfigFragment extends Fragment {
             }
         });
 
-        expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                if (v.findViewById(R.id.saveButton) != null) {
-                    Button writeConfigButton = (Button) v.findViewById(R.id.saveButton);
-                    Button resetListButton = (Button) v.findViewById(R.id.resetButton);
-
-                    writeConfigButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    resetListButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            shimmerDeviceClone = shimmerDevice.deepClone();
-                            expandListAdapter.updateCloneDevice(shimmerDeviceClone);
-                            expandListAdapter.notifyDataSetChanged();
-                            Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-
-                return false;
-            }
-        });
+//        expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+//            @Override
+//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+//                if (v.findViewById(R.id.saveButton) != null) {
+//                    Button writeConfigButton = (Button) v.findViewById(R.id.saveButton);
+//                    Button resetListButton = (Button) v.findViewById(R.id.resetButton);
+//
+//                    writeConfigButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//
+//                    resetListButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            shimmerDeviceClone = shimmerDevice.deepClone();
+//                            expandListAdapter.updateCloneDevice(shimmerDeviceClone);
+//                            expandListAdapter.notifyDataSetChanged();
+//                            Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                }
+//
+//                return false;
+//            }
+//        });
 
         //Only add the buttons if they haven't been added before:
         if(expandListView.getFooterViewsCount() == 0) {

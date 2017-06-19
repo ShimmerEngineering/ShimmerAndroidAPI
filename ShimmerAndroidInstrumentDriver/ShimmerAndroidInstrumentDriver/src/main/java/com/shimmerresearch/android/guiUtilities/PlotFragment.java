@@ -28,6 +28,7 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
