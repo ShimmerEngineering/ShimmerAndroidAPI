@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
@@ -76,7 +77,8 @@ public class SensorsEnabledFragment extends ListFragment {
      * @param shimmerDevice
      * @param activityContext
      */
-    public void buildSensorsList(final ShimmerDevice shimmerDevice, final Context activityContext) {
+    public void buildSensorsList(final ShimmerDevice shimmerDevice, final Context activityContext,
+                                 final ShimmerBluetoothManagerAndroid bluetoothManager) {
 
         originalShimmerDevice = shimmerDevice;
         shimmerDeviceClone = shimmerDevice.deepClone();
@@ -150,7 +152,7 @@ public class SensorsEnabledFragment extends ListFragment {
 
                             //((Shimmer) device).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
 
-                            ((Shimmer) shimmerDevice).configureShimmer(shimmerDeviceClone);
+                            bluetoothManager.configureShimmer(shimmerDeviceClone);
                             //configureShimmers(cloneList);
 
                         } else if (shimmerDevice instanceof Shimmer4Android) {

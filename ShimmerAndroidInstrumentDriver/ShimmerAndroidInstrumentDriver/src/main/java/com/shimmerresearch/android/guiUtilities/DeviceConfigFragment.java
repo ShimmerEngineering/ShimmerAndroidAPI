@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
@@ -45,7 +46,8 @@ public class DeviceConfigFragment extends Fragment {
         return fragment;
     }
 
-    public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context) {
+    public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context,
+                                      final ShimmerBluetoothManagerAndroid bluetoothManager) {
 
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
         shimmerDeviceClone = shimmerDevice.deepClone();
@@ -134,8 +136,8 @@ public class DeviceConfigFragment extends Fragment {
                     cloneList.add(0, shimmerDeviceClone);
                     AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                    if(shimmerDevice instanceof Shimmer) {
-                        ((Shimmer) shimmerDevice).configureShimmer(shimmerDeviceClone);
+                    if(shimmerDeviceClone instanceof Shimmer) {
+                        bluetoothManager.configureShimmer(shimmerDeviceClone);
                     }
 
                 }

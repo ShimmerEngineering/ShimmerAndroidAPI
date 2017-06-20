@@ -1228,10 +1228,16 @@ public class ShimmerService extends Service {
 		return btManager.getListOfConnectedDevices();
 	}
 
+	public void configureShimmer(ShimmerDevice device) {
+		btManager.configureShimmer(device);
+	}
+
 	public void configureShimmers(List<ShimmerDevice> listOfShimmers) {
 		btManager.configureShimmers(listOfShimmers);
 	}
 
 	public Handler getHandler() {	return mHandler;	}
+
+
 
 }
