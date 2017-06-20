@@ -240,7 +240,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandler = handler;
 		mHandlerList.add(0, mHandler);
 //		mContinousSync=continousSync;
-		mSetupDevice=false;
+		mSetupDeviceWhileConnecting=false;
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandler = handlerList.get(0);
 		mHandlerList = handlerList;
-		mSetupDevice = false;
+		mSetupDeviceWhileConnecting = false;
 	}
 
 	/**
@@ -268,7 +268,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandler = handler;
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
-		mSetupDevice=false;
+		mSetupDeviceWhileConnecting=false;
 	}
 	/**
 	 *
@@ -282,7 +282,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandler = handler;
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
-		mSetupDevice=false;
+		mSetupDeviceWhileConnecting=false;
 	}
 	
 	
@@ -306,7 +306,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
-		mSetupDevice = true;
+		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
 	}
 
@@ -331,7 +331,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
-		mSetupDevice = true;
+		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
 	}
 
@@ -356,7 +356,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
-		mSetupDevice = true;
+		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
 		mLowPowerMag = enableLowPowerMag;
 		mLowPowerAccelWR = enableLowPowerAccel;
@@ -386,7 +386,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mGSRRange = gsrRange;
 		mSetEnabledSensors=setEnabledSensors;
 		mShimmerUserAssignedName = myName;
-		mSetupDevice = true;
+		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
 		mLowPowerMag = enableLowPowerMag;
 		mLowPowerAccelWR = enableLowPowerAccel;
