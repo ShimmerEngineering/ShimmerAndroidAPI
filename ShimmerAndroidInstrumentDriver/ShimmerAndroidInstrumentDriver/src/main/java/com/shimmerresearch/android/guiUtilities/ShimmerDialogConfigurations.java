@@ -130,7 +130,8 @@ public class ShimmerDialogConfigurations {
         ad.show();
     }
 
-    public static void buildShimmerSensorEnableDetails2(final ShimmerDevice shimmerDevice, final Context context) {
+    public static void buildShimmerSensorEnableDetails2(final ShimmerDevice shimmerDevice, final Context context,
+                                                        final ShimmerBluetoothManagerAndroid bluetoothManager) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
@@ -185,8 +186,8 @@ public class ShimmerDialogConfigurations {
                         cloneList.add(0, shimmerDeviceClone);
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                        if (shimmerDevice instanceof Shimmer) {
-                            ((Shimmer) shimmerDevice).configureShimmer(shimmerDeviceClone);
+                        if (shimmerDeviceClone instanceof Shimmer) {
+                            bluetoothManager.configureShimmer(shimmerDeviceClone);
                         }
                     }
                 })
@@ -202,7 +203,8 @@ public class ShimmerDialogConfigurations {
 
     }
 
-    public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context){
+    public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context,
+                                                 final ShimmerBluetoothManagerAndroid bluetoothManager){
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
         final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
         Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
@@ -222,7 +224,7 @@ public class ShimmerDialogConfigurations {
                         // of the selected item
                         Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
                         //buildConfigOptionDetailsSensor(cs[which].toString(),configOptionsMap,context, shimmerDevice, shimmerDeviceClone);
-                        buildConfigOptionDetailsSensor2(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone);
+                        buildConfigOptionDetailsSensor2(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone, bluetoothManager);
                     }
                 });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -307,7 +309,10 @@ public class ShimmerDialogConfigurations {
         }
     }
 
-    public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
+    public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
+                                                       final Context context, final ShimmerDevice shimmerDevice,
+                                                       final ShimmerDevice shimmerDeviceClone,
+                                                       final ShimmerBluetoothManagerAndroid bluetoothManager) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
         String title = "";
@@ -334,10 +339,10 @@ public class ShimmerDialogConfigurations {
 
                                 //shimmerDeviceClone.refreshShimmerInfoMemBytes();
                                 if (shimmerDevice instanceof Shimmer) {
-                                    ((Shimmer) shimmerDevice).configureShimmer(shimmerDeviceClone);
+                                    bluetoothManager.configureShimmer(shimmerDeviceClone);
                                     //((Shimmer)shimmerDevice).configureShimmer(shimmerDeviceClone);
                                 } else if (shimmerDevice instanceof Shimmer4Android){
-                                    ((Shimmer4Android)shimmerDevice).configureShimmer(shimmerDeviceClone);
+                                    bluetoothManager.configureShimmer(shimmerDeviceClone);
                                 }
                             }
                         });
@@ -555,7 +560,8 @@ public class ShimmerDialogConfigurations {
      * This displays a popup dialog populated by the list of Shimmers connected via Shimmer Bluetooth Manager.
      * @param
      */
-    public void buildShimmersConnectedList(final List<ShimmerDevice> deviceList, final Context context) {
+    public void buildShimmersConnectedList(final List<ShimmerDevice> deviceList, final Context context,
+                                           final ShimmerBluetoothManagerAndroid bluetoothManager) {
         //List<ShimmerDevice> deviceList = btManager.getListOfConnectedDevices();
         CharSequence[] nameList = new CharSequence[deviceList.size()];
         CharSequence[] macList = new CharSequence[deviceList.size()];
@@ -580,7 +586,7 @@ public class ShimmerDialogConfigurations {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 ShimmerDevice shimmerDevice = deviceList.get(i);
-                buildSensorOrConfigOptions(shimmerDevice, context);
+                buildSensorOrConfigOptions(shimmerDevice, context, bluetoothManager);
                 //dialogInterface.cancel();
             }
         });
@@ -588,7 +594,8 @@ public class ShimmerDialogConfigurations {
         builder.create().show();
     }
 
-    public void buildSensorOrConfigOptions(final ShimmerDevice shimmerDevice, final Context context) {
+    public void buildSensorOrConfigOptions(final ShimmerDevice shimmerDevice, final Context context,
+                                           final ShimmerBluetoothManagerAndroid bluetoothManager) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         CharSequence[] items = new CharSequence[2];
         items[0] = "Enable/Disable Sensors";
@@ -602,7 +609,7 @@ public class ShimmerDialogConfigurations {
                     buildShimmerSensorEnableDetails(shimmerDevice, context);
                 }
                 else if(i == 1) {
-                    buildShimmerConfigOptions(shimmerDevice, context);
+                    buildShimmerConfigOptions(shimmerDevice, context, bluetoothManager);
                 }
             }
         });

@@ -1015,7 +1015,7 @@ public class ShimmerCapture extends ServiceActivity {
 				
 			} else if(optionSelected.equals(NEW_SHIMMER_CONFIGURATION)){
 				//buildShimmerConfigOptions(mService.getShimmer(mBluetoothAddress));
-				ShimmerDialogConfigurations.buildShimmerConfigOptions(mService.getShimmer(mBluetoothAddress),ShimmerCapture.this);
+				ShimmerDialogConfigurations.buildShimmerConfigOptions(mService.getShimmer(mBluetoothAddress),ShimmerCapture.this, mService.getBluetoothManager());
 
 			} else if(optionSelected.equals(GRAPH_CONFIGURATION)){
 				

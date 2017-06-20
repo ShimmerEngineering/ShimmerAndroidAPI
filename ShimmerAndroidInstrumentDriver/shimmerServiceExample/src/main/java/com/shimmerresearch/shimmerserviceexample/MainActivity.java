@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if(selectedDeviceAddress != null) {
                     ShimmerDevice mDevice2 = mService.getShimmer(selectedDeviceAddress);
                     mDevice2.stopStreaming();
-                    sensorsEnabledFragment.buildSensorsList(mDevice2, this);
-                    deviceConfigFragment.buildDeviceConfigList(mDevice2, this);
+                    sensorsEnabledFragment.buildSensorsList(mDevice2, this, mService.getBluetoothManager());
+                    deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
                 }
                 return true;
             default:
@@ -360,9 +360,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
 
         sensorsEnabledFragment.setShimmerService(mService);
-        sensorsEnabledFragment.buildSensorsList(device, this);
+        sensorsEnabledFragment.buildSensorsList(device, this, mService.getBluetoothManager());
 
-        deviceConfigFragment.buildDeviceConfigList(device, this);
+        deviceConfigFragment.buildDeviceConfigList(device, this, mService.getBluetoothManager());
 
         plotFragment.setShimmerService(mService);
         plotFragment.clearPlot();
