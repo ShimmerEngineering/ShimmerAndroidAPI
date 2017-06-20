@@ -1,6 +1,7 @@
 package com.shimmerresearch.shimmerserviceexample;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.res.Configuration;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     PlotFragment plotFragment;
     SignalsToPlotFragment signalsToPlotFragment;
     public String selectedDeviceAddress, selectedDeviceName;
+    boolean mServiceFirstTime;
 
     XYPlot dynamicPlot;
 
@@ -115,16 +117,14 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             int REQUEST_ENABLE_BT = 1;
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            //Start the Shimmer service
+        }
+        else {
             Intent intent = new Intent(this, ShimmerService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            startService(intent);
+            getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             Log.d(LOG_TAG, "Shimmer Service started");
             Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
         }
-
-
-
 
 
     }
@@ -218,7 +218,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         if (requestCode == 1) { //The system Bluetooth enable dialog has returned a result
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, ShimmerService.class);
-                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                startService(intent);
+                getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                 Log.d(LOG_TAG, "Shimmer Service started");
                 Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
@@ -248,11 +249,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
                 if(position == 0) {
-                    if(isServiceStarted) {
-                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-                    } else {
+//                    if(isServiceStarted) {
+//                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+//                    } else {
                         connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                    }
+//                    }
                     return connectedShimmersListFragment;
                 }
                 else if(position == 1) {
@@ -364,11 +365,16 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         deviceConfigFragment.buildDeviceConfigList(device, this);
 
         plotFragment.setShimmerService(mService);
+        plotFragment.clearPlot();
         dynamicPlot = plotFragment.getDynamicPlot();
+
+        mService.stopStreamingAllDevices();
     }
 
-
-
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent intent=new Intent(this, ShimmerService.class);
+        getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
 }

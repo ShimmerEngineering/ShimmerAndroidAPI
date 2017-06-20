@@ -324,4 +324,9 @@ public class PlotFragment extends Fragment {
         return dynamicPlot;
     }
 
+    public void clearPlot() {
+        mPlotSeriesMap.clear();
+        mPlotDataMap.clear();
+        dynamicPlot.clear();
+    }
 }

@@ -153,7 +153,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             String configValueLabel = (String) getGroup(groupPosition);
             int currentConfigInt = (int) cloneDevice.getConfigValueUsingConfigLabel(configValueLabel);
             String currentConfigValue = Integer.toString(currentConfigInt);
-            Log.e("JOS", "currentConfigValue: " + currentConfigValue);
 
             String valuelabel = getConfigValueLabelFromConfigLabel(configValueLabel);
 

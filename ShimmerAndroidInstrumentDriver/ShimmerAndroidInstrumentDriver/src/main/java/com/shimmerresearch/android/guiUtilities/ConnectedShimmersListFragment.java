@@ -128,7 +128,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
                     CheckedTextView checkedTextView = (CheckedTextView) view.findViewById(android.R.id.text1);
                     if (checkedTextView != null) {
                         String text = checkedTextView.getText().toString();
-                        Log.e("JOS", "text: " + text);
                         if (text.contains(selectedDeviceAddress)) {
                             listView.setItemChecked(i, true);
                         } else {

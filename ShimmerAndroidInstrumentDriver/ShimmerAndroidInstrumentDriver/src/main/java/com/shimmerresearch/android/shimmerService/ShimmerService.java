@@ -194,9 +194,12 @@ public class ShimmerService extends Service {
 	@Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("LocalService", "Received start id " + startId + ": " + intent);
+
+        return START_NOT_STICKY;
+
         // We want this service to continue running until it is explicitly
-        // stopped, so return sticky.
-        return START_STICKY;
+        // stopped, so return sticky (the service will be restarted if the OS kills it).
+        //return START_STICKY;
     }
 
 	@Override
