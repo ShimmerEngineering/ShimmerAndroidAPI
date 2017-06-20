@@ -143,39 +143,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
     }
 
     @Override
-    public void onDestroyView() {
-        Log.e(LOG_TAG, "ConnectedShimmersListFragment onDestroyView()");
-        super.onDestroyView();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e(LOG_TAG, "ConnectedShimmersListFragment onCreateView()");
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.e(LOG_TAG, "ConnectedShimmersListFragment onDestroy()");
-        super.onDestroy();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.e(LOG_TAG, "ConnectedShimmersListFragment onActivityCreated()");
-    }
-
-    private void setOnItemClickListener(ListView mListView) {
-
-    }
-
-    @Override
     public void onResume() {
         if(savedListView != null && savedListAdapter != null) {
             buildShimmersConnectedListView(shimmerDeviceList, context);

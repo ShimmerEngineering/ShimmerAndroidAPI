@@ -23,15 +23,4 @@ public class Shimmer4Android extends Shimmer4 {
         mHandler = handler;
     }
 
-    public void configureShimmer(ShimmerDevice cloneShimmer) {
-
-        Shimmer4 cloneShimmerCast = (Shimmer4) cloneShimmer;
-        operationPrepare();
-        writeConfigBytes(cloneShimmerCast.getShimmerInfoMemBytes());
-        writeCalibrationDump(cloneShimmerCast.calibByteDumpGenerate());
-        operationStart(ShimmerBluetooth.BT_STATE.CONFIGURING);
-
-    }
-
-
 }
