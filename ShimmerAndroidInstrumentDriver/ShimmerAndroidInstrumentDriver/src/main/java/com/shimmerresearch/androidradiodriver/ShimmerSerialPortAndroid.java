@@ -57,12 +57,14 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
                     eventDeviceConnected();
                 }
                 else{
+                    eventDeviceDisconnected();
                     Log.e("Shimmer", "Could not get IO Stream!");
                     NullPointerException e = new NullPointerException();
                     catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
                 }
             }
             else {
+                eventDeviceDisconnected();
                 Log.e("Shimmer", "Shimmer device is not online!");
                 NullPointerException e = new NullPointerException();
                 catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTION);

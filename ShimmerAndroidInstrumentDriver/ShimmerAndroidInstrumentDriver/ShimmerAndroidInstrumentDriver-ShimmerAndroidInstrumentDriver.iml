@@ -133,6 +133,7 @@
     <orderEntry type="library" exported="" name="ShimmerDriver-0.6" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-1.1b" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.3.1" level="project" />
@@ -151,7 +152,6 @@
     <orderEntry type="library" exported="" name="guava-19.0" level="project" />
     <orderEntry type="library" exported="" name="protobuf-java-util-3.0.0-beta-3" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-1.1" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-okhttp-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-auth-1.0.0-pre1" level="project" />
