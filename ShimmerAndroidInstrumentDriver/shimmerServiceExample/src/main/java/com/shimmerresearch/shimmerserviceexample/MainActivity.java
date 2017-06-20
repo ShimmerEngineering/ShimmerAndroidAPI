@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     protected void onDestroy() {
         //Stop the Shimmer service
         super.onDestroy();
+/*
         mHandler = null;
         if(isServiceStarted) {
             this.unbindService(mConnection);
@@ -182,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         stopService(intent);
         Log.d(LOG_TAG, "Shimmer Service stopped");
         Toast.makeText(this, "Shimmer Service stopped", Toast.LENGTH_SHORT).show();
+*/
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -245,7 +247,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            Log.i("JOS", "Position is: " + position);
                 if(position == 0) {
                     if(isServiceStarted) {
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
@@ -311,7 +312,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         //Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
                         connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
-                        Log.e("JOS", "Shimmer device has been CONNECTED!!!!");
                         break;
                     case CONNECTING:
                         break;
