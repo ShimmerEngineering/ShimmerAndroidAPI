@@ -19,6 +19,7 @@ import com.shimmerresearch.comms.serialPortInterface.AbstractSerialPortHal;
 import com.shimmerresearch.comms.serialPortInterface.ErrorCodesSerialPort;
 import com.shimmerresearch.driver.BasicProcessWithCallBack;
 import com.shimmerresearch.driver.Configuration;
+import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerObject;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
@@ -30,6 +31,7 @@ import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerObject;
 import com.shimmerresearch.exception.DeviceNotPairedException;
 
+import com.shimmerresearch.exceptions.ConnectionExceptionListener;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
@@ -83,11 +85,31 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     @Override
-    public void connectShimmerTroughBTAddress(String bluetoothAddress) {
+    public void connectShimmerTroughBTAddress(final String bluetoothAddress) {
 
         if(isDevicePaired(bluetoothAddress)) {
             addDiscoveredDevice(bluetoothAddress);
             super.connectShimmerTroughBTAddress(bluetoothAddress);
+            super.setConnectionExceptionListener(new ConnectionExceptionListener() {
+                @Override
+                public void onConnectionStart(String connectionHandle) {
+
+                }
+
+                @Override
+                public void onConnectionException(Exception exception) {
+                    mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                            new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
+
+                }
+
+                @Override
+                public void onConnectStartException(String connectionHandle) {
+                    mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                            new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
+
+                }
+            });
         }
         else{
             String msg = "Device " + bluetoothAddress + " not paired";

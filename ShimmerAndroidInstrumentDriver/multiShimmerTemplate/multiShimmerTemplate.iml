@@ -126,6 +126,7 @@
     <orderEntry type="library" exported="" name="protobuf-javanano-3.0.0-alpha-5" level="project" />
     <orderEntry type="library" exported="" name="JTransforms-3.1" level="project" />
     <orderEntry type="library" exported="" name="ShimmerDriver-0.6" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-1.1b" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-nano-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="vecmath-1.3.1" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.9.4" level="project" />
@@ -136,7 +137,6 @@
     <orderEntry type="library" exported="" name="slf4j-api-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="protobuf-java-util-3.0.0-beta-3" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-1.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-okhttp-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-auth-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="google-auth-library-credentials-0.4.0" level="project" />
