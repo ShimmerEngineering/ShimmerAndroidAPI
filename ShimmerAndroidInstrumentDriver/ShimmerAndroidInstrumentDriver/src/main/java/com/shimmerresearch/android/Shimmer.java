@@ -201,7 +201,7 @@ public class Shimmer extends ShimmerBluetooth{
 	// Key names received from the Shimmer Handler 
 	public static final String TOAST = "toast";
 	transient private final BluetoothAdapter mAdapter;
-	transient public final Handler mHandler;
+	//transient public final Handler mHandler;
 
 	transient private ConnectThread mConnectThread;
 	transient private ConnectedThread mConnectedThread;
@@ -237,8 +237,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Handler handler) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
-		mHandlerList.add(0, mHandler);
+		mHandlerList.add(0, handler);
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
 	}
@@ -251,7 +250,6 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(ArrayList<Handler> handlerList) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handlerList.get(0);
 		mHandlerList = handlerList;
 		mSetupDeviceWhileConnecting = false;
 	}
@@ -265,7 +263,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Handler handler, String myName, Boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
+		mHandlerList.add(handler);
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
@@ -279,7 +277,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Context context, Handler handler, String myName, Boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
+		mHandlerList.add(handler);
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
@@ -300,7 +298,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
+		mHandlerList.add(handler);
 		setSamplingRateShimmer(samplingRate);
 		setDigitalAccelRange(accelRange); //		mAccelRange = accelRange;
 		mGSRRange = gsrRange;
@@ -324,7 +322,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, int magRange) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
+		mHandlerList.add(handler);
 		setSamplingRateShimmer(samplingRate);
 		setDigitalAccelRange(accelRange); //		mAccelRange = accelRange;
 		setMagRange(magRange); // mMagRange = magRange;
@@ -350,7 +348,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
+		mHandlerList.add(handler);
 		setSamplingRateShimmer(samplingRate);
 		setDigitalAccelRange(accelRange); // mAccelRange = accelRange;
 		mGSRRange = gsrRange;
@@ -380,7 +378,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange,byte[] exg1,byte[] exg2) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
-		mHandler = handler;
+		mHandlerList.add(handler);
 		setSamplingRateShimmer(samplingRate);
 		setDigitalAccelRange(accelRange); //		mAccelRange = accelRange;
 		mGSRRange = gsrRange;

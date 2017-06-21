@@ -159,6 +159,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
                 }
                 return true;
+            case R.id.disconnect_all_devices:
+                mService.disconnectAllDevices();
+                connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -200,6 +204,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             //Add this activity's Handler to the service's list of Handlers so we know when a Shimmer is connected/disconnected
             mService.addHandlerToList(mHandler);
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
+
+            //if there is a device connected display it on the fragment
+            List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
+            connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
 
 //            mHandler = mService.getHandler();
         }

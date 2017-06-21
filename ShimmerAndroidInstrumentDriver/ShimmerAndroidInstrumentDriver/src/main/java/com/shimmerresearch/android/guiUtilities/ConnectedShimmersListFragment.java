@@ -67,7 +67,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
     }
 
     public void buildShimmersConnectedListView(final List<ShimmerDevice> deviceList, final Context context) {
-
+        if(isVisible()){
         shimmerDeviceList = deviceList;
         this.context = context;
         if(deviceList == null) {
@@ -121,7 +121,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
             savedListAdapter = listAdapter;
 
             //Ensure that the selected item's checkbox is checked
-            if(selectedDeviceAddress != null) {
+            if (selectedDeviceAddress != null) {
                 for (int i = 0; i < listView.getAdapter().getCount(); i++) {
 
                     View view = getViewByPosition(i, listView);
@@ -138,7 +138,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
                 }
             }
 
-
+        }
         }
     }
 
