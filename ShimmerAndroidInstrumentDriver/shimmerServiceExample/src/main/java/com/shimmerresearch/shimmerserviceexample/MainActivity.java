@@ -159,6 +159,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
                 }
                 return true;
+            case R.id.disconnect_all_devices:
+                mService.disconnectAllDevices();
+                connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
