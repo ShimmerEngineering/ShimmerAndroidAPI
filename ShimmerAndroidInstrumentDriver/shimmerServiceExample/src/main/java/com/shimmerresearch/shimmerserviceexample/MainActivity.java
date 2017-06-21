@@ -203,6 +203,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             mService.addHandlerToList(mHandler);
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
 
+            //if there is a device connected display it on the fragment
+            List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
+            connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
+
 //            mHandler = mService.getHandler();
         }
 
