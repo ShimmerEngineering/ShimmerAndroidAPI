@@ -174,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     protected void onDestroy() {
         //Stop the Shimmer service
         super.onDestroy();
+        mService.stopStreamingAllDevices();
+        mService.disconnectAllDevices();
 /*
         mHandler = null;
         if(isServiceStarted) {
@@ -377,4 +379,5 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         Intent intent=new Intent(this, ShimmerService.class);
         getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
+
 }
