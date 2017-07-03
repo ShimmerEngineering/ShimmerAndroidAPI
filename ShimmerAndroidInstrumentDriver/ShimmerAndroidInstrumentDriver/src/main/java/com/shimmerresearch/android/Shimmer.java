@@ -143,8 +143,9 @@ import android.util.Log;
 
 import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
-import com.shimmerresearch.driver.InfoMemLayoutShimmer3;
+
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerMsg;
@@ -1238,6 +1239,7 @@ public class Shimmer extends ShimmerBluetooth{
 			mIsConnected = true;
 			mIsStreaming = false;
 		} else if(mBluetoothRadioState==BT_STATE.SDLOGGING){
+			mIsConnected = true;
 			mIsInitialised = true;
 			mIsStreaming = false;
 		}
@@ -1323,7 +1325,7 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void createConfigBytesLayout() {
 		//TODO check this is ok
-		mInfoMemLayout = new InfoMemLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
+		mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
 	}
 
 	protected void finishOperation(BT_STATE currentOperation) {

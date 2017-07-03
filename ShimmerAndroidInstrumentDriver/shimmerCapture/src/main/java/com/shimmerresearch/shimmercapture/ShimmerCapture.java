@@ -326,28 +326,18 @@ public class ShimmerCapture extends ServiceActivity {
 				arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.menu_item);
 				if(mService.DevicesConnected(mBluetoothAddress)){
 					arrayAdapter.add(DISCONNECT);
+					if(mService.isUsingLogAndStreamFW(mBluetoothAddress)) {
+						if (mService.DeviceIsLogging(mBluetoothAddress)) {
+							arrayAdapter.add(STOP_LOGGING);
+						} else {
+							arrayAdapter.add(START_LOGGING);
+						}
+					}
 					if(mService.DeviceIsStreaming(mBluetoothAddress)){
-						if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-							if (mService.DeviceIsLogging(mBluetoothAddress)){
-								arrayAdapter.add(STOP_LOGGING);
-							} else {
-								arrayAdapter.add(START_LOGGING);
-							}
 						arrayAdapter.add(STOP_STREAMING);
-						}
-						else{
-							arrayAdapter.add(STOP_STREAMING);
-						}
 					}
 					else{
 						arrayAdapter.add(START_STREAMING);
-						if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-							if (mService.DeviceIsLogging(mBluetoothAddress)){
-								arrayAdapter.add(STOP_LOGGING);
-							} else {
-								arrayAdapter.add(START_LOGGING);
-							}
-						}
 						ShimmerDevice sDevice = mService.getShimmer(mBluetoothAddress);
 						if (sDevice.getHardwareVersion()!= ShimmerVerDetails.HW_ID.SHIMMER_4_SDK) {
 							arrayAdapter.add(ENABLE_SENSOR);

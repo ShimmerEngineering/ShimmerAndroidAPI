@@ -254,7 +254,7 @@ public class ShimmerService extends Service {
 	}
 
 	public void connectShimmer(final String bluetoothAddress){
-		btManager.connectShimmerTroughBTAddress(bluetoothAddress);
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress);
 	}
 
 	public void onStop(){
@@ -478,7 +478,10 @@ public class ShimmerService extends Service {
 								   sendBroadcast(intent);
 								   break;
 	            			   case SDLOGGING:
-	            				   Log.d("Shimmer",((ObjectCluster) msg.obj).getMacAddress() + "  " + ((ObjectCluster) msg.obj).getShimmerName());
+								   shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
+								   mMultiShimmer.remove(macAddress);
+								   if (mMultiShimmer.get(macAddress)==null) { mMultiShimmer.put(macAddress,shimmerDevice); }
+								   Log.d("Shimmer",((ObjectCluster) msg.obj).getMacAddress() + "  " + ((ObjectCluster) msg.obj).getShimmerName());
 	            				   intent.putExtra("ShimmerBluetoothAddress", ((ObjectCluster) msg.obj).getMacAddress() );
 	            				   intent.putExtra("ShimmerDeviceName", ((ObjectCluster) msg.obj).getShimmerName() );
 	            				   intent.putExtra("ShimmerState",BT_STATE.SDLOGGING);

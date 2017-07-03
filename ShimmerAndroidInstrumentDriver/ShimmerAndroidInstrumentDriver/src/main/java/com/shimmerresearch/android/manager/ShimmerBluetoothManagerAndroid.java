@@ -81,15 +81,15 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void connectBluetoothDevice(BluetoothDevice device){
         String bluetoothAddress = device.getAddress();
         addDiscoveredDevice(bluetoothAddress);
-        super.connectShimmerTroughBTAddress(bluetoothAddress);
+        super.connectShimmerThroughBTAddress(bluetoothAddress);
     }
 
     @Override
-    public void connectShimmerTroughBTAddress(final String bluetoothAddress) {
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
 
         if(isDevicePaired(bluetoothAddress)) {
             addDiscoveredDevice(bluetoothAddress);
-            super.connectShimmerTroughBTAddress(bluetoothAddress);
+            super.connectShimmerThroughBTAddress(bluetoothAddress);
             super.setConnectionExceptionListener(new ConnectionExceptionListener() {
                 @Override
                 public void onConnectionStart(String connectionHandle) {
@@ -833,7 +833,10 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
             ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-            if ((stemp.mBluetoothRadioState == ShimmerBluetooth.BT_STATE.SDLOGGING || stemp.mBluetoothRadioState == ShimmerBluetooth.BT_STATE.STREAMING_AND_SDLOGGING) && stemp.getMacId().equals(bluetoothAddress.replaceAll(":",""))){
+            String address = stemp.getMacId();
+            address = address.replace(":","");
+            bluetoothAddress = bluetoothAddress.replace(":","");
+            if ((stemp.mBluetoothRadioState == ShimmerBluetooth.BT_STATE.SDLOGGING || stemp.mBluetoothRadioState == ShimmerBluetooth.BT_STATE.STREAMING_AND_SDLOGGING)   && address.equals(bluetoothAddress)){
                 deviceLogging=true;
             }
         }
