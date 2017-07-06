@@ -18,6 +18,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.database.DatabaseHandler;
 import com.shimmerresearch.service.MultiShimmerTemplateService;
 
@@ -117,7 +118,7 @@ public class BlankFragment extends Fragment {
 	            case Shimmer.MESSAGE_TOAST:
 	            	Log.d("toast",msg.getData().getString(Shimmer.TOAST));
 	            	
-	            case Shimmer.MESSAGE_READ:
+	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 					if (mTVmsgreceived.getText().toString().equals("Data Received")){
 						
 					} else {

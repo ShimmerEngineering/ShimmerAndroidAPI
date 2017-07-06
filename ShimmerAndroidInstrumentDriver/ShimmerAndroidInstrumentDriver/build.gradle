@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '0.4b'
+version = '0.8'
 
 android {
     compileSdkVersion 25
@@ -94,7 +94,7 @@ dependencies {
                 exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.6b') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.7') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'
@@ -185,7 +185,7 @@ dependencies {
     }
 
 // https://github.com/bintray/gradle-bintray-plugin
-    /*bintray {
+    bintray {
         user = bintray_username //this usually comes from gradle.properties file in ~/.gradle
         key = bintray_api_key //this usually comes from gradle.properties file in ~/.gradle
 
@@ -209,5 +209,8 @@ dependencies {
                 vcsTag = ''
             }
         }
-    }*/
+    }
+	
+	
+	
 }

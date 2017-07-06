@@ -29,7 +29,7 @@ import com.shimmerresearch.adapter.NavDrawerListAdapter;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.slidingmenu.R;
 import com.shimmerresearch.model.NavDrawerItem;
-
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -224,7 +224,7 @@ public class MainActivity extends Activity {
             fragmentHandler.handleMessage(msg);
             switch (msg.what) {
             
-            case Shimmer.MESSAGE_STATE_CHANGE:
+            case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
             	
             	switch (msg.arg1) {/*
                 case Shimmer.STATE_CONNECTED:

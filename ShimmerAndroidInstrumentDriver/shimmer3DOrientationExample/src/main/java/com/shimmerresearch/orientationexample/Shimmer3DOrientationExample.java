@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
@@ -130,26 +131,26 @@ public class Shimmer3DOrientationExample extends Activity {
 	 private final Handler mHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	            switch (msg.what) { // handlers have a what identifier which is used to identify the type of msg
-	            case Shimmer.MESSAGE_READ:
+	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
 	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
-	                	    Collection<FormatCluster> accelXFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_A);  // first retrieve all the possible formats for the current sensor device
+	                	    Collection<FormatCluster> accelXFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_A);  // first retrieve all the possible formats for the current sensor device
 				 	    	float angle = 0,x = 0,y=0,z=0;
 	                	    if (accelXFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelXFormats,"CAL")); // retrieve the calibrated data
 				 	    		angle = (float) formatCluster.mData;
 				 	    	}
-				 	    	Collection<FormatCluster> accelYFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_X);  // first retrieve all the possible formats for the current sensor device
+				 	    	Collection<FormatCluster> accelYFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_X);  // first retrieve all the possible formats for the current sensor device
 				 	    	if (accelYFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelYFormats,"CAL")); // retrieve the calibrated data
 				 	    		x=(float) formatCluster.mData;
 				 	    	}
-				 	    	Collection<FormatCluster> accelZFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_Y);  // first retrieve all the possible formats for the current sensor device
+				 	    	Collection<FormatCluster> accelZFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_Y);  // first retrieve all the possible formats for the current sensor device
 				 	    	if (accelZFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelZFormats,"CAL")); // retrieve the calibrated data
 				 	    		y=(float) formatCluster.mData;
 				 	    	}
-				 	    	Collection<FormatCluster> aaFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_Z);  // first retrieve all the possible formats for the current sensor device
+				 	    	Collection<FormatCluster> aaFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_Z);  // first retrieve all the possible formats for the current sensor device
 				 	    	if (aaFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(aaFormats,"CAL")); // retrieve the calibrated data
 				 	    		z=(float) formatCluster.mData;
@@ -175,7 +176,7 @@ public class Shimmer3DOrientationExample extends Activity {
 	                	Toast.makeText(getApplicationContext(), msg.getData().getString(Shimmer.TOAST),Toast.LENGTH_SHORT).show();
 	                break;
 
-	                 case Shimmer.MESSAGE_STATE_CHANGE:
+	                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
 	                     switch (((ObjectCluster)msg.obj).mState) {
 	                     case CONNECTED:
 	                    	 Log.d("ConnectionStatus","Successful");

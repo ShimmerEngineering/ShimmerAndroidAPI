@@ -143,6 +143,7 @@ import android.util.Log;
 
 import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
 
@@ -188,8 +189,9 @@ public class Shimmer extends ShimmerBluetooth{
 	public static final int MESSAGE_ACK_RECEIVED = 4;
 	@Deprecated
 	public static final int MESSAGE_DEVICE_NAME = 5;
-	@Deprecated
-	public static final int MESSAGE_TOAST = 6;
+
+	public static final int MESSAGE_TOAST = 999;
+
 	@Deprecated
 	public static final int MESSAGE_STOP_STREAMING_COMPLETE = 9;
 	@Deprecated
@@ -908,6 +910,8 @@ public class Shimmer extends ShimmerBluetooth{
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
+		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED, getMacId(), getComPort());
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
 		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
 				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
 		//TODO: Delete this...
@@ -931,6 +935,8 @@ public class Shimmer extends ShimmerBluetooth{
 			setBluetoothRadioState(BT_STATE.STREAMING);
 				
 		}
+		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_START_STREAMING, getMacId(), getComPort());
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
 		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1,
 				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
 		//TODO: Delete this...
@@ -1003,7 +1009,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected boolean bytesAvailableToBeRead() {
-		// TODO Auto-generated method stub
+		
 		try {
 			if (mInStream.available()!=0){
 				return true;
@@ -1034,7 +1040,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void writeBytes(byte[] data) {
-		// TODO Auto-generated method stub
+		
 		write(data);
 	}
 
@@ -1064,14 +1070,14 @@ public class Shimmer extends ShimmerBluetooth{
 	
 	@Override
 	protected byte[] readBytes(int numberofBytes) {
-		// TODO Auto-generated method stub
+		
 		byte[] b = new byte[numberofBytes];
 		try {
 			//mIN.read(b,0,numberofBytes);
 			mInStream.readFully(b,0,numberofBytes);
 			return(b);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			System.out.println("Connection Lost");
 			e.printStackTrace();
 		}
@@ -1115,7 +1121,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void printLogDataForDebugging(String msg) {
-		// TODO Auto-generated method stub
+		
 		Log.d(mClassName,msg);
 	}
 
@@ -1132,10 +1138,10 @@ public class Shimmer extends ShimmerBluetooth{
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
-//		mHandler.sendMessage(msg);
+
 		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
-		//TODO: Delete this...
-//		mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_STOP_STREAMING, getMacId(), getComPort());
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
 		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STOP_STREAMING, -1,
 				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
 		
@@ -1189,7 +1195,7 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		
 	
-		// TODO Auto-generated method stub
+		
 		/*
 		int docked, sensing;
 		
@@ -1210,7 +1216,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void processMsgFromCallback(ShimmerMsg shimmerMSG) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -1226,15 +1232,9 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 	
 	@Override
-	public void setBluetoothRadioState(BT_STATE state) {
+	public boolean setBluetoothRadioState(BT_STATE state) {
+		boolean changed = super.setBluetoothRadioState(state);
 
-		
-		//TODO: below not needed any more?
-//		if (state==STATE.NONE && mIsStreaming==true){
-//			disconnect();
-//		}
-		mBluetoothRadioState = state;
-		
 		if(mBluetoothRadioState==BT_STATE.CONNECTED){
 			mIsConnected = true;
 			mIsStreaming = false;
@@ -1262,6 +1262,7 @@ public class Shimmer extends ShimmerBluetooth{
 			sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
 					new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), state));
 		}
+		return changed;
 	}
 
 	public boolean isConnected(){
@@ -1275,13 +1276,13 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void startOperation(BT_STATE currentOperation) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	protected void startOperation(BT_STATE currentOperation, int totalNumOfCmds) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -1292,7 +1293,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void batteryStatusChanged() {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -1330,25 +1331,25 @@ public class Shimmer extends ShimmerBluetooth{
 
 	protected void finishOperation(BT_STATE currentOperation) {
 
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	protected void dockedStateChange() {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public boolean doesSensorKeyExist(int sensorKey) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public Set<Integer> getSensorMapKeySet() {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -1436,5 +1437,9 @@ public class Shimmer extends ShimmerBluetooth{
 
 	}
 
+	@Override
+	public void stateHandler(Object obj){
+		//sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, obj);
+	}
 
 }

@@ -33,6 +33,7 @@ import com.shimmerresearch.algorithms.Filter;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.biophysicalprocessing.ECGtoHRAlgorithm;
 import com.shimmerresearch.biophysicalprocessing.PPGtoHRAlgorithm;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
 import com.shimmerresearch.database.DatabaseHandler;
 import com.shimmerresearch.database.ShimmerConfiguration;
@@ -388,7 +389,7 @@ public class MultiShimmerTemplateService extends Service {
 	  public static final Handler mHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	            switch (msg.what) { // handlers have a what identifier which is used to identify the type of msg
-	            case Shimmer.MESSAGE_READ:
+	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
 	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
 	            	    
@@ -485,7 +486,7 @@ public class MultiShimmerTemplateService extends Service {
 	            	    
 	            	    
 	            	   if (mGraphing==true && (objectCluster.getMacAddress().equals(mGraphBluetoothAddress) || mGraphBluetoothAddress.equals(""))){
-	            		   mHandlerGraph.obtainMessage(Shimmer.MESSAGE_READ, objectCluster).sendToTarget();
+	            		   mHandlerGraph.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, objectCluster).sendToTarget();
 	            		   
 	            	   } 
 	            	   if (mWriting==true){
@@ -516,9 +517,9 @@ public class MultiShimmerTemplateService extends Service {
 	            		message.setData(bundle);
 	            		mHandlerGraph.sendMessage(message);	                	
 	                break;
-	                 case Shimmer.MESSAGE_STATE_CHANGE:
+	                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
 	                	 if (mHandlerGraph!=null){
-	                		 mHandlerGraph.obtainMessage(Shimmer.MESSAGE_STATE_CHANGE, msg.arg1, -1, msg.obj).sendToTarget();
+	                		 mHandlerGraph.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, msg.arg1, -1, msg.obj).sendToTarget();
 	                	 }
 	                     switch (((ObjectCluster)msg.obj).mState) {
 	                     /*case CONNECTED:
@@ -575,7 +576,7 @@ public class MultiShimmerTemplateService extends Service {
 	 					           	service.mDataBase.saveShimmerConfigurations("Temp", service.mShimmerConfigurationList);
 	 				           	}
 	 			           	}
-	                    	 mHandlerGraph.obtainMessage(Shimmer.MESSAGE_STATE_CHANGE, msg.arg1, -1, msg.obj).sendToTarget();
+	                    	 mHandlerGraph.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, msg.arg1, -1, msg.obj).sendToTarget();
 	                        
 	                    	
 	                         break;
