@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="small">8sp</dimen>
-    <dimen name="medium">12sp</dimen>
-    <dimen name="large">17sp</dimen>
-    <dimen name="button_scan_size">45dp</dimen>
-</resources>

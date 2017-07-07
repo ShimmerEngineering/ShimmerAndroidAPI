@@ -1,5 +1,4 @@
 include ':ShimmerAndroidInstrumentDriver', ':shimmerBasicExample', ':shimmerGrpcClientExample', ':shimmerServiceExample'
-include ':shimmerCapture'
 include ':multiShimmerTemplate'
 include ':shimmer3DOrientationExample'
 include ':shimmer9DOFCalibration'
