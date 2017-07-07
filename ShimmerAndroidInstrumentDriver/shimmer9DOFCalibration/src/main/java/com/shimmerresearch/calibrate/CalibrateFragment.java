@@ -44,6 +44,7 @@ import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
 import com.shimmerresearch.driver.Configuration.Shimmer2;
 import com.shimmerresearch.driver.Configuration.Shimmer3;
@@ -871,7 +872,7 @@ public class CalibrateFragment extends Fragment {
         	
         	switch (msg.what) {
             
-            case Shimmer.MESSAGE_READ:
+            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
         	    if ((msg.obj instanceof ObjectCluster)){
         	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
         		int[] data = new int[0];

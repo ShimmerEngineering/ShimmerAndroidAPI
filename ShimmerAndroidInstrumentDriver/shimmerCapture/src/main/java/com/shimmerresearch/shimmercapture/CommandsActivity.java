@@ -13,8 +13,9 @@ import com.shimmerresearch.driver.ShimmerObject;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 
 import com.shimmerresearch.sensors.SensorGSR;
-import com.shimmerresearch.sensors.SensorLSM303;
-import com.shimmerresearch.sensors.SensorMPU9X50;
+import com.shimmerresearch.sensors.lsm303.SensorLSM303;
+import com.shimmerresearch.sensors.lsm303.SensorLSM303DLHC;
+import com.shimmerresearch.sensors.mpu9x50.SensorMPU9X50;
 import com.shimmersensing.shimmerconnect.R;
 
 import android.app.AlertDialog;
@@ -213,18 +214,18 @@ public class CommandsActivity extends ServiceActivity {
         
     	
     	final AlertDialog.Builder dialogAccelShimmer3 = new AlertDialog.Builder(this);		 
-    	dialogAccelShimmer3.setTitle("Accelerometer Range").setItems(SensorLSM303.ListofAccelRange, new DialogInterface.OnClickListener() {
+    	dialogAccelShimmer3.setTitle("Accelerometer Range").setItems(SensorLSM303DLHC.ListofLSM303AccelRange, new DialogInterface.OnClickListener() {
                 	public void onClick(DialogInterface dialog, int item) {
-                		 Log.d("Shimmer",SensorLSM303.ListofAccelRange[item]);
+                		 Log.d("Shimmer",SensorLSM303.ListofLSM303AccelRange[item]);
 	           		    int accelRange=0;
 	           		    
-	           		    	if (SensorLSM303.ListofAccelRange[item]=="+/- 2g"){
+	           		    	if (SensorLSM303.ListofLSM303AccelRange[item]=="+/- 2g"){
 	         	  		    	accelRange=0;
-	         	  		    } else if (SensorLSM303.ListofAccelRange[item]=="+/- 4g"){
+	         	  		    } else if (SensorLSM303.ListofLSM303AccelRange[item]=="+/- 4g"){
 	         	  		    	accelRange=1;
-	         	  		    } else if (SensorLSM303.ListofAccelRange[item]=="+/- 8g"){
+	         	  		    } else if (SensorLSM303.ListofLSM303AccelRange[item]=="+/- 8g"){
 	         	  		    	accelRange=2;
-	         	  		    } else if (SensorLSM303.ListofAccelRange[item]=="+/- 16g"){
+	         	  		    } else if (SensorLSM303.ListofLSM303AccelRange[item]=="+/- 16g"){
 	         	  		    	accelRange=3;
 	         	  		    }
 
@@ -238,8 +239,8 @@ public class CommandsActivity extends ServiceActivity {
 	           		    }
 	           		    
 	           		    ServiceActivity.mService.writeAccelRange(mBluetoothAddress, accelRange);
-	         	  		Toast.makeText(getApplicationContext(), "Accelerometer rate changed. New rate = "+SensorLSM303.ListofAccelRange[item], Toast.LENGTH_SHORT).show();
-	         	  		buttonAccRange.setText("WR ACCEL RANGE"+"\n"+"("+SensorLSM303.ListofAccelRange[item]+")");
+	         	  		Toast.makeText(getApplicationContext(), "Accelerometer rate changed. New rate = "+SensorLSM303.ListofLSM303AccelRange[item], Toast.LENGTH_SHORT).show();
+	         	  		buttonAccRange.setText("WR ACCEL RANGE"+"\n"+"("+SensorLSM303.ListofLSM303AccelRange[item]+")");
 	           		    
                 }
         });
@@ -327,30 +328,30 @@ public class CommandsActivity extends ServiceActivity {
         });
         
         final AlertDialog.Builder dialogMagRangeShimmer3 = new AlertDialog.Builder(this);		 
-        dialogMagRangeShimmer3.setTitle("Magnetometer Range").setItems(SensorLSM303.ListofMagRange, new DialogInterface.OnClickListener() {
+        dialogMagRangeShimmer3.setTitle("Magnetometer Range").setItems(SensorLSM303DLHC.ListofLSM303DLHCMagRange, new DialogInterface.OnClickListener() {
                 	public void onClick(DialogInterface dialog, int item) {
-                		 Log.d("Shimmer",SensorLSM303.ListofMagRange[item]);
+                		 Log.d("Shimmer",SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]);
                 		 int magRange=0;
              		  
-             		    	if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[0]){
+             		    	if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[0]){
              		    		magRange=1;
-             		    	} else if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[1]){
+             		    	} else if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[1]){
              		    		magRange=2;
-             		    	} else if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[2]){
+             		    	} else if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[2]){
              		    		magRange=3;
-             		    	} else if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[3]){
+             		    	} else if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[3]){
              		    		magRange=4;
-             		    	} else if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[4]){
+             		    	} else if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[4]){
              		    		magRange=5;
-             		    	} else if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[5]){
+             		    	} else if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[5]){
              		    		magRange=6;
-             		    	} else if (SensorLSM303.ListofMagRange[item]==SensorLSM303.ListofMagRange[6]){
+             		    	} else if (SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]==SensorLSM303DLHC.ListofLSM303DLHCMagRange[6]){
              		    		magRange=7;
              		    	}
 
              		    	ServiceActivity.mService.writeMagRange(mBluetoothAddress, magRange);
-                 		    Toast.makeText(getApplicationContext(), "Magnometer rate changed. New rate = "+SensorLSM303.ListofMagRange[item], Toast.LENGTH_SHORT).show();
-                 		    buttonMagRange.setText("MAG RANGE"+"\n"+"("+SensorLSM303.ListofMagRange[item]+")");
+                 		    Toast.makeText(getApplicationContext(), "Magnometer rate changed. New rate = "+SensorLSM303DLHC.ListofLSM303DLHCMagRange[item], Toast.LENGTH_SHORT).show();
+                 		    buttonMagRange.setText("MAG RANGE"+"\n"+"("+SensorLSM303DLHC.ListofLSM303DLHCMagRange[item]+")");
                 	}
         });
         
@@ -548,7 +549,7 @@ public class CommandsActivity extends ServiceActivity {
 					cBox5VReg.setTextColor(getResources().getColor(R.color.shimmer_grey_checkbox));
 					String currentGyroRange = "(" + SensorMPU9X50.ListofGyroRange[shimmer.getGyroRange()] + ")";
 					buttonGyroRange.setText("GYRO RANGE" + "\n" + currentGyroRange);
-					String currentMagRange = "(" + SensorLSM303.ListofMagRange[shimmer.getMagRange() - 1] + ")";
+					String currentMagRange = "(" + SensorLSM303DLHC.ListofLSM303DLHCMagRange[shimmer.getMagRange() - 1] + ")";
 					buttonMagRange.setText("MAG RANGE" + "\n" + currentMagRange);
 					String currentPressureResolution = "(" + ListofPressureResolution[shimmer.getPressureResolution()] + ")";
 					buttonPressureResolution.setText("PRESSURE RES" + "\n" + currentPressureResolution);

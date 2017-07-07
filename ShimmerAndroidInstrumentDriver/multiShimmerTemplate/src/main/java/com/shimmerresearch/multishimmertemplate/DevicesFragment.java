@@ -540,7 +540,7 @@ public class DevicesFragment extends Fragment{
 		        case Shimmer.MESSAGE_TOAST:
 		        	Toast.makeText(mActivity, msg.getData().getString(Shimmer.TOAST), Toast.LENGTH_SHORT).show();
 		        break;
-		        case Shimmer.MESSAGE_STATE_CHANGE:
+		        case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     switch (((ObjectCluster)msg.obj).mState) {
                     /*case CONNECTED:
                      	//check to see if there are other Shimmer Devices which need to be connected

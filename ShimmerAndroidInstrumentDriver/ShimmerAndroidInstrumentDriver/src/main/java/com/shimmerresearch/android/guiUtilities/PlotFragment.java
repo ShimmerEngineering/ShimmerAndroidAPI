@@ -184,7 +184,6 @@ public class PlotFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 //TODO: Check if ShimmerBluetooth msg works
-                //case Shimmer.MESSAGE_STATE_CHANGE:
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     ShimmerBluetooth.BT_STATE state=null;
                     String shimmerName = "";
@@ -291,7 +290,7 @@ public class PlotFragment extends Fragment {
 
 
                     break;
-                case Shimmer.MESSAGE_READ:
+                case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 
                     if ((msg.obj instanceof ObjectCluster)){
 
@@ -311,10 +310,6 @@ public class PlotFragment extends Fragment {
                 case Shimmer.MESSAGE_TOAST:
                     Toast.makeText(context, msg.getData().getString(Shimmer.TOAST),
                             Toast.LENGTH_SHORT).show();
-                    break;
-
-                case Shimmer.MESSAGE_LOG_AND_STREAM_STATUS_CHANGED:
-                    int docked = msg.arg1;
                     break;
             }
         }

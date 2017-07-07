@@ -40,6 +40,7 @@ import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
 import com.shimmerresearch.slidingmenu.R;
 import com.shimmerresearch.driver.FormatCluster;
@@ -493,7 +494,7 @@ public class HomeFragment extends Fragment{
 	        	
 	        	switch (msg.what) {
 	            
-	            case Shimmer.MESSAGE_STATE_CHANGE:
+	            case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
 	            	 switch (((ObjectCluster)msg.obj).mState) {
 	                
 	                case CONNECTED:
@@ -521,7 +522,7 @@ public class HomeFragment extends Fragment{
 	            		break;
 	                }
 	                break;
-	            case Shimmer.MESSAGE_READ:
+	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	        	    if ((msg.obj instanceof ObjectCluster)){
 	        	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
 	        		double[] dataArray = new double[0];

@@ -324,30 +324,20 @@ public class ShimmerCapture extends ServiceActivity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.menu_item);
-				if(mService.DevicesConnected(mBluetoothAddress)){
+				if(mService.getBluetoothManager().DevicesConnected(mBluetoothAddress)){
 					arrayAdapter.add(DISCONNECT);
-					if(mService.DeviceIsStreaming(mBluetoothAddress)){
-						if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-							if (mService.DeviceIsLogging(mBluetoothAddress)){
-								arrayAdapter.add(STOP_LOGGING);
-							} else {
-								arrayAdapter.add(START_LOGGING);
-							}
+					if(mService.getBluetoothManager().isUsingLogAndStreamFW(mBluetoothAddress)) {
+						if (mService.getBluetoothManager().DeviceIsLogging(mBluetoothAddress)) {
+							arrayAdapter.add(STOP_LOGGING);
+						} else {
+							arrayAdapter.add(START_LOGGING);
+						}
+					}
+					if(mService.getBluetoothManager().DeviceIsStreaming(mBluetoothAddress)){
 						arrayAdapter.add(STOP_STREAMING);
-						}
-						else{
-							arrayAdapter.add(STOP_STREAMING);
-						}
 					}
 					else{
 						arrayAdapter.add(START_STREAMING);
-						if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-							if (mService.DeviceIsLogging(mBluetoothAddress)){
-								arrayAdapter.add(STOP_LOGGING);
-							} else {
-								arrayAdapter.add(START_LOGGING);
-							}
-						}
 						ShimmerDevice sDevice = mService.getShimmer(mBluetoothAddress);
 						if (sDevice.getHardwareVersion()!= ShimmerVerDetails.HW_ID.SHIMMER_4_SDK) {
 							arrayAdapter.add(ENABLE_SENSOR);
@@ -403,7 +393,7 @@ public class ShimmerCapture extends ServiceActivity {
 				//set the filename in the LogFile
 				mFileName = mEditFileName.getText().toString();
     			if(!mFileName.equals(mService.mLogFileName)){
-    				if(mService.DeviceIsStreaming(mBluetoothAddress)){
+    				if(mService.getBluetoothManager().DeviceIsStreaming(mBluetoothAddress)){
 	    				mService.closeAndRemoveFile(mBluetoothAddress);
 	    				Toast.makeText(getApplicationContext(), "Writing data to the new file: "+mFileName, Toast.LENGTH_SHORT).show();
     				}
@@ -412,7 +402,7 @@ public class ShimmerCapture extends ServiceActivity {
 				mEnableLogging = mCheckBoxEnableLogging.isChecked();
 				if (mEnableLogging==true){
     				mService.setEnableLogging(mEnableLogging);
-    				if(mService.DeviceIsStreaming(mBluetoothAddress))
+    				if(mService.getBluetoothManager().DeviceIsStreaming(mBluetoothAddress))
     					if(mFileName.equals("Default"))
     						Toast.makeText(getApplicationContext(), "Writing data to the defult file\n You can find this file in the ShimmerCapture folder", Toast.LENGTH_SHORT).show();
     					else
@@ -549,7 +539,7 @@ public class ShimmerCapture extends ServiceActivity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
             
-            case Shimmer.MESSAGE_STATE_CHANGE:
+            case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
 				ShimmerBluetooth.BT_STATE state=null;
 				String shimmerName = "";
 				if (msg.obj instanceof ObjectCluster){
@@ -561,6 +551,18 @@ public class ShimmerCapture extends ServiceActivity {
 					mBluetoothAddress = ((CallbackObject)msg.obj).mBluetoothAddress;
 					shimmerName = "";
 				}
+				if (mService.getBluetoothManager().DevicesConnected(mBluetoothAddress)){
+					logAndStreamStatusLayout.setVisibility(View.VISIBLE);
+					if(mService.getBluetoothManager().isDocked(mBluetoothAddress))
+						textDockedStatus.setText("Yes");
+					else
+						textDockedStatus.setText("No");
+
+					if(mService.getBluetoothManager().isSensing(mBluetoothAddress))
+						textSensingStatus.setText("Yes");
+					else
+						textSensingStatus.setText("No");
+				}
                 switch (state) {
                 case CONNECTED:
 
@@ -570,26 +572,7 @@ public class ShimmerCapture extends ServiceActivity {
                     textDeviceName.setText(mBluetoothAddress);
                     textDeviceState.setText(deviceState);
                     buttonMenu.setEnabled(true);
-                    /*
-                    if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-                    	mService.readStatusLogAndStream(mBluetoothAddress);
-                    	try {
-    						Thread.sleep(300);
-    					} catch (InterruptedException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
-                    	logAndStreamStatusLayout.setVisibility(View.VISIBLE);
-                    	if(mService.isDocked(mBluetoothAddress))
-                    		textDockedStatus.setText("Yes");
-                    	else
-                    		textDockedStatus.setText("No");
-                    	
-                    	if(mService.isSensing(mBluetoothAddress))
-                    		textSensingStatus.setText("Yes");
-                    	else
-                    		textSensingStatus.setText("No");
-                    }*/  
+
                     break;
                 case SDLOGGING:
 
@@ -599,26 +582,7 @@ public class ShimmerCapture extends ServiceActivity {
                     textDeviceName.setText(mBluetoothAddress);
                     textDeviceState.setText(deviceState);
                     buttonMenu.setEnabled(true);
-                    /*
-                    if(mService.isUsingLogAndStreamFW(mBluetoothAddress)){
-                    	mService.readStatusLogAndStream(mBluetoothAddress);
-                    	try {
-    						Thread.sleep(300);
-    					} catch (InterruptedException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
-                    	logAndStreamStatusLayout.setVisibility(View.VISIBLE);
-                    	if(mService.isDocked(mBluetoothAddress))
-                    		textDockedStatus.setText("Yes");
-                    	else
-                    		textDockedStatus.setText("No");
-                    	
-                    	if(mService.isSensing(mBluetoothAddress))
-                    		textSensingStatus.setText("Yes");
-                    	else
-                    		textSensingStatus.setText("No");
-                    }*/  
+
                     break;
                 case CONNECTING:
                 	Log.d("ShimmerActivity","Driver is attempting to establish connection with Shimmer device");
@@ -636,9 +600,9 @@ public class ShimmerCapture extends ServiceActivity {
                     //TODO: if(!mSensorView.equals(""))
                     //TODO:	setLegend();
                     //TODO: else{
-                    	List<String> sensorList = mService.getListofEnabledSensors(mBluetoothAddress);
+                    	List<String> sensorList = mService.getBluetoothManager().getListofEnabledSensors(mBluetoothAddress);
                     	if(sensorList!=null){
-    	            		if(mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
+    	            		if(mService.getBluetoothManager().getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
     	            			sensorList.remove("ECG");
     	            			sensorList.remove("EMG");
     	            			if(sensorList.contains("EXG1")){
@@ -700,63 +664,7 @@ public class ShimmerCapture extends ServiceActivity {
                     textDeviceState.setText(deviceState);
                     //set the enable logging regarding the user selection
                     mService.setEnableLogging(mEnableLogging);
-                    /*if(!mSensorView.equals(""))
-                    	setLegend();
-                    else{
-                    	List<String> sensorList = mService.getListofEnabledSensors(mBluetoothAddress);
-                    	if(sensorList!=null){
-    	            		if(mService.getShimmerVersion(mBluetoothAddress)==ShimmerVerDetails.HW_ID.SHIMMER_3){
-    	            			sensorList.remove("ECG");
-    	            			sensorList.remove("EMG");
-    	            			if(sensorList.contains("EXG1")){
-    	            				sensorList.remove("EXG1");
-    	            				sensorList.remove("EXG2");
-    	            				if(mService.isEXGUsingECG24Configuration(mBluetoothAddress)){
-    	            					sensorList.add("ECG");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
-    	            					//sensorName[0] = "ECG LL-RA";
-    	                    			//sensorName[1] = "ECG LA-RA";
-    	                    			//sensorName[2] = "EXG2 CH1";
-    	                    			//sensorName[3] = "ECG Vx-RL";
-    	            				}
-    	            					
-    	            				else if(mService.isEXGUsingEMG24Configuration(mBluetoothAddress)){
-    	            					sensorList.add("EMG");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT);
-    	            				}
-	            					
-    	            				else if(mService.isEXGUsingTestSignal24Configuration(mBluetoothAddress))
-    	            					sensorList.add("ExG Test Signal");
-    	            			}
-    	            			if(sensorList.contains("EXG1 16Bit")){
-    	            				sensorList.remove("EXG1 16Bit");
-    	            				sensorList.remove("EXG2 16Bit");
-    	            				if(mService.isEXGUsingECG16Configuration(mBluetoothAddress)){
-    	            					sensorList.add("ECG 16Bit");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_LL_LA_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT);
-    	            				}
-    	            				else if(mService.isEXGUsingEMG16Configuration(mBluetoothAddress)){
-    	            					sensorList.add("EMG 16Bit");
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT);
-    	            					sensorList.add(Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT);
-    	            				}
-    	            				else if(mService.isEXGUsingTestSignal16Configuration(mBluetoothAddress))
-    	            					sensorList.add("ExG Test Signal 16Bit");
-    	            			}
-    	            		}
-                    	}
-                			
-                		sensorList.add("Timestamp");
-                    	mSensorView = sensorList.get(0);
-                    	setLegend();
-                    }*/
+
                 	break;
                 case DISCONNECTED:
                 	Log.d("ShimmerActivity","Shimmer No State");
@@ -772,42 +680,12 @@ public class ShimmerCapture extends ServiceActivity {
            	 
 
                 break;
-            case Shimmer.MESSAGE_READ:
-
-            	    if ((msg.obj instanceof ObjectCluster)){
-
-					}
-				
-                break;
-            case Shimmer.MESSAGE_ACK_RECEIVED:
-            	
-            	break;
-            case Shimmer.MESSAGE_DEVICE_NAME:
-                // save the connected device's name
-                
-                Toast.makeText(getContext(), "Connected to "
-                               + mBluetoothAddress, Toast.LENGTH_SHORT).show();
-                break;
-       
-            	
             case Shimmer.MESSAGE_TOAST:
                 Toast.makeText(getContext(), msg.getData().getString(Shimmer.TOAST),
                                Toast.LENGTH_SHORT).show();
                 break;
                 
-            case Shimmer.MESSAGE_LOG_AND_STREAM_STATUS_CHANGED:
-            	int docked = msg.arg1;
-            	int sensing = msg.arg2;
-            	if(docked==1)
-            		textDockedStatus.setText("Yes");
-            	else
-            		textDockedStatus.setText("No");
-            	
-            	if(sensing==1)
-            		textSensingStatus.setText("Yes");
-            	else
-            		textSensingStatus.setText("No");
-            	break;
+
             }
         }
     };

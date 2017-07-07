@@ -3,48 +3,804 @@
 
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.codeminders\hidapi\1.1\65b153b94d8e12b5be1c305f477e2f21c3ec1bb2\hidapi-1.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="65b153b94d8e12b5be1c305f477e2f21c3ec1bb2">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\hidapi-1.1_51f48a4a7f03dc82f013b894963d48c842ac685a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-protobuf-nano\1.0.0-pre1\c88ce3b66d21eadcdfecb8326ecd976b2aecbe9f\grpc-protobuf-nano-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c88ce3b66d21eadcdfecb8326ecd976b2aecbe9f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-protobuf-nano-1.0.0-pre1_b0ba1f88e80153da78c1529dbb2ced122dfbe951\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math3\3.6\825c90790e83af784be1de0a3f3a9f066cf884b9\commons-math3-3.6.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="825c90790e83af784be1de0a3f3a9f066cf884b9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\commons-math3-3.6_1d4e524b72db4ea0c22c062145f26914c4995af4\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-auth\1.0.0-pre1\f0f297a406c45ecc030e2aca69b81a7ed67c3de7\grpc-auth-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f0f297a406c45ecc030e2aca69b81a7ed67c3de7">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-auth-1.0.0-pre1_1251348be47be6cb19aeab0bf3ea3120ef80dae0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-media-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-25.3.1_2834626de259fb15c8297994be276c440ed85fdc\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-core-ui\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-25.3.1_1305b382dc3c127ccd39ba1bef2eca6d26c674c9\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp\okhttp\2.5.0\4de2b4ed3445c37ec1720a7d214712e845a24636\okhttp-2.5.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4de2b4ed3445c37ec1720a7d214712e845a24636">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\okhttp-2.5.0_683323dfc2c868ac148e8c752980d50c3c18064d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.github.wendykierp\JTransforms\3.1\f1f6d3c9c9bc04f848e38bdb77dea01e8764a01f\JTransforms-3.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f1f6d3c9c9bc04f848e38bdb77dea01e8764a01f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\JTransforms-3.1_3dc88a1b9d975961ef59e198a9368c2e7a8199b0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
         sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_a08648e6c94266c5a99200e856ca76b5002c1a2c\classes.dex" />
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_da7b23e7e4f71a9648e108cfbdbc505f1cee65b9\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="ffe04b2f646f75ba509d83433650004d5f62183f">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_ba138c75be7822f8bfccaf6474e758ae67fd1028\classes.dex" />
+        sha1="84c740ee384ec39cfdb4450d40ad98c6330629b8">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_3b19d39e3ccbeb0964b1d3b4c650de701c94276c\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\androidplot-core-0.5.0-release.jar"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-okhttp\1.0.0-pre1\3cd4e41931268eef7c1ce00a2baecba6e53cb1da\grpc-okhttp-1.0.0-pre1.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="a08bcc8dba24bfe666c84df486f4bde7afba07d9">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\androidplot-core-0.5.0-release_9f0ad4e3caca255ead6fab8acfd7a8b7c19103c0\classes.dex" />
+        sha1="3cd4e41931268eef7c1ce00a2baecba6e53cb1da">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-okhttp-1.0.0-pre1_9418fe6fb78f81a5f57700301c2208ea09653de4\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\AndroidBluetoothLibrary.jar"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\25.3.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="7f53e8175d44f2c87f4bf757d0e03961af1b038e">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\AndroidBluetoothLibrary_832a3fd79c33027c02e2faf401bf0bbf44922f3e\classes.dex" />
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-25.3.1_64b6bd92585d8463eb0e21aa5c41a2d6f06e2534\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-v4\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-25.3.1_69f449a8a8f8271139b94ef848a7c1209e7c5b77\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.managers.bluetoothmanager\ShimmerBluetoothManager\1.1c\5b713ed3ae82f6314c1e49263a8d52f28729e419\ShimmerBluetoothManager-1.1c.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="5b713ed3ae82f6314c1e49263a8d52f28729e419">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerBluetoothManager-1.1c_f57297b508ca872a4fe457a034ac73452d8626fc\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-25.3.1_243580200ca5990c25bc3b141914c19ef96d51bb\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-v4\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-25.3.1_8524955cf8b23b00122305d9062af56c0654f77f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-lang\commons-lang\2.6\ce1edb914c94ebc388f086c6827e8bdeec71ac2\commons-lang-2.6.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="0ce1edb914c94ebc388f086c6827e8bdeec71ac2">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\commons-lang-2.6_9007383960af2b89d188e1c8b657a2b6bbb9ac08\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.4\5fe28b9518e58819180a43a850fbc0dd24b7c050\commons-lang3-3.4.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="5fe28b9518e58819180a43a850fbc0dd24b7c050">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\commons-lang3-3.4_6f2d2c2aca75d8470dea11e7471f903e23b67909\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-multidex-1.0.1_b2b553cb134cb3fce1413c73b7b5be3e929107bd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-core-ui\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-25.3.1_1d5a91713967747eae36477db653b894b22fbf86\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3\5fc52c41ef0239d1093a1eb7c3697036183677ce\gson-2.3.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="5fc52c41ef0239d1093a1eb7c3697036183677ce">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\gson-2.3_6d63b2c19b72956c34d46f3a74b11dbb0b09c3a8\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-media-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-25.3.1_9ff2268c9652d3f27ea9f86144cc1df5f74732fd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\appcompat-v7\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-25.3.1_8c08ed342998e6484352a4e99a97872df6940ac4\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-protobuf-lite\1.0.0-pre1\8ab07e256e0d9fb3650954f38bc09b5ea258b716\grpc-protobuf-lite-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="8ab07e256e0d9fb3650954f38bc09b5ea258b716">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-protobuf-lite-1.0.0-pre1_b63b16cb31a963fdc77912ab6642b958ceb2f6e2\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-25.3.1_70e3125f109fe20df44093312f715ddf9750a602\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\java3d\vecmath\1.3.1\a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d\vecmath-1.3.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="a0ae4f51da409fa0c20fa0ca59e6bbc9413ae71d">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\vecmath-1.3.1_016743bf3038fb0ab45816b57d2c6a0ac3a92b7d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\appcompat-v7\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-25.3.1_49868499b374c8d7df06c167bd70b41dae1b8ebd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_0b0f72c393742cd591c5ad325fc6a71c890f9d0b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-fragment\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-25.3.1_0969a30a70c0fd9a647b85769e847f59d045d1e2\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-stub\1.0.0-pre1\1fb325fdb52b0e5df3aea3a98b0f75119b2a3701\grpc-stub-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="1fb325fdb52b0e5df3aea3a98b0f75119b2a3701">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-stub-1.0.0-pre1_0128906a36394c004077cd9e112028d1591d1539\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.protobuf\protobuf-lite\3.0.1\59b5b9c6e1a3054696d23492f888c1f8b583f5fc\protobuf-lite-3.0.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="59b5b9c6e1a3054696d23492f888c1f8b583f5fc">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\protobuf-lite-3.0.1_fce2b7af355f2e2ceb5731e31c7520c7eb0762de\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-protobuf\1.0.0-pre1\9e5235fbae40a22fe97a4cd55333b18969ef76cb\grpc-protobuf-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="9e5235fbae40a22fe97a4cd55333b18969ef76cb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-protobuf-1.0.0-pre1_676d9b571c63dc7ce5e19e61216a08f4b27e8503\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_6b5f198306cb1fe32dbda0723da9b58441f3ddb9\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support.constraint\constraint-layout\1.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="44ee06abb66da30f5855e6bf54574e64cdcd982a">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support.constraint-constraint-layout-1.0.2_0ada6920ab734144481f62cf1eff8cc6d4fde950\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.auth\google-auth-library-credentials\0.4.0\171da91494a1391aef13b88bd7302b29edb8d3b3\google-auth-library-credentials-0.4.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="171da91494a1391aef13b88bd7302b29edb8d3b3">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\google-auth-library-credentials-0.4.0_528d48d50fe4a587d73132dd3a43564ef917613a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-core-utils\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-25.3.1_55f037add1e6f1f4b4b48c72c59863f09c739712\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.slf4j\slf4j-api\1.7.21\139535a69a4239db087de9bab0bee568bf8e0b70\slf4j-api-1.7.21.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="139535a69a4239db087de9bab0bee568bf8e0b70">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\slf4j-api-1.7.21_ef10812f0b481312b8f579de2d2c165726703568\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
         sha1="3855121e83b525150312e04d114c382bded92081">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\ShimmerBiophysicalProcessingLibrary_Rev_0_11_6653c5c9189a1d0ac28babe0be66d5ddb7acb08e\classes.dex" />
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\ShimmerBiophysicalProcessingLibrary_Rev_0_11_397b0f393c7ff87c8b4adbedb529a634897e6f60\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-25.3.1_39ff45f52f2d838ce60020ce7707f83c2b80e913\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-media-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-25.3.1_ccc832b58b06567a8b28b2e5c3cda3f070123e58\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.3.1\support-annotations-25.3.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="bf8841d29fa39e077730e7a91222c2ce269fa7c9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-25.3.1_a8c5baf242221654410fd851e4e6a94c326e482a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-collections\commons-collections\3.2\f951934aa5ae5a88d7e6dfaa6d32307d834a88be\commons-collections-3.2.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f951934aa5ae5a88d7e6dfaa6d32307d834a88be">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\commons-collections-3.2_7d612583996d4f64c3a2e8a620ba8e781ab27616\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-multidex-1.0.1_9e230921007051370fc639274eb601bc036b616b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-core-utils\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-25.3.1_7d3b72dc06281398f93745ce42dd97c1a592bfc1\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\AndroidBluetoothLibrary.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="7f53e8175d44f2c87f4bf757d0e03961af1b038e">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\AndroidBluetoothLibrary_2aaf27bfa574c611082b777bbeaa205e7930a59e\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-25.3.1_6d54bfcd37c80bc72b11426a737f3684e10578ed\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-core-utils\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-25.3.1_9d75618cd85dfe02d0d99e22821e484962089aef\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-25.3.1_0e7d98e8b7bb0afe48b9a67643ff0a71bc6b6918\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\support-fragment\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-25.3.1_0073092a1fbf53902ab27718748e499e7a7f8294\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-media-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-25.3.1_e4c2e86ce5feb0f197ac8cbf539e664ef09e9728\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="0eab63fda62f3c8c1346f25ca5faeef007d38119">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_2b1ccaa5bacd3a3e6b81b16cfa788765b4f6c459\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-core-utils\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-25.3.1_1e20d39c9572a1861fb6352d235303e7044989a0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-25.3.1_5ec6cb2e4b640d8efaa87ab163b8df750e15da30\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-v4\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-25.3.1_724cc3661f0acd87286294f7fe317ca380824517\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="95519720620b553f63afc789beba9ad582807f7c">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-25.3.1_2a81b969f70e79032faf8fbfed29053be97b086a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-25.3.1_20fc0b1e9309f21a5c1fd2bce702639510299865\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\appcompat-v7\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-25.3.1_497be2657b9becf3658054566c9b434803f6082a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.findbugs\jsr305\3.0.0\5871fb60dc68d67da54a663c3fd636a10a532948\jsr305-3.0.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\jsr305-3.0.0_3a3ed28e08e17cfd74280d4f4729ed886de33500\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\joda-time\joda-time\2.9.4\1c295b462f16702ebe720bbb08f62e1ba80da41b\joda-time-2.9.4.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="1c295b462f16702ebe720bbb08f62e1ba80da41b">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\joda-time-2.9.4_e853adf29d863b730ea6e6c3be22274554602137\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-math\2.2\4877b85d388275f994a5cfc7eceb73a8045d3006\commons-math-2.2.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4877b85d388275f994a5cfc7eceb73a8045d3006">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\commons-math-2.2_56e3af8e65e82a65c2d272a36b43498af43ba7a8\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-compat\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-25.3.1_05bc5a6b27e26138a13a75fb54e2e572552975ef\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.protobuf\protobuf-java\3.3.0\9f301d1a27501b1afcb2ed16aad428337dabf9e4\protobuf-java-3.3.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="9f301d1a27501b1afcb2ed16aad428337dabf9e4">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\protobuf-java-3.3.0_ec6fae77ed2d8b967000d80f2a5f2f9ac316074d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\ShimmerAndroidInstrumentDriver\build\intermediates\bundles\default\libs\androidplot-core-0.5.0-release.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="a08bcc8dba24bfe666c84df486f4bde7afba07d9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\8\androidplot-core-0.5.0-release_639519680c0211dfc8a3689ac7d46320995acafa\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.8\7d48024c5395774de966efd411b5046ba4684bc6\ShimmerDriver-0.8.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="7d48024c5395774de966efd411b5046ba4684bc6">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.8_6a7be468bd1e881933a2a494c7b2b96bec3f8a40\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-25.3.1_a0704eaa8eb48f46109b3e684a557217f399a9e4\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e94bc41ea495b52a29ea1bf3c66f20a2856ee051">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_f5278e02c1e3f516cf9c4b61df269e4d9fd7020e\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-25.3.1_cc7088fb59c3d2b4a74b77c308d3dd3c928fc50c\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\appcompat-v7\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-25.3.1_4bb76b973ed21330c406da8849edc68040475dd4\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support.constraint\constraint-layout\1.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="44ee06abb66da30f5855e6bf54574e64cdcd982a">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support.constraint-constraint-layout-1.0.2_8b05d42b5f372ed0f0525fc0bd09cd6d16710e0a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\19.0\6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9\guava-19.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\guava-19.0_de256f5692e7e6c8452e812f62a87334ff3d62de\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-core\1.0.0-pre1\6489670c182cb214cdcbbd7e6508b4f3ac831ce5\grpc-core-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6489670c182cb214cdcbbd7e6508b4f3ac831ce5">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-core-1.0.0-pre1_559f3c13a52c837366a2783982b73f025f6240c9\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-core-ui\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-25.3.1_1d78ebb4c0e734b054918c2ad7b8715a92780e9e\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\exploded-aar\com.android.support\support-v4\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-25.3.1_729370e905538d1dca6cbb14356395240c22a856\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\AppData\Local\Android\sdk\extras\m2repository\com\android\support\constraint\constraint-layout-solver\1.0.2\constraint-layout-solver-1.0.2.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b9cd8fc6bd15cb915735d34535db30ece0c44603">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\constraint-layout-solver-1.0.2_888dc6c70591458ee998c2926f41c5e65a528d54\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4c7f70172db500faf3f6553bd2e733a18bdfddd8">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\multiShimmerTemplate\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_523fda790d57fc60c6028381a6e88a3e5fce1e94\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\support-fragment\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-25.3.1_9579bbc7c2506e40d72bfaefc954711b2ffdf068\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.6.0\98476622f10715998eacf9240d6b479f12c66143\okio-1.6.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="98476622f10715998eacf9240d6b479f12c66143">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\okio-1.6.0_c6c36c9266a53bff725e5087f6a3090b1d0ab593\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-multidex-1.0.1_66b643de56f8793865160c1d2b4ad8e498cb6431\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\pl.edu.icm\JLargeArrays\1.5\fe1350c7b5537c144fb0af39206e212ad1bbbe2\JLargeArrays-1.5.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="0fe1350c7b5537c144fb0af39206e212ad1bbbe2">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\JLargeArrays-1.5_b63b3160aba9b9d97622c3aefc8aa47505d235f2\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerCapture\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-25.3.1_25a9cbabe7773817853875cf29111a8ff20c82e6\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.findbugs\jsr305\1.3.9\40719ea6961c0cb6afaeb6a921eaa1f6afd4cfdf\jsr305-1.3.9.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="40719ea6961c0cb6afaeb6a921eaa1f6afd4cfdf">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\jsr305-1.3.9_5a9b0e6409d59df8350d5ab55d4416be5f17ed19\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-core-ui\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-25.3.1_790cb47751c1be3b7acb49347f44d48ff39ff4c7\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-codec\commons-codec\1.6\b7f0fc8f61ecadeb3695f0b9464755eee44374d4\commons-codec-1.6.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b7f0fc8f61ecadeb3695f0b9464755eee44374d4">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\commons-codec-1.6_249620c2dab3298fe8658b3f6e0464933c70c281\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.protobuf\protobuf-java-util\3.0.0-beta-3\5c39485775c197fc1938e594dc358bfec1c188a0\protobuf-java-util-3.0.0-beta-3.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="5c39485775c197fc1938e594dc358bfec1c188a0">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\protobuf-java-util-3.0.0-beta-3_b078ffd9a2dbae2e58d7ca3f69d829ca0ec725d9\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_bda49e0f2589d7dedaca4132df6894cfed158868\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="78ea232052df889856dcb7b7b542707c89bb3bfb">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-multidex-1.0.1_ab1f4a600be5ba3d11f9f4062278cc07e3fdf1cd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.protobuf.nano\protobuf-javanano\3.0.0-alpha-5\357e60f95cebb87c72151e49ba1f570d899734f8\protobuf-javanano-3.0.0-alpha-5.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="357e60f95cebb87c72151e49ba1f570d899734f8">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\protobuf-javanano-3.0.0-alpha-5_1b6d4d29b47822477f3f3800abbe4d02688650b3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\exploded-aar\com.android.support\support-fragment\25.3.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-25.3.1_d4f097546963159a766ce607b01ce36f37e3ffd5\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-netty\1.0.0-pre1\53094773926bf863daa8faa3ff1175f3f6909ca8\grpc-netty-1.0.0-pre1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="53094773926bf863daa8faa3ff1175f3f6909ca8">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-netty-1.0.0-pre1_ed34b3753b6e774429a6c2836ec150362f9f8d66\classes.dex" />
     </item>
 
 </items>
