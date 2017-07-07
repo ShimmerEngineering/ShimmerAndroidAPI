@@ -1,7 +1,5 @@
-include ':ShimmerAndroidInstrumentDriver', ':shimmerBasicExample', ':shimmerGrpcClientExample', ':shimmerServiceExample'
-include ':multiShimmerTemplate'
+include ':ShimmerAndroidInstrumentDriver', ':shimmerBasicExample', ':shimmerServiceExample'
 include ':shimmer3DOrientationExample'
-include ':shimmer9DOFCalibration'
 //Don't need shimmeradvancelibrary is just an example on how to import projects from different folders
 //include ':ShimmerAdvanceLibrary'
 //project (":ShimmerAdvanceLibrary").projectDir = new File("../../ShimmerAdvanceAPI/ShimmerAdvanceLibrary")
