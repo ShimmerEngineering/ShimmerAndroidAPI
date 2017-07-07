@@ -58,7 +58,21 @@ public class DeviceConfigFragment extends Fragment {
                 listOfKeys.addAll(sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated);
             }
         }
-//        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
+
+        List<String> keysToRemove = new ArrayList<String>();
+
+        for(String key : listOfKeys) {
+            ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
+            if(cods == null) {
+                keysToRemove.add(key);
+            }
+        }
+
+        for(String key : keysToRemove) {
+            listOfKeys.remove(key);
+        }
+
+        //        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
 
         expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmerDevice, shimmerDeviceClone);
         expandListView = (ExpandableListView) getView().findViewById(R.id.expandable_listview);

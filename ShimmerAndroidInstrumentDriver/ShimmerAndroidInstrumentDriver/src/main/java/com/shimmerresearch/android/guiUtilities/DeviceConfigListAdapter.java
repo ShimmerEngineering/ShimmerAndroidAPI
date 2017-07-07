@@ -71,32 +71,34 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
 
         for(String key : list) {    //TODO: Place this in DeviceConfigFragment
             ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
-            String[] cs = cods.getGuiValues();
-            if(cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
-                if (cs != null) {
-                    //Put the expandable list child values in the HashMap
-                    List<String> csList = Arrays.asList(cs);
-                    expandableListDetail.put(key, csList);
 
-                    //Get the current setting from the configOptionsMap
-                    Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
-                    if (returnedValue != null) {
-                        int configValue = (int) returnedValue;
-                        int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
-                        String currentSetting = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
-                        currentSettingsMap.put(key, currentSetting);
+            if (cods != null) {
+                String[] cs = cods.getGuiValues();
+                if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
+                    if (cs != null) {
+                        //Put the expandable list child values in the HashMap
+                        List<String> csList = Arrays.asList(cs);
+                        expandableListDetail.put(key, csList);
+
+                        //Get the current setting from the configOptionsMap
+                        Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
+                        if (returnedValue != null) {
+                            int configValue = (int) returnedValue;
+                            int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+                            String currentSetting = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                            currentSettingsMap.put(key, currentSetting);
+                        }
+                    } else {
+                        Log.e("SHIMMER", "cs is null!!! with key " + key);
                     }
-                } else {
-                    Log.e("SHIMMER", "cs is null!!! with key " + key);
+                } else if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD) {
+                    //A text field is needed as this config setting can be assigned any value
+                    String value = (String) shimmerDevice.getConfigValueUsingConfigLabel(key);
+                    String[] textField = {"TEXTFIELD"};
+                    List<String> csList = Arrays.asList(textField);
+                    expandableListDetail.put(key, csList);
+                    currentSettingsMap.put(key, value);
                 }
-            }
-            else if(cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD) {
-                //A text field is needed as this config setting can be assigned any value
-                String value = (String) shimmerDevice.getConfigValueUsingConfigLabel(key);
-                String[] textField = {"TEXTFIELD"};
-                List<String> csList = Arrays.asList(textField);
-                expandableListDetail.put(key, csList);
-                currentSettingsMap.put(key, value);
             }
         }
 
