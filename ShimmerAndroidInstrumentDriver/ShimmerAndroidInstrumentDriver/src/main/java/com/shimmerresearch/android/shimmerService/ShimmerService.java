@@ -131,6 +131,8 @@ public class ShimmerService extends Service {
 			Log.e(TAG, "ERROR! " + e);
 			Toast.makeText(this, "Error! Could not create Bluetooth Manager!", Toast.LENGTH_LONG).show();
 		}
+
+		//btManager.configureShimmer();
 	}
 
 	public class LocalBinder extends Binder {

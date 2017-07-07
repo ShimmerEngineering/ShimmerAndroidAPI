@@ -178,8 +178,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     protected void onDestroy() {
         //Stop the Shimmer service
         super.onDestroy();
-        mService.stopStreamingAllDevices();
-        mService.disconnectAllDevices();
 /*
         mHandler = null;
         if(isServiceStarted) {
