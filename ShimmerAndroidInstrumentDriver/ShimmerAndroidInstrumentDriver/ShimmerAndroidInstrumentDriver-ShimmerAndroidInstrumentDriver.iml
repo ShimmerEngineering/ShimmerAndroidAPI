@@ -103,13 +103,14 @@
     <orderEntry type="library" exported="" name="ShimmerBiophysicalProcessingLibrary_Rev_0_11" level="project" />
     <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="commons-math-2.2" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.8b" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="hidapi-1.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-all-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-core-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="protobuf-lite-3.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-netty-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="multidex-instrumentation-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.6" level="project" />
@@ -119,7 +120,6 @@
     <orderEntry type="library" exported="" scope="TEST" name="httpcore-4.3.3" level="project" />
     <orderEntry type="library" exported="" name="protobuf-javanano-3.0.0-alpha-5" level="project" />
     <orderEntry type="library" exported="" name="JTransforms-3.1" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-0.8" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
