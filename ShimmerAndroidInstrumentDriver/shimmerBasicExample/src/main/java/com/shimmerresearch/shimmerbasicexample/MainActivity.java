@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
     ShimmerDevice shimmerDevice;
-    final static String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
+    String shimmerBtAdd = "00:06:66:66:96:86";  //Put the address of the Shimmer device you want to connect here
     //00:06:66:43:b4:8b
     //final static String shimmerBtAdd = "00:06:66:66:96:A9";  //Put the address of the Shimmer device you want to connect here
     //final static String shimmerBtAdd = "00:06:66:43:B4:8B";  //Put the address of the Shimmer device you want to connect here
@@ -239,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 btManager.connectShimmerThroughBTAddress(macAdd);   //Connect to the selected device
+                shimmerBtAdd = macAdd;
             }
 
         }
