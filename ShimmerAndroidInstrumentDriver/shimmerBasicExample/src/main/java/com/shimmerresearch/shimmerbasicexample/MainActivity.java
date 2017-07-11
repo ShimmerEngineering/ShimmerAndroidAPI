@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         //Connect the Shimmer using its Bluetooth Address
         try {
-            btManager.connectShimmerTroughBTAddress(shimmerBtAdd);
+            btManager.connectShimmerThroughBTAddress(shimmerBtAdd);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error. Shimmer device not paired or Bluetooth is not enabled");
             Toast.makeText(this, "Error. Shimmer device not paired or Bluetooth is not enabled. " +
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 btManager.disconnectAllDevices();   //Disconnect all devices first
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                btManager.connectShimmerTroughBTAddress(macAdd);   //Connect to the selected device
+                btManager.connectShimmerThroughBTAddress(macAdd);   //Connect to the selected device
             }
 
         }

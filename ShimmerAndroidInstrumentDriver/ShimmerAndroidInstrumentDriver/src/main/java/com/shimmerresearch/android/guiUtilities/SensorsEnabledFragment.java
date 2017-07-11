@@ -1,6 +1,8 @@
 package com.shimmerresearch.android.guiUtilities;
 
+import android.app.Activity;
 import android.content.Context;
+import android.hardware.Sensor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -39,6 +41,7 @@ public class SensorsEnabledFragment extends ListFragment {
     ShimmerService shimmerService = null;
     TreeMap<Integer, SensorGroupingDetails> compatibleSensorGroupMap;
     int sensorKeys[];
+    OnSensorsSelectedListener mCallback;
 
     final static String LOG_TAG = "SHIMMER";
 
@@ -52,6 +55,21 @@ public class SensorsEnabledFragment extends ListFragment {
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public interface OnSensorsSelectedListener {
+        public void onSensorsSelected();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (SensorsEnabledFragment.OnSensorsSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnSensorSelectedListener");
+        }
+
     }
 
     @Override
@@ -154,6 +172,7 @@ public class SensorsEnabledFragment extends ListFragment {
 
                             bluetoothManager.configureShimmer(shimmerDeviceClone);
                             //configureShimmers(cloneList);
+                            mCallback.onSensorsSelected();
 
                         } else if (shimmerDevice instanceof Shimmer4Android) {
                             //((Shimmer4Android)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());

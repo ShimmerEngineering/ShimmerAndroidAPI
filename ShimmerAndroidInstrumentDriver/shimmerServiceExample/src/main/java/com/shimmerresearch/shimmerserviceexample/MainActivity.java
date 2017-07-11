@@ -48,7 +48,7 @@ import com.shimmerresearch.driver.ShimmerDevice;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener {
+public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener {
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
@@ -377,6 +377,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         dynamicPlot = plotFragment.getDynamicPlot();
 
         mService.stopStreamingAllDevices();
+    }
+
+    @Override
+    public void onSensorsSelected() {
+        ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
+        deviceConfigFragment.buildDeviceConfigList(device, this, mService.getBluetoothManager());
     }
 
     @Override
