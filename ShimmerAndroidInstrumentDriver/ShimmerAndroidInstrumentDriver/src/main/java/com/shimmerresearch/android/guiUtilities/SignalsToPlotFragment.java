@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 
@@ -135,7 +136,7 @@ public class SignalsToPlotFragment extends ListFragment {
             //final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
             final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.simple_list_item_multiple_choice_force_black_text, android.R.id.text1, sensorNames);
             setListAdapter(adapter);
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
             updateCheckboxes();
