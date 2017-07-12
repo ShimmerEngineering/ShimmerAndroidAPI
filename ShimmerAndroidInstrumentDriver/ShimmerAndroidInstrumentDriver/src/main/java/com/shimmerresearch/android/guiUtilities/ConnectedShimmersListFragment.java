@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.driver.ShimmerDevice;
 
 import java.util.List;
@@ -92,7 +93,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
                 displayList[i] = nameList[i] + "\n" + macList[i];
             }
 
-            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, displayList);
+            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, R.layout.simple_list_item_multiple_choice_force_black_text, displayList);
 
             //Set the list of devices to be displayed in the Fragment
             setListAdapter(listAdapter);
