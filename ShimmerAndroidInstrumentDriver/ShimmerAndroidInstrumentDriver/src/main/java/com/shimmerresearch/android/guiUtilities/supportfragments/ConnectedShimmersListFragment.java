@@ -1,11 +1,11 @@
-package com.shimmerresearch.android.guiUtilities;
+package com.shimmerresearch.android.guiUtilities.supportfragments;
 
 
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
