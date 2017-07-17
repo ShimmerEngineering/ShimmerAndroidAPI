@@ -403,6 +403,7 @@ public class ShimmerDialogConfigurations {
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         final List<String[]> listofChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
+        final List<String[]> listOfChannels = shimmerService.getBluetoothManager().getListofEnabledSensorSignals(bluetoothAddress);
 
         List<String> sensorList = new ArrayList<String>();
         for(int i=0;i<listofChannels.size();i++) {
