@@ -341,7 +341,14 @@ public class ShimmerService extends Service {
 
 	            				double hr = mPPGtoHR.ppgToHrConversion(ppgdata, calts);
 	            				System.out.print("Heart Rate: " + Integer.toString((int)hr) + "\n");
+
 	            				objectCluster.addData(Configuration.Shimmer3.ObjectClusterSensorName.PPG_TO_HR,CHANNEL_TYPE.CAL,Configuration.CHANNEL_UNITS.BEATS_PER_MINUTE,hr);
+
+								try {
+									mPlotManager.filterDataAndPlot((ObjectCluster) objectCluster);
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
 
 	            			}
 
