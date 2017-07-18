@@ -311,14 +311,7 @@ public class ShimmerService extends Service {
 	            case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
 	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj;
-						try {
 
-							mPlotManager.filterDataAndPlot((ObjectCluster) msg.obj);
-
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 	            	    //Filter Signal
 	            	    //PPG to HR
 	            	    if (mPPGtoHREnabled){
@@ -343,16 +336,7 @@ public class ShimmerService extends Service {
 	            				System.out.print("Heart Rate: " + Integer.toString((int)hr) + "\n");
 
 	            				objectCluster.addData(Configuration.Shimmer3.ObjectClusterSensorName.PPG_TO_HR,CHANNEL_TYPE.CAL,Configuration.CHANNEL_UNITS.BEATS_PER_MINUTE,hr);
-
-								try {
-									mPlotManager.filterDataAndPlot(objectCluster);
-								} catch (Exception e1) {
-									e1.printStackTrace();
-								}
-
 	            			}
-
-
 	            	    }
 
 	            	    //Filter Signal
@@ -394,10 +378,18 @@ public class ShimmerService extends Service {
 	            				//objectCluster.mPropertyCluster.remove(Configuration.Shimmer3.ObjectClusterSensorName.GSR, formatClusterGSR);
 	            				objectCluster.addData(Configuration.Shimmer3.ObjectClusterSensorName.GSR_CONDUCTANCE,CHANNEL_TYPE.CAL,"microSiemens",conductance);
 	            			}
-
             			}
 
-	            		objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.BATT_PERCENTAGE);
+            			//Plot the data in the ObjectCluster
+						try {
+							mPlotManager.filterDataAndPlot((ObjectCluster) msg.obj);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+
+						objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.BATT_PERCENTAGE);
 	            		objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.SYSTEM_TIMESTAMP_PLOT);
 	            		objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_OVERALL);
 	            		objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_CURRENT);
