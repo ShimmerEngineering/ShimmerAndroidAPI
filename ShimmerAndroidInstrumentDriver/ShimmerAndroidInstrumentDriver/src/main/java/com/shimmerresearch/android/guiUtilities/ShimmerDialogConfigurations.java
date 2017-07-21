@@ -172,7 +172,6 @@ public class ShimmerDialogConfigurations {
 
                         if(isChecked == true) {
                             shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
-                            Log.e("JOS", "SensorKey is: " + sensorKeys[which] + " for " + arraySensors[which]);
                         } else {
                             shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
                         }

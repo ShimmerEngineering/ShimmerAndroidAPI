@@ -4,6 +4,7 @@ package com.shimmerresearch.android.guiUtilities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.widget.ListView;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
@@ -40,6 +41,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
 
     }
 
+/*
     @Override
     protected void showFrame() {
 // Set the dialog title
@@ -84,6 +86,80 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
         AlertDialog ad = builder.create();
         ad.show();
     }
+*/
+
+    @Override
+    protected void showFrame() {
+
+        final ShimmerDevice shimmerDeviceClone = shimmer.deepClone();
+
+        // Set the dialog title
+        builder.setTitle("Sensors");
+        // Specify the list array, the items to be selected by default (null for none),
+        // and the listener through which to receive callbacks when items are selected
+        final DialogInterface.OnMultiChoiceClickListener onClick =
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog,
+                                        final int which, final boolean isChecked) {
+
+                        if(isChecked == true) {
+                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
+                        } else {
+                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
+                        }
+
+                        final AlertDialog alertDialog = (AlertDialog) dialog;
+                        final ListView listView = alertDialog.getListView();
+
+                        for(int i=0; i<listView.getAdapter().getCount(); i++) {
+                            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                                listView.setItemChecked(i, true);
+                            } else {
+                                listView.setItemChecked(i, false);
+                            }
+                        }
+
+                    }
+                };
+
+
+        builder.setMultiChoiceItems(arraySensors, null, onClick)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, shimmerDeviceClone);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
+                        if (shimmerDeviceClone instanceof Shimmer) {
+                            writeConfiguration();
+                        }
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog ad = builder.create();
+        ad.show();
+
+        final ListView listView = ad.getListView();
+
+        for(int i=0; i<listView.getCount(); i++) {
+            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                listView.setItemChecked(i, true);
+            } else {
+                listView.setItemChecked(i, false);
+            }
+        }
+
+    }
+
 
     @Override
     protected void createCheckBox(String sensorName, boolean state, int count) {
