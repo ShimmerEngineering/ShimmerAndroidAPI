@@ -33,6 +33,7 @@ public class DeviceConfigFragment extends Fragment {
     DeviceConfigListAdapter expandListAdapter;
     ExpandableListView expandListView;
     ShimmerDevice shimmerDeviceClone;
+    int buttonBackgroundResourceId = -1;
 
     public DeviceConfigFragment() {
         // Required empty public constructor
@@ -41,6 +42,23 @@ public class DeviceConfigFragment extends Fragment {
     public static DeviceConfigFragment newInstance() {
         DeviceConfigFragment fragment = new DeviceConfigFragment();
         return fragment;
+    }
+
+
+    /**
+     * This method allows for the setting of a custom Drawable background resource for the buttons
+     * at the bottom of the ListView
+     * @param shimmerDevice
+     * @param context
+     * @param bluetoothManager
+     * @param buttonResourceId
+     */
+    public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context,
+                                      final ShimmerBluetoothManagerAndroid bluetoothManager,
+                                      final int buttonResourceId) {
+
+        buttonBackgroundResourceId = buttonResourceId;
+        buildDeviceConfigList(shimmerDevice, context, bluetoothManager);
     }
 
     public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context,
@@ -140,6 +158,11 @@ public class DeviceConfigFragment extends Fragment {
             buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
             Button writeConfigButton = new Button(context);
             Button resetListButton = new Button(context);
+            if(buttonBackgroundResourceId != -1) {
+                //A custom Button background resource ID has been given
+                writeConfigButton.setBackgroundResource(buttonBackgroundResourceId);
+                resetListButton.setBackgroundResource(buttonBackgroundResourceId);
+            }
             writeConfigButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -163,8 +186,8 @@ public class DeviceConfigFragment extends Fragment {
                     Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
                 }
             });
-            writeConfigButton.setText("Write config to Shimmer");
-            resetListButton.setText("Reset settings");
+            writeConfigButton.setText("Save Changes");
+            resetListButton.setText("Reset List");
             buttonLayout.addView(resetListButton);
             buttonLayout.addView(writeConfigButton);
             expandListView.addFooterView(buttonLayout);
