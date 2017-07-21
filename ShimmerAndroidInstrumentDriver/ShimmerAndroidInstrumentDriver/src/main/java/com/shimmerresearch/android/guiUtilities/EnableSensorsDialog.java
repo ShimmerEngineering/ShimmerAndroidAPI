@@ -91,8 +91,6 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
     @Override
     protected void showFrame() {
 
-        final ShimmerDevice shimmerDeviceClone = shimmer.deepClone();
-
         // Set the dialog title
         builder.setTitle("Sensors");
         // Specify the list array, the items to be selected by default (null for none),
@@ -104,16 +102,16 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
                                         final int which, final boolean isChecked) {
 
                         if(isChecked == true) {
-                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
+                            clone.setSensorEnabledState(sensorKeys[which], true);
                         } else {
-                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
+                            clone.setSensorEnabledState(sensorKeys[which], false);
                         }
 
                         final AlertDialog alertDialog = (AlertDialog) dialog;
                         final ListView listView = alertDialog.getListView();
 
                         for(int i=0; i<listView.getAdapter().getCount(); i++) {
-                            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                            if(clone.isSensorEnabled(sensorKeys[i])) {
                                 listView.setItemChecked(i, true);
                             } else {
                                 listView.setItemChecked(i, false);
@@ -129,11 +127,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                        cloneList.add(0, shimmerDeviceClone);
-                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-
-                        if (shimmerDeviceClone instanceof Shimmer) {
+                        if (clone instanceof Shimmer) {
                             writeConfiguration();
                         }
                     }
@@ -151,7 +145,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
         final ListView listView = ad.getListView();
 
         for(int i=0; i<listView.getCount(); i++) {
-            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+            if(clone.isSensorEnabled(sensorKeys[i])) {
                 listView.setItemChecked(i, true);
             } else {
                 listView.setItemChecked(i, false);

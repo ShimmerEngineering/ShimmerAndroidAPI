@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '0.9.3d'
+version = '0.9.3e'
 
 android {
     compileSdkVersion 25
