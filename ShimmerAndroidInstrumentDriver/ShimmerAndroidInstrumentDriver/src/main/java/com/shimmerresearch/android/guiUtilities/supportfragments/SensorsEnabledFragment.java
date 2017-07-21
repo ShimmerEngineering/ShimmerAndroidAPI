@@ -105,6 +105,14 @@ public class SensorsEnabledFragment extends ListFragment {
             }
         }
 
+        for(SensorGroupingDetails sgd : groupMap.values()) {
+            List<ShimmerVerObject> listOfCompatibleVersionInfo = sgd.mListOfCompatibleVersionInfo;
+            List<String> listOfGuiConfigNames = sgd.mListofGuiConfigNames;
+            List<Integer> listOfSensorMapKeysAssociated = sgd.mListOfSensorMapKeysAssociated;
+            int a = 1;
+            a++;
+        }
+
         final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
         Map<Integer, SensorDetails> sensorMap = shimmerDeviceClone.getSensorMap();
         int count = 0;

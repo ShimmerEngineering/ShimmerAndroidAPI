@@ -122,7 +122,7 @@ public class ShimmerDialogConfigurations {
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                       dialog.cancel();
+                        dialog.cancel();
                     }
                 });
 
@@ -144,7 +144,7 @@ public class ShimmerDialogConfigurations {
             }
         }
 
-        String[] arraySensors = new String[count];
+        final String[] arraySensors = new String[count];
         final boolean[] listEnabled = new boolean[count];
         final int[] sensorKeys = new int[count];
         count = 0;
@@ -159,25 +159,40 @@ public class ShimmerDialogConfigurations {
             }
         }
 
+
         // Set the dialog title
-        builder.setTitle("Sensors")
-                // Specify the list array, the items to be selected by default (null for none),
-                // and the listener through which to receive callbacks when items are selected
-                .setMultiChoiceItems(arraySensors, listEnabled,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which,
-                                                boolean isChecked) {
+        builder.setTitle("Sensors");
+        // Specify the list array, the items to be selected by default (null for none),
+        // and the listener through which to receive callbacks when items are selected
+        final DialogInterface.OnMultiChoiceClickListener onClick =
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog,
+                                        final int which, final boolean isChecked) {
 
-                                if(shimmerDeviceClone.isSensorEnabled(sensorKeys[which])) {
-                                    shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
-                                } else {
-                                    shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
-                                }
+                        if(isChecked == true) {
+                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
+                            Log.e("JOS", "SensorKey is: " + sensorKeys[which] + " for " + arraySensors[which]);
+                        } else {
+                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
+                        }
 
+                        final AlertDialog alertDialog = (AlertDialog) dialog;
+                        final ListView listView = alertDialog.getListView();
+
+                        for(int i=0; i<listView.getAdapter().getCount(); i++) {
+                            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                                listView.setItemChecked(i, true);
+                            } else {
+                                listView.setItemChecked(i, false);
                             }
-                        })
-                // Set the action buttons
+                        }
+
+                    }
+                };
+
+
+        builder.setMultiChoiceItems(arraySensors, null, onClick)
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -201,7 +216,17 @@ public class ShimmerDialogConfigurations {
         AlertDialog ad = builder.create();
         ad.show();
 
+        final ListView listView = ad.getListView();
+
+        for(int i=0; i<listView.getCount(); i++) {
+            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                listView.setItemChecked(i, true);
+            } else {
+                listView.setItemChecked(i, false);
+            }
+        }
     }
+
 
     public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context,
                                                  final ShimmerBluetoothManagerAndroid bluetoothManager){
@@ -235,6 +260,7 @@ public class ShimmerDialogConfigurations {
         });
         builder.create().show();
     }
+
 
     public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
@@ -308,6 +334,7 @@ public class ShimmerDialogConfigurations {
             }
         }
     }
+
 
     public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
                                                        final Context context, final ShimmerDevice shimmerDevice,
@@ -385,13 +412,29 @@ public class ShimmerDialogConfigurations {
         }
     }
 
-    public static void showSelectSensorPlot(Context context,final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot){
+    static protected List<String[]> mAdditionalSignalsList = null;
+
+    /**
+     * This method
+     * @param context
+     * @param shimmerService
+     * @param bluetoothAddress
+     * @param dynamicPlot
+     * @param additionalSignalsList
+     */
+    public static void showSelectSensorPlot(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot, List<String[]> additionalSignalsList) {
+        mAdditionalSignalsList = additionalSignalsList;
+        showSelectSensorPlot(context, shimmerService, bluetoothAddress, dynamicPlot);
+    }
+
+
+    public static void showSelectSensorPlot(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot){
         final Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_sensor_view);
-        final Button buttonSetPlotSignalFilter = (Button) dialog.findViewById(R.id.ButtonFilterPlotSignal);
-        final Button buttonResetPlotSignalFilter = (Button) dialog.findViewById(R.id.buttonResetFilterPlotSignal);
-        final Button buttonDone = (Button) dialog.findViewById(R.id.button_done);
-        final EditText editTextSignalFilter = (EditText) dialog.findViewById(R.id.editTextFilterPlotSignal);
+        dialog.setContentView(com.shimmerresearch.androidinstrumentdriver.R.layout.dialog_sensor_view);
+        final Button buttonSetPlotSignalFilter = (Button) dialog.findViewById(com.shimmerresearch.androidinstrumentdriver.R.id.ButtonFilterPlotSignal);
+        final Button buttonResetPlotSignalFilter = (Button) dialog.findViewById(com.shimmerresearch.androidinstrumentdriver.R.id.buttonResetFilterPlotSignal);
+        final Button buttonDone = (Button) dialog.findViewById(com.shimmerresearch.androidinstrumentdriver.R.id.button_done);
+        final EditText editTextSignalFilter = (EditText) dialog.findViewById(com.shimmerresearch.androidinstrumentdriver.R.id.editTextFilterPlotSignal);
         dialog.setCanceledOnTouchOutside(true);
         TextView title = (TextView) dialog.findViewById(android.R.id.title);
         if(title != null) {
@@ -402,26 +445,36 @@ public class ShimmerDialogConfigurations {
         final ListView listView = (ListView) dialog.findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        final List<String[]> listofChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
-        final List<String[]> listOfChannels = shimmerService.getBluetoothManager().getListofEnabledSensorSignals(bluetoothAddress);
+        //Temporary list so we have the option of adding additional custom channels
+        List<String[]> tempListOfChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
 
         List<String> sensorList = new ArrayList<String>();
-        for(int i=0;i<listofChannels.size();i++) {
-            sensorList.add(joinStrings(listofChannels.get(i)));
+        for(int i=0;i<tempListOfChannels.size();i++) {
+            sensorList.add(joinStrings(tempListOfChannels.get(i)));
+        }
+
+        if(mAdditionalSignalsList != null && mAdditionalSignalsList.size() > 0) {
+            for (String[] addSignal : mAdditionalSignalsList) {
+                sensorList.add(joinStrings(addSignal));    //Add just the signal name and format (CAL/UNCAL)
+                tempListOfChannels.add(addSignal);      //Add the custom channel to the list of channels
+            }
         }
 
         final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
+        int count = sensorNames.length;
 
         final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
         listView.setAdapter(adapterSensorNames);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         //listView.setItemChecked(position, value);
 
-        for (int p=0;p<listofChannels.size();p++){
-            if (shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(p))){
+        for (int p=0;p<tempListOfChannels.size();p++){
+            if (shimmerService.mPlotManager.checkIfPropertyExist(tempListOfChannels.get(p))){
                 listView.setItemChecked(p, true);
             }
         }
+
+        final List<String[]> listOfChannels = tempListOfChannels;   //Final list so inner methods can access it
 
         buttonDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -438,17 +491,17 @@ public class ShimmerDialogConfigurations {
                 List<String> sensorList = new ArrayList<String>();
                 String plotSignaltoFilter  = editTextSignalFilter.getText().toString();
 
-                for (int i=listofChannels.size()-1;i>-1;i--){
-                    String signal = joinStrings(listofChannels.get(i));
+                for (int i=listOfChannels.size()-1;i>-1;i--){
+                    String signal = joinStrings(listOfChannels.get(i));
                     if (!signal.toLowerCase().contains(plotSignaltoFilter.toLowerCase())){
 
-                        listofChannels.remove(i);
+                        listOfChannels.remove(i);
                     }
 
                 }
 
-                for(int i=0;i<listofChannels.size();i++) {
-                    sensorList.add(joinStrings(listofChannels.get(i)));
+                for(int i=0;i<listOfChannels.size();i++) {
+                    sensorList.add(joinStrings(listOfChannels.get(i)));
                 }
 
                 final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
@@ -456,8 +509,8 @@ public class ShimmerDialogConfigurations {
                 listView.setAdapter(adapterSensorNames);
                 listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-                for (int p=0;p<listofChannels.size();p++){
-                    if (shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(p))){
+                for (int p=0;p<listOfChannels.size();p++){
+                    if (shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(p))){
                         listView.setItemChecked(p, true);
                     }
                 }
@@ -468,15 +521,15 @@ public class ShimmerDialogConfigurations {
                     public void onItemClick(AdapterView<?> arg0, View arg1, int index,
                                             long arg3) {
                         CheckedTextView cb = (CheckedTextView) arg1;
-                        if (!shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(index))){
+                        if (!shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(index))){
                             try {
-                                shimmerService.mPlotManager.addSignal(listofChannels.get(index), dynamicPlot);
+                                shimmerService.mPlotManager.addSignal(listOfChannels.get(index), dynamicPlot);
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                         } else {
-                            shimmerService.mPlotManager.removeSignal(listofChannels.get(index));
+                            shimmerService.mPlotManager.removeSignal(listOfChannels.get(index));
                         }
                     }
 
@@ -539,15 +592,15 @@ public class ShimmerDialogConfigurations {
             public void onItemClick(AdapterView<?> arg0, View arg1, int index,
                                     long arg3) {
                 CheckedTextView cb = (CheckedTextView) arg1;
-                if (!shimmerService.mPlotManager.checkIfPropertyExist(listofChannels.get(index))){
+                if (!shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(index))){
                     try {
-                        shimmerService.mPlotManager.addSignal(listofChannels.get(index), dynamicPlot);
+                        shimmerService.mPlotManager.addSignal(listOfChannels.get(index), dynamicPlot);
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 } else {
-                    shimmerService.mPlotManager.removeSignal(listofChannels.get(index));
+                    shimmerService.mPlotManager.removeSignal(listOfChannels.get(index));
                 }
             }
 
