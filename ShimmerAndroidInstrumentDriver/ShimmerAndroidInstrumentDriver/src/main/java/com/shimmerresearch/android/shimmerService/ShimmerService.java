@@ -362,7 +362,7 @@ public class ShimmerService extends Service {
 
 	            				double hr = mECGtoHR.ecgToHrConversion(ecgdata, calts);
 	            				System.out.print("Heart Rate: " + Integer.toString((int)hr) + "\n");
-	            				objectCluster.addData(Configuration.Shimmer3.ObjectClusterSensorName.ECG_TO_HR_FW,CHANNEL_TYPE.CAL,Configuration.CHANNEL_UNITS.BEATS_PER_MINUTE,hr);
+	            				objectCluster.addData(Configuration.Shimmer3.GuiLabelSensors.ECG_TO_HR, CHANNEL_TYPE.CAL, Configuration.CHANNEL_UNITS.BEATS_PER_MINUTE, hr);
 	            			}
 	            	    }
 
