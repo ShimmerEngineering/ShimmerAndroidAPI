@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ExpandableListView;
@@ -134,7 +135,8 @@ public class DeviceConfigFragment extends Fragment {
         //Only add the buttons if they haven't been added before:
         if(expandListView.getFooterViewsCount() == 0) {
             LinearLayout buttonLayout = new LinearLayout(context);
-            buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            //buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            buttonLayout.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
             buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
             Button writeConfigButton = new Button(context);
             Button resetListButton = new Button(context);
