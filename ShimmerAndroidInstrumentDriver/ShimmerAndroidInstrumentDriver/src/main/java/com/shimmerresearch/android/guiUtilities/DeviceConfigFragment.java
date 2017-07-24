@@ -160,7 +160,7 @@ public class DeviceConfigFragment extends Fragment {
             buttonLayout.setGravity(Gravity.CENTER_HORIZONTAL);
             Button writeConfigButton = new Button(context);
             Button resetListButton = new Button(context);
-            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
             writeConfigButton.setLayoutParams(buttonParams);
             resetListButton.setLayoutParams(buttonParams);
             if(buttonBackgroundResourceId != -1) {
