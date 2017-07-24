@@ -140,45 +140,15 @@ public class DeviceSensorConfigFragment extends Fragment {
                 }
             });
 
-//        expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//            @Override
-//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//                if (v.findViewById(R.id.saveButton) != null) {
-//                    Button writeConfigButton = (Button) v.findViewById(R.id.saveButton);
-//                    Button resetListButton = (Button) v.findViewById(R.id.resetButton);
-//
-//                    writeConfigButton.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//
-//                    resetListButton.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            shimmerDeviceClone = shimmerDevice.deepClone();
-//                            expandListAdapter.updateCloneDevice(shimmerDeviceClone);
-//                            expandListAdapter.notifyDataSetChanged();
-//                            Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                }
-//
-//                return false;
-//            }
-//        });
-
             //Only add the buttons if they haven't been added before:
             if(expandListView.getFooterViewsCount() == 0) {
                 LinearLayout buttonLayout = new LinearLayout(context);
-                //buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 buttonLayout.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
                 buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
                 buttonLayout.setGravity(Gravity.CENTER_HORIZONTAL);
                 Button writeConfigButton = new Button(context);
                 Button resetListButton = new Button(context);
-                LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
                 writeConfigButton.setLayoutParams(buttonParams);
                 resetListButton.setLayoutParams(buttonParams);
                 if(buttonBackgroundResourceId != -1) {
