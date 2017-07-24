@@ -32,7 +32,9 @@ import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetails;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
 import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.driverUtilities.SensorGroupingDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerObject;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 import com.shimmerresearch.sensors.AbstractSensor;
 
@@ -40,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Lim on 16/06/2016.
@@ -681,6 +684,128 @@ public class ShimmerDialogConfigurations {
         }
         return js;
     }
+
+
+    public static void buildSelectSensorGroupingsDialog(final ShimmerDevice shimmerDevice, final Context context,
+                                                        final ShimmerBluetoothManagerAndroid bluetoothManager) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
+        Map<Integer,SensorDetails> sensorMap = shimmerDeviceClone.getSensorMap();
+        int count = 0;
+
+        //Get the list of sensor groups the device is compatible with and store it in an ArrayList
+        TreeMap<Integer, SensorGroupingDetails> compatibleSensorGroupMap = new TreeMap<Integer, SensorGroupingDetails>();
+        TreeMap<Integer, SensorGroupingDetails> groupMap = shimmerDeviceClone.getSensorGroupingMap();
+        for(Map.Entry<Integer, SensorGroupingDetails> entry : groupMap.entrySet()) {
+            if(isSensorGroupCompatible(shimmerDeviceClone, entry.getValue())) {
+                compatibleSensorGroupMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        for(SensorGroupingDetails sgd : compatibleSensorGroupMap.values()) {
+            Log.e("JOS", "SensorGroupingDetails group name: " + sgd.mGroupName);
+            List<Integer> sensorKeys = sgd.mListOfSensorMapKeysAssociated;
+            for(Integer i : sensorKeys) {
+                SensorDetails sd = sensorMap.get(i);
+                Log.e("JOS", "Sensor Associated: " + sd.mSensorDetailsRef.mGuiFriendlyLabel);
+            }
+        }
+
+        for (SensorDetails sd:sensorMap.values()){
+            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+                count++;
+            }
+        }
+
+        final String[] arraySensors = new String[count];
+        final boolean[] listEnabled = new boolean[count];
+        final int[] sensorKeys = new int[count];
+        count = 0;
+
+        for (int key:sensorMap.keySet()){
+            SensorDetails sd = sensorMap.get(key);
+            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
+                arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
+                listEnabled[count] = sd.isEnabled();
+                sensorKeys[count] = key;
+                count++;
+            }
+        }
+
+
+        // Set the dialog title
+        builder.setTitle("Sensors");
+        // Specify the list array, the items to be selected by default (null for none),
+        // and the listener through which to receive callbacks when items are selected
+        final DialogInterface.OnMultiChoiceClickListener onClick =
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog,
+                                        final int which, final boolean isChecked) {
+
+                        if(isChecked == true) {
+                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
+                        } else {
+                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
+                        }
+
+                        final AlertDialog alertDialog = (AlertDialog) dialog;
+                        final ListView listView = alertDialog.getListView();
+
+                        for(int i=0; i<listView.getAdapter().getCount(); i++) {
+                            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                                listView.setItemChecked(i, true);
+                            } else {
+                                listView.setItemChecked(i, false);
+                            }
+                        }
+
+                    }
+                };
+
+
+        builder.setMultiChoiceItems(arraySensors, null, onClick)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, shimmerDeviceClone);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
+                        if (shimmerDeviceClone instanceof Shimmer) {
+                            bluetoothManager.configureShimmer(shimmerDeviceClone);
+                        }
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog ad = builder.create();
+        ad.show();
+
+        final ListView listView = ad.getListView();
+
+        for(int i=0; i<listView.getCount(); i++) {
+            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
+                listView.setItemChecked(i, true);
+            } else {
+                listView.setItemChecked(i, false);
+            }
+        }
+    }
+
+    static protected boolean isSensorGroupCompatible(ShimmerDevice device, SensorGroupingDetails groupDetails) {
+        List<ShimmerVerObject> listOfCompatibleVersionInfo = groupDetails.mListOfCompatibleVersionInfo;
+        return device.isVerCompatibleWithAnyOf(listOfCompatibleVersionInfo);
+    }
+
+
 
 
 }
