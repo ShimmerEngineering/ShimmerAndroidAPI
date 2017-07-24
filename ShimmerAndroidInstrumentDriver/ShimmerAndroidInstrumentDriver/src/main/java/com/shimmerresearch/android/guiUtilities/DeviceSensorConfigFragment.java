@@ -65,32 +65,8 @@ public class DeviceSensorConfigFragment extends Fragment {
 
     public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context,
                                       final ShimmerBluetoothManagerAndroid bluetoothManager) {
+
         SensorConfigDialog scd = new SensorConfigDialog(shimmerDevice,bluetoothManager,context);
-
-        final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
-        Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
-        List<String> listOfKeys = new ArrayList<String>();
-        for (SensorDetails sd:sensorMap.values()) {
-            if (sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated!=null && sd.isEnabled()) {
-                listOfKeys.addAll(sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated);
-            }
-        }
-
-        List<String> keysToRemove = new ArrayList<String>();
-
-        for(String key : listOfKeys) {
-            ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
-            if(cods == null) {
-                keysToRemove.add(key);
-            }
-        }
-
-        for(String key : keysToRemove) {
-            listOfKeys.remove(key);
-        }
-
-        //        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
-
 
     }
 
@@ -103,8 +79,11 @@ public class DeviceSensorConfigFragment extends Fragment {
     public class SensorConfigDialog extends AbstractSensorConfigDialog{
         Context context;
         SensorConfigDialog(ShimmerDevice shimmerDevice, ShimmerBluetoothManager bluetoothManager, Context context){
+
             super(shimmerDevice,bluetoothManager);
-            this.context=context;
+            this.context = context;
+            initialize(shimmerDevice, bluetoothManager);
+            showFrame();
 
         }
         @Override
