@@ -414,22 +414,58 @@ public class ShimmerDialogConfigurations {
         }
     }
 
+    //Additional variables for custom signals and filtered signals for the SelectSensorPlot dialog
     static protected List<String[]> mAdditionalSignalsList = null;
+    static protected List<String[]> mFilteredSignalsList = null;
 
     /**
-     * This method
+     * Call this to display the select signals to plot dialog with additional custom signals
      * @param context
      * @param shimmerService
      * @param bluetoothAddress
      * @param dynamicPlot
-     * @param additionalSignalsList
+     * @param additionalSignalsList Should be in the format: Array[0] = Shimmer device name | Array[1] = Signal/channel name | Array[2] = Format (CAL/UNCAL) | Array[3] = Units
      */
-    public static void showSelectSensorPlot(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot, List<String[]> additionalSignalsList) {
+    public static void showSelectSensorPlotWithAddSignals(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot, List<String[]> additionalSignalsList) {
         mAdditionalSignalsList = additionalSignalsList;
         showSelectSensorPlot(context, shimmerService, bluetoothAddress, dynamicPlot);
     }
 
+    /**
+     * Call this to display the select signals to plot dialog with specific signals filtered out
+     * @param context
+     * @param shimmerService
+     * @param bluetoothAddress
+     * @param dynamicPlot
+     * @param filteredSignalsList   Should be in the format: Array[0] = Shimmer device name | Array[1] = Signal/channel name | Array[2] = Format (CAL/UNCAL) | Array[3] = Units
+     */
+    public static void showSelectSensorPlotWithFilter(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot, List<String[]> filteredSignalsList) {
+        mFilteredSignalsList = filteredSignalsList;
+        showSelectSensorPlot(context, shimmerService, bluetoothAddress, dynamicPlot);
+    }
 
+    /**
+     * Call this to display the select signals to plot dialog with additional custom signals and specific signals filtered out
+     * @param context
+     * @param shimmerService
+     * @param bluetoothAddress
+     * @param dynamicPlot
+     * @param additionalSignalsList Should be in the format: Array[0] = Shimmer device name | Array[1] = Signal/channel name | Array[2] = Format (CAL/UNCAL) | Array[3] = Units
+     * @param filteredSignalsList   Should be in the format: Array[0] = Shimmer device name | Array[1] = Signal/channel name | Array[2] = Format (CAL/UNCAL) | Array[3] = Units
+     */
+    public static void showSelectSensorPlotWithFilterAddSignals(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot, List<String[]> additionalSignalsList, List<String[]> filteredSignalsList) {
+        mFilteredSignalsList = filteredSignalsList;
+        mAdditionalSignalsList = additionalSignalsList;
+        showSelectSensorPlot(context, shimmerService, bluetoothAddress, dynamicPlot);
+    }
+
+    /**
+     * Call this to display the select signals to plot dialog
+     * @param context
+     * @param shimmerService
+     * @param bluetoothAddress
+     * @param dynamicPlot
+     */
     public static void showSelectSensorPlot(Context context, final ShimmerService shimmerService, final String bluetoothAddress, final XYPlot dynamicPlot){
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(com.shimmerresearch.androidinstrumentdriver.R.layout.dialog_sensor_view);
@@ -448,35 +484,53 @@ public class ShimmerDialogConfigurations {
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         //Temporary list so we have the option of adding additional custom channels
-        List<String[]> tempListOfChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
-
-        List<String> sensorList = new ArrayList<String>();
-        for(int i=0;i<tempListOfChannels.size();i++) {
-            sensorList.add(joinStrings(tempListOfChannels.get(i)));
-        }
+        List<String[]> listOfChannels = shimmerService.getListofEnabledSensorSignals(bluetoothAddress);
 
         if(mAdditionalSignalsList != null && mAdditionalSignalsList.size() > 0) {
             for (String[] addSignal : mAdditionalSignalsList) {
-                sensorList.add(joinStrings(addSignal));    //Add just the signal name and format (CAL/UNCAL)
-                tempListOfChannels.add(addSignal);      //Add the custom channel to the list of channels
+                listOfChannels.add(addSignal);      //Add the custom channel to the list of channels
             }
         }
 
+        //Create a temporary list of channels to remove the filter signals while iterating through the original list of channels
+        List<String[]> tempListOfChannelsWithSignalsFiltered = new ArrayList<String[]>();
+        for(String[] temp : listOfChannels) {
+            tempListOfChannelsWithSignalsFiltered.add(temp);
+        }
+
+        if(mFilteredSignalsList != null && mFilteredSignalsList.size() > 0) {
+            for(String[] signalToFilter : mFilteredSignalsList) {
+                for(String[] signal : listOfChannels) {
+                    //Check if the channel name and format (CAL/UNCAL) matches the signal to be filtered
+                    if(signal[1].equals(signalToFilter[1]) && signal[2].equals(signalToFilter[2])) {
+                        tempListOfChannelsWithSignalsFiltered.remove(signal);
+                    }
+                }
+            }
+        }
+
+        //Assign the filtered list back to the original list
+        listOfChannels = tempListOfChannelsWithSignalsFiltered;
+
+        //Join the Strings in each individual array in the list of channels in order to pass them to the ArrayAdapter
+        List<String> sensorList = new ArrayList<String>();
+        for(int i=0;i<listOfChannels.size();i++) {
+            sensorList.add(joinStrings(listOfChannels.get(i)));
+        }
+
         final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
-        int count = sensorNames.length;
 
         final ArrayAdapter<String> adapterSensorNames = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
         listView.setAdapter(adapterSensorNames);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        //listView.setItemChecked(position, value);
 
-        for (int p=0;p<tempListOfChannels.size();p++){
-            if (shimmerService.mPlotManager.checkIfPropertyExist(tempListOfChannels.get(p))){
+        for (int p=0;p<listOfChannels.size();p++){
+            if (shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(p))){
                 listView.setItemChecked(p, true);
             }
         }
 
-        final List<String[]> listOfChannels = tempListOfChannels;   //Final list so inner methods can access it
+        final List<String[]> listOfChannelsFinal = listOfChannels;   //Final list so inner methods can access it
 
         buttonDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -493,17 +547,17 @@ public class ShimmerDialogConfigurations {
                 List<String> sensorList = new ArrayList<String>();
                 String plotSignaltoFilter  = editTextSignalFilter.getText().toString();
 
-                for (int i=listOfChannels.size()-1;i>-1;i--){
-                    String signal = joinStrings(listOfChannels.get(i));
+                for (int i=listOfChannelsFinal.size()-1;i>-1;i--){
+                    String signal = joinStrings(listOfChannelsFinal.get(i));
                     if (!signal.toLowerCase().contains(plotSignaltoFilter.toLowerCase())){
 
-                        listOfChannels.remove(i);
+                        listOfChannelsFinal.remove(i);
                     }
 
                 }
 
-                for(int i=0;i<listOfChannels.size();i++) {
-                    sensorList.add(joinStrings(listOfChannels.get(i)));
+                for(int i=0;i<listOfChannelsFinal.size();i++) {
+                    sensorList.add(joinStrings(listOfChannelsFinal.get(i)));
                 }
 
                 final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
@@ -511,8 +565,8 @@ public class ShimmerDialogConfigurations {
                 listView.setAdapter(adapterSensorNames);
                 listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-                for (int p=0;p<listOfChannels.size();p++){
-                    if (shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(p))){
+                for (int p=0;p<listOfChannelsFinal.size();p++){
+                    if (shimmerService.mPlotManager.checkIfPropertyExist(listOfChannelsFinal.get(p))){
                         listView.setItemChecked(p, true);
                     }
                 }
@@ -523,15 +577,15 @@ public class ShimmerDialogConfigurations {
                     public void onItemClick(AdapterView<?> arg0, View arg1, int index,
                                             long arg3) {
                         CheckedTextView cb = (CheckedTextView) arg1;
-                        if (!shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(index))){
+                        if (!shimmerService.mPlotManager.checkIfPropertyExist(listOfChannelsFinal.get(index))){
                             try {
-                                shimmerService.mPlotManager.addSignal(listOfChannels.get(index), dynamicPlot);
+                                shimmerService.mPlotManager.addSignal(listOfChannelsFinal.get(index), dynamicPlot);
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                         } else {
-                            shimmerService.mPlotManager.removeSignal(listOfChannels.get(index));
+                            shimmerService.mPlotManager.removeSignal(listOfChannelsFinal.get(index));
                         }
                     }
 
@@ -594,15 +648,15 @@ public class ShimmerDialogConfigurations {
             public void onItemClick(AdapterView<?> arg0, View arg1, int index,
                                     long arg3) {
                 CheckedTextView cb = (CheckedTextView) arg1;
-                if (!shimmerService.mPlotManager.checkIfPropertyExist(listOfChannels.get(index))){
+                if (!shimmerService.mPlotManager.checkIfPropertyExist(listOfChannelsFinal.get(index))){
                     try {
-                        shimmerService.mPlotManager.addSignal(listOfChannels.get(index), dynamicPlot);
+                        shimmerService.mPlotManager.addSignal(listOfChannelsFinal.get(index), dynamicPlot);
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 } else {
-                    shimmerService.mPlotManager.removeSignal(listOfChannels.get(index));
+                    shimmerService.mPlotManager.removeSignal(listOfChannelsFinal.get(index));
                 }
             }
 
@@ -613,7 +667,7 @@ public class ShimmerDialogConfigurations {
     }
 
     /**
-     * This displays a popup dialog populated by the list of Shimmers connected via Shimmer Bluetooth Manager.
+     * This displays a dialog populated by the list of Shimmers connected via Shimmer Bluetooth Manager.
      * @param
      */
     public void buildShimmersConnectedList(final List<ShimmerDevice> deviceList, final Context context,
@@ -673,6 +727,11 @@ public class ShimmerDialogConfigurations {
         builder.create().show();
     }
 
+    /**
+     * Combines the strings in an array into a single string
+     * @param a
+     * @return
+     */
     public static String joinStrings(String[] a){
         String js="";
         for (int i=0;i<a.length;i++){
@@ -704,11 +763,9 @@ public class ShimmerDialogConfigurations {
         }
 
         for(SensorGroupingDetails sgd : compatibleSensorGroupMap.values()) {
-            Log.e("JOS", "SensorGroupingDetails group name: " + sgd.mGroupName);
             List<Integer> sensorKeys = sgd.mListOfSensorMapKeysAssociated;
             for(Integer i : sensorKeys) {
                 SensorDetails sd = sensorMap.get(i);
-                Log.e("JOS", "Sensor Associated: " + sd.mSensorDetailsRef.mGuiFriendlyLabel);
             }
         }
 
