@@ -82,7 +82,12 @@ public class DeviceSensorConfigFragment extends Fragment {
 
             super(shimmerDevice,bluetoothManager);
             this.context = context;
-            initialize(shimmerDevice, bluetoothManager);
+
+            List<String> filterList = new ArrayList<String>();
+            filterList.add("Wide Range Accel Rate");
+            setSensorKeysFilter(filterList, true);
+
+            initialize();
             showFrame();
 
         }
@@ -108,7 +113,7 @@ public class DeviceSensorConfigFragment extends Fragment {
 
         @Override
         public void showFrame() {
-            expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmer, cloneDevice);
+            expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmerDevice, cloneDevice);
             expandListView = (ExpandableListView) getView().findViewById(R.id.expandable_listview);
             expandListView.setAdapter(expandListAdapter);
 
@@ -173,7 +178,7 @@ public class DeviceSensorConfigFragment extends Fragment {
                 resetListButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        cloneDevice = shimmer.deepClone();
+                        cloneDevice = shimmerDevice.deepClone();
                         expandListAdapter.updateCloneDevice(cloneDevice);
                         expandListAdapter.notifyDataSetChanged();
                         Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();

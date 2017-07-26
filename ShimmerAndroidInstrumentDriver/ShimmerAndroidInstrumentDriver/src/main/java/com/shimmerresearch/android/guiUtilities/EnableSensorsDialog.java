@@ -26,8 +26,14 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
     final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
 
     public EnableSensorsDialog(ShimmerDevice shimmerPC, ShimmerBluetoothManager btManager, Context context) {
-        super(shimmerPC,btManager);
+        super(shimmerPC, btManager);
         builder = new AlertDialog.Builder(context);
+
+        List<Integer> sensorKeysToFilter = new ArrayList<Integer>();
+        sensorKeysToFilter.add(Configuration.Shimmer3.SensorMapKey.HOST_PPG_DUMMY);
+        sensorKeysToFilter.add(Configuration.Shimmer3.SensorMapKey.HOST_EXG_CUSTOM);
+        setSensorKeysFilter(sensorKeysToFilter, true);
+
         initialize();
     }
 
