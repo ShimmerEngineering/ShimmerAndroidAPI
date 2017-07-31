@@ -359,9 +359,11 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName = myName;
 		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
-		mLowPowerMag = enableLowPowerMag;
-		mLowPowerAccelWR = enableLowPowerAccel;
-		mLowPowerGyro = enableLowPowerGyro;
+
+		setLowPowerMag(enableLowPowerMag);
+		setLowPowerAccelWR(enableLowPowerAccel);
+		setLowPowerGyro(enableLowPowerGyro);
+
 		setGyroRange(gyroRange); //	mGyroRange = gyroRange;
 		setMagRange(magRange); // mMagRange = magRange;
 	}
@@ -389,9 +391,11 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName = myName;
 		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
-		mLowPowerMag = enableLowPowerMag;
-		mLowPowerAccelWR = enableLowPowerAccel;
-		mLowPowerGyro = enableLowPowerGyro;
+
+		setLowPowerMag(enableLowPowerMag);
+		setLowPowerAccelWR(enableLowPowerAccel);
+		setLowPowerGyro(enableLowPowerGyro);
+
 		setGyroRange(gyroRange); //	mGyroRange = gyroRange;
 		setMagRange(magRange); // mMagRange = magRange;
 		mSetupEXG = true;

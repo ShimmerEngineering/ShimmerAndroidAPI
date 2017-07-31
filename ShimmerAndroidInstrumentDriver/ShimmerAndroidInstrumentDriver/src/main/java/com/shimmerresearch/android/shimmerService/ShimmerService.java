@@ -1242,6 +1242,20 @@ public class ShimmerService extends Service {
 
 	public Handler getHandler() {	return mHandler;	}
 
+	/**
+	 * Replaces the current BluetoothManager with a new BluetoothManager. Call this if Bluetooth is enabled after ShimmerService onCreate() is called.
+	 */
+	public void createNewBluetoothManager() {
+
+		try {
+			btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
+		} catch (Exception e) {
+			Log.e(TAG, "ERROR! " + e);
+			Toast.makeText(this, "Error! Could not create Bluetooth Manager!", Toast.LENGTH_LONG).show();
+		}
+
+	}
+
 
 
 }
