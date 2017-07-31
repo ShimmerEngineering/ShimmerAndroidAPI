@@ -105,6 +105,7 @@
     <orderEntry type="library" exported="" name="ShimmerBiophysicalProcessingLibrary_Rev_0_11" level="project" />
     <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="commons-math-2.2" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.4beta" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="hidapi-1.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-all-1.0.0-pre1" level="project" />
@@ -132,17 +133,16 @@
     <orderEntry type="library" exported="" name="joda-time-2.9.4" level="project" />
     <orderEntry type="library" exported="" name="jsr305-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="commons-math3-3.6" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-0.9.12beta" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="AndroidBluetoothLibrary" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-25.3.1" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-0.9.11beta" level="project" />
     <orderEntry type="library" exported="" name="guava-19.0" level="project" />
     <orderEntry type="library" exported="" name="protobuf-java-util-3.0.0-beta-3" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.3beta" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-okhttp-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-auth-1.0.0-pre1" level="project" />
