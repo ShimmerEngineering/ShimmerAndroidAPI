@@ -64,8 +64,6 @@ public class PlotFragment extends Fragment {
     private static Paint LPFpaint;
 
 
-
-
     public PlotFragment() {
         // Required empty public constructor
     }
@@ -96,7 +94,7 @@ public class PlotFragment extends Fragment {
     }
 
     /**
-     * This function sets up the graph
+     * Setup the graph
      */
     private void initPlot() {
         dynamicPlot = (XYPlot) getView().findViewById(R.id.dynamicPlot);

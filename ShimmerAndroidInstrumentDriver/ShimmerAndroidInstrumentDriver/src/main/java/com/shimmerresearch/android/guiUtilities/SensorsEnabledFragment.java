@@ -156,17 +156,8 @@ public class SensorsEnabledFragment extends ListFragment {
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
                         if (shimmerDevice instanceof Shimmer) {
-                            //((Shimmer)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
-                            /*try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }*/
-
-                            //((Shimmer) device).writeEnabledSensors(shimmerDeviceClone.getEnabledSensors());
 
                             bluetoothManager.configureShimmer(shimmerDeviceClone);
-                            //configureShimmers(cloneList);
                             mCallback.onSensorsSelected();
 
                         } else if (shimmerDevice instanceof Shimmer4Android) {
