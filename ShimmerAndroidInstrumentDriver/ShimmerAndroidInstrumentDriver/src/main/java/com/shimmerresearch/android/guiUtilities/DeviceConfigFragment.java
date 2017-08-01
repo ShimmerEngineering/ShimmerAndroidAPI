@@ -62,6 +62,13 @@ public class DeviceConfigFragment extends Fragment {
         buildDeviceConfigList(shimmerDevice, context, bluetoothManager);
     }
 
+
+    /**
+     * Builds the list of config options for the selected Shimmer device
+     * @param shimmerDevice
+     * @param context
+     * @param bluetoothManager
+     */
     public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context,
                                       final ShimmerBluetoothManagerAndroid bluetoothManager) {
 
@@ -87,8 +94,6 @@ public class DeviceConfigFragment extends Fragment {
         for(String key : keysToRemove) {
             listOfKeys.remove(key);
         }
-
-        //        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
 
         expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmerDevice, shimmerDeviceClone);
         expandListView = (ExpandableListView) getView().findViewById(R.id.expandable_listview);
@@ -122,52 +127,28 @@ public class DeviceConfigFragment extends Fragment {
             }
         });
 
-//        expandListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//            @Override
-//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//                if (v.findViewById(R.id.saveButton) != null) {
-//                    Button writeConfigButton = (Button) v.findViewById(R.id.saveButton);
-//                    Button resetListButton = (Button) v.findViewById(R.id.resetButton);
-//
-//                    writeConfigButton.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Toast.makeText(context, "Writing config to Shimmer...", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//
-//                    resetListButton.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            shimmerDeviceClone = shimmerDevice.deepClone();
-//                            expandListAdapter.updateCloneDevice(shimmerDeviceClone);
-//                            expandListAdapter.notifyDataSetChanged();
-//                            Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                }
-//
-//                return false;
-//            }
-//        });
 
         //Only add the buttons if they haven't been added before:
         if(expandListView.getFooterViewsCount() == 0) {
+
             LinearLayout buttonLayout = new LinearLayout(context);
-            //buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             buttonLayout.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
             buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
             buttonLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+
             Button writeConfigButton = new Button(context);
             Button resetListButton = new Button(context);
+
             LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
             writeConfigButton.setLayoutParams(buttonParams);
             resetListButton.setLayoutParams(buttonParams);
+
             if(buttonBackgroundResourceId != -1) {
                 //A custom Button background resource ID has been given
                 writeConfigButton.setBackgroundResource(buttonBackgroundResourceId);
                 resetListButton.setBackgroundResource(buttonBackgroundResourceId);
             }
+
             writeConfigButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -182,6 +163,7 @@ public class DeviceConfigFragment extends Fragment {
 
                 }
             });
+
             resetListButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -191,6 +173,7 @@ public class DeviceConfigFragment extends Fragment {
                     Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
                 }
             });
+
             writeConfigButton.setText("Save Changes");
             resetListButton.setText("Reset List");
             buttonLayout.addView(resetListButton);

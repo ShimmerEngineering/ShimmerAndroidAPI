@@ -64,6 +64,12 @@ public class ConnectedShimmersListFragment extends ListFragment {
         return fragment;
     }
 
+
+    /**
+     * Call this to build or update the list of Shimmer devices which are currently connected
+     * @param deviceList
+     * @param context
+     */
     public void buildShimmersConnectedListView(final List<ShimmerDevice> deviceList, final Context context) {
         if(isVisible()){
         shimmerDeviceList = deviceList;

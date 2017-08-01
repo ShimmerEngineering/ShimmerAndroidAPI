@@ -119,9 +119,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
                 }
             }
             final EditText editText = (EditText) convertView.findViewById(R.id.editText);
-//            String textFieldValue = (String) currentSettingsMap.get(getGroup(groupPosition));
-//            editText.setText(textFieldValue);
-//            editText.append("");
 
             Object textFieldValue = cloneDevice.getConfigValueUsingConfigLabel((String)getGroup(groupPosition));
             editText.setText((String)textFieldValue);
