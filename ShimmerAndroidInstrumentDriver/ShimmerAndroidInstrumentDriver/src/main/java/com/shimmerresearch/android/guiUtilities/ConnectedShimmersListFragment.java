@@ -68,17 +68,12 @@ public class ConnectedShimmersListFragment extends ListFragment {
         if(isVisible()){
         shimmerDeviceList = deviceList;
         this.context = context;
+
         if(deviceList == null) {
-            //String[] displayList = {"Service not yet initialised"};
             String[] displayList = {"No devices connected"};
             ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, displayList);
             setListAdapter(listAdapter);
         }
-//        else if(deviceList.isEmpty()) {
-//            String[] displayList = {"No Shimmers connected"};
-//            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, displayList);
-//            setListAdapter(listAdapter);
-//        }
         else {
             final String[] nameList = new String[deviceList.size()];
             final String[] macList = new String[deviceList.size()];

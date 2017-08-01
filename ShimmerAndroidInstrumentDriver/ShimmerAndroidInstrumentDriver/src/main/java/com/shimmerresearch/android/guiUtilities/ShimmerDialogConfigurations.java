@@ -50,6 +50,13 @@ import java.util.TreeMap;
 
 public class ShimmerDialogConfigurations {
 
+
+    /**
+     * This method is retained for compatibility with older applications that do not utilize ShimmerBLuetoothManagerAndroid
+     * @param shimmerDevice
+     * @param context
+     */
+    @Deprecated
     public static void buildShimmerSensorEnableDetails(final ShimmerDevice shimmerDevice, final Context context){
 
         final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
@@ -133,7 +140,14 @@ public class ShimmerDialogConfigurations {
         ad.show();
     }
 
-    public static void buildShimmerSensorEnableDetails2(final ShimmerDevice shimmerDevice, final Context context,
+
+    /**
+     * Displays a dialog with a list of sensors supported by the Shimmer which can be enabled/disabled
+     * @param shimmerDevice
+     * @param context
+     * @param bluetoothManager
+     */
+    public static void buildShimmerSensorEnableDetails(final ShimmerDevice shimmerDevice, final Context context,
                                                         final ShimmerBluetoothManagerAndroid bluetoothManager) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -230,6 +244,12 @@ public class ShimmerDialogConfigurations {
     }
 
 
+    /**
+     * Displays a dialog with a list of Shimmer device configuration options
+     * @param shimmerDevice
+     * @param context
+     * @param bluetoothManager
+     */
     public static void buildShimmerConfigOptions(final ShimmerDevice shimmerDevice, final Context context,
                                                  final ShimmerBluetoothManagerAndroid bluetoothManager){
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
@@ -251,7 +271,7 @@ public class ShimmerDialogConfigurations {
                         // of the selected item
                         Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
                         //buildConfigOptionDetailsSensor(cs[which].toString(),configOptionsMap,context, shimmerDevice, shimmerDeviceClone);
-                        buildConfigOptionDetailsSensor2(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone, bluetoothManager);
+                        buildConfigOptionDetailsSensor(cs[which].toString(), configOptionsMap, context, shimmerDevice, shimmerDeviceClone, bluetoothManager);
                     }
                 });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -264,6 +284,15 @@ public class ShimmerDialogConfigurations {
     }
 
 
+    /**
+     * This method is retained for compatibility with older applications that do not utilize the ShimmerBluetoothManagerAndroid
+     * @param key
+     * @param configOptionsMap
+     * @param context
+     * @param shimmerDevice
+     * @param shimmerDeviceClone
+     */
+    @Deprecated
     public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
@@ -338,7 +367,16 @@ public class ShimmerDialogConfigurations {
     }
 
 
-    public static void buildConfigOptionDetailsSensor2(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
+    /**
+     * Displays a dialog with a list of Shimmer sensor configuration options
+     * @param key
+     * @param configOptionsMap
+     * @param context
+     * @param shimmerDevice
+     * @param shimmerDeviceClone
+     * @param bluetoothManager
+     */
+    public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
                                                        final Context context, final ShimmerDevice shimmerDevice,
                                                        final ShimmerDevice shimmerDeviceClone,
                                                        final ShimmerBluetoothManagerAndroid bluetoothManager) {
@@ -413,6 +451,7 @@ public class ShimmerDialogConfigurations {
             }
         }
     }
+
 
     //Additional variables for custom signals and filtered signals for the SelectSensorPlot dialog
     static protected List<String[]> mAdditionalSignalsList = null;
@@ -666,6 +705,7 @@ public class ShimmerDialogConfigurations {
 
     }
 
+
     /**
      * This displays a dialog populated by the list of Shimmers connected via Shimmer Bluetooth Manager.
      * @param
@@ -704,6 +744,13 @@ public class ShimmerDialogConfigurations {
         builder.create().show();
     }
 
+
+    /**
+     * Displays a dialog allowing for selection of either enable sensors or configure device
+     * @param shimmerDevice
+     * @param context
+     * @param bluetoothManager
+     */
     public void buildSensorOrConfigOptions(final ShimmerDevice shimmerDevice, final Context context,
                                            final ShimmerBluetoothManagerAndroid bluetoothManager) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -716,7 +763,7 @@ public class ShimmerDialogConfigurations {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(i == 0) {
-                    buildShimmerSensorEnableDetails(shimmerDevice, context);
+                    buildShimmerSensorEnableDetails(shimmerDevice, context, bluetoothManager);
                 }
                 else if(i == 1) {
                     buildShimmerConfigOptions(shimmerDevice, context, bluetoothManager);
@@ -726,6 +773,7 @@ public class ShimmerDialogConfigurations {
 
         builder.create().show();
     }
+
 
     /**
      * Combines the strings in an array into a single string
@@ -743,126 +791,6 @@ public class ShimmerDialogConfigurations {
         }
         return js;
     }
-
-
-    public static void buildSelectSensorGroupingsDialog(final ShimmerDevice shimmerDevice, final Context context,
-                                                        final ShimmerBluetoothManagerAndroid bluetoothManager) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        final ShimmerDevice shimmerDeviceClone = shimmerDevice.deepClone();
-        Map<Integer,SensorDetails> sensorMap = shimmerDeviceClone.getSensorMap();
-        int count = 0;
-
-        //Get the list of sensor groups the device is compatible with and store it in an ArrayList
-        TreeMap<Integer, SensorGroupingDetails> compatibleSensorGroupMap = new TreeMap<Integer, SensorGroupingDetails>();
-        TreeMap<Integer, SensorGroupingDetails> groupMap = shimmerDeviceClone.getSensorGroupingMap();
-        for(Map.Entry<Integer, SensorGroupingDetails> entry : groupMap.entrySet()) {
-            if(isSensorGroupCompatible(shimmerDeviceClone, entry.getValue())) {
-                compatibleSensorGroupMap.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        for(SensorGroupingDetails sgd : compatibleSensorGroupMap.values()) {
-            List<Integer> sensorKeys = sgd.mListOfSensorMapKeysAssociated;
-            for(Integer i : sensorKeys) {
-                SensorDetails sd = sensorMap.get(i);
-            }
-        }
-
-        for (SensorDetails sd:sensorMap.values()){
-            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-                count++;
-            }
-        }
-
-        final String[] arraySensors = new String[count];
-        final boolean[] listEnabled = new boolean[count];
-        final int[] sensorKeys = new int[count];
-        count = 0;
-
-        for (int key:sensorMap.keySet()){
-            SensorDetails sd = sensorMap.get(key);
-            if (shimmerDevice.isVerCompatibleWithAnyOf(sd.mSensorDetailsRef.mListOfCompatibleVersionInfo)) {
-                arraySensors[count] = sd.mSensorDetailsRef.mGuiFriendlyLabel;
-                listEnabled[count] = sd.isEnabled();
-                sensorKeys[count] = key;
-                count++;
-            }
-        }
-
-
-        // Set the dialog title
-        builder.setTitle("Sensors");
-        // Specify the list array, the items to be selected by default (null for none),
-        // and the listener through which to receive callbacks when items are selected
-        final DialogInterface.OnMultiChoiceClickListener onClick =
-                new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog,
-                                        final int which, final boolean isChecked) {
-
-                        if(isChecked == true) {
-                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], true);
-                        } else {
-                            shimmerDeviceClone.setSensorEnabledState(sensorKeys[which], false);
-                        }
-
-                        final AlertDialog alertDialog = (AlertDialog) dialog;
-                        final ListView listView = alertDialog.getListView();
-
-                        for(int i=0; i<listView.getAdapter().getCount(); i++) {
-                            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
-                                listView.setItemChecked(i, true);
-                            } else {
-                                listView.setItemChecked(i, false);
-                            }
-                        }
-
-                    }
-                };
-
-
-        builder.setMultiChoiceItems(arraySensors, null, onClick)
-                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                        cloneList.add(0, shimmerDeviceClone);
-                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-
-                        if (shimmerDeviceClone instanceof Shimmer) {
-                            bluetoothManager.configureShimmer(shimmerDeviceClone);
-                        }
-                    }
-                })
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog ad = builder.create();
-        ad.show();
-
-        final ListView listView = ad.getListView();
-
-        for(int i=0; i<listView.getCount(); i++) {
-            if(shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
-                listView.setItemChecked(i, true);
-            } else {
-                listView.setItemChecked(i, false);
-            }
-        }
-    }
-
-    static protected boolean isSensorGroupCompatible(ShimmerDevice device, SensorGroupingDetails groupDetails) {
-        List<ShimmerVerObject> listOfCompatibleVersionInfo = groupDetails.mListOfCompatibleVersionInfo;
-        return device.isVerCompatibleWithAnyOf(listOfCompatibleVersionInfo);
-    }
-
-
 
 
 }

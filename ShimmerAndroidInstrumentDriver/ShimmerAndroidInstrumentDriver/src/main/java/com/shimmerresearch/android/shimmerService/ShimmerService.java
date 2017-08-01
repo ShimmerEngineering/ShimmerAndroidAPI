@@ -1243,7 +1243,7 @@ public class ShimmerService extends Service {
 	public Handler getHandler() {	return mHandler;	}
 
 	/**
-	 * Replaces the current BluetoothManager with a new BluetoothManager. Call this if Bluetooth is enabled after ShimmerService onCreate() is called.
+	 * Replaces the current BluetoothManager with a new BluetoothManager. Call this if Bluetooth is enabled only after ShimmerService onCreate() is called.
 	 */
 	public void createNewBluetoothManager() {
 
