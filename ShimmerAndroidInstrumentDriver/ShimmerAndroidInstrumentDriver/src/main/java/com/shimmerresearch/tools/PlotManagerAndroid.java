@@ -27,6 +27,14 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	int mXAxisLimit = 500;
 	boolean mClearGraphatLimit = false;
 
+	public void setXAxisLimit(int limit,boolean clearGraph){
+		mXAxisLimit = limit;
+		for (XYSeriesShimmer xys:mListofSeries){
+			xys.setXAxisLimit(mXAxisLimit);
+			xys.setClearGraphatLimit(clearGraph);
+		}
+	}
+
 	@Override
 	public void setTraceLineStyleAll(PLOT_LINE_STYLE plot_line_style) {
 
