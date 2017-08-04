@@ -163,7 +163,7 @@ public class PlotFragment extends Fragment {
     }
 
     /**
-     * Passes the Shimmer Service to the fragment and sets its
+     * Passes the Shimmer Service to the fragment to set its graph handler
      * @param service must be an already running Shimmer Service
      */
     public void setShimmerService(ShimmerService service) {
@@ -181,7 +181,6 @@ public class PlotFragment extends Fragment {
 
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                //TODO: Check if ShimmerBluetooth msg works
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     ShimmerBluetooth.BT_STATE state=null;
                     String shimmerName = "";

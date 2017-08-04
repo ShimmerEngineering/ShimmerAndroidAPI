@@ -150,10 +150,7 @@ public class SensorsEnabledFragment extends ListFragment {
                             shimmerDeviceClone.setSensorEnabledState((int) sensorKeys[selected], listEnabled[selected]);
                         }
 
-                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                        cloneList.add(0, shimmerDeviceClone);
-                        //TODO: Change this when AssembleShimmerConfig has been updated:
-                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+                        AssembleShimmerConfig.generateSingleShimmerConfig(shimmerDeviceClone, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
                         if (shimmerDevice instanceof Shimmer) {
 

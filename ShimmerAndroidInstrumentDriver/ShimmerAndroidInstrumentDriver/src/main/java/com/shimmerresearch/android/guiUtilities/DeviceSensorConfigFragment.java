@@ -83,6 +83,7 @@ public class DeviceSensorConfigFragment extends Fragment {
             super(shimmerDevice,bluetoothManager);
             this.context = context;
 
+            //Filter out config options that are no longer in use
             List<String> filterList = new ArrayList<String>();
             filterList.add("Wide Range Accel Rate");
             setSensorKeysFilter(filterList, true);

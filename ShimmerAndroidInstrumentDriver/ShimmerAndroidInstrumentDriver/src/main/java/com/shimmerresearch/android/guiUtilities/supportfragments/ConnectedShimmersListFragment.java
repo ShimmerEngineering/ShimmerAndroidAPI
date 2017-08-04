@@ -74,11 +74,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
             ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, displayList);
             setListAdapter(listAdapter);
         }
-//        else if(deviceList.isEmpty()) {
-//            String[] displayList = {"No Shimmers connected"};
-//            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, displayList);
-//            setListAdapter(listAdapter);
-//        }
         else {
             final String[] nameList = new String[deviceList.size()];
             final String[] macList = new String[deviceList.size()];
@@ -147,7 +142,6 @@ public class ConnectedShimmersListFragment extends ListFragment {
         } else {
             buildShimmersConnectedListView(null, getActivity().getApplicationContext());
         }
-        Log.e(LOG_TAG, "ConnectedShimmersListFragment onResume()");
         super.onResume();
     }
 

@@ -25,7 +25,6 @@ import static com.shimmerresearch.driver.Configuration.Shimmer3.SENSOR_ID.HOST_P
 
 public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
     AlertDialog.Builder builder;
-    final List<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
 
     public EnableSensorsDialog(ShimmerDevice shimmerPC, ShimmerBluetoothManager btManager, Context context) {
         super(shimmerPC, btManager);
