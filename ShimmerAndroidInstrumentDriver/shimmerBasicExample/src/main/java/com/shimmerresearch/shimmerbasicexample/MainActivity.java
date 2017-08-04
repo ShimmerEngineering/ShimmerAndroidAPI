@@ -103,14 +103,13 @@ public class MainActivity extends AppCompatActivity {
                         Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP);
                         FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         double timeStampData = timeStampCluster.mData;
-
+                        Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
                         allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
                         FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        double accelXData = accelXCluster.mData;
-
-                        Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
-                        Log.i(LOG_TAG, "Accel LN X: " + accelXData);
-
+                        if (accelXCluster!=null) {
+                            double accelXData = accelXCluster.mData;
+                            Log.i(LOG_TAG, "Accel LN X: " + accelXData);
+                        }
                     }
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
@@ -209,10 +208,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the paired devices button is clicked
+     * Called when the connect button is clicked
      * @param v
      */
-    public void pairedDevices(View v) {
+    public void connectDevice(View v) {
         Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
         startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
     }
