@@ -108,7 +108,8 @@ public class SensorsEnabledFragment extends ListFragment {
         for(SensorGroupingDetails sgd : groupMap.values()) {
             List<ShimmerVerObject> listOfCompatibleVersionInfo = sgd.mListOfCompatibleVersionInfo;
             List<String> listOfGuiConfigNames = sgd.mListofGuiConfigNames;
-            List<Integer> listOfSensorMapKeysAssociated = sgd.mListOfSensorMapKeysAssociated;
+            //TODO: Refactor listOfSensorMapKeysAssociated (SENSOR_ID)
+            List<Integer> listOfSensorMapKeysAssociated = sgd.mListOfSensorIdsAssociated;
             int a = 1;
             a++;
         }

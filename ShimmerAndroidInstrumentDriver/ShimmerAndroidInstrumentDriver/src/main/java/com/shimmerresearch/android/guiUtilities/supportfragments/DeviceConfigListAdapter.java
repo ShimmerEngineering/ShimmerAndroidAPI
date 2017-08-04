@@ -130,11 +130,8 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             editText.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    Log.i("JOS", "Key presssed");
-                    Log.i("Key pressed", "Key pressed");
                     if(keyCode == KEYCODE_ENTER) {
                         cloneDevice.setConfigValueUsingConfigLabel((String)getGroup(groupPosition), editText.getText().toString());
-                        Log.e("JOS", "getText().toString()  " + editText.getText().toString());
                         notifyDataSetChanged();
                     }
                     return false;

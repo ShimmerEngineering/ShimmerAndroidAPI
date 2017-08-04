@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '0.9.4h'
+version = '0.9.5'
 
 android {
     compileSdkVersion 25
@@ -89,12 +89,12 @@ dependencies {
     compile files('libs/AndroidBluetoothLibrary.jar')
     compile files('libs/androidplot-core-0.5.0-release.jar')
 //    compile files('libs/ShimmerDriverML.jar')
-    compile ('com.shimmerresearch.managers.bluetoothmanager:ShimmerBluetoothManager:0.9.12beta') {
+    compile ('com.shimmerresearch.managers.bluetoothmanager:ShimmerBluetoothManager:0.9.13beta') {
                 // excluding org.json which is provided by Android
                 exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.4beta') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.5beta') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'

@@ -77,6 +77,13 @@ public class SignalsToPlotFragment extends ListFragment {
         super.onResume();
     }
 
+    /**
+     * Displays the list of signals which are available for plotting
+     * @param context
+     * @param service
+     * @param bluetoothAddress
+     * @param plot
+     */
     public void buildSignalsToPlotList(Context context, final ShimmerService service, final String bluetoothAddress, final XYPlot plot) {
 
         this.context = context;

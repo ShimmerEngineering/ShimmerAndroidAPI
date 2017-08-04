@@ -17,6 +17,8 @@ import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.shimmerresearch.driver.Configuration.Shimmer3.SENSOR_ID.HOST_PPG_DUMMY;
+
 /**
  * Created by User on 21/7/2017.
  */
@@ -30,8 +32,8 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
         builder = new AlertDialog.Builder(context);
 
         List<Integer> sensorKeysToFilter = new ArrayList<Integer>();
-        sensorKeysToFilter.add(Configuration.Shimmer3.SensorMapKey.HOST_PPG_DUMMY);
-        sensorKeysToFilter.add(Configuration.Shimmer3.SensorMapKey.HOST_EXG_CUSTOM);
+        sensorKeysToFilter.add(Configuration.Shimmer3.SENSOR_ID.HOST_PPG_DUMMY);
+        sensorKeysToFilter.add(Configuration.Shimmer3.SENSOR_ID.HOST_EXG_CUSTOM);
         setSensorKeysFilter(sensorKeysToFilter, true);
 
         initialize();
