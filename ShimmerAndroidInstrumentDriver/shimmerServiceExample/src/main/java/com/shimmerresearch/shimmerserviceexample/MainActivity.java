@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.paired_devices:
+            case R.id.connect_device:
                 Intent pairedDevicesIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
                 startActivityForResult(pairedDevicesIntent, REQUEST_CONNECT_SHIMMER);
                 return true;
