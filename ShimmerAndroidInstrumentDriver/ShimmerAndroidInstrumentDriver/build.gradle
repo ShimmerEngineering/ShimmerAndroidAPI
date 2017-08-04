@@ -196,7 +196,7 @@ dependencies {
             repo = 'testshimmer'
             // it is the name that appears in bintray when logged
             name = 'shimmerandroiddriver'
-            desc = 'awsome jc'
+            desc = ''
             websiteUrl = ''
             vcsUrl = ''
             licenses = ['MIT']
