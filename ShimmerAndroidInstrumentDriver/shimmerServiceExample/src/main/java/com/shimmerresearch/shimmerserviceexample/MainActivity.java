@@ -164,22 +164,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     }
 
 
-    @Override
-    protected void onDestroy() {
-        //Stop the Shimmer service
-        super.onDestroy();
-/*
-        mHandler = null;
-        if(isServiceStarted) {
-            this.unbindService(mConnection);
-        }
-        Intent intent = new Intent(this, ShimmerService.class);
-        stopService(intent);
-        Log.d(LOG_TAG, "Shimmer Service stopped");
-        Toast.makeText(this, "Shimmer Service stopped", Toast.LENGTH_SHORT).show();
-*/
-    }
-
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             // This is called when the connection with the service has been
@@ -197,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
             connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
 
-//            mHandler = mService.getHandler();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -247,11 +230,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
                 if(position == 0) {
-//                    if(isServiceStarted) {
-//                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-//                    } else {
-                        connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-//                    }
+                    connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
                     return connectedShimmersListFragment;
                 }
                 else if(position == 1) {
@@ -308,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 }
                 switch (state) {
                     case CONNECTED:
-                        //Toast.makeText(getApplicationContext(), "Device connected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
                         connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
                         break;
@@ -350,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      */
     @Override
     public void onShimmerDeviceSelected(String macAddress, String deviceName) {
-        Toast.makeText(this, "Selected Shimmer: " + deviceName + "\n" + macAddress, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Selected Device: " + deviceName + "\n" + macAddress, Toast.LENGTH_SHORT).show();
         selectedDeviceAddress = macAddress;
         selectedDeviceName = deviceName;
 

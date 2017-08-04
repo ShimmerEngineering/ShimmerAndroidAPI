@@ -53,6 +53,7 @@ public class ShimmerBluetoothDialog extends Activity {
     // Debugging
     private static final String TAG = "DeviceListActivity";
     private static final boolean D = true;
+    public final static int REQUEST_CONNECT_SHIMMER = 2;
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";

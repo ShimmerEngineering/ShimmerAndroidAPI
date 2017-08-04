@@ -154,41 +154,11 @@ public class ShimmerService extends Service {
 	public void onDestroy() {
 		Toast.makeText(this, "Shimmer Service Stopped", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onDestroy");
-
 		btManager.disconnectAllDevices();
-
-/*		TODO:
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			stemp.stop();
-		}
-*/
-
 	}
 
 	public void disconnectAllDevices(){
-
 		btManager.disconnectAllDevices();
-
-/*		TODO:
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			ShimmerDevice stemp=(ShimmerDevice) iterator.next();
-			if (stemp instanceof Shimmer) {
-				((Shimmer) stemp).stop();
-			}
-//			else if (stemp instanceof Shimmer4Android){
-//				try {
-//					((Shimmer4Android) stemp).mShimmerRadioHWLiteProtocol.disconnect();
-//				} catch(Exception e){
-//					e.printStackTrace();
-//				}
-//			}
-		}
-*/
 		mMultiShimmer.clear();
 		mLogShimmer.clear();
 	}
@@ -198,11 +168,7 @@ public class ShimmerService extends Service {
         Log.d("LocalService", "Received start id " + startId + ": " + intent);
 
         return START_NOT_STICKY;
-
-        // We want this service to continue running until it is explicitly
-        // stopped, so return sticky (the service will be restarted if the OS kills it).
-        //return START_STICKY;
-    }
+	}
 
 	@Override
 	public void onStart(Intent intent, int startid) {
@@ -264,15 +230,6 @@ public class ShimmerService extends Service {
 		Log.d(TAG, "onDestroy");
 
 		btManager.disconnectAllDevices();
-
-/*		TODO:
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			stemp.stop();
-		}
-*/
 	}
 
 	/**
@@ -514,42 +471,11 @@ public class ShimmerService extends Service {
 
 
     public void stopStreamingAllDevices() {
-/*		TODO: check if this works
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-
-			if (stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING){
-				stemp.stopStreaming();
-			}
-		}
-*/
 		btManager.stopStreamingAllDevices();
 	}
 
 	public void startStreamingAllDevices() {
-
-		//TODO: Check if this works
 		btManager.startStreamingAllDevices();
-
-/*
-		Collection<Object> colS=mMultiShimmer.values();
-		Iterator<Object> iterator = colS.iterator();
-		while (iterator.hasNext()) {
-			Shimmer stemp=(Shimmer) iterator.next();
-			if ((stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING)){
-				if (mPPGtoHREnabled){
-					enablePPGtoHR(stemp.getBluetoothAddress(),true);
-				}
-				if (mECGtoHREnabled){
-					enableECGtoHR(stemp.getBluetoothAddress(),true);
-				}
-
-				stemp.startStreaming();
-			}
-		}
-*/
 	}
 
 	public void setEnableLogging(boolean enableLogging){
