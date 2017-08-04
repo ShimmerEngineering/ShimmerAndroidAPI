@@ -32,9 +32,9 @@ public class ConnectedShimmersListFragment extends ListFragment {
     ListView savedListView = null;
     ArrayAdapter<String> savedListAdapter = null;
     int selectedItemPos = -1;
+    int selectedDevicePos = -1;
     List<ShimmerDevice> shimmerDeviceList;
     Context context;
-    int selectedDevicePos = -1;
 
 
     public ConnectedShimmersListFragment() {

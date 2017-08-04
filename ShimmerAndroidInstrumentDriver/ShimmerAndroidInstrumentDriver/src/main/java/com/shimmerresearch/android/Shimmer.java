@@ -1352,10 +1352,10 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	@Override
-	public Set<Integer> getSensorMapKeySet() {
-		
-		return null;
+	public Set<Integer> getSensorIdsSet() {
+		return super.getSensorIdsSet();
 	}
+
 
 //	@Override
 //	protected void checkBatteryShimmer2r() {

@@ -67,7 +67,6 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         expandableListTitle = list;
         cloneDevice = shimmerDeviceClone;
         shimmerDevice = device;
-        //TODO: expandableListTitle.add(index, "FOOTER");
 
         for(String key : list) {    //TODO: Place this in DeviceConfigFragment
             ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
@@ -89,7 +88,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
                             currentSettingsMap.put(key, currentSetting);
                         }
                     } else {
-                        Log.e("SHIMMER", "cs is null!!! with key " + key);
+                        Log.e("SHIMMER", "cs is null for key " + key);
                     }
                 } else if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD) {
                     //A text field is needed as this config setting can be assigned any value
@@ -130,11 +129,8 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             editText.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    Log.i("JOS", "Key presssed");
-                    Log.i("Key pressed", "Key pressed");
                     if(keyCode == KEYCODE_ENTER) {
                         cloneDevice.setConfigValueUsingConfigLabel((String)getGroup(groupPosition), editText.getText().toString());
-                        Log.e("JOS", "getText().toString()  " + editText.getText().toString());
                         notifyDataSetChanged();
                     }
                     return false;
