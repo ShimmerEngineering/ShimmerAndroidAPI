@@ -321,9 +321,9 @@ public class ShimmerDialogConfigurations {
                                 AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
                                 if (shimmerDevice instanceof Shimmer) {
-                                    ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                                    ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                                 } else if (shimmerDevice instanceof Shimmer4Android){
-                                    ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                                    ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                                 }
                             }
                         });
@@ -355,9 +355,9 @@ public class ShimmerDialogConfigurations {
                         cloneList.add(0, shimmerDeviceClone);
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
                         if (shimmerDevice instanceof Shimmer) {
-                            ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         } else if (shimmerDevice instanceof Shimmer4Android){
-                            ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         }
                     }
                 });
@@ -441,9 +441,9 @@ public class ShimmerDialogConfigurations {
                         cloneList.add(0, shimmerDeviceClone);
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
                         if (shimmerDevice instanceof Shimmer) {
-                            ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         } else if (shimmerDevice instanceof Shimmer4Android){
-                            ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
+                            ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         }
                     }
                 });

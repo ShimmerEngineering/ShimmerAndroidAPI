@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '0.9.5'
+version = '3.0.0Beta'
 
 android {
     compileSdkVersion 25
@@ -89,12 +89,12 @@ dependencies {
     compile files('libs/AndroidBluetoothLibrary.jar')
     compile files('libs/androidplot-core-0.5.0-release.jar')
 //    compile files('libs/ShimmerDriverML.jar')
-    compile ('com.shimmerresearch.managers.bluetoothmanager:ShimmerBluetoothManager:0.9.13beta') {
+    compile ('com.shimmerresearch.managers.bluetoothmanager:ShimmerBluetoothManager:0.9.14beta') {
                 // excluding org.json which is provided by Android
                 exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.5beta') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.6beta') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         //exclude group: 'com.google.protobuf'
@@ -186,19 +186,19 @@ dependencies {
 
 // https://github.com/bintray/gradle-bintray-plugin
     bintray {
-        user = bintray_username //this usually comes from gradle.properties file in ~/.gradle
-        key = bintray_api_key //this usually comes from gradle.properties file in ~/.gradle
+        user = shimmer_bintray_username //this usually comes from gradle.properties file in ~/.gradle
+        key = shimmer_bintray_api_key //this usually comes from gradle.properties file in ~/.gradle
 
         configurations = ['archives']
 
         // Package info for BinTray
         pkg {
-            repo = 'testshimmer'
+            repo = 'Shimmer'
             // it is the name that appears in bintray when logged
             name = 'shimmerandroiddriver'
             desc = ''
             websiteUrl = ''
-            vcsUrl = ''
+            vcsUrl = 'https://github.com/ShimmerEngineering/ShimmerAndroidAPI'
             licenses = ['MIT']
             publish = true
             publicDownloadNumbers = true

@@ -298,6 +298,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
 	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
+	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -322,6 +323,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
 	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
+	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, int magRange) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -348,6 +350,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
 	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
+	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -380,6 +383,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param setEnabledSensors Defines the sensors to be enabled (e.g. 'Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO' enables the Accelerometer and Gyroscope)
 	 * @param continousSync A boolean value defining whether received packets should be checked continuously for the correct start and end of packet.
 	 */
+	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange,byte[] exg1,byte[] exg2) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -402,8 +406,42 @@ public class Shimmer extends ShimmerBluetooth{
 		mEXG1RegisterArray = exg1;
 		mEXG2RegisterArray = exg2;
 	}
-	
 
+	/** Shimmer 3 Constructor
+	 * @param userAssignedName
+	 * @param samplingRate
+	 * @param accelRange
+	 * @param gsrRange
+	 * @param sensorIdsToEnable
+	 * @param gyroRange
+	 * @param magRange
+	 * @param orientation
+	 */
+	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation){
+		super(userAssignedName, samplingRate, sensorIdsToEnable, accelRange, gsrRange, gyroRange, magRange);
+		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothRadioState = BT_STATE.DISCONNECTED;
+		mHandlerList.add(handler);
+		setupOrientation(orientation, samplingRate);
+	}
+
+	/** Shimmer2R Constructor
+	 * @param myName
+	 * @param samplingRate
+	 * @param accelRange
+	 * @param gsrRange
+	 * @param setEnabledSensors
+	 * @param magGain
+	 * @param orientation
+	 */
+	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation) {
+		super(myName,samplingRate, setEnabledSensors, accelRange, gsrRange, magGain);
+		setupOrientation(orientation, samplingRate);
+		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothRadioState = BT_STATE.DISCONNECTED;
+		mHandlerList.add(handler);
+		setupOrientation(orientation, samplingRate);
+	}
 
 	/**
 	 * Set the current state of the chat connection
