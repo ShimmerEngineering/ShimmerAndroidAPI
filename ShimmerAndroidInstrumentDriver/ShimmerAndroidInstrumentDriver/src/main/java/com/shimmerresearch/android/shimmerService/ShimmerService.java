@@ -108,7 +108,7 @@ public class ShimmerService extends Service {
 	private String mECGtoHRSignalName = Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT;
 	public PlotManagerAndroid mPlotManager;
 
-	private ShimmerBluetoothManagerAndroid btManager;
+	protected ShimmerBluetoothManagerAndroid btManager;
 
 
 	@Override
