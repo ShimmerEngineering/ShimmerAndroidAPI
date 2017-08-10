@@ -792,6 +792,7 @@ public class ShimmerService extends Service {
 		return pmux;
 	}
 
+/*	TODO: Remove this?
 	public void startStreaming(String bluetoothAddress) {
 		// TODO Auto-generated method stub
 				Collection<Object> colS=mMultiShimmer.values();
@@ -815,6 +816,11 @@ public class ShimmerService extends Service {
 						}
 					}
 				}
+	}
+*/
+
+	public void startStreaming(String bluetoothAddress) {
+		btManager.startStreaming(bluetoothAddress);
 	}
 
 	/**
@@ -881,6 +887,7 @@ public class ShimmerService extends Service {
 		return btManager.bluetoothAddressComparator(bluetoothAddress, address);
 	}
 
+/*	TODO: Remove this?
 	public void stopStreaming(String bluetoothAddress) {
 		// TODO Auto-generated method stub
 				Collection<Object> colS=mMultiShimmer.values();
@@ -902,6 +909,11 @@ public class ShimmerService extends Service {
 
 					}
 				}
+	}
+*/
+
+	public void stopStreaming(String bluetoothAddress) {
+		btManager.stopStreaming(bluetoothAddress);
 	}
 
 	/**
