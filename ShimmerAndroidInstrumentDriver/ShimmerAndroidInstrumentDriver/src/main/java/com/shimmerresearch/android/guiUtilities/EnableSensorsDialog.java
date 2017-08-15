@@ -26,8 +26,8 @@ import static com.shimmerresearch.driver.Configuration.Shimmer3.SENSOR_ID.HOST_P
 public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
     AlertDialog.Builder builder;
 
-    public EnableSensorsDialog(ShimmerDevice shimmerPC, ShimmerBluetoothManager btManager, Context context) {
-        super(shimmerPC, btManager);
+    public EnableSensorsDialog(ShimmerDevice shimmerDevice, ShimmerBluetoothManager btManager, Context context) {
+        super(shimmerDevice, btManager);
         builder = new AlertDialog.Builder(context);
 
         List<Integer> sensorKeysToFilter = new ArrayList<Integer>();
