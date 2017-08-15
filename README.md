@@ -7,6 +7,7 @@ There are a number of changes which will be made before the official release, th
 - Deprecating and reducing the number of Constructors which are used to connect and setup the device. This will be narrowed down to one for Shimmer3 and one for Shimmer2r Devices
 - Refactoring of signal names in order to make them more user friendly
 
+#Changelog 
 (Beta) Rev 3.00
 
 - Change to Handler MSGs
