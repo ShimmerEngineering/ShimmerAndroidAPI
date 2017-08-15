@@ -216,6 +216,7 @@ public class Shimmer extends ShimmerBluetooth{
 	//private BufferedInputStream mInStream=null;
 	transient private OutputStream mmOutStream=null;
 
+	@Deprecated
 	public static final int MSG_STATE_FULLY_INITIALIZED = 3;  // This is the connected state, indicating the device has establish a connection + tx/rx commands and reponses (Initialized)
 	public static final int MSG_STATE_STREAMING = 4;
 	public static final int MSG_STATE_STOP_STREAMING = 5;
