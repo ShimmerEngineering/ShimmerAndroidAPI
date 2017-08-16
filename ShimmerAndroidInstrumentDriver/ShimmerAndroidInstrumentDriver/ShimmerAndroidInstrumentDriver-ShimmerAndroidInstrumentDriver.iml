@@ -110,8 +110,8 @@
     <orderEntry type="library" exported="" name="grpc-all-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-core-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="protobuf-lite-3.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-netty-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="multidex-instrumentation-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.6" level="project" />
