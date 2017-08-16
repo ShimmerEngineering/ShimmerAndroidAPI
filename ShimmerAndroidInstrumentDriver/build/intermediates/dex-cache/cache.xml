@@ -3,15 +3,6 @@
 
     <item
         is-multidex="true"
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.9.6beta\749425bede759456790a71e084342782cd43b6ce\ShimmerDriver-0.9.6beta.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="749425bede759456790a71e084342782cd43b6ce">
-        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.9.6beta_1b7a72271cdd4c597c1eef2af590888ba706ae50\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         optimize="true"
@@ -27,6 +18,15 @@
         revision="25.0.2"
         sha1="70bf5014096a2ed923c6e1cfe70c4b8c46ec0586">
         <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerBluetoothManager-0.9.13beta_3c0bdc4d2df3e023562c5e3a31fd8436039cfb0e\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.9.7beta\13eefffef80d44cb64b35df79e232396022f97e5\ShimmerDriver-0.9.7beta.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="13eefffef80d44cb64b35df79e232396022f97e5">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.9.7beta_999200031057576571beced647e507c789eb713c\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -54,6 +54,15 @@
         revision="25.0.2"
         sha1="a08bcc8dba24bfe666c84df486f4bde7afba07d9">
         <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\transforms\dex\debug\folders\1000\8\androidplot-core-0.5.0-release_639519680c0211dfc8a3689ac7d46320995acafa\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.managers.bluetoothmanager\ShimmerBluetoothManager\0.9.15beta\bb5cb92e04650646f28da23b1184b06f4f499b7a\ShimmerBluetoothManager-0.9.15beta.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="bb5cb92e04650646f28da23b1184b06f4f499b7a">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerBluetoothManager-0.9.15beta_cc8eb177af38dcd3e03d1f84d24fa40df52318d3\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -99,15 +108,6 @@
         revision="25.0.2"
         sha1="cfdd6d12ad787ebfc51d1c7c7ef6762cda5df441">
         <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_09bf820cedbd0f858b20d49ea68ae51f69cc0a21\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.managers.bluetoothmanager\ShimmerBluetoothManager\0.9.14beta\98d57c94028b31206416549164cdbfcde1bce2ce\ShimmerBluetoothManager-0.9.14beta.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="98d57c94028b31206416549164cdbfcde1bce2ce">
-        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerBluetoothManager-0.9.14beta_d2e86cde2bf4fb4aa6df2a390692d1486ec17457\classes.dex" />
     </item>
     <item
         is-multidex="true"
