@@ -100,6 +100,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
                 });
 
         AlertDialog ad = builder.create();
+        setDialogTheme(ad);
         ad.show();
 
         final ListView listView = ad.getListView();
@@ -118,5 +119,13 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
     @Override
     protected void createCheckBox(String sensorName, boolean state, int count) {
 
+    }
+
+    /**
+     * Override this method to customise the style and theme of the dialog
+     * @param ad
+     */
+    protected static void setDialogTheme(AlertDialog ad) {
+        //Add custom style here
     }
 }
