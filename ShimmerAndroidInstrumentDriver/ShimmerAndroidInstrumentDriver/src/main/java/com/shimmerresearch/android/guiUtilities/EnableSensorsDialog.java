@@ -125,7 +125,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
      * Override this method to customise the style and theme of the dialog
      * @param ad
      */
-    protected static void setDialogTheme(AlertDialog ad) {
+    protected void setDialogTheme(AlertDialog ad) {
         //Add custom style here
     }
 }
