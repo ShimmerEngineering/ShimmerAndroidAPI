@@ -57,7 +57,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
     BluetoothAdapter mBluetoothAdapter;
     Context mContext;
-    Handler mHandler;
+    protected Handler mHandler;
 
     public ShimmerBluetoothManagerAndroid(Context context, Handler handler) throws Exception {
         super();
