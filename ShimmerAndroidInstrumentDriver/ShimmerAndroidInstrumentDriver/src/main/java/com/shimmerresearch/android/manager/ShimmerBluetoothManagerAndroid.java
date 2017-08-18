@@ -58,6 +58,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     BluetoothAdapter mBluetoothAdapter;
     Context mContext;
     Handler mHandler;
+    private boolean AllowAutoPairing = true;
 
     public ShimmerBluetoothManagerAndroid(Context context, Handler handler) throws Exception {
         super();
@@ -87,7 +88,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     @Override
     public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
 
-        if(isDevicePaired(bluetoothAddress)) {
+        if(isDevicePaired(bluetoothAddress) || AllowAutoPairing) {
             addDiscoveredDevice(bluetoothAddress);
             super.connectShimmerThroughBTAddress(bluetoothAddress);
             super.setConnectionExceptionListener(new ConnectionExceptionListener() {
@@ -972,4 +973,10 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         return false;
     }
 
+    /**
+     * @param allowAutoPairing
+     */
+    public void setAutoPairing(boolean allowAutoPairing){
+        AllowAutoPairing = allowAutoPairing;
+    }
 }
