@@ -41,6 +41,7 @@ package com.shimmerresearch.android.shimmerService;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.os.Binder;
@@ -219,6 +220,10 @@ public class ShimmerService extends Service {
 
 	public boolean isECGtoHREnabled(){
 		return mECGtoHREnabled;
+	}
+
+	public void connectShimmer(final String bluetoothAddress,Context context){
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,context);
 	}
 
 	public void connectShimmer(final String bluetoothAddress){

@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                mService.connectShimmer(macAdd);    //Connect to the selected device
+                mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
             }
         }
     }

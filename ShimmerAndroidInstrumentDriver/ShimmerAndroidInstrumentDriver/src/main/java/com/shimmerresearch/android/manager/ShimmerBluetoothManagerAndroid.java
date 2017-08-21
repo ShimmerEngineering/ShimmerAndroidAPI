@@ -1,11 +1,13 @@
 package com.shimmerresearch.android.manager;
 
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
@@ -51,7 +53,7 @@ import static android.R.id.list;
  */
 
 public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
-
+    ProgressDialog mProgressDialog;
     private static final String TAG = ShimmerBluetoothManagerAndroid.class.getSimpleName();
     private static final String DEFAULT_SHIMMER_NAME = "ShimmerDevice";
 
@@ -85,10 +87,26 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         super.connectShimmerThroughBTAddress(bluetoothAddress);
     }
 
-    @Override
-    public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
+    /**
+     * @param bluetoothAddress
+     * @param context if the context is set, a progress dialog will show, otherwise a toast msg will show
+     */
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress,Context context) {
 
         if(isDevicePaired(bluetoothAddress) || AllowAutoPairing) {
+            if (!isDevicePaired(bluetoothAddress)){
+                if (context!=null) {
+                    //Toast.makeText(mContext, "Attempting to pair device, please wait...", Toast.LENGTH_LONG).show();
+                    final ProgressDialog progress = new ProgressDialog(context);
+                    progress.setTitle("Pairing Device");
+                    progress.setMessage("Trying to pair device...");
+                    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+                    progress.show();
+                    mProgressDialog = progress;
+                } else {
+                    Toast.makeText(mContext, "Attempting to pair device, please wait...", Toast.LENGTH_LONG).show();
+                }
+            }
             addDiscoveredDevice(bluetoothAddress);
             super.connectShimmerThroughBTAddress(bluetoothAddress);
             super.setConnectionExceptionListener(new ConnectionExceptionListener() {
@@ -99,6 +117,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
                 @Override
                 public void onConnectionException(Exception exception) {
+                    if (mProgressDialog!=null) {
+                        mProgressDialog.dismiss();
+                    }
                     mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
                             new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
 
@@ -106,6 +127,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
                 @Override
                 public void onConnectStartException(String connectionHandle) {
+                    if (mProgressDialog!=null) {
+                        mProgressDialog.dismiss();
+                    }
                     mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
                             new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
 
@@ -116,6 +140,11 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
             String msg = "Device " + bluetoothAddress + " not paired";
             throw new DeviceNotPairedException(bluetoothAddress, msg);
         }
+    }
+
+    @Override
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
+        connectShimmerThroughBTAddress(bluetoothAddress,null);
     }
 
     private boolean isDevicePaired(String bluetoothAddress){
@@ -192,6 +221,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
     @Override
     protected ShimmerDevice createNewShimmer3(ShimmerRadioInitializer shimmerRadioInitializer, String bluetoothAddress) {
+        if(mProgressDialog!=null){
+            mProgressDialog.dismiss();
+        }
         ShimmerSerialPortAndroid serialPort = (ShimmerSerialPortAndroid) shimmerRadioInitializer.getSerialCommPort();
         Shimmer shimmer = new Shimmer(mHandler);
         shimmer.setDelayForBtRespone(true);
@@ -221,6 +253,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
     @Override
     protected Shimmer4 createNewShimmer4(String comport, String bluetoothAddress) {
+        if(mProgressDialog!=null){
+            mProgressDialog.dismiss();
+        }
         Shimmer4Android shimmer = new Shimmer4Android(mHandler);
         mMapOfBtConnectedShimmers.put(bluetoothAddress, shimmer);
         return shimmer;
