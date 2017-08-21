@@ -455,7 +455,8 @@ public class ShimmerDialogConfigurations {
     public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
                                                       final Context context,
                                                       final ShimmerDevice shimmerDeviceClone,
-                                                      final ShimmerBluetoothManagerAndroid bluetoothManager) {
+                                                      final ShimmerBluetoothManagerAndroid bluetoothManager,
+                                                      final ShimmerDialogConfigurations shimmerDialogConfigurations) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
         String title = "";
@@ -476,7 +477,7 @@ public class ShimmerDialogConfigurations {
                                 // of the selected item
                                 Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
                                 shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
-                                writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+                                shimmerDialogConfigurations.writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
                             }
                         });
                 builder.create().show();
@@ -513,7 +514,7 @@ public class ShimmerDialogConfigurations {
                             ((Shimmer4Android)shimmerDeviceClone).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         }
 */
-                        writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+                        shimmerDialogConfigurations.writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
                     }
                 });
                 builder.create().show();
@@ -521,7 +522,7 @@ public class ShimmerDialogConfigurations {
         }
     }
 
-    public static void writeConfigToShimmer(ShimmerDevice clone, ShimmerBluetoothManagerAndroid bluetoothManager) {
+    public void writeConfigToShimmer(ShimmerDevice clone, ShimmerBluetoothManagerAndroid bluetoothManager) {
 
         AssembleShimmerConfig.generateSingleShimmerConfig(clone, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
@@ -530,6 +531,7 @@ public class ShimmerDialogConfigurations {
         } else if (clone instanceof Shimmer4Android){
             bluetoothManager.configureShimmer(clone);
         }
+
     }
 
     //Additional variables for custom signals and filtered signals for the SelectSensorPlot dialog
