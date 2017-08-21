@@ -455,7 +455,8 @@ public class ShimmerDialogConfigurations {
     public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
                                                       final Context context,
                                                       final ShimmerDevice shimmerDeviceClone,
-                                                      final ShimmerBluetoothManagerAndroid bluetoothManager) {
+                                                      final ShimmerBluetoothManagerAndroid bluetoothManager,
+                                                      final ShimmerDialogConfigurations shimmerDialogConfigurations) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
         String title = "";
@@ -476,7 +477,6 @@ public class ShimmerDialogConfigurations {
                                 // of the selected item
                                 Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
                                 shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
-                                ShimmerDialogConfigurations shimmerDialogConfigurations = new ShimmerDialogConfigurations();
                                 shimmerDialogConfigurations.writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
                             }
                         });
@@ -514,7 +514,6 @@ public class ShimmerDialogConfigurations {
                             ((Shimmer4Android)shimmerDeviceClone).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         }
 */
-                        ShimmerDialogConfigurations shimmerDialogConfigurations = new ShimmerDialogConfigurations();
                         shimmerDialogConfigurations.writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
                     }
                 });
