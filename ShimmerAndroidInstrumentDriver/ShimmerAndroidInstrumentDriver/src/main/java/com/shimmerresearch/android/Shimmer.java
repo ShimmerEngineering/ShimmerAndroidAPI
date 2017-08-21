@@ -226,7 +226,9 @@ public class Shimmer extends ShimmerBluetooth{
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
 	transient private BluetoothAdapter mBluetoothAdapter = null;
 	transient List<Handler> mHandlerList = new ArrayList<Handler>();
-
+	{
+		setEnableProcessMarker(false);
+	}
 	private boolean mContinuousStateUpdates = true;
 
 
