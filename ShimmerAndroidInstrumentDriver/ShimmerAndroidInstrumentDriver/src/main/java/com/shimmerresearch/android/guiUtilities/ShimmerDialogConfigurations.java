@@ -452,6 +452,85 @@ public class ShimmerDialogConfigurations {
         }
     }
 
+    public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap,
+                                                      final Context context,
+                                                      final ShimmerDevice shimmerDeviceClone,
+                                                      final ShimmerBluetoothManagerAndroid bluetoothManager) {
+        final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
+        final CharSequence[] cs = cods.getGuiValues();
+        String title = "";
+        if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
+            Object returnedValue = shimmerDeviceClone.getConfigValueUsingConfigLabel(key);
+
+            if(returnedValue != null) {
+                int configValue = (int) returnedValue;
+                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                shimmerDeviceClone.getConfigValueUsingConfigLabel(key);
+                builder.setTitle(title);
+                builder.setItems(cs,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                                Toast.makeText(context, cs[which], Toast.LENGTH_SHORT).show();
+                                shimmerDeviceClone.setConfigValueUsingConfigLabel(key,cods.mConfigValues[which]);
+                                writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+                            }
+                        });
+                builder.create().show();
+            }
+        } else if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD){
+            Object returnedValue = shimmerDeviceClone.getConfigValueUsingConfigLabel(key);
+
+            if(returnedValue != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle((String)returnedValue);
+                LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                final EditText et = new EditText(context);
+                et.setText((String)returnedValue);
+                LinearLayout layout = new LinearLayout(context);
+                LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setLayoutParams(parms);
+                layout.setGravity(Gravity.CLIP_VERTICAL);
+                layout.setPadding(2, 2, 2, 2);
+                layout.addView(et, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                builder.setView(layout);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        shimmerDeviceClone.setConfigValueUsingConfigLabel(key,et.getText().toString());
+
+                        //shimmerDeviceClone.refreshShimmerInfoMemBytes();
+/*
+                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                        cloneList.add(0, shimmerDeviceClone);
+                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+                        if (shimmerDeviceClone instanceof Shimmer) {
+                            ((Shimmer)shimmerDeviceClone).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
+                        } else if (shimmerDeviceClone instanceof Shimmer4Android){
+                            ((Shimmer4Android)shimmerDeviceClone).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
+                        }
+*/
+                        writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+                    }
+                });
+                builder.create().show();
+            }
+        }
+    }
+
+    public static void writeConfigToShimmer(ShimmerDevice clone, ShimmerBluetoothManagerAndroid bluetoothManager) {
+
+        AssembleShimmerConfig.generateSingleShimmerConfig(clone, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
+        if (clone instanceof Shimmer) {
+            bluetoothManager.configureShimmer(clone);
+        } else if (clone instanceof Shimmer4Android){
+            bluetoothManager.configureShimmer(clone);
+        }
+    }
 
     //Additional variables for custom signals and filtered signals for the SelectSensorPlot dialog
     static protected List<String[]> mAdditionalSignalsList = null;
