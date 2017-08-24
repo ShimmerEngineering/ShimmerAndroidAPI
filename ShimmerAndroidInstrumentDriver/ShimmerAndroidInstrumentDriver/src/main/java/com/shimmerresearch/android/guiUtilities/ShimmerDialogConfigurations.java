@@ -5,9 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Sensor;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -480,6 +485,10 @@ public class ShimmerDialogConfigurations {
                                 shimmerDialogConfigurations.writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
                             }
                         });
+
+                //Empty method which can be overwritten to interact with the Builder (e.g. to customize the look of the dialog)
+                shimmerDialogConfigurations.setADBuilderTheme(context, builder, title);
+
                 builder.create().show();
             }
         } else if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.TEXTFIELD){
@@ -488,7 +497,6 @@ public class ShimmerDialogConfigurations {
             if(returnedValue != null) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle((String)returnedValue);
-                LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 final EditText et = new EditText(context);
                 et.setText((String)returnedValue);
                 LinearLayout layout = new LinearLayout(context);
@@ -501,22 +509,16 @@ public class ShimmerDialogConfigurations {
                 builder.setView(layout);
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        shimmerDeviceClone.setConfigValueUsingConfigLabel(key,et.getText().toString());
 
-                        //shimmerDeviceClone.refreshShimmerInfoMemBytes();
-/*
-                        List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                        cloneList.add(0, shimmerDeviceClone);
-                        AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-                        if (shimmerDeviceClone instanceof Shimmer) {
-                            ((Shimmer)shimmerDeviceClone).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
-                        } else if (shimmerDeviceClone instanceof Shimmer4Android){
-                            ((Shimmer4Android)shimmerDeviceClone).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
-                        }
-*/
+                        shimmerDeviceClone.setConfigValueUsingConfigLabel(key,et.getText().toString());
                         shimmerDialogConfigurations.writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+
                     }
                 });
+
+                //Empty method which can be overwritten to interact with the Builder (e.g. to customize the look of the dialog)
+                shimmerDialogConfigurations.setADBuilderTheme(context, builder, (String) returnedValue);
+
                 builder.create().show();
             }
         }
@@ -854,6 +856,139 @@ public class ShimmerDialogConfigurations {
 
         builder.create().show();
     }
+
+
+    public void buildSamplingRateDialog(final ShimmerDevice shimmerDeviceClone, final Context context, final ShimmerBluetoothManagerAndroid bluetoothManager) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        double currentSamplingRate = shimmerDeviceClone.getSamplingRateShimmer();
+
+        final String[] presets = new String[] {"8","16","51.2","102.4","128","204.8","256","512","1024"};
+        final EditText editText = new EditText(context);
+        final Button validateButton = new Button(context);
+        final ListView listView = new ListView(context);
+        final TextView textView = new TextView(context);
+
+        validateButton.setText("Validate");
+        textView.setText("Custom: ");
+        textView.setTextSize(18);
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+
+        ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, presets);
+        listView.setAdapter(listAdapter);
+
+        validateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String text = editText.getText().toString();
+                double samplingRate = -1;
+                if(text != null && !text.isEmpty()) {
+                    try {
+                        samplingRate = Double.parseDouble(text);
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(samplingRate != -1) {
+                    shimmerDeviceClone.setShimmerAndSensorsSamplingRate(samplingRate);
+                }
+
+                //Get the adjusted sampling rate back from the clone and display it in EditText
+                double newSamplingRate = shimmerDeviceClone.getSamplingRateShimmer();
+                editText.setText(Double.toString(newSamplingRate));
+            }
+        });
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(400, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout verticalLinearLayout = new LinearLayout(context, null);
+        LinearLayout horizontalLinearLayout = new LinearLayout(context, null);
+
+        verticalLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        horizontalLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        editText.setLayoutParams(layoutParams);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER |  InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        horizontalLinearLayout.addView(textView);
+        horizontalLinearLayout.addView(editText);
+        horizontalLinearLayout.addView(validateButton);
+
+        //Add the ListView first, then the EditText and Button for setting a custom sampling rate
+        verticalLinearLayout.addView(listView);
+        verticalLinearLayout.addView(horizontalLinearLayout);
+
+        builder.setView(verticalLinearLayout);
+
+        builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(context, shimmerDeviceClone.getSamplingRateShimmer() + "Hz selected", Toast.LENGTH_SHORT).show();
+                writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        //Empty method which can be overwritten to customize the builder theme
+        setADBuilderTheme(context, builder, Double.toString(currentSamplingRate) + "Hz");
+
+        final AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(final DialogInterface dialogInterface) {
+
+                Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+                //Empty method which can be overwritten to customize the dialog and buttons theme
+                setDialogAndButtonsTheme(context, dialog, positiveButton, negativeButton);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Double value = Double.parseDouble(presets[position]);
+                        shimmerDeviceClone.setShimmerAndSensorsSamplingRate(value);
+                        Toast.makeText(context, value + "Hz selected", Toast.LENGTH_SHORT).show();
+                        writeConfigToShimmer(shimmerDeviceClone, bluetoothManager);
+                        dialogInterface.dismiss();
+                    }
+                });
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    /**
+     * Override this method to interact with and customize the AlertDialog Builder
+     * @param context
+     * @param builder
+     */
+    public void setADBuilderTheme(Context context, AlertDialog.Builder builder, String title) {
+        //Insert code to edit and customize the builder here
+    }
+
+    /**
+     * Override this method to interact with and customize the Dialog and its buttons
+     * @param context
+     * @param dialog
+     * @param positiveButton
+     * @param negativeButton
+     */
+    public void setDialogAndButtonsTheme(Context context, AlertDialog dialog, Button positiveButton, Button negativeButton) {
+        //Insert code to edit and customize the dialog and buttons here
+    }
+
+
+
 
 
     /**
