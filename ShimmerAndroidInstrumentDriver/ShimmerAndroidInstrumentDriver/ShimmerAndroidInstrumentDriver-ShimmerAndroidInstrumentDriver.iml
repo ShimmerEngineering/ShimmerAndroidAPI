@@ -101,7 +101,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-0.9.16beta" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.9beta" level="project" />
     <orderEntry type="library" exported="" name="grpc-stub-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="ShimmerBiophysicalProcessingLibrary_Rev_0_11" level="project" />
     <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
@@ -118,7 +118,6 @@
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-core-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="AndroidBluetoothLibrary" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.8beta" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="httpclient-4.3.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-1.0.0-pre1" level="project" />
@@ -137,6 +136,7 @@
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-0.9.17beta" level="project" />
     <orderEntry type="library" exported="" name="grpc-okhttp-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="grpc-auth-1.0.0-pre1" level="project" />
     <orderEntry type="library" exported="" name="google-auth-library-credentials-0.4.0" level="project" />
