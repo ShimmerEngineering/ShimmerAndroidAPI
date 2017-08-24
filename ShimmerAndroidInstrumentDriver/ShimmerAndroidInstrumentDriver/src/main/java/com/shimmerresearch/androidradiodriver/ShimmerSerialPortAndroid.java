@@ -195,11 +195,13 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
     @Override
     public byte[] rxBytes(int numBytes){
         byte[] buffer = new byte[numBytes];
-        try {
-            mInStream.readFully(buffer,0,numBytes);
-            return(buffer);
-        } catch (IOException e) {
-            catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_READING_DATA);
+        if (mInStream!=null) {
+            try {
+                mInStream.readFully(buffer, 0, numBytes);
+                return (buffer);
+            } catch (IOException e) {
+                catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_READING_DATA);
+            }
         }
         return null;
     }
