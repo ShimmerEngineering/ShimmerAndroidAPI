@@ -474,6 +474,13 @@ public class ShimmerService extends Service {
 	        }
 	    };
 
+	public void handleMsgDataPacket() {
+
+	}
+
+	public void handleMsgStateChange() {
+
+	}
 
     public void stopStreamingAllDevices() {
 		btManager.stopStreamingAllDevices();
