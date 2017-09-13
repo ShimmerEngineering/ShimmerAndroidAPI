@@ -79,6 +79,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.shimmerresearch.bluetooth.ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE;
+import static com.shimmerresearch.bluetooth.ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED;
+
 public class ShimmerService extends Service {
 	private static final String TAG = "ShimmerService";
     public Logging shimmerLog1 = null;
@@ -296,7 +299,11 @@ public class ShimmerService extends Service {
                  case Shimmer.MESSAGE_LOG_AND_STREAM_STATUS_CHANGED:
                  	mHandlerGraph.obtainMessage(Shimmer.MESSAGE_LOG_AND_STREAM_STATUS_CHANGED, msg.arg1, msg.arg2).sendToTarget();
                  	break;
-	            }
+				case MSG_IDENTIFIER_NOTIFICATION_MESSAGE:
+					handleNotificationMsg(msg);
+					break;
+
+				}
 	        }
 	    };
 
@@ -495,6 +502,16 @@ public class ShimmerService extends Service {
 			}
 
 		}
+	}
+
+	/**
+	 * Handles the notification message received by the Handler
+	 * Note: Shimmer FULLY_INITIALIZED messages are received here
+	 * Override this method to change how the message is handled
+	 * @param msg
+	 */
+	public void handleNotificationMsg(Message msg) {
+		//Handle message here
 	}
 
     public void stopStreamingAllDevices() {
