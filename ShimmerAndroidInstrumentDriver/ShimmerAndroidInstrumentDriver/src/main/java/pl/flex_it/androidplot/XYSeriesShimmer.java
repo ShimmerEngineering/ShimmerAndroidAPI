@@ -75,7 +75,11 @@ public class XYSeriesShimmer implements XYSeries {
 
     @Override
     public Number getY(int index) {
-        return mDataY.get(index);
+		if(index < mDataY.size()) {
+			return mDataY.get(index);
+		} else {
+			return null;
+		}
     }
 
     @Override
