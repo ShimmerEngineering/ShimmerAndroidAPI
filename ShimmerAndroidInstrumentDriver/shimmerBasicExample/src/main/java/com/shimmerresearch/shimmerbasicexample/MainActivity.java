@@ -216,6 +216,16 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
     }
 
+    public void startSDLogging(View v) {
+        ((ShimmerBluetooth)shimmerDevice).writeConfigTime(System.currentTimeMillis());
+        shimmerDevice.startSDLogging();
+    }
+
+    public void stopSDLogging(View v) {
+        shimmerDevice.stopSDLogging();
+    }
+
+
     /**
      * Get the result from the paired devices dialog
      * @param requestCode
