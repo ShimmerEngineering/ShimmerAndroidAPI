@@ -241,6 +241,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param handler add handler to receive msgs from the shimmer class
 	 */
 	public Shimmer(Handler handler) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(0, handler);
@@ -254,6 +255,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param handlerList this is an ArrayList containing multiple Handlers
 	 */
 	public Shimmer(ArrayList<Handler> handlerList) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList = handlerList;
@@ -267,6 +269,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	@Deprecated
 	public Shimmer(Handler handler, String myName, Boolean continousSync) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
@@ -281,6 +284,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, Boolean continousSync) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
@@ -303,6 +307,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
@@ -328,6 +333,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, int magRange) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
@@ -355,6 +361,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
@@ -388,6 +395,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	@Deprecated
 	public Shimmer(Context context, Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, long setEnabledSensors, boolean continousSync, boolean enableLowPowerAccel, boolean enableLowPowerGyro, boolean enableLowPowerMag, int gyroRange, int magRange,byte[] exg1,byte[] exg2) {
+		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);

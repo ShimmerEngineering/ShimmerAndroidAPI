@@ -12,6 +12,15 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.9.15beta\fc33a693b0e4fb03e2d57e8001f0f2aa0e295baa\ShimmerDriver-0.9.15beta.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="fc33a693b0e4fb03e2d57e8001f0f2aa0e295baa">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.9.15beta_1bc3c9274ac29d25c2f5065adfa1682fbe701978\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.errorprone\error_prone_annotations\2.0.19\c3754a0bdd545b00ddc26884f9e7624f8b6a14de\error_prone_annotations-2.0.19.jar"
         jumboMode="true"
         optimize="true"
@@ -72,6 +81,15 @@
         revision="25.0.2"
         sha1="b8b87068b478759937cd6b83c1f3f57e5057dcfa">
         <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-okhttp-1.6.1_0ad2d4ebddb7db288bd60ddf53394b9c18b314e6\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_a25a6cdd6b59def1378ac6983346df607d9debd0\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -171,6 +189,15 @@
         revision="25.0.2"
         sha1="7d92aed4885519987a3965e6ebbb6585a2f6bd59">
         <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-auth-1.6.1_a6d329d2c85a9fdf10e43d0f5a9b79c93cbeda74\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="22031e2c315c5c3cd0c34d14497739867e300a5d">
+        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmer3DOrientationExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_09bf820cedbd0f858b20d49ea68ae51f69cc0a21\classes.dex" />
     </item>
     <item
         is-multidex="true"
