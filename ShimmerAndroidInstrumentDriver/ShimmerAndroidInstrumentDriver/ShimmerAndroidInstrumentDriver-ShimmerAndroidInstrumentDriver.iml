@@ -109,7 +109,6 @@
     <orderEntry type="library" exported="" name="okhttp-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="hidapi-1.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-stub-1.6.1" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.16beta" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
     <orderEntry type="library" exported="" name="opencensus-api-0.5.1" level="project" />
@@ -125,6 +124,7 @@
     <orderEntry type="library" exported="" name="JTransforms-3.1" level="project" />
     <orderEntry type="library" exported="" name="instrumentation-api-0.4.3" level="project" />
     <orderEntry type="library" exported="" name="proto-google-common-protos-0.1.9" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.18beta" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />

@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '3.0.25Beta'
+version = '3.0.27Beta'
 
 android {
     compileSdkVersion 25
@@ -94,7 +94,7 @@ dependencies {
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.16beta') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.18beta') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
