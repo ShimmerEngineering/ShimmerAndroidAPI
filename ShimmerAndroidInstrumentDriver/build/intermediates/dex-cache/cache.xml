@@ -30,15 +30,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.9.17beta\eb9f24bda0adde1cb8da3c1cfbc799dc2b4e0ae4\ShimmerDriver-0.9.17beta.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="eb9f24bda0adde1cb8da3c1cfbc799dc2b4e0ae4">
-        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.9.17beta_f3b38bc4099c82eb1ff118158863243cf842980c\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\io.grpc\grpc-context\1.6.1\9c52ae577c2dd4b8c6ac6e49c1154e1dc37d98ee\grpc-context-1.6.1.jar"
         jumboMode="true"
         optimize="true"
@@ -180,15 +171,6 @@
         revision="25.0.2"
         sha1="124bca81a50bc76b6a6babcc4bc529e5a93db70f">
         <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\grpc-protobuf-lite-1.6.1_8e6de9206d5d64471199c479df904de6892befee\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.9.16beta\49e9353a19940f867e360bc4d39df7a540e4b7e8\ShimmerDriver-0.9.16beta.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="49e9353a19940f867e360bc4d39df7a540e4b7e8">
-        <dex dex="C:\Users\User\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.9.16beta_c389f91254bf138ebdd60102eca36215de2a97ad\classes.dex" />
     </item>
     <item
         is-multidex="true"
