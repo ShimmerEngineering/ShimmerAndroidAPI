@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/ShimmerAndroidInstrumentDriver" />
             <option value="$PROJECT_DIR$/shimmer3DOrientationExample" />
             <option value="$PROJECT_DIR$/shimmerBasicExample" />
+            <option value="$PROJECT_DIR$/shimmerLegacyExample" />
             <option value="$PROJECT_DIR$/shimmerServiceExample" />
           </set>
         </option>
