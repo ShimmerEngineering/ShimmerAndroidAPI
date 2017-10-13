@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ShimmerBluetoothManagerAndroid btManager;
     String shimmerBtAdd = "";
     final static String LOG_TAG = "ShimmerLegacyExample";
+    private boolean mFirstTimeConnection = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +76,11 @@ public class MainActivity extends AppCompatActivity {
                         case CONNECTED:
                             Log.i(LOG_TAG, "Device connected: " + macAddress);
                             //Check if Accel is enabled on the Shimmer, and if not, enable it
-                            Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
-                            ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
+                            if(mFirstTimeConnection) {
+                                Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
+                                ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
+                            }
+                            mFirstTimeConnection = false;
                             break;
                         case STREAMING:
                             Log.i(LOG_TAG, "Device: " + macAddress + " now streaming");
@@ -132,6 +136,10 @@ public class MainActivity extends AppCompatActivity {
         btManager.stopStreaming(shimmerBtAdd);
     }
 
+    public void disconnectDevice(View v){
+        btManager.disconnectAllDevices();
+        mFirstTimeConnection = true;
+    }
 /*  TODO: Add in configuration dialogs
     public void enableSensors(View v) {
         ShimmerDevice shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);
