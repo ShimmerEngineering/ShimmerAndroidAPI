@@ -75,10 +75,11 @@ public class MainActivity extends AppCompatActivity {
                         case CONNECTED:
                             Log.i(LOG_TAG, "Device connected: " + macAddress);
                             //Check if Accel is enabled on the Shimmer, and if not, enable it
-                            ShimmerDevice shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
-                            ((ShimmerBluetooth) shimmerDevice).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
+                            Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
+                            ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
                             break;
                         case STREAMING:
+                            Log.i(LOG_TAG, "Device: " + macAddress + " now streaming");
                             break;
                         case STREAMING_AND_SDLOGGING:
                             break;
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     if (msg.obj instanceof CallbackObject) {
                         int ind = ((CallbackObject) msg.obj).mIndicator;
                         if (ind == NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
-
+                            //FULLY_INITIALIZED state is returned when Shimmer is connected or after Shimmer has been configured
                         }
                     }
                     break;
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         btManager.stopStreaming(shimmerBtAdd);
     }
 
+/*  TODO: Add in configuration dialogs
     public void enableSensors(View v) {
         ShimmerDevice shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);
         if(shimmerDevice != null) {
@@ -148,12 +150,21 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Can't configure sensors: no device connected", Toast.LENGTH_LONG).show();
         }
     }
+*/
 
+    /**
+     * Gets the selected Bluetooth address from the list of paired Bluetooth devices in ShimmerBluetoothDialog
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
-                btManager.disconnectAllDevices();   //Disconnect all devices first
+                //Ensure no previous device is connected to the App as it only supports a single device at a time:
+                btManager.disconnectAllDevices();
+
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 btManager.connectShimmerThroughBTAddress(macAdd);   //Connect to the selected device
@@ -162,5 +173,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        btManager.disconnectAllDevices();
+        super.onDestroy();
     }
 }
