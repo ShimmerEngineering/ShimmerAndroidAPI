@@ -21,6 +21,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case CONNECTED:
                             Log.i(LOG_TAG, "Device connected: " + macAddress);
-                            //Check if Accel is enabled on the Shimmer, and if not, enable it
-                            Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
-                            ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
+                            //Enable just Accel on the Shimmer
+//                            Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
+//                            ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
                             break;
                         case STREAMING:
                             Log.i(LOG_TAG, "Device: " + macAddress + " now streaming");

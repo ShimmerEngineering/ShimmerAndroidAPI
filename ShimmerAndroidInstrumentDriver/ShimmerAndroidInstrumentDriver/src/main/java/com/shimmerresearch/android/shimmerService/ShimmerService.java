@@ -675,7 +675,9 @@ public class ShimmerService extends Service {
 		while (iterator.hasNext()) {
 			Shimmer stemp=(Shimmer) iterator.next();
 			if ((stemp.getBluetoothRadioState()==BT_STATE.CONNECTED || stemp.getBluetoothRadioState()==BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
-				stemp.writeShimmerAndSensorsSamplingRate(samplingRate);
+				//Jos removed Oct 2017
+				//stemp.writeShimmerAndSensorsSamplingRate(samplingRate);
+				stemp.setShimmerAndSensorsSamplingRate(samplingRate);
 				if (mPPGtoHREnabled){
 					mPPGtoHR = new PPGtoHRAlgorithm(samplingRate, mNumberOfBeatsToAvg, true);
 					try {
