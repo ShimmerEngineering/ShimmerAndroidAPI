@@ -478,7 +478,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	public synchronized void connect(final String address, String bluetoothLibrary) {
 		mIamAlive = false;
-		mListofInstructions.clear();
+		getListofInstructions().clear();
 		mFirstTime=true;
 
 
@@ -1035,21 +1035,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mEnableCalibration = enable;
 	}
 
-	
 
-
-
-	public void writeInstruction(){
-		if (getState() == BT_STATE.CONNECTED || getState() == BT_STATE.STREAMING) {
-			byte[] instruction = (byte[]) mListofInstructions.get(0);
-			write(instruction);
-		}
-	}
-
-
-
-	
-	
 	@Override
 	protected void sendStatusMsgPacketLossDetected() {
 		//TODO: Delete this...

@@ -21,7 +21,6 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
-import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ShimmerBluetoothManagerAndroid btManager;
     String shimmerBtAdd = "";
     final static String LOG_TAG = "ShimmerLegacyExample";
+    private boolean mFirstTimeConnection = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +75,12 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case CONNECTED:
                             Log.i(LOG_TAG, "Device connected: " + macAddress);
-                            //Enable just Accel on the Shimmer
-//                            Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
-//                            ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
+                            //Check if Accel is enabled on the Shimmer, and if not, enable it
+                            if(mFirstTimeConnection) {
+                                Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
+                                ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
+                            }
+                            mFirstTimeConnection = false;
                             break;
                         case STREAMING:
                             Log.i(LOG_TAG, "Device: " + macAddress + " now streaming");
@@ -133,6 +136,10 @@ public class MainActivity extends AppCompatActivity {
         btManager.stopStreaming(shimmerBtAdd);
     }
 
+    public void disconnectDevice(View v){
+        btManager.disconnectAllDevices();
+        mFirstTimeConnection = true;
+    }
 /*  TODO: Add in configuration dialogs
     public void enableSensors(View v) {
         ShimmerDevice shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);

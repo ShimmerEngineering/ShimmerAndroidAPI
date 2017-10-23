@@ -75,10 +75,12 @@ public class XYSeriesShimmer implements XYSeries {
 
     @Override
     public Number getY(int index) {
-		if(index < mDataY.size()) {
-			return mDataY.get(index);
-		} else {
-			return null;
+		synchronized (mDataY) {
+			if (index < mDataY.size()) {
+				return mDataY.get(index);
+			} else {
+				return null;
+			}
 		}
     }
 
@@ -100,32 +102,38 @@ public class XYSeriesShimmer implements XYSeries {
 	}
     
 	public void clearData(){
-		mDataY.clear();
+		synchronized (mDataY) {
+			mDataY.clear();
+		}
 	}
 	
-    public void updateData(List<Number> datasource){ 
-    	this.mDataY=datasource;
-		if (mClearGraphatLimit){
-			if (mDataY.size()>=mXAxisLimit){
-				mDataY.clear();	
-			}
-			
-		} else {
-			while (mDataY.size()>=mXAxisLimit){
-				mDataY.remove(0);
+    public void updateData(List<Number> datasource){
+		synchronized (mDataY) {
+			this.mDataY = datasource;
+			if (mClearGraphatLimit) {
+				if (mDataY.size() >= mXAxisLimit) {
+					mDataY.clear();
+				}
+
+			} else {
+				while (mDataY.size() >= mXAxisLimit) {
+					mDataY.remove(0);
+				}
 			}
 		}
     }
     
-    public void addData(Number data){ 
-		this.mDataY.add(data);
-		if (mClearGraphatLimit){
-			if (mDataY.size()>=mXAxisLimit){
-				mDataY.clear();	
-			}
-		} else {
-			while (mDataY.size()>=mXAxisLimit){
-				mDataY.remove(0);
+    public void addData(Number data){
+		synchronized (mDataY) {
+			this.mDataY.add(data);
+			if (mClearGraphatLimit) {
+				if (mDataY.size() >= mXAxisLimit) {
+					mDataY.clear();
+				}
+			} else {
+				while (mDataY.size() >= mXAxisLimit) {
+					mDataY.remove(0);
+				}
 			}
 		}
 
