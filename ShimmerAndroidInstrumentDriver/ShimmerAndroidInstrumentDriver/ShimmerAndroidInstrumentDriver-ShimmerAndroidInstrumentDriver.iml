@@ -79,11 +79,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/annotations" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-safeguard" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
@@ -91,6 +93,8 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
+      <excludeFolder url="file://$MODULE_DIR$/build/libs" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/poms" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
@@ -117,7 +121,6 @@
     <orderEntry type="library" exported="" name="commons-lang-2.6" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-nano-1.6.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="httpcore-4.3.3" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.21beta" level="project" />
     <orderEntry type="library" exported="" name="protobuf-javanano-3.0.0-alpha-5" level="project" />
     <orderEntry type="library" exported="" name="JTransforms-3.1" level="project" />
     <orderEntry type="library" exported="" name="instrumentation-api-0.4.3" level="project" />
@@ -126,6 +129,7 @@
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerDriver-0.9.22beta" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="androidplot-core-0.5.0-release" level="project" />
     <orderEntry type="library" exported="" name="grpc-protobuf-lite-1.6.1" level="project" />
@@ -138,11 +142,10 @@
     <orderEntry type="library" exported="" name="slf4j-api-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-0.9.22beta" level="project" />
     <orderEntry type="library" exported="" name="grpc-netty-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-auth-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="grpc-all-1.6.1" level="project" />
-    <orderEntry type="library" exported="" name="jblas-1.2.4" level="project" />
-    <orderEntry type="library" exported="" name="ShimmerBluetoothManager-0.9.21beta" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="google-auth-library-credentials-0.4.0" level="project" />
     <orderEntry type="library" exported="" name="commons-collections-3.2" level="project" />
