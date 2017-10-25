@@ -301,14 +301,14 @@ public class ShimmerDialogConfigurations {
     public static void buildConfigOptionDetailsSensor(final String key, Map<String, ConfigOptionDetailsSensor> configOptionsMap, final Context context, final ShimmerDevice shimmerDevice, final ShimmerDevice shimmerDeviceClone) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
-        String title = "";
+        String title = getConfigValueLabelFromConfigLabel(key, shimmerDeviceClone);
         if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
             Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
 
             if(returnedValue != null) {
-                int configValue = (int) returnedValue;
-                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
-                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+//                int configValue = (int) returnedValue;
+//                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+//                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 shimmerDevice.getConfigValueUsingConfigLabel(key);
                 builder.setTitle(title);
@@ -387,14 +387,14 @@ public class ShimmerDialogConfigurations {
                                                        final ShimmerBluetoothManagerAndroid bluetoothManager) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
-        String title = "";
+        String title = getConfigValueLabelFromConfigLabel(key, shimmerDeviceClone);
         if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
             Object returnedValue = shimmerDevice.getConfigValueUsingConfigLabel(key);
 
             if(returnedValue != null) {
-                int configValue = (int) returnedValue;
-                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
-                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+//                int configValue = (int) returnedValue;
+//                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+//                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 shimmerDevice.getConfigValueUsingConfigLabel(key);
                 builder.setTitle(title);
@@ -464,14 +464,14 @@ public class ShimmerDialogConfigurations {
                                                       final ShimmerDialogConfigurations shimmerDialogConfigurations) {
         final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
         final CharSequence[] cs = cods.getGuiValues();
-        String title = "";
+        String title = getConfigValueLabelFromConfigLabel(key, shimmerDeviceClone);
         if (cods.mGuiComponentType == ConfigOptionDetails.GUI_COMPONENT_TYPE.COMBOBOX) {
             Object returnedValue = shimmerDeviceClone.getConfigValueUsingConfigLabel(key);
 
             if(returnedValue != null) {
-                int configValue = (int) returnedValue;
-                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
-                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+//                int configValue = (int) returnedValue;
+//                int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
+//                title = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 shimmerDeviceClone.getConfigValueUsingConfigLabel(key);
                 builder.setTitle(title);
@@ -534,6 +534,30 @@ public class ShimmerDialogConfigurations {
             bluetoothManager.configureShimmer(clone);
         }
 
+    }
+
+    private static String getConfigValueLabelFromConfigLabel(String label, ShimmerDevice cloneDevice){
+        ConfigOptionDetailsSensor cods = cloneDevice.getConfigOptionsMap().get(label);
+        int currentConfigInt = (int) cloneDevice.getConfigValueUsingConfigLabel(label);
+        int index = -1;
+        Integer[] values = cods.getConfigValues();
+        String[] valueLabels = cods.getGuiValues();
+        for (int i=0;i<values.length;i++){
+            if (currentConfigInt==values[i]){
+                index=i;
+            }
+        }
+        if (index==-1){
+            System.out.println();
+            return "";
+        }
+        return valueLabels[index];
+    }
+
+    private static int getConfigValueIntFromConfigGuiIndex(int configGuiIndex, String currentConfigKey, ShimmerDevice cloneDevice) {
+        ConfigOptionDetailsSensor cods = cloneDevice.getConfigOptionsMap().get(currentConfigKey);
+        Integer[] values = cods.getConfigValues();
+        return values[configGuiIndex];
     }
 
     //Additional variables for custom signals and filtered signals for the SelectSensorPlot dialog
