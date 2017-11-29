@@ -9,10 +9,10 @@
     android:gravity="center">
 
     <TextView
-        android:text="Enable/Disable Sensors"
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView" />
+        android:text="Enable/Disable Sensors" />
 
     <Button
         android:id="@+id/button"
@@ -38,9 +38,14 @@
         android:layout_height="wrap_content"
         android:text=" " />
 
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Please refer to the Android Logcat for signal data" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent"
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please refer to the Android Logcat for signal data"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button

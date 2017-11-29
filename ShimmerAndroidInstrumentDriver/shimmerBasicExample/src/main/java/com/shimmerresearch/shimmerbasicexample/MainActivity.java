@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     String shimmerBtAdd = "00:00:00:00:00:00";  //Put the address of the Shimmer device you want to connect here
 
     final static String LOG_TAG = "SHIMMER";
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Error. Shimmer device not paired or Bluetooth is not enabled. " +
                             "Please close the app and pair or enable Bluetooth", Toast.LENGTH_LONG).show();
         }
+        textView = (TextView) findViewById(R.id.textView);
         super.onStart();
     }
 
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    int updateCount = 0;
     /**
      * Messages from the Shimmer device including sensor data are received here
      */
@@ -100,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
                     if ((msg.obj instanceof ObjectCluster)) {
 
                         ObjectCluster objectCluster = (ObjectCluster) msg.obj;
+                        updateCount++;
+                        if(updateCount == 500) {
+                            Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(((ObjectCluster) msg.obj).getMacAddress());
+                            textView.setText("Current Packet Reception Rate: " + shimmer.getPacketReceptionRateCurrent());
+                            updateCount = 0;
+                        }
 
                         //Retrieve all possible formats for the current sensor device:
                         Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP);
