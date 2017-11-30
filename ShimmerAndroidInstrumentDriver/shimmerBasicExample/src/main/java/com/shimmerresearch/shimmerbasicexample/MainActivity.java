@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     int updateCount = 0;
+    double savedTimeStamp = 0;
     /**
      * Messages from the Shimmer device including sensor data are received here
      */
@@ -104,11 +105,13 @@ public class MainActivity extends AppCompatActivity {
                     if ((msg.obj instanceof ObjectCluster)) {
 
                         ObjectCluster objectCluster = (ObjectCluster) msg.obj;
-                        updateCount++;
-                        if(updateCount == 500) {
+
+                        double currentTimeStamp = ((ObjectCluster) msg.obj).getTimestampMilliSecs();
+                        double diff = currentTimeStamp - savedTimeStamp;
+                        if(diff > 1000) {
                             Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(((ObjectCluster) msg.obj).getMacAddress());
-                            textView.setText("Current Packet Reception Rate: " + shimmer.getPacketReceptionRateCurrent());
-                            updateCount = 0;
+                            textView.setText("Current Packet Reception Rate: " + shimmer.getPacketReceptionRateOverall());
+                            savedTimeStamp = currentTimeStamp;
                         }
 
                         //Retrieve all possible formats for the current sensor device:
