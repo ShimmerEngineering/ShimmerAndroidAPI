@@ -64,6 +64,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
     public ShimmerBluetoothManagerAndroid(Context context, Handler handler) throws Exception {
         super();
+        ShimmerRadioInitializer.useLegacyDelayBeforeBtRead(true);
         this.mContext = context;
         this.mHandler = handler;
         if(mHandler==null){ throw new Exception("Handler is NULL"); }
@@ -221,6 +222,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
     @Override
     protected ShimmerDevice createNewShimmer3(ShimmerRadioInitializer shimmerRadioInitializer, String bluetoothAddress) {
+        shimmerRadioInitializer.useLegacyDelayBeforeBtRead(true);
         if(mProgressDialog!=null){
             mProgressDialog.dismiss();
         }
@@ -263,7 +265,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
     @Override
     protected Shimmer4 createNewShimmer4(ShimmerRadioInitializer shimmerRadioInitializer, String bluetoothAddress) {
-
+        shimmerRadioInitializer.useLegacyDelayBeforeBtRead(true);
         ShimmerSerialPortAndroid serialPortComm = (ShimmerSerialPortAndroid) shimmerRadioInitializer.getSerialCommPort();
         Shimmer4 shimmer4 = createNewShimmer4("", bluetoothAddress); //first parameter is com port, but we do not know it in android
         if(serialPortComm!=null){

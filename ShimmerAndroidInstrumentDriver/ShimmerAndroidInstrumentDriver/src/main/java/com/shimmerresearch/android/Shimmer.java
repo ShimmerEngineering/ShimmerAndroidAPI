@@ -247,6 +247,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandlerList.add(0, handler);
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
+		mUseProcessingThread = true;
 	}
 
 	/**
@@ -260,6 +261,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList = handlerList;
 		mSetupDeviceWhileConnecting = false;
+		mUseProcessingThread = true;
 	}
 
 	/**
@@ -276,6 +278,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
+		mUseProcessingThread = true;
 	}
 	/**
 	 *
@@ -291,6 +294,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
+		mUseProcessingThread = true;
 	}
 	
 	
@@ -318,6 +322,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName = myName;
 		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
+		mUseProcessingThread = true;
 	}
 
 	/**
@@ -345,6 +350,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName = myName;
 		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
+		mUseProcessingThread = true;
 	}
 
 	
@@ -379,6 +385,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 		setGyroRange(gyroRange); //	mGyroRange = gyroRange;
 		setMagRange(magRange); // mMagRange = magRange;
+		mUseProcessingThread = true;
 	}
 
 
@@ -416,6 +423,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mSetupEXG = true;
 		mEXG1RegisterArray = exg1;
 		mEXG2RegisterArray = exg2;
+		mUseProcessingThread = true;
 	}
 
 	/** Shimmer 3 Constructor
@@ -435,6 +443,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
+		mUseProcessingThread = true;
 	}
 
 	/** Shimmer2R Constructor
@@ -453,6 +462,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
+		mUseProcessingThread = true;
 	}
 
 	/**
