@@ -10,6 +10,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -27,7 +28,16 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+    }
 }
 
 dependencies {
