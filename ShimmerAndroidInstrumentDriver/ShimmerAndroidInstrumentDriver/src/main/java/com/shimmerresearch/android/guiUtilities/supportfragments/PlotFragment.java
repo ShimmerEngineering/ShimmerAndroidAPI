@@ -177,6 +177,7 @@ public class PlotFragment extends Fragment {
         shimmerService.mPlotManager.updateDynamicPlot(dynamicPlot);
     }
 
+    static double savedTimeStamp = 0;
 
     private static Handler graphHandler = new Handler() {
 
@@ -293,7 +294,15 @@ public class PlotFragment extends Fragment {
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 
                     if ((msg.obj instanceof ObjectCluster)){
+                        ObjectCluster objectCluster = (ObjectCluster) msg.obj;
 
+                        double currentTimeStamp = ((ObjectCluster) msg.obj).getTimestampMilliSecs();
+                        double diff = currentTimeStamp - savedTimeStamp;
+                        if(diff > 1000) {
+                            Shimmer shimmer = (Shimmer) shimmerService.getShimmer(((ObjectCluster) msg.obj).getMacAddress());
+                            Log.e("JOS", "PRR: " + shimmer.getPacketReceptionRateOverall());
+                            savedTimeStamp = currentTimeStamp;
+                        }
                     }
 
                     break;

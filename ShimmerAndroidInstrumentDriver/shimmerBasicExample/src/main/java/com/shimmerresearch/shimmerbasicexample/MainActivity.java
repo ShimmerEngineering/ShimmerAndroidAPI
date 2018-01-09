@@ -24,6 +24,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driver.ShimmerObject;
 
 import java.io.IOException;
 import java.util.Collection;

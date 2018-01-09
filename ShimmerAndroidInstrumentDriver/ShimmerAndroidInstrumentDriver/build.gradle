@@ -95,7 +95,7 @@ dependencies {
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.24beta') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.25test') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'

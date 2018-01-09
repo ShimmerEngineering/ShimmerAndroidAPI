@@ -230,6 +230,7 @@ public class Shimmer extends ShimmerBluetooth{
 		setEnableProcessMarker(false);
 	}
 	private boolean mContinuousStateUpdates = true;
+	private boolean useProcessingThread = false;
 
 
 	{
@@ -247,7 +248,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandlerList.add(0, handler);
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	/**
@@ -261,7 +262,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList = handlerList;
 		mSetupDeviceWhileConnecting = false;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	/**
@@ -278,7 +279,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 	/**
 	 *
@@ -294,7 +295,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName=myName;
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 	
 	
@@ -322,7 +323,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName = myName;
 		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	/**
@@ -350,7 +351,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mShimmerUserAssignedName = myName;
 		mSetupDeviceWhileConnecting = true;
 //		mContinousSync = continousSync;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	
@@ -385,7 +386,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 		setGyroRange(gyroRange); //	mGyroRange = gyroRange;
 		setMagRange(magRange); // mMagRange = magRange;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 
@@ -423,7 +424,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mSetupEXG = true;
 		mEXG1RegisterArray = exg1;
 		mEXG2RegisterArray = exg2;
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	/** Shimmer 3 Constructor
@@ -443,7 +444,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	/** Shimmer2R Constructor
@@ -462,7 +463,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
-		mUseProcessingThread = true;
+		mUseProcessingThread = useProcessingThread;
 	}
 
 	/**
@@ -1050,7 +1051,7 @@ public class Shimmer extends ShimmerBluetooth{
 	protected void sendStatusMsgPacketLossDetected() {
 		//TODO: Delete this...
 		//mHandler.obtainMessage(Shimmer.MESSAGE_PACKET_LOSS_DETECTED,  new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress())).sendToTarget();
-		sendMsgToHandlerListTarget(Shimmer.MESSAGE_PACKET_LOSS_DETECTED,
+		sendMsgToHandlerListTarget(Shimmer.MESSAGE_PACKET_LOSS_DETECTED,	//TODO JOS: TEST ONLY
 				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress()));
 	}
 	
@@ -1151,11 +1152,17 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 	}
 
+	int count = 0;	//TODO JOS: Test Only
 	@Override
 	protected void dataHandler(ObjectCluster ojc) {
 		// TODO: Delete this...
 		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc).sendToTarget();
-		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc);
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET, ojc);	// TODO JOS: Test Only
+		if(count == 1024) {
+			Log.e("JOS", "PRR: " + getPacketReceptionRateOverall());
+			count = 0;
+		}
+		count++;
 	}
 
 	@Override
@@ -1445,7 +1452,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 
 }
-
+	//TODO JOS: BELOW COMMENTED OUT CODE TEST ONLY
 	private void sendMsgToHandlerList(int obtainMessage) {
 		for(Handler handler : mHandlerList) {
 			Message msg = handler.obtainMessage(obtainMessage);

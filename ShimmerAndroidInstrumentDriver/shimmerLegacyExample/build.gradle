@@ -5,6 +5,7 @@ android {
     buildToolsVersion '26.0.2'
 
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.shimmerresearch.shimmerlegacyexample"
         minSdkVersion 14
         targetSdkVersion 25
@@ -26,6 +27,11 @@ android {
 
     dexOptions {
         javaMaxHeapSize "4g"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
     }
 
 }
