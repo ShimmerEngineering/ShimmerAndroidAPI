@@ -230,7 +230,7 @@ public class Shimmer extends ShimmerBluetooth{
 		setEnableProcessMarker(false);
 	}
 	private boolean mContinuousStateUpdates = true;
-	private boolean useProcessingThread = false;
+	private boolean useProcessingThread = true;
 
 
 	{

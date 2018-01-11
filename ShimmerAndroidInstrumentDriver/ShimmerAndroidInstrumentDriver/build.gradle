@@ -10,7 +10,7 @@ version = '3.0.43Beta'
 android {
     compileSdkVersion 25
     //compileSdkVersion 23
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.2'
 
     lintOptions {
         abortOnError false
@@ -95,7 +95,7 @@ dependencies {
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.25test') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.32test') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'

@@ -118,8 +118,11 @@ public class MainActivity extends AppCompatActivity {
                         //Retrieve all possible formats for the current sensor device:
                         Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP);
                         FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        double timeStampData = timeStampCluster.mData;
-                        Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
+
+                        if(timeStampCluster != null) {
+                            double timeStampData = timeStampCluster.mData;
+                            Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
+                        }
                         allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
                         FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         if (accelXCluster!=null) {
