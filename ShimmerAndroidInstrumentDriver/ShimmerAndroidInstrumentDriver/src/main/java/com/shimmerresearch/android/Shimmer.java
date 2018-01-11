@@ -456,6 +456,52 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	/**
+	 * Shimmer 3 Constructor with option to enable/disable calibration
+	 * @param handler
+	 * @param userAssignedName
+	 * @param samplingRate
+	 * @param accelRange
+	 * @param gsrRange
+	 * @param sensorIdsToEnable
+	 * @param gyroRange
+	 * @param magRange
+	 * @param orientation
+	 * @param pressureResolution
+	 * @param enableCalibration
+	 */
+	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, boolean enableCalibration){
+		super(userAssignedName, samplingRate, sensorIdsToEnable, accelRange, gsrRange, gyroRange, magRange, pressureResolution);
+		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothRadioState = BT_STATE.DISCONNECTED;
+		mHandlerList.add(handler);
+		setupOrientation(orientation, samplingRate);
+		setEnableCalibration(enableCalibration);
+	}
+
+	/**
+	 * Shimmer 2R Constructor with option to enable/disable calibration
+	 * @param handler
+	 * @param myName
+	 * @param samplingRate
+	 * @param accelRange
+	 * @param gsrRange
+	 * @param setEnabledSensors
+	 * @param magGain
+	 * @param orientation
+	 * @param enableCalibration
+	 */
+	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, boolean enableCalibration) {
+		super(myName,samplingRate, setEnabledSensors, accelRange, gsrRange, magGain);
+		setupOrientation(orientation, samplingRate);
+		mAdapter = BluetoothAdapter.getDefaultAdapter();
+		mBluetoothRadioState = BT_STATE.DISCONNECTED;
+		mHandlerList.add(handler);
+		setupOrientation(orientation, samplingRate);
+		setEnableCalibration(enableCalibration);
+	}
+
+
+	/**
 	 * Set the current state of the chat connection
 	 * @param state  An integer defining the current connection state
 	 */

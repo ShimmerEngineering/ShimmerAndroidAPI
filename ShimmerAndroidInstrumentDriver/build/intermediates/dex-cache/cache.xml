@@ -3,21 +3,12 @@
 
     <item
         is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jar="C:\Users\Jos\.gradle\caches\modules-2\files-2.1\com.shimmerresearch.driver\ShimmerDriver\0.9.26beta\55686c5ef8b9dc8eea6260a2260fbd2c9bee364e\ShimmerDriver-0.9.26beta.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_a08648e6c94266c5a99200e856ca76b5002c1a2c\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.2"
-        sha1="410790e1b1f006a879c0a6c0171c1584454ac9dd">
-        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerServiceExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_ba138c75be7822f8bfccaf6474e758ae67fd1028\classes.dex" />
+        sha1="55686c5ef8b9dc8eea6260a2260fbd2c9bee364e">
+        <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10\ShimmerDriver-0.9.26beta_800b080a92f0c79b375d795e2595873f68dbfb82\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -34,7 +25,7 @@
         jumboMode="true"
         optimize="true"
         revision="25.0.2"
-        sha1="64b048a8d03c009e115e23715e1bf42f342a6a00">
+        sha1="8f8cbd745c88efdad9fcd76949b1867664864cce">
         <dex dex="C:\Users\Jos\Documents\GitHub\ShimmerAndroidAPI\ShimmerAndroidInstrumentDriver\shimmerBasicExample\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_e1f3e26ca05936580d656f110b005ba121c211de\classes.dex" />
     </item>
     <item
