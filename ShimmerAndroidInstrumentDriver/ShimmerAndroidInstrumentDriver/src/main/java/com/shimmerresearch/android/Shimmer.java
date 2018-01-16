@@ -1083,14 +1083,6 @@ public class Shimmer extends ShimmerBluetooth{
 		return instructionStatus;
 	}
 
-	/**
-	 * Purpose of disabling calibration are for logging applications, to reduce the amount of computations needed to compute the data thus reducing risk of a performance bottleneck occuring and maximizing logging performance
-	 * @param enable enables or disables calibration, note that this need to be enabled when using the ID as to calculate 3D orientation, see enable3DOrientation 
-	 */
-	public void enableCalibration(boolean enable){
-		mEnableCalibration = enable;
-	}
-
 
 	@Override
 	protected void sendStatusMsgPacketLossDetected() {
