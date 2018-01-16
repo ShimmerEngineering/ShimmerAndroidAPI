@@ -486,6 +486,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
 		setEnableCalibration(enableCalibration);
+		mUseProcessingThread = true;
 	}
 
 	/**
@@ -508,6 +509,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
 		setEnableCalibration(enableCalibration);
+		mUseProcessingThread = true;
 	}
 
 
