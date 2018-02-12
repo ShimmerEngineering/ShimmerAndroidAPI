@@ -84,7 +84,8 @@ dependencies {
 
     //compile 'io.grpc:grpc-okhttp:1.0.0-pre1'
     //compile 'io.grpc:grpc-protobuf-lite:1.0.0-pre1'
-    //compile 'io.grpc:grpc-stub:1.0.0-pre1'
+    //compile 'io.grpc:grpc-stub:1.0.0-pre1']
+
 
     //compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
@@ -97,7 +98,7 @@ dependencies {
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.52beta') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.100test') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
