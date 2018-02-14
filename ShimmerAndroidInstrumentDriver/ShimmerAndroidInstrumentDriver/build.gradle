@@ -5,12 +5,10 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '3.0.46Beta'
+version = '3.0.47Beta'
 
 android {
     compileSdkVersion 25
-    //compileSdkVersion 23
-    buildToolsVersion '25.0.2'
 
     lintOptions {
         abortOnError false
@@ -52,7 +50,6 @@ android {
         exclude 'META-INF/DEPENDENCIES'
     }
     dexOptions {
-        incremental true
         javaMaxHeapSize "4g"
         preDexLibraries = false
         jumboMode = true
@@ -98,7 +95,7 @@ dependencies {
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.100test') {
+    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.104Internal') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
