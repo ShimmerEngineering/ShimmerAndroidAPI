@@ -8,8 +8,22 @@ DO NOT pull this commit if your project requires the GSR sensor.
 Main purpose of this commit is to release the updated Arrays data structure, which can improve packet reception rate significantly. 
 An example of how to use this can be found in Efficient Data Array Example.
 
-# Importing Via Gradle
-This api can also be imported using gradle, please include the following repository in your build.gradle file 
+
+# Frequently Asked Questions
+
+- **Getting Started with the Shimmer Android API**
+1) *Clone the repository from GitHub*
+You can clone the Android API repository by navigating over to the repository's GitHub main page, and clicking the green "Clone or Download" button on the right.
+
+You then have the option of:
+A) Downloading the repository as a zip file. 
+You would then need to unzip it and import the contents of the unzipped folder into Android Studio as a project.
+
+B) Copying the link provided. 
+You would then need to choose the option "Check out project from Version Control" on the Android Studio start screen. After that, click on "GitHub" and copy the link into the popup dialog.
+
+2) *Importing via Gradle*
+This api can also be imported using gradle. Please include the following repository in your build.gradle file 
 ```
 allprojects {
     repositories {
@@ -23,8 +37,8 @@ allprojects {
 Most recent uploaded library can be found here:-
 https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver
 
-# Frequently Asked Questions
-**Difference between methods**
+
+- **Difference between methods**
 In the Android API, you may notice methods with different names, but which appear to perform the same function.
 
 For example, Shimmer.setSamplingRateShimmer(rate) vs Shimmer.writeShimmerAndSensorsSamplingRate(rate)
@@ -34,7 +48,8 @@ Set - Modifies the setting on the Shimmer object in code only.
 These settings still have to be written to the physical device using a command e.g. shimmer.writeConfigBytes()
 Write - Modifies the setting on the Shimmer object in code AND writes the setting to the physical Shimmer device
 
-**Timestamps (Shimmer3)**
+
+- **Timestamps (Shimmer3)**
 Each ObjectCluster (message) received from the Shimmer devices contains a record of the time when the message or the sample was recorded. These records are known as timestamps.
 
 Each message can contain multiple types of timestamps, and the differences between each are listed below.
@@ -50,6 +65,37 @@ This latency cannot be avoided, but it can be mitigated in part by methods such 
 SYSTEM_TIMESTAMP_PLOT - This is equivalent to the SYSTEM_TIMESTAMP
 
 TIMESTAMP_OFFSET - It is not recommended to use this, as this is used for SD parsing.
+
+
+**Common Errors**
+- **DexArchiveMergerException** *e.g. ':app:transformDexArchiveWithExternalLibsDexMergerForDebug'.>
+java.lang.RuntimeException: java.lang.RuntimeException:
+com.android.builder.dexing.DexArchiveMergerException: Unable to merge dex*
+
+To resolve this, enable Multidex in your project's build.gradle file:
+```
+android {
+    defaultConfig {
+        ...
+        multiDexEnabled true
+        ...
+    }
+```
+
+- **Errors with buildToolsVersion and/or MultiDex Incremental**
+These options were removed from the build.gradle files as they are unnecessary in the latest version of Android Studio and Gradle Plugin 3.0 and above. Should you encounter issues with these settings, simply add them back in:
+```
+android {
+    ...
+    buildToolsVersion x.x.x
+    
+    dexOptions {
+        incremental true
+    }
+    ...
+
+}
+```
 
 
 # Changelog 
