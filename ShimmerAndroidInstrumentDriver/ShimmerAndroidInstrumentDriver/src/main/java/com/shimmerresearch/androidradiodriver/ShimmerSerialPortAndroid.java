@@ -149,13 +149,13 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
     @Override
     public void disconnect()  {
         closeBTConnection();
-        eventDeviceConnected();
+        eventDeviceDisconnected();
     }
 
     @Override
     public void closeSafely()  {
         closeBTConnection();
-        eventDeviceConnected();
+        eventDeviceDisconnected();
     }
 
     private void closeBTConnection()  {
