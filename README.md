@@ -2,6 +2,9 @@
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
+Please note that the latest release, 3.0.47Internal, is an internal release, as there is a bug with the GSR signal.
+Do not pull this release if your project requires the GSR sensor. 
+
 # Importing Via Gradle
 This api can also be imported using gradle, please include the following repository in your build.gradle file 
 ```
@@ -19,6 +22,18 @@ https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver
 
 
 # Changelog 
+
+14 February 2018 (3.0.47Internal)
+- Bug with GSR signal. Fix in progress...
+- Added alternative Arrays data structure to ObjectCluster, accessible via sensorDataArray data class.
+Enabling this data structure can improve packet reception rate performance significantly, especially on older devices.
+- Added method to get Arrays index for a channel, getIndexForChannelName, in ObjectCluster
+- Updated getFormatClusterValue in ObjectCluster to return Arrays data if Arrays data structure is enabled
+- Refactored Shimmer Basic Example name to Bluetooth Manager Example
+- Added new Shimmer Basic Example, demonstrating connecting and streaming from Shimmer without Bluetooth Manager
+- Added new Efficient Data Array Example, demonstrating the use of the alternative Arrays data structure
+- Cleaned up build.gradle files for all project modules
+
 (Beta) Rev 3.00
 - Support for Shimmer3 devices using updated IMU sensors
 - Change to Handler MSGs
