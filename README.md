@@ -2,8 +2,11 @@
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-Please note that the latest release, 3.0.47Internal, is an internal release, as there is a bug with the GSR signal.
-Do not pull this release if your project requires the GSR sensor. 
+Please note that the latest commit, 3.0.47Internal, is an internal commit, as there is a bug with the GSR signal.
+DO NOT pull this commit if your project requires the GSR sensor. 
+
+Main purpose of this commit is to release the updated Arrays data structure, which can improve packet reception rate significantly. 
+An example of how to use this can be found in Efficient Data Array Example.
 
 # Importing Via Gradle
 This api can also be imported using gradle, please include the following repository in your build.gradle file 
@@ -19,6 +22,34 @@ allprojects {
 ```
 Most recent uploaded library can be found here:-
 https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver
+
+# Frequently Asked Questions
+**Difference between methods**
+In the Android API, you may notice methods with different names, but which appear to perform the same function.
+
+For example, Shimmer.setSamplingRateShimmer(rate) vs Shimmer.writeShimmerAndSensorsSamplingRate(rate)
+
+The differences between these methods are as follows:
+Set - Modifies the setting on the Shimmer object in code only. 
+These settings still have to be written to the physical device using a command e.g. shimmer.writeConfigBytes()
+Write - Modifies the setting on the Shimmer object in code AND writes the setting to the physical Shimmer device
+
+**Timestamps (Shimmer3)**
+Each ObjectCluster (message) received from the Shimmer devices contains a record of the time when the message or the sample was recorded. These records are known as timestamps.
+
+Each message can contain multiple types of timestamps, and the differences between each are listed below.
+Note that these names are found in Configuration.Shimmer3.ObjectClusterSensorName
+
+TIMESTAMP - This is the Shimmer internal device clock timestamp, and is taken a sample is recorded on the device.
+This is the most accurate timestamp for identifying the exact time when a sample was recorded.
+
+SYSTEM_TIMESTAMP - This is the timestamp which is taken when a packet has been received on an Android device. This is less accurate than the Shimmer's internal clock, as there will be variable latency introduced between the sample being recorded on the Shimmer, and the packet being received on the Android device. This is due to the nature of the Bluetooth connection.
+
+This latency cannot be avoided, but it can be mitigated in part by methods such as a linear fit, which can be found in Section 7.2 of the Multi Shimmer Sync for Android user manual.
+
+SYSTEM_TIMESTAMP_PLOT - This is equivalent to the SYSTEM_TIMESTAMP
+
+TIMESTAMP_OFFSET - It is not recommended to use this, as this is used for SD parsing.
 
 
 # Changelog 
