@@ -63,7 +63,9 @@ SYSTEM_TIMESTAMP - This is the timestamp which is taken when a packet has been r
 This latency cannot be avoided, but it can be mitigated in part by methods such as a linear fit, which can be found in Section 7.2 of the Multi Shimmer Sync for Android user manual.
 
 SYSTEM_TIMESTAMP_PLOT - This is the current TIMESTAMP added to an offset. 
-This offset is calculated once, when the first packet is received, using the equation: OFFSET = SYSTEM_TIMESTAMP - TIMESTAMP
+
+This offset is calculated once, when the first packet is received, using the equation: 
+OFFSET = SYSTEM_TIMESTAMP - TIMESTAMP.
 This ensures that the latency between a Shimmer recording a packet and transmitting it to the Android device is constant and equal to the latency of the first packet received. 
 
 TIMESTAMP_OFFSET - It is not recommended to use this, as this is used for SD parsing.
