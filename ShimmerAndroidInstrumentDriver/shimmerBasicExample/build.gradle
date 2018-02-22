@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "shimmerresearch.com.shimmerbasicexample"
-        minSdkVersion 20
+        minSdkVersion 17
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
