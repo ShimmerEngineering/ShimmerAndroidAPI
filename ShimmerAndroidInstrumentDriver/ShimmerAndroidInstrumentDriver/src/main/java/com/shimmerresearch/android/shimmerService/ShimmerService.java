@@ -91,7 +91,7 @@ public class ShimmerService extends Service {
 	public HashMap<String, Object> mMultiShimmer = new HashMap<String, Object>(7);
 	public HashMap<String, Logging> mLogShimmer = new HashMap<String, Logging>(7);
 	private List<Handler> mHandlerList = new ArrayList<Handler>();
-	private Handler mHandlerGraph=null;
+	protected Handler mHandlerGraph=null;
 	private boolean mGraphing=false;
 	public String mLogFileName="Default";
 	Filter mFilter;
@@ -1029,7 +1029,10 @@ public class ShimmerService extends Service {
 
 	public void setGraphHandler(Handler handler){
 		mHandlerGraph=handler;
+	}
 
+	public Handler getGraphHandler(Handler handler) {
+		return mHandlerGraph;
 	}
 
 	public void addHandlerToList(Handler handler) {
