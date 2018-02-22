@@ -1031,7 +1031,7 @@ public class ShimmerService extends Service {
 		mHandlerGraph=handler;
 	}
 
-	public Handler getGraphHandler(Handler handler) {
+	public Handler getGraphHandler() {
 		return mHandlerGraph;
 	}
 
