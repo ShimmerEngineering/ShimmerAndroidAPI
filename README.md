@@ -2,11 +2,11 @@
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-Please note that the latest commit, 3.0.47Internal, is an internal commit, as there is a bug with the GSR signal.
-DO NOT pull this commit if your project requires the GSR sensor. 
+The latest version is 3.0.51Beta.
 
-Main purpose of this commit is to release the updated Arrays data structure, which can improve packet reception rate significantly. 
-An example of how to use this can be found in Efficient Data Array Example.
+The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
+Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
+An example of how to use this arrays data structure can be found in Efficient Data Array Example.
 
 
 # Frequently Asked Questions
@@ -103,6 +103,11 @@ android {
 
 
 # Changelog 
+
+22 February 2018 (3.0.51Beta)
+- Updated GSR calibration parameters
+- GSR signal bug fixed
+- Graph Handler in ShimmerService now accessible as a protected variable
 
 14 February 2018 (3.0.47Internal)
 - Bug with GSR signal. Fix in progress...
