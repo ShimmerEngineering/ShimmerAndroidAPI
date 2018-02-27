@@ -24,7 +24,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerObject;
-import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
+import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 import com.shimmerresearch.driverUtilities.BluetoothDeviceDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.HwDriverShimmerDeviceDetails;
@@ -186,7 +186,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
 
-    protected Shimmer4 initializeNewShimmer4(ShimmerRadioInitializer shimmerRadioInitializer) {
+    protected Shimmer4sdk initializeNewShimmer4(ShimmerRadioInitializer shimmerRadioInitializer) {
         Shimmer4Android shimmer = new Shimmer4Android(mHandler);
 //        shimmer.setShimmerUserAssignedName(selectedDevice);
         mMapOfBtConnectedShimmers.put(shimmer.getBtConnectionHandle(), shimmer);
@@ -254,7 +254,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     @Override
-    protected Shimmer4 createNewShimmer4(String comport, String bluetoothAddress) {
+    protected Shimmer4sdk createNewShimmer4(String comport, String bluetoothAddress) {
         if(mProgressDialog!=null){
             mProgressDialog.dismiss();
         }
@@ -264,10 +264,10 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     @Override
-    protected Shimmer4 createNewShimmer4(ShimmerRadioInitializer shimmerRadioInitializer, String bluetoothAddress) {
+    protected Shimmer4sdk createNewShimmer4(ShimmerRadioInitializer shimmerRadioInitializer, String bluetoothAddress) {
         shimmerRadioInitializer.useLegacyDelayBeforeBtRead(true);
         ShimmerSerialPortAndroid serialPortComm = (ShimmerSerialPortAndroid) shimmerRadioInitializer.getSerialCommPort();
-        Shimmer4 shimmer4 = createNewShimmer4("", bluetoothAddress); //first parameter is com port, but we do not know it in android
+        Shimmer4sdk shimmer4 = createNewShimmer4("", bluetoothAddress); //first parameter is com port, but we do not know it in android
         if(serialPortComm!=null){
             CommsProtocolRadio commsProtocolRadio = new CommsProtocolRadio(serialPortComm, new LiteProtocol(bluetoothAddress));
             shimmer4.setCommsProtocolRadio(commsProtocolRadio);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/.." />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/../bluetoothManagerExample" />
+            <option value="$PROJECT_DIR$/../efficientDataArrayExample" />
+            <option value="$PROJECT_DIR$/../shimmer3DOrientationExample" />
+            <option value="$PROJECT_DIR$/../shimmerBasicExample" />
+            <option value="$PROJECT_DIR$/../shimmerKotlinExample" />
+            <option value="$PROJECT_DIR$/../shimmerLegacyExample" />
+            <option value="$PROJECT_DIR$/../shimmerServiceExample" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
