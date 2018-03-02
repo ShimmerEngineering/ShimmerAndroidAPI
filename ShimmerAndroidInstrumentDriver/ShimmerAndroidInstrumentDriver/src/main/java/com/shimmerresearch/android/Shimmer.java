@@ -150,7 +150,7 @@ import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
-import com.shimmerresearch.driver.shimmer4sdk.Shimmer4;
+import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 
@@ -1029,6 +1029,9 @@ public class Shimmer extends ShimmerBluetooth{
 		//TODO: Delete this...
 		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
+		if(mAutoStartStreaming){
+			startStreaming();
+		}
 	}
 
 	protected void isNowStreaming() {
