@@ -5,7 +5,6 @@ import android.os.Handler;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
-import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 
 /**
  * Created by Lim on 06/06/2016.
