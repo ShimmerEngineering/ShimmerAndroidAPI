@@ -13,7 +13,6 @@
             <option value="$PROJECT_DIR$/efficientDataArrayExample" />
             <option value="$PROJECT_DIR$/shimmer3DOrientationExample" />
             <option value="$PROJECT_DIR$/shimmerBasicExample" />
-            <option value="$PROJECT_DIR$/shimmerKotlinExample" />
             <option value="$PROJECT_DIR$/shimmerLegacyExample" />
             <option value="$PROJECT_DIR$/shimmerServiceExample" />
           </set>

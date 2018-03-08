@@ -1,4 +1,4 @@
-include ':ShimmerAndroidInstrumentDriver', ':bluetoothManagerExample', ':shimmerServiceExample', ':shimmerLegacyExample', ':shimmerBasicExample', ':shimmerKotlinExample', ':efficientDataArrayExample'
+include ':ShimmerAndroidInstrumentDriver', ':bluetoothManagerExample', ':shimmerServiceExample', ':shimmerLegacyExample', ':shimmerBasicExample', ':efficientDataArrayExample'
 include ':shimmer3DOrientationExample'
 //Don't need shimmeradvancelibrary is just an example on how to import projects from different folders
 //include ':ShimmerAdvanceLibrary'
