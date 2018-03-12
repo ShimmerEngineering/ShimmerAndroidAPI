@@ -2,7 +2,7 @@
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is 3.0.51Beta.
+The latest version is 3.0.56Beta.
 
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
@@ -103,6 +103,9 @@ android {
 
 
 # Changelog 
+12 March 2018 (3.0.56Beta)
+- Add 9DOF channels to arrays data structure (only added if 3D Orientation is enabled)
+- Bugfix for EMG CH2 disappearing from arrays
 
 22 February 2018 (3.0.51Beta)
 - Updated GSR calibration parameters
