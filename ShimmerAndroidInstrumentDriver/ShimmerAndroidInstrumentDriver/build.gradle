@@ -187,28 +187,33 @@ dependencies {
     }
 
 // https://github.com/bintray/gradle-bintray-plugin
-    bintray {
-        user = shimmer_bintray_username //this usually comes from gradle.properties file in ~/.gradle
-        key = shimmer_bintray_api_key //this usually comes from gradle.properties file in ~/.gradle
+    File file = new File(rootProject.getProjectDir().getAbsolutePath() + '/gradle.properties')
+    if(file.exists()) {
+        bintray {
+            user = shimmer_bintray_username
+            //this usually comes from gradle.properties file in ~/.gradle
+            key = shimmer_bintray_api_key
+            //this usually comes from gradle.properties file in ~/.gradle
 
-        configurations = ['archives']
+            configurations = ['archives']
 
-        // Package info for BinTray
-        pkg {
-            repo = 'Shimmer'
-            // it is the name that appears in bintray when logged
-            name = 'shimmerandroiddriver'
-            desc = ''
-            websiteUrl = ''
-            vcsUrl = 'https://github.com/ShimmerEngineering/ShimmerAndroidAPI'
-            licenses = ['MIT']
-            publish = true
-            publicDownloadNumbers = true
-            version {
-                name = project.version
+            // Package info for BinTray
+            pkg {
+                repo = 'Shimmer'
+                // it is the name that appears in bintray when logged
+                name = 'shimmerandroiddriver'
                 desc = ''
-                released = new Date()
-                vcsTag = ''
+                websiteUrl = ''
+                vcsUrl = 'https://github.com/ShimmerEngineering/ShimmerAndroidAPI'
+                licenses = ['MIT']
+                publish = true
+                publicDownloadNumbers = true
+                version {
+                    name = project.version
+                    desc = ''
+                    released = new Date()
+                    vcsTag = ''
+                }
             }
         }
     }
