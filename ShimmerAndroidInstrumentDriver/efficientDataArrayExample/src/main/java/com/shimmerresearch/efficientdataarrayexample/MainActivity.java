@@ -70,41 +70,49 @@ public class MainActivity extends Activity {
     }
 
     public void startStreaming(View v) {
-        //Setup CSV writing
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "ObjectClusterExample Data " + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
-        String filePath = baseDir + File.separator + fileName;
-        file = new File(filePath);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            fw = new FileWriter(file.getAbsoluteFile());
-            bw = new BufferedWriter(fw);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-
-
         Shimmer shimmer = (Shimmer) btManager.getShimmer(bluetoothAdd);
-        //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
-        shimmer.enablePCTimeStamps(false);
-        //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
-        shimmer.enableArraysDataStructure(true);
-        btManager.startStreaming(bluetoothAdd);
+        if(shimmer != null) {   //this is null if Shimmer device is not connected
+            //Setup CSV writing
+            String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+            String fileName = "ObjectClusterExample Data " + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
+            String filePath = baseDir + File.separator + fileName;
+            file = new File(filePath);
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                fw = new FileWriter(file.getAbsoluteFile());
+                bw = new BufferedWriter(fw);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
+            shimmer.enablePCTimeStamps(false);
+            //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
+            shimmer.enableArraysDataStructure(true);
+            btManager.startStreaming(bluetoothAdd);
+        } else {
+            Toast.makeText(this, "Can't start streaming\nShimmer device is not connected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void stopStreaming(View v) {
-        try {   //Stop CSV writing
-            bw.flush();
-            bw.close();
-            fw.close();
-            firstTimeWrite = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if(btManager.getShimmer(bluetoothAdd) != null) {
+            try {   //Stop CSV writing
+                bw.flush();
+                bw.close();
+                fw.close();
+                firstTimeWrite = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        btManager.stopStreaming(bluetoothAdd);
+            btManager.stopStreaming(bluetoothAdd);
+        } else {
+            Toast.makeText(this, "Can't stop streaming\nShimmer device is not connected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
