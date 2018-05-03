@@ -1,4 +1,4 @@
-# ShimmerBasicExample
+# Bluetooth Manager Example
 This example is only applicable for Shimmer3 devices onwards
 
 - This example automatically connects to a shimmer device (see variable shimmerBtAdd in MainActivity), otherwise the connect button can be used to connect to a single shimmer device
