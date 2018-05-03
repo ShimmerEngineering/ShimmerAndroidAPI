@@ -1,6 +1,9 @@
 This API Is made up of the following projects
 
 - ShimmerAndroidInstrumentDriver
-- ShimmerBasicExample
-- ShimmerServiceExample
+- BluetoothManagerExample
+- EfficientDataArrayExample
 - Shimmer3DOrientationExample
+- ShimmerBasicExample
+- ShimmerLegacyExample
+- ShimmerServiceExample
