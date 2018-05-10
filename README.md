@@ -35,7 +35,7 @@ allprojects {
 }
 ```
 Most recent uploaded library can be found here:-
-https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver
+https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver and should be added as one of the dependencies
 
 
 - **Difference between methods**
