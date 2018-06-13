@@ -82,7 +82,10 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
                         if (returnedValue != null) {
                             int configValue = (int) returnedValue;
                             int itemIndex = Arrays.asList(configOptionsMap.get(key).getConfigValues()).indexOf(configValue);
-                            String currentSetting = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                            String currentSetting = "";
+                            if(itemIndex >= 0) {
+                                currentSetting = Arrays.asList(configOptionsMap.get(key).getGuiValues()).get(itemIndex);
+                            }
                             currentSettingsMap.put(key, currentSetting);
                         }
                     } else {

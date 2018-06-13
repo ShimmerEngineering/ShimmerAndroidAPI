@@ -2,8 +2,8 @@
 buildscript {
     ext.kotlin_version = '1.2.21'
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -17,10 +17,10 @@ plugins {
 }
 allprojects {
     repositories {
+        google()
         jcenter()
         maven {
             url  "http://dl.bintray.com/shimmerengineering/Shimmer"
         }
-        google()
     }
 }
