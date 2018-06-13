@@ -37,6 +37,8 @@ allprojects {
 Most recent uploaded library can be found here:-
 https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver and should be added as one of the dependencies
 
+*Note: do not download any versions of the library marked as "test". These are internal releases, and may not be fully functional.*
+
 
 - **Difference between methods**
 In the Android API, you may notice methods with different names, but which appear to perform the same function.
