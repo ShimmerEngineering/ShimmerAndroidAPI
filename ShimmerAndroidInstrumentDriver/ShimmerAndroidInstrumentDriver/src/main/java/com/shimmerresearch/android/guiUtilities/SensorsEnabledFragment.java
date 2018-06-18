@@ -30,6 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Class which displays a list of available sensors for a Shimmer device.
+ * The currently enabled sensors are checked in the list, and the user can enable/disable individual sensors.
+ * Note: Only compatible with Shimmer3 and newer devices.
+ */
 public class SensorsEnabledFragment extends ListFragment {
 
     ShimmerDevice shimmerDeviceClone, originalShimmerDevice;

@@ -31,6 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class to display a list of sensor configuration options for a Shimmer device.
+ * This has the same functionality as the {@link DeviceConfigFragment}, with the difference being that this Class extends the Abstract Dialog from the Shimmer Java API
+ * Only compatible with Shimmer3 and newer devices.
+ */
 public class DeviceSensorConfigFragment extends Fragment {
 
     DeviceConfigListAdapter expandListAdapter;
