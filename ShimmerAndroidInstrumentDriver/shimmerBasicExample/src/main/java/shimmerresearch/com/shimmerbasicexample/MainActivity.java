@@ -53,7 +53,6 @@ public class MainActivity extends Activity {
     }
 
 
-    double packetCount = 0;
     /**
      * Messages from the Shimmer device including sensor data are received here
      */

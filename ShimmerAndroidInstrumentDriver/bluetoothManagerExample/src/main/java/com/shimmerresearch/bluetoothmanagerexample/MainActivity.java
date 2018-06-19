@@ -27,7 +27,7 @@ import java.util.Collection;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
 /**
- * This Example demonstrates the use of the {@link ShimmerBluetoothManagerAndroid} to:
+ * This example demonstrates the use of the {@link ShimmerBluetoothManagerAndroid} to:
  * <ul>
  *     <li>Connect to a Shimmer device</li>
  *     <li>Stream data from the Shimmer device</li>
