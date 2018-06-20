@@ -114,7 +114,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:
-                    /**   Toast messages sent from {@link Shimmer} are received here. E.g. device xxxx now streaming */
+                    /** Toast messages sent from {@link Shimmer} are received here. E.g. device xxxx now streaming.
+                     *  Note that display of these Toast messages is done automatically in the Handler in {@link com.shimmerresearch.android.shimmerService.ShimmerService} */
                     Toast.makeText(getApplicationContext(), msg.getData().getString(Shimmer.TOAST), Toast.LENGTH_SHORT).show();
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
