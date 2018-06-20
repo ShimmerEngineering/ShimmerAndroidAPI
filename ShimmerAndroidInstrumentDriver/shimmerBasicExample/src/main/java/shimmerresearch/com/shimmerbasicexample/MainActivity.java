@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
@@ -82,6 +83,10 @@ public class MainActivity extends Activity {
                         }
 
                     }
+                    break;
+                case Shimmer.MESSAGE_TOAST:
+                    /**   Toast messages sent from {@link Shimmer} are received here. E.g. device xxxx now streaming */
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(Shimmer.TOAST), Toast.LENGTH_SHORT).show();
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     ShimmerBluetooth.BT_STATE state = null;
