@@ -81,7 +81,6 @@ public class MainActivity extends Activity {
                             double accelXData = accelXCluster.mData;
                             Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
-
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:

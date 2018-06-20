@@ -207,6 +207,10 @@ public class MainActivity extends Activity {
                         }
                     }
                     break;
+                case Shimmer.MESSAGE_TOAST:
+                    /**   Toast messages sent from {@link Shimmer} are received here. E.g. device xxxx now streaming */
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(Shimmer.TOAST), Toast.LENGTH_SHORT).show();
+                    break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     ShimmerBluetooth.BT_STATE state = null;
                     String macAddress = "";
