@@ -114,6 +114,19 @@ public class ShimmerService extends Service {
 
 	protected ShimmerBluetoothManagerAndroid btManager;
 
+	public enum FILE_TYPE {
+		DAT("DAT", 0),
+		CSV("CSV", 1);
+
+		private final String fileName;
+		private final int fileType;
+
+		FILE_TYPE(String fileName, int fileType) {
+			this.fileName = fileName;
+			this.fileType = fileType;
+		}
+	}
+	public FILE_TYPE mLoggingFileType = FILE_TYPE.DAT;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -401,16 +414,16 @@ public class ShimmerService extends Service {
 			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.SYSTEM_TIMESTAMP);
 
 			if (mEnableLogging==true){
-				shimmerLog1= (Logging)mLogShimmer.get(objectCluster.getMacAddress());
+				shimmerLog1= mLogShimmer.get(objectCluster.getMacAddress());
 				if (shimmerLog1!=null){
 					shimmerLog1.logData(objectCluster);
 				} else {
 					char[] bA=objectCluster.getMacAddress().toCharArray();
 					Logging shimmerLog;
 					if (mLogFileName.equals("Default")){
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", "ShimmerCapture");
+						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", "ShimmerCapture", mLoggingFileType);
 					} else {
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", "ShimmerCapture");
+						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", "ShimmerCapture", mLoggingFileType);
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
 					if (mLogShimmer.get(objectCluster.getMacAddress())==null){
@@ -525,6 +538,16 @@ public class ShimmerService extends Service {
 	public void setEnableLogging(boolean enableLogging){
 		mEnableLogging=enableLogging;
 		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
+	}
+
+	public void setEnableLogging(boolean enableLogging, FILE_TYPE fileType) {
+		mEnableLogging=enableLogging;
+		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
+		mLoggingFileType = fileType;
+	}
+
+	public void setLoggingFileType(FILE_TYPE fileType) {
+		mLoggingFileType = fileType;
 	}
 
 	public boolean getEnableLogging(){
