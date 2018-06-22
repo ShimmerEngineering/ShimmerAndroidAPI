@@ -114,9 +114,10 @@ public class ShimmerService extends Service {
 
 	protected ShimmerBluetoothManagerAndroid btManager;
 
+	/**	For logging to file	*/
 	public enum FILE_TYPE {
-		DAT("DAT", 0),
-		CSV("CSV", 1);
+		DAT("dat", 0),
+		CSV("csv", 1);
 
 		private final String fileName;
 		private final int fileType;
@@ -535,17 +536,30 @@ public class ShimmerService extends Service {
 		btManager.startStreamingAllDevices();
 	}
 
+    /**
+     * Enable or disable logging to file
+     * @param enableLogging
+     */
 	public void setEnableLogging(boolean enableLogging){
 		mEnableLogging=enableLogging;
 		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
 	}
 
+    /**
+     * Enable or disable logging to file with selection of file output type
+     * @param enableLogging
+     * @param fileType File output type
+     */
 	public void setEnableLogging(boolean enableLogging, FILE_TYPE fileType) {
 		mEnableLogging=enableLogging;
 		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
 		mLoggingFileType = fileType;
 	}
 
+    /**
+     * Sets the log file output type
+     * @param fileType
+     */
 	public void setLoggingFileType(FILE_TYPE fileType) {
 		mLoggingFileType = fileType;
 	}

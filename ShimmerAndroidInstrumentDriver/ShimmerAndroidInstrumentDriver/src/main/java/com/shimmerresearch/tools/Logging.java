@@ -75,7 +75,7 @@ public class Logging {
 		outputFile = new File(root, mFileName+".dat");
 	}
 	
-	public Logging(String myName,String delimiter){
+	public Logging(String myName, String delimiter){
 		mFileName=myName;
 		mDelimiter=delimiter;
 		File root = Environment.getExternalStorageDirectory();
@@ -84,6 +84,7 @@ public class Logging {
 	}
 	
 	/**
+	 * Constructor with default file output type (.dat)
 	 * @param myName
 	 * @param delimiter
 	 * @param folderName will create a new folder if it does not exist
@@ -95,9 +96,16 @@ public class Logging {
 		   if(!root.exists()) {
 		        if(root.mkdir()); //directory is created;
 		    }
-		outputFile = new File(root, mFileName+".dat");
+		outputFile = new File(root, mFileName+ "." + ShimmerService.FILE_TYPE.DAT.toString());
 	}
 
+	/**
+	 * Constructor to select output file type
+	 * @param myName
+	 * @param delimiter
+	 * @param folderName will create a new folder if it does not exist
+	 * @param fileType File output type. Currently supports .dat or .csv
+	 */
 	public Logging(String myName, String delimiter, String folderName, ShimmerService.FILE_TYPE fileType) {
 		mFileName=myName;
 		mDelimiter=delimiter;
@@ -105,11 +113,7 @@ public class Logging {
 		if(!root.exists()) {
 			if(root.mkdir()); //directory is created;
 		}
-		if(fileType.equals(ShimmerService.FILE_TYPE.CSV)) {
-			outputFile = new File(root, mFileName + ".csv");
-		} else {
-			outputFile = new File(root, mFileName + ".dat");
-		}
+		outputFile = new File(root, mFileName + "." + fileType.toString());
 	}
 	
 	
