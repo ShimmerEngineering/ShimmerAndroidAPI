@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
@@ -119,6 +120,11 @@ public class MainActivity extends AppCompatActivity {
                             Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
                     }
+                    break;
+                case Shimmer.MESSAGE_TOAST:
+                    /** Toast messages sent from {@link Shimmer} are received here. E.g. device xxxx now streaming.
+                     *  Note that display of these Toast messages is done automatically in the Handler in {@link com.shimmerresearch.android.shimmerService.ShimmerService} */
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(Shimmer.TOAST), Toast.LENGTH_SHORT).show();
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     ShimmerBluetooth.BT_STATE state = null;

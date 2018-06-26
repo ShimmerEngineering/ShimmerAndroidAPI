@@ -165,7 +165,7 @@ public class PlotFragment extends Fragment {
     }
 
     /**
-     * Passes the Shimmer Service to the fragment and sets its
+     * Passes the Shimmer Service to the fragment and initializes its PlotManager
      * @param service must be an already running Shimmer Service
      */
     public void setShimmerService(ShimmerService service) {
