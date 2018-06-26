@@ -29,6 +29,10 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 import static com.shimmerresearch.bluetooth.ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE;
 import static com.shimmerresearch.bluetooth.ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED;
 
+/**
+ * This example demonstrates connecting and streaming from a Shimmer2/2r device.
+ * Note: for Shimmer3 and newer devices, use the Bluetooth Manager Example instead
+ */
 public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
@@ -48,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Messages from the Shimmer device, including sensor data, are received here
+     */
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {

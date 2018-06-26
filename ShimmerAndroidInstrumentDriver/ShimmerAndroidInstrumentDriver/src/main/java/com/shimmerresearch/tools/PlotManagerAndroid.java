@@ -71,7 +71,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	}
 	
 	/**Constructor
-	 * @param propertiestoPlot Sets the properties to plot 
+	 * @param propertiestoPlot Sets the properties to plot. Each individual array within this List should be in the format: DeviceName-Property-Format-Unit
 	 * @param limit Sets the X axis limit for the series
 	 * @param chart the XYPlot in main UI thread so the series can be added
 	 * @throws Exception if the list of signals have duplicates
@@ -85,7 +85,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 
 	/**Constructor
 	 * 
-	 * @param propertiestoPlot Sets the properties to plot 
+	 * @param propertiestoPlot Sets the properties to plot. Each individual array within this List should be in the format: DeviceName-Property-Format-Unit
 	 * @param limit Sets the X axis limit for the series
 	 * @param chart the XYPlot in main UI thread so the series can be added
 	 * @param clearGraphatLimit Clears the graph once the X Axis limit is reached for the series
@@ -100,7 +100,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	}
 	
 	/** Constructor
-	 * @param propertiestoPlot Sets the properties to plot
+	 * @param propertiestoPlot Sets the properties to plot. Each individual array within this List should be in the format: DeviceName-Property-Format-Unit
 	 * @param listofColors List of colors to use for the plots
 	 * @param limit Sets the X axis limit for the series 
 	 * @param chart the XYPlot in main UI thread so the series can be added
@@ -114,7 +114,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	}
 	
 	/** Constructor
-	 * @param propertiestoPlot Sets the properties to plot
+	 * @param propertiestoPlot Sets the properties to plot. Each individual array within this List should be in the format: DeviceName-Property-Format-Unit
 	 * @param listofColors List of colors to use for the plots
 	 * @param limit Sets the X axis limit for the series 
 	 * @param chart the XYPlot in main UI thread so the series can be added
@@ -145,7 +145,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 
 	/**Adds a signal to the plot manager. Note that the signal array should be equivalent to the standard Shimmer format DeviceName->Property->Format->Unit (e.g. the four columns of the csv file)
 	 *
-	 * @param signal
+	 * @param signal This array should be in the standard Shimmer format DeviceName-Property-Format-Unit (i.e. the four columns of the CSV file)
 	 * @param chart
 	 * @throws Exception if the signal already exist
 	 */
@@ -179,7 +179,7 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	
 	/**Adds a signal to the plot manager. Note that the signal array should be equivalent to the standard Shimmer format DeviceName->Property->Format->Unit (e.g. the four columns of the csv file)
 	 * 
-	 * @param signal 
+	 * @param signal This array should be in the standard Shimmer format DeviceName->Property->Format->Unit (i.e. the four columns of the CSV file)
 	 * @param chart
 	 * @throws Exception if the signal already exist
 	 */

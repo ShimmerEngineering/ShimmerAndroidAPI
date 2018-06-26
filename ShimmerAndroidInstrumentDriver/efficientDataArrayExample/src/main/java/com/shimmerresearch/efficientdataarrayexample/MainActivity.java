@@ -30,6 +30,16 @@ import java.util.Date;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
+/**
+ * This example demonstrates the use of the arrays data structure, {@link ObjectCluster#sensorDataArray}, in the following scenarios:
+ * <ul>
+ *     <li>Enabling the arrays data structure</li>
+ *     <li>Different methods of retrieving signal data from the arrays</li>
+ *     <li>Writing the signal data to a CSV file</li>
+ * </ul>
+ * Note: The arrays data structure is an alternative to the standard Multimap ({@link ObjectCluster#mPropertyCluster}) data structure.
+ * Switching to using the arrays can improve packet reception rate on slower Android devices.
+ */
 public class MainActivity extends Activity {
 
     ShimmerBluetoothManagerAndroid btManager;

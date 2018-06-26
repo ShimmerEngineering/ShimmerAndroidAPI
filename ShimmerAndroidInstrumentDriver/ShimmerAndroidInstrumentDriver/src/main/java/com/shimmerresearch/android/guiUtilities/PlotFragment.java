@@ -42,7 +42,10 @@ import java.util.List;
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
 
-
+/**
+ * A {@link Fragment} containing an {@link XYPlot}.
+ * This can be used in conjunction with the {@link SignalsToPlotFragment} to graph signals from a streaming Shimmer device.
+ */
 public class PlotFragment extends Fragment {
 
     private static ShimmerService shimmerService;

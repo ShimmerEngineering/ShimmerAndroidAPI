@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Class which displays a list of available signals that can be selected for plotting.
  */
 public class SignalsToPlotFragment extends ListFragment {
 
