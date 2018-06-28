@@ -85,7 +85,8 @@ import static com.shimmerresearch.bluetooth.ShimmerBluetooth.NOTIFICATION_SHIMME
 public class ShimmerService extends Service {
 	private static final String TAG = "ShimmerService";
     public Logging shimmerLog1 = null;
-    private boolean mEnableLogging=false;
+    private boolean mEnableLogging = false;
+    private String mLogFolderName = "ShimmerCapture";
 	private BluetoothAdapter mBluetoothAdapter = null;
 	private final IBinder mBinder = new LocalBinder();
 	public HashMap<String, Object> mMultiShimmer = new HashMap<String, Object>(7);
@@ -422,9 +423,9 @@ public class ShimmerService extends Service {
 					char[] bA=objectCluster.getMacAddress().toCharArray();
 					Logging shimmerLog;
 					if (mLogFileName.equals("Default")){
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", "ShimmerCapture", mLoggingFileType);
+						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", mLogFolderName, mLoggingFileType);
 					} else {
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", "ShimmerCapture", mLoggingFileType);
+						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", mLogFolderName, mLoggingFileType);
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
 					if (mLogShimmer.get(objectCluster.getMacAddress())==null){
@@ -551,15 +552,23 @@ public class ShimmerService extends Service {
      * @param fileType File output type
      */
 	public void setEnableLogging(boolean enableLogging, FILE_TYPE fileType) {
-		mEnableLogging=enableLogging;
-		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
+		setEnableLogging(enableLogging);
 		mLoggingFileType = fileType;
 	}
 
-    /**
-     * Sets the log file output type
-     * @param fileType
-     */
+	public void setEnableLogging(boolean enableLogging, FILE_TYPE fileType, String folderName) {
+		setEnableLogging(enableLogging, fileType);
+		mLogFolderName = folderName;
+	}
+
+	public void setLogFolderName(String folderName) {
+		mLogFolderName = folderName;
+	}
+
+	public String getLogFolderName() {
+		return mLogFolderName;
+	}
+
 	public void setLoggingFileType(FILE_TYPE fileType) {
 		mLoggingFileType = fileType;
 	}

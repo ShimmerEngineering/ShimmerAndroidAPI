@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.guiUtilities.FileListActivity;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -26,15 +27,22 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER;
 
 public class MainActivity extends Activity {
 
     ShimmerBluetoothManagerAndroid btManager;
     private String bluetoothAdd = "";
-    private final static String LOG_TAG = "ObjectClusterExample";
+    private final static String LOG_TAG = "ArraysExample";
+    private final static String CSV_FILE_NAME_PREFIX = "Data";
+    private final static String APP_FOLDER_NAME = "ShimmerArraysExample";
+    private final static String APP_DIR_PATH = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + APP_FOLDER_NAME + File.separator;
+    /** This can be found in the Manifest */
+    private final static String APP_FILE_PROVIDER_AUTHORITY = "com.shimmerresearch.efficientdataarrayexample.fileprovider";
     private final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
 
     //Write to CSV variables
@@ -66,28 +74,13 @@ public class MainActivity extends Activity {
 
     public void connectDevice(View v) {
         Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
-        startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
+        startActivityForResult(intent, REQUEST_CONNECT_SHIMMER);
     }
 
     public void startStreaming(View v) {
         Shimmer shimmer = (Shimmer) btManager.getShimmer(bluetoothAdd);
         if(shimmer != null) {   //this is null if Shimmer device is not connected
-            //Setup CSV writing
-            String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-            String fileName = "ObjectClusterExample Data " + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
-            String filePath = baseDir + File.separator + fileName;
-            file = new File(filePath);
-            try {
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                fw = new FileWriter(file.getAbsoluteFile());
-                bw = new BufferedWriter(fw);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
+            setupCSV();
             //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
             shimmer.enablePCTimeStamps(false);
             //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
@@ -255,5 +248,39 @@ public class MainActivity extends Activity {
         }
     }
 
+    /**
+     * Setup CSV writing
+     */
+    private void setupCSV() {
+        File dir = new File(APP_DIR_PATH);
+        if(!dir.exists()) {
+            //Create the directory if it doesn't already exist
+            dir.mkdir();
+        }
+
+        String fileName = CSV_FILE_NAME_PREFIX + "_" + new SimpleDateFormat("dd-MM-yy_HHmm").format(new Date()) + ".csv";
+        String filePath = APP_DIR_PATH + File.separator + fileName;
+        file = new File(filePath);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Launch the files list activity, which is themed as a dialog in the Android Manifest
+     * @param v
+     */
+    public void openLogFilesList(View v) {
+        Intent intent = new Intent(getApplicationContext(), FileListActivity.class);
+        intent.putExtra(FileListActivity.INTENT_EXTRA_DIR_PATH, APP_DIR_PATH);
+        intent.putExtra(FileListActivity.INTENT_EXTRA_PROVIDER_AUTHORITY, APP_FILE_PROVIDER_AUTHORITY);
+        startActivityForResult(intent, REQUEST_CONNECT_SHIMMER);
+    }
 
 }

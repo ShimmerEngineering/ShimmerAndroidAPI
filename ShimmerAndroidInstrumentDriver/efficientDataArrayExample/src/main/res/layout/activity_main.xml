@@ -56,4 +56,11 @@
             android:onClick="connectDevice"
             android:text="Connect" />
 
-    </android.widget.LinearLayout>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="List CSV Log Files"
+        android:onClick="openLogFilesList"/>
+
+</android.widget.LinearLayout>
