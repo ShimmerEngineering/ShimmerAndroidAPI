@@ -85,7 +85,8 @@ import static com.shimmerresearch.bluetooth.ShimmerBluetooth.NOTIFICATION_SHIMME
 public class ShimmerService extends Service {
 	private static final String TAG = "ShimmerService";
     public Logging shimmerLog1 = null;
-    private boolean mEnableLogging=false;
+    private boolean mEnableLogging = false;
+    private String mLogFolderName = "ShimmerCapture";
 	private BluetoothAdapter mBluetoothAdapter = null;
 	private final IBinder mBinder = new LocalBinder();
 	public HashMap<String, Object> mMultiShimmer = new HashMap<String, Object>(7);
@@ -114,6 +115,20 @@ public class ShimmerService extends Service {
 
 	protected ShimmerBluetoothManagerAndroid btManager;
 
+	/**	For logging to file	*/
+	public enum FILE_TYPE {
+		DAT("dat", 0),
+		CSV("csv", 1);
+
+		private final String fileName;
+		private final int fileType;
+
+		FILE_TYPE(String fileName, int fileType) {
+			this.fileName = fileName;
+			this.fileType = fileType;
+		}
+	}
+	public FILE_TYPE mLoggingFileType = FILE_TYPE.DAT;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -401,16 +416,16 @@ public class ShimmerService extends Service {
 			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.SYSTEM_TIMESTAMP);
 
 			if (mEnableLogging==true){
-				shimmerLog1= (Logging)mLogShimmer.get(objectCluster.getMacAddress());
+				shimmerLog1= mLogShimmer.get(objectCluster.getMacAddress());
 				if (shimmerLog1!=null){
 					shimmerLog1.logData(objectCluster);
 				} else {
 					char[] bA=objectCluster.getMacAddress().toCharArray();
 					Logging shimmerLog;
 					if (mLogFileName.equals("Default")){
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", "ShimmerCapture");
+						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", mLogFolderName, mLoggingFileType);
 					} else {
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", "ShimmerCapture");
+						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", mLogFolderName, mLoggingFileType);
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
 					if (mLogShimmer.get(objectCluster.getMacAddress())==null){
@@ -522,9 +537,40 @@ public class ShimmerService extends Service {
 		btManager.startStreamingAllDevices();
 	}
 
+    /**
+     * Enable or disable logging to file
+     * @param enableLogging
+     */
 	public void setEnableLogging(boolean enableLogging){
 		mEnableLogging=enableLogging;
 		Log.d("Shimmer","Logging :" + Boolean.toString(mEnableLogging));
+	}
+
+    /**
+     * Enable or disable logging to file with selection of file output type
+     * @param enableLogging
+     * @param fileType File output type
+     */
+	public void setEnableLogging(boolean enableLogging, FILE_TYPE fileType) {
+		setEnableLogging(enableLogging);
+		mLoggingFileType = fileType;
+	}
+
+	public void setEnableLogging(boolean enableLogging, FILE_TYPE fileType, String folderName) {
+		setEnableLogging(enableLogging, fileType);
+		mLogFolderName = folderName;
+	}
+
+	public void setLogFolderName(String folderName) {
+		mLogFolderName = folderName;
+	}
+
+	public String getLogFolderName() {
+		return mLogFolderName;
+	}
+
+	public void setLoggingFileType(FILE_TYPE fileType) {
+		mLoggingFileType = fileType;
 	}
 
 	public boolean getEnableLogging(){

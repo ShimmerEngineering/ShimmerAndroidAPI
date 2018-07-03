@@ -50,6 +50,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.google.common.collect.Multimap;
+import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 
@@ -74,7 +75,7 @@ public class Logging {
 		outputFile = new File(root, mFileName+".dat");
 	}
 	
-	public Logging(String myName,String delimiter){
+	public Logging(String myName, String delimiter){
 		mFileName=myName;
 		mDelimiter=delimiter;
 		File root = Environment.getExternalStorageDirectory();
@@ -83,6 +84,7 @@ public class Logging {
 	}
 	
 	/**
+	 * Constructor with default file output type (.dat)
 	 * @param myName
 	 * @param delimiter
 	 * @param folderName will create a new folder if it does not exist
@@ -90,28 +92,39 @@ public class Logging {
 	public Logging(String myName,String delimiter, String folderName){
 		mFileName=myName;
 		mDelimiter=delimiter;
-
 		 File root = new File(Environment.getExternalStorageDirectory() + "/"+folderName);
-
-		   if(!root.exists())
-		    {
+		   if(!root.exists()) {
 		        if(root.mkdir()); //directory is created;
 		    }
-		   outputFile = new File(root, mFileName+".dat");
+		outputFile = new File(root, mFileName+ "." + ShimmerService.FILE_TYPE.DAT.toString());
+	}
+
+	/**
+	 * Constructor to select output file type
+	 * @param myName
+	 * @param delimiter
+	 * @param folderName will create a new folder if it does not exist
+	 * @param fileType File output type. Currently supports .dat or .csv
+	 */
+	public Logging(String myName, String delimiter, String folderName, ShimmerService.FILE_TYPE fileType) {
+		mFileName=myName;
+		mDelimiter=delimiter;
+		File root = new File(Environment.getExternalStorageDirectory() + "/"+folderName);
+		if(!root.exists()) {
+			if(root.mkdir()); //directory is created;
+		}
+		outputFile = new File(root, mFileName + "." + fileType.toString());
 	}
 	
 	
 	/**
 	 * This function takes an object cluster and logs all the data within it. User should note that the function will write over prior files with the same name.
-	 * @param objectClusterLog data which will be written into the file
+	 * @param objectCluster data which will be written into the file
 	 */
 	public void logData(ObjectCluster objectCluster){
 		ObjectCluster objectClusterLog = objectCluster;
-		try {
-			
-    		
-				
 
+		try {
 			if (mFirstWrite==true) {
 				writer = new BufferedWriter(new FileWriter(outputFile,true));
 				
@@ -129,20 +142,16 @@ public class Logging {
 					 //first check that there are no repeat entries
 					 
 					 if(compareStringArray(mSensorNames, key) == true) {
-						 for(FormatCluster formatCluster : m.get(key)) {
-							 mSensorFormats[p]=formatCluster.mFormat;
-							 mSensorUnits[p]=formatCluster.mUnits;
+						 for (FormatCluster formatCluster : m.get(key)) {
+							 mSensorFormats[p] = formatCluster.mFormat;
+							 mSensorUnits[p] = formatCluster.mUnits;
 							 //Log.d("Shimmer",key + " " + mSensorFormats[p] + " " + mSensorUnits[p]);
 							 p++;
 						 }
-						 
-					 }	
-					 
+					 }
 					 mSensorNames[i]=key;
 					 i++;				 
 				 	}
-			 	
-			
 			// write header to a file
 			
 			writer = new BufferedWriter(new FileWriter(outputFile,false));
@@ -191,8 +200,6 @@ public class Logging {
             	writer.write(mDelimiter);
 			}
 			writer.newLine();
-			
-			
 		}
 	catch (IOException e) {
 		// TODO Auto-generated catch block
