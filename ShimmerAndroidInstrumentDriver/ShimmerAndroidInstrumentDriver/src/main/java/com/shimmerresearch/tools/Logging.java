@@ -96,7 +96,7 @@ public class Logging {
 		   if(!root.exists()) {
 		        if(root.mkdir()); //directory is created;
 		    }
-		outputFile = new File(root, mFileName+ "." + ShimmerService.FILE_TYPE.DAT.toString());
+		outputFile = new File(root, mFileName+ "." + ShimmerService.FILE_TYPE.DAT.getName());
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class Logging {
 		if(!root.exists()) {
 			if(root.mkdir()); //directory is created;
 		}
-		outputFile = new File(root, mFileName + "." + fileType.toString());
+		outputFile = new File(root, mFileName + "." + fileType.getName());
 	}
 	
 	

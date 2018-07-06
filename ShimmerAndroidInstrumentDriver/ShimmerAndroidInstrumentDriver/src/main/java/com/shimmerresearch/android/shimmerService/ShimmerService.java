@@ -53,7 +53,6 @@ import android.widget.Toast;
 
 import com.shimmerresearch.algorithms.Filter;
 import com.shimmerresearch.android.Shimmer;
-import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.biophysicalprocessing.ECGtoHRAdaptive;
 import com.shimmerresearch.biophysicalprocessing.PPGtoHRAlgorithm;
@@ -64,10 +63,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
-import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
-import com.shimmerresearch.driverUtilities.SensorDetails;
-import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.tools.Logging;
 import com.shimmerresearch.tools.PlotManagerAndroid;
 
@@ -80,7 +76,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.shimmerresearch.bluetooth.ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE;
-import static com.shimmerresearch.bluetooth.ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED;
 
 public class ShimmerService extends Service {
 	private static final String TAG = "ShimmerService";
@@ -120,14 +115,23 @@ public class ShimmerService extends Service {
 		DAT("dat", 0),
 		CSV("csv", 1);
 
-		private final String fileName;
-		private final int fileType;
+		private String fileName;
+		private int fileTypeOrder;
 
 		FILE_TYPE(String fileName, int fileType) {
 			this.fileName = fileName;
-			this.fileType = fileType;
+			this.fileTypeOrder = fileType;
+		}
+
+		public String getName() {
+			return fileName;
+		}
+
+		public int getFileTypeOrder() {
+			return fileTypeOrder;
 		}
 	}
+
 	public FILE_TYPE mLoggingFileType = FILE_TYPE.DAT;
 
 	@Override
