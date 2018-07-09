@@ -2,7 +2,7 @@
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is 3.0.61Beta.
+The latest version is 3.0.64Beta.
 
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
@@ -115,6 +115,12 @@ android {
 
 
 # Changelog 
+9 July 2018 (3.0.64Beta)
+- Addition of FilesListActivity to display list of files for a folder. Files can be selected to be opened in an external application. An example of how to use the FilesListActivity can be found in Efficient Data Arrays Example.
+- Added option to log to CSV file in Logging & ShimmerService
+- Examples updated to demonstrate how to receive and display Shimmer status messages (Toast messages)
+- Minor refactoring & Javadoc comments
+
 13 June 2018 (3.0.61Beta)
 - Added method to get clone device from Device Sensor Config Fragment
 - Added check to Device Config List Adapter so it doesn't crash when an invalid config value is returned
