@@ -296,10 +296,19 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 			mDynamicPlot.redraw();
 		}
 	}
+
+
+	public void setLegendTextSize(float textSize) {
+		mDynamicPlot.getLegendWidget().getTextPaint().setTextSize(textSize);
+	}
 	
-	
-	
-	
+	public void setLegendWidth(float width) {
+		mDynamicPlot.getLegendWidget().setWidth(width);
+	}
+
+	public void setLegendHeight(float height) {
+		mDynamicPlot.getLegendWidget().setHeight(height);
+	}
 
 }
 
