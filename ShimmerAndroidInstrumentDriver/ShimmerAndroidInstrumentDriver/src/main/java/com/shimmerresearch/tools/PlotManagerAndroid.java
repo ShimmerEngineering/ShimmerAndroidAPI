@@ -7,6 +7,8 @@ package com.shimmerresearch.tools;
 
 import android.graphics.Color;
 
+import com.androidplot.ui.SizeLayoutType;
+import com.androidplot.ui.SizeMetrics;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.XYPlot;
 
@@ -312,6 +314,18 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 	public void setLegendHeight(float height) {
 		mDynamicPlot.getLegendWidget().setHeight(height);
 	}
+
+    /**
+     * Sets the icon size(s) inside the XYPlot legend widget.
+     * By default, this is the signal colour icon
+     * @param height
+     * @param heightLayoutType
+     * @param width
+     * @param widthLayoutType
+     */
+	public void setLegendIconSize(float height, SizeLayoutType heightLayoutType, float width, SizeLayoutType widthLayoutType) {
+        mDynamicPlot.getLegendWidget().setIconSizeMetrics(new SizeMetrics(height, heightLayoutType, width, widthLayoutType));
+    }
 
 }
 
