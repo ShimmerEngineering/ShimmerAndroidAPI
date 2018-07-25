@@ -297,7 +297,10 @@ public class PlotManagerAndroid extends AbstractPlotManager {
 		}
 	}
 
-
+	/**
+	 * Change the text size of the signal labels in the legend widget on the XYPlot
+	 * @param textSize
+	 */
 	public void setLegendTextSize(float textSize) {
 		mDynamicPlot.getLegendWidget().getTextPaint().setTextSize(textSize);
 	}
