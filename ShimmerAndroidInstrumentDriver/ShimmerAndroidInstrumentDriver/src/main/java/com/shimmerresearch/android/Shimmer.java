@@ -208,7 +208,8 @@ public class Shimmer extends ShimmerBluetooth{
 
 	transient private ConnectThread mConnectThread;
 	transient private ConnectedThread mConnectedThread;
-	private boolean mDummy=false;
+	/** Determines if an inquiry has just been completed, so the number of commands in buffer can be queried to find exactly when device is ready for streaming */
+	private boolean mIsInquiryDone = false;
 	transient private LocalDevice localDevice;
 	//private InputStream mInputStream=null;
 	//private DataInputStream mInStream=null;
@@ -229,6 +230,8 @@ public class Shimmer extends ShimmerBluetooth{
 	{
 		setEnableProcessMarker(false);
 	}
+
+	/** Sends Shimmer status updates to mHandlerList every 5s if enabled */
 	private boolean mContinuousStateUpdates = true;
 
 
@@ -991,27 +994,21 @@ public class Shimmer extends ShimmerBluetooth{
 
 
 	protected void inquiryDone() {
-		//TODO: Delete this...
-//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Inquiry done for device-> " + mMyBluetoothAddress);
 		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
-//		msg.setData(bundle);
-//		mHandler.sendMessage(msg);
+		mIsInquiryDone = true;
 		isReadyForStreaming();
 	}   
 
 	protected void isReadyForStreaming(){
-		//TODO: Delete this...
-//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" is ready for Streaming");
-		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
-//		msg.setData(bundle);
-//		mHandler.sendMessage(msg);
 		if (mIsInitialised == false){
 			//only do this during the initialization process to indicate that it is fully initialized, dont do this for a normal inqiuiry
 			mIsInitialised = true;
+			//This is sent when device is first connected:
+			Bundle bundle = new Bundle();
+			bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" is ready for Streaming");
+			sendMsgToHandlerList(MESSAGE_TOAST, bundle);
 		}
 		if(isSDLogging()){
 			if (mIsInitialised){
@@ -1022,12 +1019,14 @@ public class Shimmer extends ShimmerBluetooth{
 		} else {
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
-		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED, getMacId(), getComPort());
-		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
-		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
-		//TODO: Delete this...
-		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
+
+		//JY commented out 9 Oct 2018: Moved inside mIsInitialised check above to send when device is first connected,
+        //and moved to sendProgressReport() to only send when mNumberofRemainingCMDsInBuffer == 1. JIRA Tag: AA-228
+//		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED, getMacId(), getComPort());
+//		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
+//		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+//				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
+
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
 		if(mAutoStartStreaming){
 			startStreaming();
@@ -1035,13 +1034,9 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	protected void isNowStreaming() {
-		//TODO: Delete this...
-//		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
 		bundle.putString(TOAST, "Device " + mMyBluetoothAddress + " is now Streaming");
 		sendMsgToHandlerList(MESSAGE_TOAST, bundle);
-//		msg.setData(bundle);
-//		mHandler.sendMessage(msg);
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" is now Streaming");
 		if (isSDLogging()){
 			setBluetoothRadioState(BT_STATE.STREAMING_AND_SDLOGGING);
@@ -1054,9 +1049,6 @@ public class Shimmer extends ShimmerBluetooth{
 		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
 		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1,
 				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
-		//TODO: Delete this...
-		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, MSG_STATE_STREAMING, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
-		
 	}
 
 	/*
@@ -1309,15 +1301,22 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void processMsgFromCallback(ShimmerMsg shimmerMSG) {
-		
+
 
 	}
 
 	@Override
 	protected void sendProgressReport(BluetoothProgressReportPerCmd pr) {
-		// TODO: Delete this...
-//		mHandler.obtainMessage(MESSAGE_PROGRESS_REPORT, pr).sendToTarget();
 		sendMsgToHandlerListTarget(MESSAGE_PROGRESS_REPORT, pr);
+		if(mIsInquiryDone) {
+			if (pr.mNumberofRemainingCMDsInBuffer == 1) {
+				//AA-228, device is only ready for streaming when number of remaining commands in buffer is 1:
+				mIsInquiryDone = false;
+				Bundle bundle = new Bundle();
+				bundle.putString(TOAST, "Device " + mMyBluetoothAddress + " is ready for Streaming");
+				sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+			}
+		}
 	}
 	
 	public BT_STATE getState() {
