@@ -1293,6 +1293,9 @@ public class ShimmerService extends Service {
 
 	}
 
+	public PlotManagerAndroid getPlotManager() {
+		return mPlotManager;
+	}
 
 
 }
