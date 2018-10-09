@@ -1005,8 +1005,9 @@ public class Shimmer extends ShimmerBluetooth{
 		if (mIsInitialised == false){
 			//only do this during the initialization process to indicate that it is fully initialized, dont do this for a normal inqiuiry
 			mIsInitialised = true;
-			//This is sent when device is first connected:
-			Bundle bundle = new Bundle();
+			//AA-228, this is sent when device is first connected:
+            mIsInquiryDone = false; //To prevent "is ready for Streaming" being sent twice
+            Bundle bundle = new Bundle();
 			bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" is ready for Streaming");
 			sendMsgToHandlerList(MESSAGE_TOAST, bundle);
 		}
