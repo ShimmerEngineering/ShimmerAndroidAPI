@@ -1002,14 +1002,24 @@ public class Shimmer extends ShimmerBluetooth{
 	}   
 
 	protected void isReadyForStreaming(){
+		if(getHardwareVersion() < ShimmerVerDetails.HW_ID.SHIMMER_3) {
+			//AA-228: Only sent from here if this is a Shimmer2r.
+			Bundle bundle = new Bundle();
+			bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" is ready for Streaming");
+			sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+		}
+
 		if (mIsInitialised == false){
 			//only do this during the initialization process to indicate that it is fully initialized, dont do this for a normal inqiuiry
 			mIsInitialised = true;
+
 			//AA-228, this is sent when device is first connected:
-            mIsInquiryDone = false; //To prevent "is ready for Streaming" being sent twice
-            Bundle bundle = new Bundle();
-			bundle.putString(TOAST, "Device " + mMyBluetoothAddress +" is ready for Streaming");
-			sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+			if(getHardwareVersion() >= ShimmerVerDetails.HW_ID.SHIMMER_3) {
+				mIsInquiryDone = false; //To prevent "is ready for Streaming" being sent twice
+				Bundle bundle = new Bundle();
+				bundle.putString(TOAST, "Device " + mMyBluetoothAddress + " is ready for Streaming");
+				sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+			}
 		}
 		if(isSDLogging()){
 			if (mIsInitialised){
@@ -1021,12 +1031,10 @@ public class Shimmer extends ShimmerBluetooth{
 			setBluetoothRadioState(BT_STATE.CONNECTED);
 		}
 
-		//JY commented out 9 Oct 2018: Moved inside mIsInitialised check above to send when device is first connected,
-        //and moved to sendProgressReport() to only send when mNumberofRemainingCMDsInBuffer == 1. JIRA Tag: AA-228
-//		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED, getMacId(), getComPort());
-//		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
-//		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-//				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
+		CallbackObject callBackObject = new CallbackObject(ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED, getMacId(), getComPort());
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE, callBackObject);
+		sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+				new ObjectCluster(mShimmerUserAssignedName, getBluetoothAddress(), mBluetoothRadioState));
 
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
 		if(mAutoStartStreaming){
@@ -1309,13 +1317,16 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	protected void sendProgressReport(BluetoothProgressReportPerCmd pr) {
 		sendMsgToHandlerListTarget(MESSAGE_PROGRESS_REPORT, pr);
-		if(mIsInquiryDone) {
-			if (pr.mNumberofRemainingCMDsInBuffer == 1) {
-				//AA-228, device is only ready for streaming when number of remaining commands in buffer is 1:
-				mIsInquiryDone = false;
-				Bundle bundle = new Bundle();
-				bundle.putString(TOAST, "Device " + mMyBluetoothAddress + " is ready for Streaming");
-				sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+		if(getHardwareVersion() >= ShimmerVerDetails.HW_ID.SHIMMER_3) {
+			//TODO JY: Improve 2r compatibility instead of filtering out [AA-228]
+			if (mIsInquiryDone) {
+				if (pr.mNumberofRemainingCMDsInBuffer == 1) {
+					//AA-228, device is only ready for streaming when number of remaining commands in buffer is 1:
+					mIsInquiryDone = false;
+					Bundle bundle = new Bundle();
+					bundle.putString(TOAST, "Device " + mMyBluetoothAddress + " is ready for Streaming");
+					sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+				}
 			}
 		}
 	}
