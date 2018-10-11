@@ -1,62 +1,38 @@
 package com.shimmerresearch.android;
 
-import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
-
-
-import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
-import com.shimmerresearch.bluetooth.ShimmerBluetooth;
-import com.shimmerresearch.driver.CallbackObject;
-import com.shimmerresearch.driver.Configuration;
-import com.shimmerresearch.driver.FormatCluster;
-import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
-import com.shimmerresearch.exceptions.ShimmerException;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-
-import java.util.Collection;
-
-import static com.shimmerresearch.bluetooth.ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED;
 import static org.junit.Assert.*;
 
+
 /**
- * Instrumented test, which will execute on an Android device.
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * This are general bluetooth test for a Shimmer2R device, you will need to update the bluetooth address in order to run the test
+ * @author Mas Azalya & Jong Chern
+ * @version 001
  */
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 
 public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
-    private boolean mFirstTimeConnection = true;
-    final static String LOG_TAG = "ShimmerLegacyExample";
-    final int DELAY_DURATION_MS = 3000;
-    static Handler handler = null;
+    final private int DELAY_DURATION_MS = 3000;
+    private static Handler handler = null; //Handler not used for anything in this test so setting to null
     final static Shimmer shimmer = new Shimmer (handler);
-    public static final int SHIMMER_2R = 2;
-
-    //btManager.connect("00:06:66:42:0B:54");
-    //String macAddress = "00:06:66:42:0B:54";
-    //shimmer.connect(00:06:66:42:0B:54, "default");
+    private static final String mMacAddress = "00:06:66:43:B4:D6";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        shimmer.connect("00:06:66:42:0B:54", "default");
+        shimmer.connect(mMacAddress, "default");
         Thread.sleep(10000);
     }
 
     @Test   //test Shimmer 2R connection
-    public void testAConnect() throws Exception {
+    public void test001_Connect() throws Exception {
         //shimmer = new Shimmer(mHandler);
 
         if (shimmer.isConnected()) {
@@ -69,7 +45,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test   //get hardware version of Shimmer 2R
-    public void testBGetHW() throws Exception {
+    public void test002_GetHW() throws Exception {
         System.out.println("GeneralBluetoothShimmer2RTest B : Hardware version");
         if (shimmer.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_2R) {
             assertTrue(true);
@@ -80,7 +56,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test   //get firmware version of Shimmer 2R
-    public void testCGetFW() throws Exception {
+    public void test003_GetFW() throws Exception {
 
         if (shimmer.getFirmwareIdentifier() == ShimmerVerDetails.FW_ID.BTSTREAM) {
             assertTrue(true);
@@ -91,7 +67,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test   //write and read sampling rate of the hardware
-    public void testDWriteReadSamplingRate() throws Exception {
+    public void test004_WriteReadSamplingRate() throws Exception {
 
         double samplingrate;
         shimmer.readSamplingRate();
@@ -118,7 +94,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test   //test Shimmer 2R start streaming
-    public void testEStartStreaming() throws Exception {
+    public void test005_StartStreaming() throws Exception {
 
         shimmer.startStreaming();
         Thread.sleep(DELAY_DURATION_MS);
@@ -131,7 +107,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test   //test Shimmer 2R stop streaming
-    public void testFStopStreaming() throws Exception {
+    public void test006_StopStreaming() throws Exception {
         shimmer.stopStreaming();
         Thread.sleep(DELAY_DURATION_MS);
         if (shimmer.isStreaming()) {
@@ -143,7 +119,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test      //test for multiple start and stop streaming
-    public void testGMultipleStartStopStreaming() throws Exception {
+    public void test007_MultipleStartStopStreaming() throws Exception {
         for (int i = 1; i < 8; i++) {
 
             //odd value of i will start streaming
@@ -171,7 +147,7 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
     }
 
     @Test    //test Shimmer 2R disconnection
-    public void testHDisconnect() {
+    public void test008_Disconnect() {
         shimmer.disconnect();
         if (shimmer.isConnected()) {
             assertTrue(false);
