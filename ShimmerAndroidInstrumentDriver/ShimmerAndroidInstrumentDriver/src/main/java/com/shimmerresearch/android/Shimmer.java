@@ -1491,28 +1491,36 @@ public class Shimmer extends ShimmerBluetooth{
 
 	private void sendMsgToHandlerList(int obtainMessage) {
 		for(Handler handler : mHandlerList) {
-			Message msg = handler.obtainMessage(obtainMessage);
-			handler.sendMessage(msg);
+			if (handler!=null) {
+				Message msg = handler.obtainMessage(obtainMessage);
+				handler.sendMessage(msg);
+			}
 		}
 	}
 
 	private void sendMsgToHandlerList(int obtainMessage, Bundle bundle) {
 		for(Handler handler : mHandlerList) {
-			Message msg = handler.obtainMessage(obtainMessage);
-			msg.setData(bundle);
-			handler.sendMessage(msg);
+			if (handler != null) {
+				Message msg = handler.obtainMessage(obtainMessage);
+				msg.setData(bundle);
+				handler.sendMessage(msg);
+			}
 		}
 	}
 
 	private void sendMsgToHandlerListTarget(int what, Object object) {
 		for(Handler handler : mHandlerList) {
-			handler.obtainMessage(what, object).sendToTarget();
+			if (handler!=null) {
+				handler.obtainMessage(what, object).sendToTarget();
+			}
 		}
 	}
 
 	private void sendMsgToHandlerListTarget(int what, int arg1, int arg2, Object object) {
 		for(Handler handler : mHandlerList) {
-			handler.obtainMessage(what, arg1, arg2, object).sendToTarget();
+			if (handler!=null) {
+				handler.obtainMessage(what, arg1, arg2, object).sendToTarget();
+			}
 		}
 	}
 
