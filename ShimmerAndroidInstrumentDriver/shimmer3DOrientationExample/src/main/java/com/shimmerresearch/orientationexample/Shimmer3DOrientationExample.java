@@ -83,7 +83,7 @@ public class Shimmer3DOrientationExample extends Activity {
 		m3d = new Matrix3d();
 		invm3d.setIdentity();
 		mShimmerDevice1 = new Shimmer(this, mHandler,"RightArm", 51.2, 0, 0, Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO|Shimmer.SENSOR_MAG, false); 
-		mShimmerDevice1.enableOnTheFlyGyroCal(true, 102, 1.2);
+		//mShimmerDevice1.enableOnTheFlyGyroCal(true, 102, 1.2);
 		mShimmerDevice1.enable3DOrientation(true);
 		buttonReset.setOnClickListener(new OnClickListener(){
 
@@ -135,40 +135,49 @@ public class Shimmer3DOrientationExample extends Activity {
 	            	if ((msg.obj instanceof ObjectCluster)){	// within each msg an object can be include, objectclusters are used to represent the data structure of the shimmer device
 	            	    ObjectCluster objectCluster =  (ObjectCluster) msg.obj; 
 	                	    Collection<FormatCluster> accelXFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_A);  // first retrieve all the possible formats for the current sensor device
-				 	    	float angle = 0,x = 0,y=0,z=0;
+
+						float angle = 0,x = 0,y=0,z=0;
 	                	    if (accelXFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelXFormats,"CAL")); // retrieve the calibrated data
-				 	    		angle = (float) formatCluster.mData;
+								if(formatCluster!= null) {
+									angle = (float) formatCluster.mData;
+								}
 				 	    	}
 				 	    	Collection<FormatCluster> accelYFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_X);  // first retrieve all the possible formats for the current sensor device
 				 	    	if (accelYFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelYFormats,"CAL")); // retrieve the calibrated data
-				 	    		x=(float) formatCluster.mData;
+								if(formatCluster!= null) {
+									x = (float) formatCluster.mData;
+								}
 				 	    	}
 				 	    	Collection<FormatCluster> accelZFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_Y);  // first retrieve all the possible formats for the current sensor device
 				 	    	if (accelZFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(accelZFormats,"CAL")); // retrieve the calibrated data
-				 	    		y=(float) formatCluster.mData;
+								if(formatCluster!= null) {
+									y = (float) formatCluster.mData;
+								}
 				 	    	}
 				 	    	Collection<FormatCluster> aaFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.AXIS_ANGLE_9DOF_Z);  // first retrieve all the possible formats for the current sensor device
 				 	    	if (aaFormats != null){
 				 	    		FormatCluster formatCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(aaFormats,"CAL")); // retrieve the calibrated data
-				 	    		z=(float) formatCluster.mData;
-				 	    		AxisAngle4d aa=new AxisAngle4d(x,y,z,angle);
-				 	    		Quat4d qt = new Quat4d();
-				 	    		qt.set(aa);
-				 	    		mTVQ1.setText(Double.toString(round(qt.w, 3, BigDecimal.ROUND_HALF_UP)));
-				 	    		mTVQ2.setText(Double.toString(round(qt.x, 3, BigDecimal.ROUND_HALF_UP)));
-				 	    		mTVQ3.setText(Double.toString(round(qt.y, 3, BigDecimal.ROUND_HALF_UP)));
-				 	    		mTVQ4.setText(Double.toString(round(qt.z, 3, BigDecimal.ROUND_HALF_UP)));
-				 	    		m3d.set(aa);
-				 	    		Matrix3d fm3dtemp = new Matrix3d();
-				 	    		
-				 	    		//set function, the purpose of this is to find a rotation such that the orientation output of the Shimmer device, matches the orientation of the cube when the orange side is facing the user which in terms of rotation matrix is the identity matrix. 
-				 	    		fm3dtemp.set(invm3d);
-				 	    		fm3dtemp.mul(m3d);
-				 	    		aa.set(fm3dtemp);
-				 	    		t.setAngleAxis((float) (aa.angle*180/Math.PI), (float)aa.x, (float)aa.y, (float)aa.z);
+								if(formatCluster!= null) {
+										z = (float) formatCluster.mData;
+										AxisAngle4d aa = new AxisAngle4d(x, y, z, angle);
+										Quat4d qt = new Quat4d();
+										qt.set(aa);
+										mTVQ1.setText(Double.toString(round(qt.w, 3, BigDecimal.ROUND_HALF_UP)));
+										mTVQ2.setText(Double.toString(round(qt.x, 3, BigDecimal.ROUND_HALF_UP)));
+										mTVQ3.setText(Double.toString(round(qt.y, 3, BigDecimal.ROUND_HALF_UP)));
+										mTVQ4.setText(Double.toString(round(qt.z, 3, BigDecimal.ROUND_HALF_UP)));
+										m3d.set(aa);
+										Matrix3d fm3dtemp = new Matrix3d();
+
+										//set function, the purpose of this is to find a rotation such that the orientation output of the Shimmer device, matches the orientation of the cube when the orange side is facing the user which in terms of rotation matrix is the identity matrix.
+										fm3dtemp.set(invm3d);
+										fm3dtemp.mul(m3d);
+										aa.set(fm3dtemp);
+										t.setAngleAxis((float) (aa.angle * 180 / Math.PI), (float) aa.x, (float) aa.y, (float) aa.z);
+									}
 				 	    	}
 	            	}
 	                break;
@@ -181,7 +190,8 @@ public class Shimmer3DOrientationExample extends Activity {
 	                     case CONNECTED:
 	                    	 Log.d("ConnectionStatus","Successful");
 	                    	 //because the default mag range for Shimmer2 and 3 are 0 and 1 respectively, please be aware of what range you use when calibrating using Shimmer 9DOF Cal App, and use the same range here
-	                    	 mShimmerDevice1.startStreaming();
+							 mShimmerDevice1.enableOnTheFlyGyroCal(true, 102, 1.2);
+							 mShimmerDevice1.startStreaming();
 	                         break;
 	                    /* case INITIALISED:
 
