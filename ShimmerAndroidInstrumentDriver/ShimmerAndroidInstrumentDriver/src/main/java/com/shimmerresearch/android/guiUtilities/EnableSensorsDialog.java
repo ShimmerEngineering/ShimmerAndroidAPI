@@ -61,7 +61,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
                     public void onClick(final DialogInterface dialog,
                                         final int which, final boolean isChecked) {
 
-                        if(isChecked == true) {
+                        if (isChecked == true) {
                             clone.setSensorEnabledState(sensorKeys[which], true);
                         } else {
                             clone.setSensorEnabledState(sensorKeys[which], false);
@@ -70,8 +70,8 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
                         final AlertDialog alertDialog = (AlertDialog) dialog;
                         final ListView listView = alertDialog.getListView();
 
-                        for(int i=0; i<listView.getAdapter().getCount(); i++) {
-                            if(clone.isSensorEnabled(sensorKeys[i])) {
+                        for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                            if (clone.isSensorEnabled(sensorKeys[i])) {
                                 listView.setItemChecked(i, true);
                             } else {
                                 listView.setItemChecked(i, false);
@@ -105,8 +105,8 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
 
         final ListView listView = ad.getListView();
 
-        for(int i=0; i<listView.getCount(); i++) {
-            if(clone.isSensorEnabled(sensorKeys[i])) {
+        for (int i = 0; i < listView.getCount(); i++) {
+            if (clone.isSensorEnabled(sensorKeys[i])) {
                 listView.setItemChecked(i, true);
             } else {
                 listView.setItemChecked(i, false);
@@ -123,6 +123,7 @@ public class EnableSensorsDialog extends AbstractEnableSensorsDialog {
 
     /**
      * Override this method to customise the style and theme of the dialog
+     *
      * @param ad
      */
     protected void setDialogTheme(AlertDialog ad) {

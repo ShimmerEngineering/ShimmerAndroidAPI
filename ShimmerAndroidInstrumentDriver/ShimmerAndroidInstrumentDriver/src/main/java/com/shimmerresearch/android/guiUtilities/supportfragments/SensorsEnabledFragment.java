@@ -74,12 +74,13 @@ public class SensorsEnabledFragment extends ListFragment {
 
     /**
      * Displays a default message when the fragment is first displayed
+     *
      * @param savedInstanceState
      */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String[] values = new String[] {"No device selected, sensors unavailable"};
+        String[] values = new String[]{"No device selected, sensors unavailable"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, values);
         setListAdapter(adapter);
@@ -87,6 +88,7 @@ public class SensorsEnabledFragment extends ListFragment {
 
     /**
      * Call this method to display the sensors from the selected Shimmer Device
+     *
      * @param shimmerDevice
      * @param activityContext
      */
@@ -99,13 +101,13 @@ public class SensorsEnabledFragment extends ListFragment {
         //Get the list of sensor groups the device is compatible with and store it in an ArrayList
         compatibleSensorGroupMap = new TreeMap<Integer, SensorGroupingDetails>();
         TreeMap<Integer, SensorGroupingDetails> groupMap = shimmerDeviceClone.getSensorGroupingMap();
-        for(Map.Entry<Integer, SensorGroupingDetails> entry : groupMap.entrySet()) {
-            if(isSensorGroupCompatible(shimmerDeviceClone, entry.getValue())) {
-              compatibleSensorGroupMap.put(entry.getKey(), entry.getValue());
+        for (Map.Entry<Integer, SensorGroupingDetails> entry : groupMap.entrySet()) {
+            if (isSensorGroupCompatible(shimmerDeviceClone, entry.getValue())) {
+                compatibleSensorGroupMap.put(entry.getKey(), entry.getValue());
             }
         }
 
-        for(SensorGroupingDetails sgd : groupMap.values()) {
+        for (SensorGroupingDetails sgd : groupMap.values()) {
             List<ShimmerVerObject> listOfCompatibleVersionInfo = sgd.mListOfCompatibleVersionInfo;
             List<String> listOfGuiConfigNames = sgd.mListofGuiConfigNames;
             //TODO: Refactor listOfSensorMapKeysAssociated (SENSOR_ID)
@@ -144,7 +146,7 @@ public class SensorsEnabledFragment extends ListFragment {
         final ListView listView = getListView();
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
-        if(listView.getFooterViewsCount() == 0) {   //Only add the button if there is no existing button
+        if (listView.getFooterViewsCount() == 0) {   //Only add the button if there is no existing button
             //Create button in the ListView footer
             Button button = new Button(activityContext);
             button.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +207,7 @@ public class SensorsEnabledFragment extends ListFragment {
                 CharSequence cs = checkedTextView.getText();
                 String sensorName = cs.toString();
 
-                if(checkedTextView.isChecked()) {
+                if (checkedTextView.isChecked()) {
                     shimmerDeviceClone.setSensorEnabledState(sensorKeys[position], true);
                 } else {
                     shimmerDeviceClone.setSensorEnabledState(sensorKeys[position], false);
@@ -221,6 +223,7 @@ public class SensorsEnabledFragment extends ListFragment {
     /**
      * Method to get the View from a position in the ListView, taking into account the constantly
      * changing index of the ListView as it is scrolled.
+     *
      * @param pos
      * @param listView
      * @return
@@ -229,7 +232,7 @@ public class SensorsEnabledFragment extends ListFragment {
         final int firstListItemPosition = listView.getFirstVisiblePosition();
         final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
 
-        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+        if (pos < firstListItemPosition || pos > lastListItemPosition) {
             return listView.getAdapter().getView(pos, null, listView);
         } else {
             final int childIndex = pos - firstListItemPosition;
@@ -248,18 +251,18 @@ public class SensorsEnabledFragment extends ListFragment {
 
     /**
      * Updates the state of the checkboxes in the ListView
+     *
      * @param listView
      * @param count
      */
     private void updateCheckboxes(ListView listView, int count) {
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             View v = getViewByPosition(i, listView);
             CheckedTextView cTextView = (CheckedTextView) v.findViewById(android.R.id.text1);
-            if(cTextView != null) {
+            if (cTextView != null) {
                 if (shimmerDeviceClone.isSensorEnabled(sensorKeys[i])) {
                     listView.setItemChecked(i, true);
-                }
-                else {
+                } else {
                     listView.setItemChecked(i, false);
                 }
             } else {

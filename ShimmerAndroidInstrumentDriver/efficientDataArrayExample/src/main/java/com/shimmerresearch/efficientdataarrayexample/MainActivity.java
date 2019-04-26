@@ -36,9 +36,9 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.RE
 /**
  * This example demonstrates the use of the arrays data structure, {@link ObjectCluster#sensorDataArray}, in the following scenarios:
  * <ul>
- *     <li>Enabling the arrays data structure</li>
- *     <li>Different methods of retrieving signal data from the arrays</li>
- *     <li>Writing the signal data to a CSV file</li>
+ * <li>Enabling the arrays data structure</li>
+ * <li>Different methods of retrieving signal data from the arrays</li>
+ * <li>Writing the signal data to a CSV file</li>
  * </ul>
  * Note: The arrays data structure is an alternative to the standard Multimap ({@link ObjectCluster#mPropertyCluster}) data structure.
  * Switching to using the arrays can improve packet reception rate on slower Android devices.
@@ -51,7 +51,9 @@ public class MainActivity extends Activity {
     private final static String CSV_FILE_NAME_PREFIX = "Data";
     private final static String APP_FOLDER_NAME = "ShimmerArraysExample";
     private final static String APP_DIR_PATH = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + APP_FOLDER_NAME + File.separator;
-    /** This can be found in the Manifest */
+    /**
+     * This can be found in the Manifest
+     */
     private final static String APP_FILE_PROVIDER_AUTHORITY = "com.shimmerresearch.efficientdataarrayexample.fileprovider";
     private final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
 
@@ -74,7 +76,7 @@ public class MainActivity extends Activity {
 
         //Check if permission to write to external storage has been granted
         if (Build.VERSION.SDK_INT >= 23) {
-            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE )!= PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         PERMISSIONS_REQUEST_WRITE_STORAGE);
             }
@@ -89,7 +91,7 @@ public class MainActivity extends Activity {
 
     public void startStreaming(View v) {
         Shimmer shimmer = (Shimmer) btManager.getShimmer(bluetoothAdd);
-        if(shimmer != null) {   //this is null if Shimmer device is not connected
+        if (shimmer != null) {   //this is null if Shimmer device is not connected
             setupCSV();
             //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
             shimmer.enablePCTimeStamps(false);
@@ -102,7 +104,7 @@ public class MainActivity extends Activity {
     }
 
     public void stopStreaming(View v) {
-        if(btManager.getShimmer(bluetoothAdd) != null) {
+        if (btManager.getShimmer(bluetoothAdd) != null) {
             try {   //Stop CSV writing
                 bw.flush();
                 bw.close();
@@ -120,13 +122,14 @@ public class MainActivity extends Activity {
 
     /**
      * Get the result from the paired devices dialog
+     *
      * @param requestCode
      * @param resultCode
      * @param data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+        if (requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 bluetoothAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
@@ -156,14 +159,14 @@ public class MainActivity extends Activity {
 
                         //Method 2a - retrieve data from the ObjectCluster by manually parsing the arrays
                         int index = -1;
-                        for(int i=0; i<objc.sensorDataArray.mSensorNames.length; i++) {
-                            if(objc.sensorDataArray.mSensorNames[i] != null) {
+                        for (int i = 0; i < objc.sensorDataArray.mSensorNames.length; i++) {
+                            if (objc.sensorDataArray.mSensorNames[i] != null) {
                                 if (objc.sensorDataArray.mSensorNames[i].equals(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X)) {
                                     index = i;
                                 }
                             }
                         }
-                        if(index != -1) {
+                        if (index != -1) {
                             //Index was found
                             data = objc.sensorDataArray.mCalData[index];
                             Log.w(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
@@ -171,7 +174,7 @@ public class MainActivity extends Activity {
 
                         //Method 2b - retrieve data from the ObjectCluster by getting the index, then accessing the arrays
                         index = objc.getIndexForChannelName(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X);
-                        if(index != -1) {
+                        if (index != -1) {
                             data = objc.sensorDataArray.mCalData[index];
                             Log.e(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
                         }
@@ -179,9 +182,9 @@ public class MainActivity extends Activity {
                         /**
                          * ---------- Writing all channels of CAL data to CSV file ----------
                          */
-                        if(firstTimeWrite) {
+                        if (firstTimeWrite) {
                             //Write headers on first-time
-                            for(String channelName : objc.sensorDataArray.mSensorNames) {
+                            for (String channelName : objc.sensorDataArray.mSensorNames) {
                                 try {
                                     bw.write(channelName + ",");
                                 } catch (IOException e) {
@@ -190,22 +193,22 @@ public class MainActivity extends Activity {
                             }
                             try {
                                 bw.write("\n");
-                            } catch(IOException e2) {
+                            } catch (IOException e2) {
                                 e2.printStackTrace();
                             }
                             firstTimeWrite = false;
                         }
-                        for(double calData : objc.sensorDataArray.mCalData) {
+                        for (double calData : objc.sensorDataArray.mCalData) {
                             String dataString = String.valueOf(calData);
                             try {
                                 bw.write(dataString + ",");
-                            } catch(IOException e3) {
+                            } catch (IOException e3) {
                                 e3.printStackTrace();
                             }
                         }
                         try {
                             bw.write("\n");
-                        } catch(IOException e2) {
+                        } catch (IOException e2) {
                             e2.printStackTrace();
                         }
                     }
@@ -248,6 +251,7 @@ public class MainActivity extends Activity {
 
     /**
      * Permission request callback
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
@@ -255,7 +259,7 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == PERMISSIONS_REQUEST_WRITE_STORAGE) {
+        if (requestCode == PERMISSIONS_REQUEST_WRITE_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this, "Error! Permission not granted. App will now close", Toast.LENGTH_LONG).show();
                 finish();
@@ -268,7 +272,7 @@ public class MainActivity extends Activity {
      */
     private void setupCSV() {
         File dir = new File(APP_DIR_PATH);
-        if(!dir.exists()) {
+        if (!dir.exists()) {
             //Create the directory if it doesn't already exist
             dir.mkdir();
         }
@@ -289,6 +293,7 @@ public class MainActivity extends Activity {
 
     /**
      * Launch the files list activity, which is themed as a dialog in the Android Manifest
+     *
      * @param v
      */
     public void openLogFilesList(View v) {

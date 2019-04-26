@@ -47,6 +47,7 @@ public class SignalsToPlotFragment extends ListFragment {
 
     /**
      * Display a default message when the fragment is first created
+     *
      * @param savedInstanceState
      */
     @Override
@@ -70,7 +71,7 @@ public class SignalsToPlotFragment extends ListFragment {
 
     @Override
     public void onResume() {
-        if(shimmerDevice != null) {
+        if (shimmerDevice != null) {
 
         }
 
@@ -85,7 +86,7 @@ public class SignalsToPlotFragment extends ListFragment {
         ShimmerBluetoothManagerAndroid btManager = shimmerService.getBluetoothManager();
         final ShimmerDevice device = btManager.getShimmer(bluetoothAddress);
 
-        if(device.isStreaming()) {
+        if (device.isStreaming()) {
 
             device.getListofEnabledChannelSignalsandFormats();
             channelsMap = device.getMapOfEnabledChannelsForStreaming();
@@ -94,37 +95,37 @@ public class SignalsToPlotFragment extends ListFragment {
             List<String> sensorList2 = new ArrayList<String>();
 
             Iterator<ChannelDetails> iterator = channelsMap.values().iterator();
-            while(iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 ChannelDetails details = iterator.next();
                 listOfEnabledChannelsAndFormats.addAll(details.getListOfChannelSignalsAndFormats());
             }
 
-            for(int i=0;i<listOfChannels.size();i++) {
+            for (int i = 0; i < listOfChannels.size(); i++) {
                 sensorList2.add(joinStrings(listOfChannels.get(i)));
             }
 
-            int p=0;
+            int p = 0;
             String deviceName = device.getShimmerUserAssignedName();
             final List<String[]> mList = new ArrayList<>();
-            for(ChannelDetails details : channelsMap.values()) {
+            for (ChannelDetails details : channelsMap.values()) {
 
                 List<ChannelDetails.CHANNEL_TYPE> listOfChannelTypes = details.mListOfChannelTypes;
 
-                for(int a=0; a<listOfChannelTypes.size(); a++) {
+                for (int a = 0; a < listOfChannelTypes.size(); a++) {
                     String format = listOfChannelTypes.get(a).name();
-                    if(format.contains("UNCAL")) {
-                        String[] temp = new String[] {deviceName, details.getChannelObjectClusterName(), format, details.mDefaultUncalUnit};
+                    if (format.contains("UNCAL")) {
+                        String[] temp = new String[]{deviceName, details.getChannelObjectClusterName(), format, details.mDefaultUncalUnit};
                         mList.add(p, temp);
                         p++;
                     } else {
-                        String[] temp = new String[] {deviceName, details.getChannelObjectClusterName(), format, details.mDefaultCalUnits};
+                        String[] temp = new String[]{deviceName, details.getChannelObjectClusterName(), format, details.mDefaultCalUnits};
                         mList.add(p, temp);
                         p++;
                     }
                 }
             }
 
-            for(int i=0; i<mList.size(); i++) {
+            for (int i = 0; i < mList.size(); i++) {
                 String[] array = mList.get(i);
                 //Remove the device name and units before putting into sensorList:
                 String s = array[1] + " " + array[2];
@@ -145,9 +146,9 @@ public class SignalsToPlotFragment extends ListFragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    if(!shimmerService.mPlotManager.checkIfPropertyExist(mList.get(position))) {
+                    if (!shimmerService.mPlotManager.checkIfPropertyExist(mList.get(position))) {
                         try {
-                            if(dynamicPlot == null) {
+                            if (dynamicPlot == null) {
                                 Log.e(LOG_TAG, "dynamicPlot is null!");
                             }
                             shimmerService.mPlotManager.addSignal(mList.get(position), dynamicPlot);
@@ -155,8 +156,7 @@ public class SignalsToPlotFragment extends ListFragment {
                             Log.e(LOG_TAG, "Error! Could not add signal: " + e);
                             e.printStackTrace();
                         }
-                    }
-                    else {
+                    } else {
                         shimmerService.mPlotManager.removeSignal(mList.get(position));
                     }
                 }
@@ -173,8 +173,8 @@ public class SignalsToPlotFragment extends ListFragment {
     }
 
     public void updateCheckboxes() {
-        for(int i=0; i<mList.size(); i++) {
-            if(shimmerService.mPlotManager.checkIfPropertyExist(mList.get(i))) {
+        for (int i = 0; i < mList.size(); i++) {
+            if (shimmerService.mPlotManager.checkIfPropertyExist(mList.get(i))) {
                 listView.setItemChecked(i, true);
             } else {
                 listView.setItemChecked(i, false);
@@ -182,12 +182,12 @@ public class SignalsToPlotFragment extends ListFragment {
         }
     }
 
-    public static String joinStrings(String[] a){
-        String js="";
-        for (int i=0;i<a.length;i++){
-            if (i==0){
+    public static String joinStrings(String[] a) {
+        String js = "";
+        for (int i = 0; i < a.length; i++) {
+            if (i == 0) {
                 js = a[i];
-            } else{
+            } else {
                 js = js + " " + a[i];
             }
         }

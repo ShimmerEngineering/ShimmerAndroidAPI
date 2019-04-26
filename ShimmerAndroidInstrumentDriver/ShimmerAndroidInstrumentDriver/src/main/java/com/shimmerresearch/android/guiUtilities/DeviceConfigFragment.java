@@ -54,6 +54,7 @@ public class DeviceConfigFragment extends Fragment {
     /**
      * This method allows for the setting of a custom Drawable background resource for the buttons
      * at the bottom of the ListView
+     *
      * @param shimmerDevice
      * @param context
      * @param bluetoothManager
@@ -70,6 +71,7 @@ public class DeviceConfigFragment extends Fragment {
 
     /**
      * Builds the list of config options for the selected Shimmer device
+     *
      * @param shimmerDevice
      * @param context
      * @param bluetoothManager
@@ -81,22 +83,22 @@ public class DeviceConfigFragment extends Fragment {
         shimmerDeviceClone = shimmerDevice.deepClone();
         Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
         List<String> listOfKeys = new ArrayList<String>();
-        for (SensorDetails sd:sensorMap.values()) {
-            if (sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated!=null && sd.isEnabled()) {
+        for (SensorDetails sd : sensorMap.values()) {
+            if (sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated != null && sd.isEnabled()) {
                 listOfKeys.addAll(sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated);
             }
         }
 
         List<String> keysToRemove = new ArrayList<String>();
 
-        for(String key : listOfKeys) {
+        for (String key : listOfKeys) {
             ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
-            if(cods == null) {
+            if (cods == null) {
                 keysToRemove.add(key);
             }
         }
 
-        for(String key : keysToRemove) {
+        for (String key : keysToRemove) {
             listOfKeys.remove(key);
         }
 
@@ -108,9 +110,9 @@ public class DeviceConfigFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 final int editTextGroupPosition = groupPosition;
-                if(v.findViewById(R.id.expandedListItem) != null) { //The item that was clicked is a checkbox
+                if (v.findViewById(R.id.expandedListItem) != null) { //The item that was clicked is a checkbox
                     CheckedTextView checkedTextView = (CheckedTextView) v.findViewById(R.id.expandedListItem);
-                    if(checkedTextView.isChecked()) {
+                    if (checkedTextView.isChecked()) {
                         checkedTextView.setChecked(false);
                     } else {
                         checkedTextView.setChecked(true);
@@ -134,7 +136,7 @@ public class DeviceConfigFragment extends Fragment {
 
 
         //Only add the buttons if they haven't been added before:
-        if(expandListView.getFooterViewsCount() == 0) {
+        if (expandListView.getFooterViewsCount() == 0) {
 
             LinearLayout buttonLayout = new LinearLayout(context);
             buttonLayout.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
@@ -148,7 +150,7 @@ public class DeviceConfigFragment extends Fragment {
             writeConfigButton.setLayoutParams(buttonParams);
             resetListButton.setLayoutParams(buttonParams);
 
-            if(buttonBackgroundResourceId != -1) {
+            if (buttonBackgroundResourceId != -1) {
                 //A custom Button background resource ID has been given
                 writeConfigButton.setBackgroundResource(buttonBackgroundResourceId);
                 resetListButton.setBackgroundResource(buttonBackgroundResourceId);
@@ -162,7 +164,7 @@ public class DeviceConfigFragment extends Fragment {
                     cloneList.add(0, shimmerDeviceClone);
                     AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                    if(shimmerDeviceClone instanceof Shimmer) {
+                    if (shimmerDeviceClone instanceof Shimmer) {
                         bluetoothManager.configureShimmer(shimmerDeviceClone);
                     }
 

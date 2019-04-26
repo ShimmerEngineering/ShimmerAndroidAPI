@@ -39,13 +39,19 @@ public class FileListActivity extends Activity {
     public final static String INTENT_EXTRA_DIR_PATH = "DirectoryPath";
     public final static String INTENT_EXTRA_PROVIDER_AUTHORITY = "FileProviderAuthority";
 
-    /** Replace this with your own file provider's authority.
-     * This will be replaced with any String extras with name INTENT_EXTRA_PROVIDER_AUTHORITY that are passed along with the Intent */
+    /**
+     * Replace this with your own file provider's authority.
+     * This will be replaced with any String extras with name INTENT_EXTRA_PROVIDER_AUTHORITY that are passed along with the Intent
+     */
     protected String FILE_PROVIDER_AUTHORITY = "com.shimmerresearch.shimmer.fileprovider";
-    /** Replace this with the directory you want to open.
-     * This will be replaced with any String extras with name INTENT_EXTRA_DIR_PATH that are passed along with the Intent */
+    /**
+     * Replace this with the directory you want to open.
+     * This will be replaced with any String extras with name INTENT_EXTRA_DIR_PATH that are passed along with the Intent
+     */
     protected String DIRECTORY_PATH = Environment.getExternalStorageDirectory().getPath() + "/Shimmer/";
-    /** You can replace this with your own custom MIME type */
+    /**
+     * You can replace this with your own custom MIME type
+     */
     protected final static String FILE_TYPE = "text/";
 
 
@@ -71,7 +77,7 @@ public class FileListActivity extends Activity {
         cancelButton = (Button) findViewById(R.id.buttonCancel);
 
         File fileDir = new File(DIRECTORY_PATH);
-        if(!fileDir.exists()) {
+        if (!fileDir.exists()) {
             Toast.makeText(this, "Error! Directory does not exist.", Toast.LENGTH_LONG).show();
             finish();
         } else {
@@ -107,13 +113,13 @@ public class FileListActivity extends Activity {
     private void retrieveAnyStringExtras() {
         String dirPath = getIntent().getStringExtra(INTENT_EXTRA_DIR_PATH);
         String providerAuthority = getIntent().getStringExtra(INTENT_EXTRA_PROVIDER_AUTHORITY);
-        if(dirPath != null) {
-            if(!dirPath.equals("")) {
+        if (dirPath != null) {
+            if (!dirPath.equals("")) {
                 DIRECTORY_PATH = dirPath;
             }
         }
-        if(providerAuthority != null) {
-            if(!providerAuthority.equals("")) {
+        if (providerAuthority != null) {
+            if (!providerAuthority.equals("")) {
                 FILE_PROVIDER_AUTHORITY = providerAuthority;
             }
         }

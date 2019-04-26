@@ -7,9 +7,9 @@ import com.shimmerresearch.comms.serialPortInterface.AbstractSerialPortHal;
  * Created by ASaez on 11-Aug-16.
  */
 
-public class ShimmerRadioInitializerAndroid extends ShimmerRadioInitializer{
+public class ShimmerRadioInitializerAndroid extends ShimmerRadioInitializer {
 
-    public ShimmerRadioInitializerAndroid(String bluetoothAddress){
+    public ShimmerRadioInitializerAndroid(String bluetoothAddress) {
         useLegacyDelayBeforeBtRead(true);
         this.serialCommPort = new ShimmerSerialPortAndroid(bluetoothAddress);
     }

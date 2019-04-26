@@ -15,11 +15,11 @@ public class Shimmer4Android extends Shimmer4sdk {
     transient public final Handler mHandler;
 
     @Override
-    public void sendCallBackMsg(int msgid,Object obj){
+    public void sendCallBackMsg(int msgid, Object obj) {
         mHandler.obtainMessage(msgid, obj).sendToTarget();
     }
 
-    public Shimmer4Android(Handler handler){
+    public Shimmer4Android(Handler handler) {
         mHandler = handler;
     }
 

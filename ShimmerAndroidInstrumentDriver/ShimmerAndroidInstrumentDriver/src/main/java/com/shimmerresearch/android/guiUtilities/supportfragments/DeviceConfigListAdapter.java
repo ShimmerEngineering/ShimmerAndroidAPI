@@ -44,18 +44,18 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
     private HashMap<String, String> currentSettingsMap = new HashMap<String, String>();
 
 
-    private String getConfigValueLabelFromConfigLabel(String label){
+    private String getConfigValueLabelFromConfigLabel(String label) {
         ConfigOptionDetailsSensor cods = cloneDevice.getConfigOptionsMap().get(label);
         int currentConfigInt = (int) cloneDevice.getConfigValueUsingConfigLabel(label);
         int index = -1;
         Integer[] values = cods.getConfigValues();
         String[] valueLabels = cods.getGuiValues();
-        for (int i=0;i<values.length;i++){
-            if (currentConfigInt==values[i]){
-                index=i;
+        for (int i = 0; i < values.length; i++) {
+            if (currentConfigInt == values[i]) {
+                index = i;
             }
         }
-        if (index==-1){
+        if (index == -1) {
             System.out.println();
             return "";
         }
@@ -68,7 +68,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         cloneDevice = shimmerDeviceClone;
         shimmerDevice = device;
 
-        for(String key : list) {    //TODO: Place this in DeviceConfigFragment
+        for (String key : list) {    //TODO: Place this in DeviceConfigFragment
             ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
 
             if (cods != null) {
@@ -109,11 +109,11 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         final String expandedListText = (String) getChild(groupPosition, childPosition);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if(expandedListText.contains("TEXTFIELD")) {    //The config option can be any value, needs a TextField
-            if(convertView == null) {
+        if (expandedListText.contains("TEXTFIELD")) {    //The config option can be any value, needs a TextField
+            if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.list_item_textfield, null);
             } else {
-                if(convertView.findViewById(R.id.editText) == null) {
+                if (convertView.findViewById(R.id.editText) == null) {
                     convertView = layoutInflater.inflate(R.layout.list_item_textfield, null);
                 }
             }
@@ -122,27 +122,26 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
 //            editText.setText(textFieldValue);
 //            editText.append("");
 
-            Object textFieldValue = cloneDevice.getConfigValueUsingConfigLabel((String)getGroup(groupPosition));
-            editText.setText((String)textFieldValue);
+            Object textFieldValue = cloneDevice.getConfigValueUsingConfigLabel((String) getGroup(groupPosition));
+            editText.setText((String) textFieldValue);
             editText.append("");
 
             editText.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    if(keyCode == KEYCODE_ENTER) {
-                        cloneDevice.setConfigValueUsingConfigLabel((String)getGroup(groupPosition), editText.getText().toString());
+                    if (keyCode == KEYCODE_ENTER) {
+                        cloneDevice.setConfigValueUsingConfigLabel((String) getGroup(groupPosition), editText.getText().toString());
                         notifyDataSetChanged();
                     }
                     return false;
                 }
             });
 
-        }
-        else {
+        } else {
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.list_item, null);
             } else {
-                if(convertView.findViewById(R.id.expandedListItem) == null) {
+                if (convertView.findViewById(R.id.expandedListItem) == null) {
                     convertView = layoutInflater.inflate(R.layout.list_item, null);
                 }
             }
@@ -154,7 +153,7 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
 
             String valuelabel = getConfigValueLabelFromConfigLabel(configValueLabel);
 
-            if(valuelabel.equals(expandedListText)) {
+            if (valuelabel.equals(expandedListText)) {
                 expandedListTextView.setChecked(true);
             } else {
                 expandedListTextView.setChecked(false);
@@ -210,14 +209,14 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
         String listTitle = (String) getGroup(groupPosition);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            if (convertView == null) {
-                convertView = layoutInflater.inflate(R.layout.list_group, null);
-            } else if(convertView.findViewById(R.id.listTitle) == null) {
-                convertView = layoutInflater.inflate(R.layout.list_group, null);
-            }
-            TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
-            listTitleTextView.setTypeface(null, Typeface.BOLD);
-            listTitleTextView.setText(listTitle);
+        if (convertView == null) {
+            convertView = layoutInflater.inflate(R.layout.list_group, null);
+        } else if (convertView.findViewById(R.id.listTitle) == null) {
+            convertView = layoutInflater.inflate(R.layout.list_group, null);
+        }
+        TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
+        listTitleTextView.setTypeface(null, Typeface.BOLD);
+        listTitleTextView.setText(listTitle);
 
         return convertView;
     }

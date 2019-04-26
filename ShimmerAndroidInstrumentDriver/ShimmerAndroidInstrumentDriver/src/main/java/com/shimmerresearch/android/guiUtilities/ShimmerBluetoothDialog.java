@@ -47,7 +47,6 @@ import java.util.Set;
  * devices detected in the area after discovery. When a device is chosen
  * by the user, the MAC address of the device is sent back to the parent
  * Activity in the result Intent.
- * 
  */
 public class ShimmerBluetoothDialog extends Activity {
     // Debugging
@@ -65,10 +64,11 @@ public class ShimmerBluetoothDialog extends Activity {
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
     //private String[] deviceAddresses={"","","","","","",""};
     private Button scanButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Set Material Design if the device's OS is Android Lollipop or higher
-        if(Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             setTheme(android.R.style.Theme_Material_Light_Dialog);
         } else {
             setTheme(android.R.style.Theme_Holo_Light_Dialog);
@@ -84,7 +84,7 @@ public class ShimmerBluetoothDialog extends Activity {
 
         // Initialize the button to perform device discovery
         scanButton = (Button) findViewById(R.id.button_scan);
-          
+
         scanButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 doDiscovery();
@@ -184,12 +184,12 @@ public class ShimmerBluetoothDialog extends Activity {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
 
-            Toast.makeText(getApplicationContext(),"Device Selected " +  "-> "+ address, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Device Selected " + "-> " + address, Toast.LENGTH_SHORT).show();
             setResult(Activity.RESULT_OK, intent);              // Set result and finish this Activity
 
             finish();
         }
-        
+
     };
 
     // The BroadcastReceiver that listens for discovered devices and
@@ -207,7 +207,7 @@ public class ShimmerBluetoothDialog extends Activity {
                 if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
                     mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 }
-            // When discovery is finished, change the Activity title
+                // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setProgressBarIndeterminateVisibility(false);
                 setTitle(R.string.select_device);

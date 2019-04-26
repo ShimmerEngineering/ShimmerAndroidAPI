@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
 
-            switch(msg.what) {
+            switch (msg.what) {
 
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
                     ShimmerBluetooth.BT_STATE state = null;
@@ -76,14 +76,14 @@ public class MainActivity extends AppCompatActivity {
                         shimmerName = ((ObjectCluster) msg.obj).getShimmerName();
                     }
 
-                    switch(state) {
+                    switch (state) {
                         case CONNECTING:
                             Log.i(LOG_TAG, "Connecting to device: " + macAddress);
                             break;
                         case CONNECTED:
                             Log.i(LOG_TAG, "Device connected: " + macAddress);
                             //Check if Accel is enabled on the Shimmer, and if not, enable it
-                            if(mFirstTimeConnection) {
+                            if (mFirstTimeConnection) {
                                 Shimmer shimmer = (Shimmer) btManager.getShimmerDeviceBtConnectedFromMac(macAddress);
                                 ((ShimmerBluetooth) shimmer).writeEnabledSensors(ShimmerBluetooth.SENSOR_ACCEL);
                             }
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         btManager.stopStreaming(shimmerBtAdd);
     }
 
-    public void disconnectDevice(View v){
+    public void disconnectDevice(View v) {
         btManager.disconnectAllDevices();
         mFirstTimeConnection = true;
     }
@@ -174,13 +174,14 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Gets the selected Bluetooth address from the list of paired Bluetooth devices in ShimmerBluetoothDialog
+     *
      * @param requestCode
      * @param resultCode
      * @param data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+        if (requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 //Ensure no previous device is connected to the App as it only supports a single device at a time:
                 btManager.disconnectAllDevices();

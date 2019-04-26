@@ -126,7 +126,7 @@ public class PlotFragment extends Fragment {
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        dynamicPlot.getLegendWidget().setSize(new SizeMetrics(width/2, SizeLayoutType.ABSOLUTE, height/3, SizeLayoutType.ABSOLUTE));
+        dynamicPlot.getLegendWidget().setSize(new SizeMetrics(width / 2, SizeLayoutType.ABSOLUTE, height / 3, SizeLayoutType.ABSOLUTE));
         // thin out domain/range tick labels so they dont overlap each other:
         dynamicPlot.setTicksPerDomainLabel(5);
         dynamicPlot.setTicksPerRangeLabel(3);
@@ -167,12 +167,13 @@ public class PlotFragment extends Fragment {
 
     /**
      * Passes the Shimmer Service to the fragment to set its graph handler
+     *
      * @param service must be an already running Shimmer Service
      */
     public void setShimmerService(ShimmerService service) {
         shimmerService = service;
         shimmerService.setGraphHandler(graphHandler);
-        if(shimmerService.mPlotManager == null) {
+        if (shimmerService.mPlotManager == null) {
             shimmerService.mPlotManager = new PlotManagerAndroid(false);
         }
         shimmerService.mPlotManager.updateDynamicPlot(dynamicPlot);
@@ -185,82 +186,76 @@ public class PlotFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE:
-                    ShimmerBluetooth.BT_STATE state=null;
+                    ShimmerBluetooth.BT_STATE state = null;
                     String shimmerName = "";
-                    if (msg.obj instanceof ObjectCluster){
-                        state = ((ObjectCluster)msg.obj).mState;
-                        mBluetoothAddress = ((ObjectCluster)msg.obj).getMacAddress();
+                    if (msg.obj instanceof ObjectCluster) {
+                        state = ((ObjectCluster) msg.obj).mState;
+                        mBluetoothAddress = ((ObjectCluster) msg.obj).getMacAddress();
                         shimmerName = ((ObjectCluster) msg.obj).getShimmerName();
-                    } else if(msg.obj instanceof CallbackObject){
-                        state = ((CallbackObject)msg.obj).mState;
-                        mBluetoothAddress = ((CallbackObject)msg.obj).mBluetoothAddress;
+                    } else if (msg.obj instanceof CallbackObject) {
+                        state = ((CallbackObject) msg.obj).mState;
+                        mBluetoothAddress = ((CallbackObject) msg.obj).mBluetoothAddress;
                         shimmerName = "";
                     }
                     switch (state) {
                         case CONNECTED:
-                            Log.d(LOG_TAG,"Message Fully Initialized Received from Shimmer driver");
+                            Log.d(LOG_TAG, "Message Fully Initialized Received from Shimmer driver");
                             shimmerService.enableGraphingHandler(true);
                             deviceState = "Connected";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
                             break;
                         case SDLOGGING:
-                            Log.d(LOG_TAG,"Message Fully Initialized Received from Shimmer driver");
+                            Log.d(LOG_TAG, "Message Fully Initialized Received from Shimmer driver");
                             shimmerService.enableGraphingHandler(true);
                             deviceState = "Connected";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
                             break;
                         case CONNECTING:
-                            Log.d(LOG_TAG,"Driver is attempting to establish connection with Shimmer device");
+                            Log.d(LOG_TAG, "Driver is attempting to establish connection with Shimmer device");
                             deviceState = "Connecting";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
                             break;
                         case STREAMING:
-                            deviceState="Streaming";
+                            deviceState = "Streaming";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
                             List<String> sensorList = shimmerService.getBluetoothManager().getListofEnabledSensors(mBluetoothAddress);
-                            if(sensorList!=null){
-                                if(shimmerService.getBluetoothManager().getShimmerVersion(mBluetoothAddress)== ShimmerVerDetails.HW_ID.SHIMMER_3){
+                            if (sensorList != null) {
+                                if (shimmerService.getBluetoothManager().getShimmerVersion(mBluetoothAddress) == ShimmerVerDetails.HW_ID.SHIMMER_3) {
                                     sensorList.remove("ECG");
                                     sensorList.remove("EMG");
-                                    if(sensorList.contains("EXG1")){
+                                    if (sensorList.contains("EXG1")) {
                                         sensorList.remove("EXG1");
                                         sensorList.remove("EXG2");
-                                        if(shimmerService.isEXGUsingECG24Configuration(mBluetoothAddress)){
+                                        if (shimmerService.isEXGUsingECG24Configuration(mBluetoothAddress)) {
                                             sensorList.add("ECG");
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_24BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_24BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_LA_24BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_24BIT);
-                                        }
-
-                                        else if(shimmerService.isEXGUsingEMG24Configuration(mBluetoothAddress)){
+                                        } else if (shimmerService.isEXGUsingEMG24Configuration(mBluetoothAddress)) {
                                             sensorList.add("EMG");
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.EMG_CH1_24BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.EMG_CH2_24BIT);
-                                        }
-
-                                        else if(shimmerService.isEXGUsingTestSignal24Configuration(mBluetoothAddress))
+                                        } else if (shimmerService.isEXGUsingTestSignal24Configuration(mBluetoothAddress))
                                             sensorList.add("ExG Test Signal");
                                     }
-                                    if(sensorList.contains("EXG1 16Bit")){
+                                    if (sensorList.contains("EXG1 16Bit")) {
                                         sensorList.remove("EXG1 16Bit");
                                         sensorList.remove("EXG2 16Bit");
-                                        if(shimmerService.isEXGUsingECG16Configuration(mBluetoothAddress)){
+                                        if (shimmerService.isEXGUsingECG16Configuration(mBluetoothAddress)) {
                                             sensorList.add("ECG 16Bit");
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LA_RA_16BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_LL_RA_16BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.ECG_VX_RL_16BIT);
-                                        }
-                                        else if(shimmerService.isEXGUsingEMG16Configuration(mBluetoothAddress)){
+                                        } else if (shimmerService.isEXGUsingEMG16Configuration(mBluetoothAddress)) {
                                             sensorList.add("EMG 16Bit");
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.EMG_CH1_16BIT);
                                             sensorList.add(Configuration.Shimmer3.ObjectClusterSensorName.EMG_CH2_16BIT);
-                                        }
-                                        else if(shimmerService.isEXGUsingTestSignal16Configuration(mBluetoothAddress))
+                                        } else if (shimmerService.isEXGUsingTestSignal16Configuration(mBluetoothAddress))
                                             sensorList.add("ExG Test Signal 16Bit");
                                     }
                                 }
@@ -274,14 +269,14 @@ public class PlotFragment extends Fragment {
                             //}
                             break;
                         case STREAMING_AND_SDLOGGING:
-                            deviceState="Streaming";
+                            deviceState = "Streaming";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
                             //TODO: set the enable logging regarding the user selection
                             break;
                         case DISCONNECTED:
-                            Log.d(LOG_TAG,"Shimmer No State");
-                            mBluetoothAddress=null;
+                            Log.d(LOG_TAG, "Shimmer No State");
+                            mBluetoothAddress = null;
                             deviceState = "Disconnected";
                             textViewDeviceName.setText("Unknown");
                             textViewDeviceState.setText(deviceState);
@@ -292,7 +287,7 @@ public class PlotFragment extends Fragment {
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
 
-                    if ((msg.obj instanceof ObjectCluster)){
+                    if ((msg.obj instanceof ObjectCluster)) {
 
                     }
 

@@ -107,8 +107,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             int REQUEST_ENABLE_BT = 1;
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-        else {
+        } else {
             Intent intent = new Intent(this, ShimmerService.class);
             startService(intent);
             getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -135,14 +134,14 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 startActivityForResult(pairedDevicesIntent, REQUEST_CONNECT_SHIMMER);
                 return true;
             case R.id.start_streaming:
-                if(selectedDeviceAddress != null) {
+                if (selectedDeviceAddress != null) {
                     ShimmerDevice mDevice1 = mService.getShimmer(selectedDeviceAddress);
                     mDevice1.startStreaming();
                     signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
                 }
                 return true;
             case R.id.stop_streaming:
-                if(selectedDeviceAddress != null) {
+                if (selectedDeviceAddress != null) {
                     ShimmerDevice mDevice2 = mService.getShimmer(selectedDeviceAddress);
                     mDevice2.stopStreaming();
                     sensorsEnabledFragment.buildSensorsList(mDevice2, this, mService.getBluetoothManager());
@@ -215,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
+                mService.connectShimmer(macAdd, this);    //Connect to the selected device, and set context to show progress dialog when pairing
             }
         }
     }
@@ -229,25 +228,20 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-                if(position == 0) {
-                    connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                    return connectedShimmersListFragment;
-                }
-                else if(position == 1) {
-                    return sensorsEnabledFragment;
-                }
-                else if (position == 2) {
-                    return deviceConfigFragment;
-                }
-                else if (position == 3) {
-                    return plotFragment;
-                }
-                else if (position == 4) {
-                    return signalsToPlotFragment;
-                }
-                else {
-                    return null;
-                }
+            if (position == 0) {
+                connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                return connectedShimmersListFragment;
+            } else if (position == 1) {
+                return sensorsEnabledFragment;
+            } else if (position == 2) {
+                return deviceConfigFragment;
+            } else if (position == 3) {
+                return plotFragment;
+            } else if (position == 4) {
+                return signalsToPlotFragment;
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -259,12 +253,18 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0: return "Connected Devices";
-                case 1: return "Enable Sensors";
-                case 2: return "Device Configuration";
-                case 3: return "Plot";
-                case 4: return "Signals to Plot";
-                default: return "";
+                case 0:
+                    return "Connected Devices";
+                case 1:
+                    return "Enable Sensors";
+                case 2:
+                    return "Device Configuration";
+                case 3:
+                    return "Plot";
+                case 4:
+                    return "Signals to Plot";
+                default:
+                    return "";
             }
         }
 
@@ -272,17 +272,17 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
-            if(msg.what == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE) {
+            if (msg.what == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE) {
                 ShimmerBluetooth.BT_STATE state = null;
                 String macAddress = "";
                 String shimmerName = "";
-                if (msg.obj instanceof ObjectCluster){
-                    state = ((ObjectCluster)msg.obj).mState;
-                    macAddress = ((ObjectCluster)msg.obj).getMacAddress();
+                if (msg.obj instanceof ObjectCluster) {
+                    state = ((ObjectCluster) msg.obj).mState;
+                    macAddress = ((ObjectCluster) msg.obj).getMacAddress();
                     shimmerName = ((ObjectCluster) msg.obj).getShimmerName();
-                } else if(msg.obj instanceof CallbackObject){
-                    state = ((CallbackObject)msg.obj).mState;
-                    macAddress = ((CallbackObject)msg.obj).mBluetoothAddress;
+                } else if (msg.obj instanceof CallbackObject) {
+                    state = ((CallbackObject) msg.obj).mState;
+                    macAddress = ((CallbackObject) msg.obj).mBluetoothAddress;
                     shimmerName = "";
                 }
                 switch (state) {
@@ -294,13 +294,13 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case STREAMING:
                         Toast.makeText(getApplicationContext(), "Device streaming: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
-                        if(selectedDeviceAddress.contains(macAddress) && dynamicPlot != null) {
+                        if (selectedDeviceAddress.contains(macAddress) && dynamicPlot != null) {
                             //If the selected device is the one that is now streaming, then show the list of signals available to be plotted
                             signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, macAddress, dynamicPlot);
                         }
                         break;
                     case STREAMING_AND_SDLOGGING:
-                        if(selectedDeviceAddress.contains(macAddress) && dynamicPlot != null) {
+                        if (selectedDeviceAddress.contains(macAddress) && dynamicPlot != null) {
                             signalsToPlotFragment.buildSignalsToPlotList(getApplicationContext(), mService, macAddress, dynamicPlot);
                         }
                         break;
@@ -313,10 +313,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
             }
 
-            if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
+            if (msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
                 signalsToPlotFragment.setDeviceNotStreamingView();
             }
-
 
 
         }
@@ -324,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     /**
      * This method is called when the ConnectedShimmersListFragment returns a selected Shimmer
+     *
      * @param macAddress
      */
     @Override
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent=new Intent(this, ShimmerService.class);
+        Intent intent = new Intent(this, ShimmerService.class);
         getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 

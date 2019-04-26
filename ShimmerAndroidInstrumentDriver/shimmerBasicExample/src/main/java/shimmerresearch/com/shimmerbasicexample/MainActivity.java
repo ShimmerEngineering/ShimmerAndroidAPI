@@ -45,11 +45,11 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
     }
 
-    public void startStreaming(View v) throws InterruptedException, IOException{
+    public void startStreaming(View v) throws InterruptedException, IOException {
         shimmer.startStreaming();
     }
 
-    public void stopStreaming(View v) throws IOException{
+    public void stopStreaming(View v) throws IOException {
         shimmer.stopStreaming();
     }
 
@@ -71,12 +71,12 @@ public class MainActivity extends Activity {
 
                         //Retrieve all possible formats for the current sensor device:
                         Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP);
-                        FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
+                        FormatCluster timeStampCluster = ((FormatCluster) ObjectCluster.returnFormatCluster(allFormats, "CAL"));
                         double timeStampData = timeStampCluster.mData;
                         Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
                         allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
-                        FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        if (accelXCluster!=null) {
+                        FormatCluster accelXCluster = ((FormatCluster) ObjectCluster.returnFormatCluster(allFormats, "CAL"));
+                        if (accelXCluster != null) {
                             double accelXData = accelXCluster.mData;
                             Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
@@ -121,13 +121,14 @@ public class MainActivity extends Activity {
 
     /**
      * Get the result from the paired devices dialog
+     *
      * @param requestCode
      * @param resultCode
      * @param data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+        if (requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);

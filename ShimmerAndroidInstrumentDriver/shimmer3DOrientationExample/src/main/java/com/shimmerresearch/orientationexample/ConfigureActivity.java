@@ -14,76 +14,74 @@ import android.widget.Toast;
 
 import com.shimmerresearch.shimmer3dexample.R;
 
-public class ConfigureActivity extends Activity{
-	// Return Intent extra
-	public static String mDone = "Done";
+public class ConfigureActivity extends Activity {
+    // Return Intent extra
+    public static String mDone = "Done";
 
-	CheckBox cboxEnableLowPowerMag;
-	CheckBox cboxEnableGyroOnTheFlyCal;
+    CheckBox cboxEnableLowPowerMag;
+    CheckBox cboxEnableGyroOnTheFlyCal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-    	// Setup the window	    
-    	setContentView(R.layout.configure);
-    	
-    	Bundle extras = getIntent().getExtras();
-    	
-    	cboxEnableLowPowerMag = (CheckBox) findViewById(R.id.checkBoxLowPowerMag);
-    	cboxEnableLowPowerMag.setChecked(extras.getBoolean("LowPowerMag"));
-    	cboxEnableLowPowerMag.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+        // Setup the window
+        setContentView(R.layout.configure);
 
-			@Override
-			public void onCheckedChanged(CompoundButton arg0, boolean enable) {
-				// TODO Auto-generated method stub
-				Intent intent = new Intent();
-   	            intent.putExtra("Command","Mag");
-   	            intent.putExtra("Enable",enable);
-   	            // Set result and finish this Activity
-   	            setResult(Activity.RESULT_OK, intent);
-   	            finish();
-			}
-    		
-    	});
-    	
-    	cboxEnableGyroOnTheFlyCal = (CheckBox) findViewById(R.id.checkBoxGyroOnTheFlyCal);
-    	cboxEnableGyroOnTheFlyCal.setChecked(extras.getBoolean("GyroOnTheFlyCal"));
-    	cboxEnableGyroOnTheFlyCal.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+        Bundle extras = getIntent().getExtras();
 
-			@Override
-			public void onCheckedChanged(CompoundButton arg0, boolean enable) {
-				// TODO Auto-generated method stub
-				Intent intent = new Intent();
-   	            intent.putExtra("Command","Gyro");
-   	            intent.putExtra("Enable",enable);
-   	            // Set result and finish this Activity
-   	            setResult(Activity.RESULT_OK, intent);
-   	            finish();
-			}
-    		
-    	});
-    	
-	   
+        cboxEnableLowPowerMag = (CheckBox) findViewById(R.id.checkBoxLowPowerMag);
+        cboxEnableLowPowerMag.setChecked(extras.getBoolean("LowPowerMag"));
+        cboxEnableLowPowerMag.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton arg0, boolean enable) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent();
+                intent.putExtra("Command", "Mag");
+                intent.putExtra("Enable", enable);
+                // Set result and finish this Activity
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            }
+
+        });
+
+        cboxEnableGyroOnTheFlyCal = (CheckBox) findViewById(R.id.checkBoxGyroOnTheFlyCal);
+        cboxEnableGyroOnTheFlyCal.setChecked(extras.getBoolean("GyroOnTheFlyCal"));
+        cboxEnableGyroOnTheFlyCal.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton arg0, boolean enable) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent();
+                intent.putExtra("Command", "Gyro");
+                intent.putExtra("Enable", enable);
+                // Set result and finish this Activity
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            }
+
+        });
+
+
     }
-    
-    
-   
-    
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.d("Shimmer","On Pause");
-		//finish();
-		
-	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.d("Shimmer","On Resume");
 
-	}
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("Shimmer", "On Pause");
+        //finish();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("Shimmer", "On Resume");
+
+    }
 	/*
 	@Override
 	protected void onDestroy() {

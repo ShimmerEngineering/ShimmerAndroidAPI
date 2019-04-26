@@ -55,6 +55,7 @@ public class DeviceSensorConfigFragment extends Fragment {
     /**
      * This method allows for the setting of a custom Drawable background resource for the buttons
      * at the bottom of the ListView
+     *
      * @param shimmerDevice
      * @param context
      * @param bluetoothManager
@@ -69,7 +70,7 @@ public class DeviceSensorConfigFragment extends Fragment {
 
     public void buildDeviceConfigList(final ShimmerDevice shimmerDevice, final Context context,
                                       final ShimmerBluetoothManagerAndroid bluetoothManager) {
-        scd = new SensorConfigDialog(shimmerDevice,bluetoothManager,context);
+        scd = new SensorConfigDialog(shimmerDevice, bluetoothManager, context);
     }
 
     @Nullable
@@ -82,12 +83,12 @@ public class DeviceSensorConfigFragment extends Fragment {
         return scd.getCloneDevice();
     }
 
-    public class SensorConfigDialog extends AbstractSensorConfigDialog{
+    public class SensorConfigDialog extends AbstractSensorConfigDialog {
 
         Context context;
 
-        SensorConfigDialog(ShimmerDevice shimmerDevice, ShimmerBluetoothManager bluetoothManager, Context context){
-            super(shimmerDevice,bluetoothManager);
+        SensorConfigDialog(ShimmerDevice shimmerDevice, ShimmerBluetoothManager bluetoothManager, Context context) {
+            super(shimmerDevice, bluetoothManager);
             this.context = context;
 
             //Filter out config options that are no longer in use
@@ -133,9 +134,9 @@ public class DeviceSensorConfigFragment extends Fragment {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                     final int editTextGroupPosition = groupPosition;
-                    if(v.findViewById(R.id.expandedListItem) != null) { //The item that was clicked is a checkbox
+                    if (v.findViewById(R.id.expandedListItem) != null) { //The item that was clicked is a checkbox
                         CheckedTextView checkedTextView = (CheckedTextView) v.findViewById(R.id.expandedListItem);
-                        if(checkedTextView.isChecked()) {
+                        if (checkedTextView.isChecked()) {
                             checkedTextView.setChecked(false);
                         } else {
                             checkedTextView.setChecked(true);
@@ -158,7 +159,7 @@ public class DeviceSensorConfigFragment extends Fragment {
             });
 
             //Only add the buttons if they haven't been added before:
-            if(expandListView.getFooterViewsCount() == 0) {
+            if (expandListView.getFooterViewsCount() == 0) {
                 LinearLayout buttonLayout = new LinearLayout(context);
                 buttonLayout.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
                 buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -168,7 +169,7 @@ public class DeviceSensorConfigFragment extends Fragment {
                 LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
                 writeConfigButton.setLayoutParams(buttonParams);
                 resetListButton.setLayoutParams(buttonParams);
-                if(buttonBackgroundResourceId != -1) {
+                if (buttonBackgroundResourceId != -1) {
                     //A custom Button background resource ID has been given
                     writeConfigButton.setBackgroundResource(buttonBackgroundResourceId);
                     resetListButton.setBackgroundResource(buttonBackgroundResourceId);
@@ -181,7 +182,7 @@ public class DeviceSensorConfigFragment extends Fragment {
                         cloneList.add(0, cloneDevice);
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                        if(cloneDevice instanceof Shimmer) {
+                        if (cloneDevice instanceof Shimmer) {
                             bluetoothManager.configureShimmer(cloneDevice);
                         }
 

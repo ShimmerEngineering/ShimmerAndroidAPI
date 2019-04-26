@@ -30,10 +30,10 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 /**
  * This example demonstrates the use of the {@link ShimmerBluetoothManagerAndroid} to:
  * <ul>
- *     <li>Connect to a Shimmer device</li>
- *     <li>Stream data from the Shimmer device</li>
- *     <li>Enable and disable sensors</li>
- *     <li>Modify individual sensor configurations</li>
+ * <li>Connect to a Shimmer device</li>
+ * <li>Stream data from the Shimmer device</li>
+ * <li>Enable and disable sensors</li>
+ * <li>Modify individual sensor configurations</li>
  * </ul>
  */
 public class MainActivity extends AppCompatActivity {
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error. Shimmer device not paired or Bluetooth is not enabled");
             Toast.makeText(this, "Error. Shimmer device not paired or Bluetooth is not enabled. " +
-                            "Please close the app and pair or enable Bluetooth", Toast.LENGTH_LONG).show();
+                    "Please close the app and pair or enable Bluetooth", Toast.LENGTH_LONG).show();
         }
         textView = (TextView) findViewById(R.id.textView);
         super.onStart();
@@ -75,16 +75,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         //Disconnect the Shimmer device when app is stopped
-        if(shimmerDevice != null) {
-            if(shimmerDevice.isSDLogging()) {
+        if (shimmerDevice != null) {
+            if (shimmerDevice.isSDLogging()) {
                 shimmerDevice.stopSDLogging();
                 Log.d(LOG_TAG, "Stopped Shimmer Logging");
-            }
-            else if(shimmerDevice.isStreaming()) {
+            } else if (shimmerDevice.isStreaming()) {
                 shimmerDevice.stopStreaming();
                 Log.d(LOG_TAG, "Stopped Shimmer Streaming");
-            }
-            else {
+            } else {
                 shimmerDevice.stopStreamingAndLogging();
                 Log.d(LOG_TAG, "Stopped Shimmer Streaming and Logging");
             }
@@ -110,12 +108,12 @@ public class MainActivity extends AppCompatActivity {
 
                         //Retrieve all possible formats for the current sensor device:
                         Collection<FormatCluster> allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP);
-                        FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
+                        FormatCluster timeStampCluster = ((FormatCluster) ObjectCluster.returnFormatCluster(allFormats, "CAL"));
                         double timeStampData = timeStampCluster.mData;
                         Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
                         allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
-                        FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        if (accelXCluster!=null) {
+                        FormatCluster accelXCluster = ((FormatCluster) ObjectCluster.returnFormatCluster(allFormats, "CAL"));
+                        if (accelXCluster != null) {
                             double accelXData = accelXCluster.mData;
                             Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
@@ -144,8 +142,11 @@ public class MainActivity extends AppCompatActivity {
                         case CONNECTED:
                             Log.i(LOG_TAG, "Shimmer [" + macAddress + "] is now CONNECTED");
                             shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);
-                            if(shimmerDevice != null) { Log.i(LOG_TAG, "Got the ShimmerDevice!"); }
-                            else { Log.i(LOG_TAG, "ShimmerDevice returned is NULL!"); }
+                            if (shimmerDevice != null) {
+                                Log.i(LOG_TAG, "Got the ShimmerDevice!");
+                            } else {
+                                Log.i(LOG_TAG, "ShimmerDevice returned is NULL!");
+                            }
                             break;
                         case CONNECTING:
                             Log.i(LOG_TAG, "Shimmer [" + macAddress + "] is CONNECTING");
@@ -170,29 +171,28 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void stopStreaming(View v){
+    public void stopStreaming(View v) {
         shimmerDevice.stopStreaming();
     }
 
-    public void startStreaming(View v){
+    public void startStreaming(View v) {
         shimmerDevice.startStreaming();
     }
 
     /**
      * Called when the configurations button is clicked
+     *
      * @param v
      */
-    public void openConfigMenu(View v){
-        if(shimmerDevice != null) {
-            if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
+    public void openConfigMenu(View v) {
+        if (shimmerDevice != null) {
+            if (!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
                 ShimmerDialogConfigurations.buildShimmerConfigOptions(shimmerDevice, MainActivity.this, btManager);
-            }
-            else {
+            } else {
                 Log.e(LOG_TAG, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING");
                 Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING", Toast.LENGTH_SHORT).show();
             }
-        }
-        else {
+        } else {
             Log.e(LOG_TAG, "Cannot open menu! Shimmer device is not connected");
             Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is not connected", Toast.LENGTH_SHORT).show();
         }
@@ -200,22 +200,21 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Called when the menu button is clicked
+     *
      * @param v
      * @throws IOException
      */
     public void openMenu(View v) throws IOException {
 
-        if(shimmerDevice != null) {
-            if(!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
+        if (shimmerDevice != null) {
+            if (!shimmerDevice.isStreaming() && !shimmerDevice.isSDLogging()) {
                 //ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(shimmerDevice, MainActivity.this);
                 ShimmerDialogConfigurations.buildShimmerSensorEnableDetails(shimmerDevice, MainActivity.this, btManager);
-            }
-            else {
+            } else {
                 Log.e(LOG_TAG, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING");
                 Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is STREAMING AND/OR LOGGING", Toast.LENGTH_SHORT).show();
             }
-        }
-        else {
+        } else {
             Log.e(LOG_TAG, "Cannot open menu! Shimmer device is not connected");
             Toast.makeText(MainActivity.this, "Cannot open menu! Shimmer device is not connected", Toast.LENGTH_SHORT).show();
         }
@@ -223,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Called when the connect button is clicked
+     *
      * @param v
      */
     public void connectDevice(View v) {
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startSDLogging(View v) {
-        ((ShimmerBluetooth)shimmerDevice).writeConfigTime(System.currentTimeMillis());
+        ((ShimmerBluetooth) shimmerDevice).writeConfigTime(System.currentTimeMillis());
         shimmerDevice.startSDLogging();
     }
 
@@ -242,13 +242,14 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Get the result from the paired devices dialog
+     *
      * @param requestCode
      * @param resultCode
      * @param data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+        if (requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 btManager.disconnectAllDevices();   //Disconnect all devices first
                 //Get the Bluetooth mac address of the selected device:
