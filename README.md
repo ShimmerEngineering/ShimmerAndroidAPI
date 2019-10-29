@@ -7,7 +7,7 @@ The latest version is 3.0.64Beta.
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
 An example of how to use this arrays data structure can be found in Efficient Data Array Example.
-
+We recommend first time users go through the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). 
 
 # Frequently Asked Questions
 
