@@ -305,6 +305,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         }
                         break;
                     case SDLOGGING:
+                        List<ShimmerDevice> deviceList2 = mService.getListOfConnectedDevices();
+                        if(deviceList2.size() > connectedShimmersListFragment.getNumShimmersConnected()) {
+                            connectedShimmersListFragment.buildShimmersConnectedListView(deviceList2, getApplicationContext());
+                        }
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
