@@ -158,6 +158,10 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case SDLOGGING:
                             Log.i(LOG_TAG, "Shimmer [" + macAddress + "] is now SDLOGGING");
+                            if(shimmerDevice == null) {
+                                shimmerDevice = btManager.getShimmerDeviceBtConnectedFromMac(shimmerBtAdd);
+                                Log.i(LOG_TAG, "Got the ShimmerDevice!");
+                            }
                             break;
                         case DISCONNECTED:
                             Log.i(LOG_TAG, "Shimmer [" + macAddress + "] has been DISCONNECTED");
@@ -251,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 btManager.disconnectAllDevices();   //Disconnect all devices first
+                shimmerDevice = null;
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 btManager.connectShimmerThroughBTAddress(macAdd);   //Connect to the selected device
