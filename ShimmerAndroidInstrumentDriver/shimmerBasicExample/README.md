@@ -5,7 +5,7 @@ This example is only applicable for Shimmer3 devices onwards. For Shimmer2 devic
 - The build.gradle file shows how to retrieve the library from bintray. Take note of the following:-
 
 ```
-compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.64Beta'
+compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.65Beta'
 ```
 
 - Note you will need to specify the url for the shimmer bintray repository, this is done in the build.gradle file (root projects folder)
