@@ -2,7 +2,7 @@
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is 3.0.64Beta.
+The latest version is 3.0.65Beta.
 
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
@@ -115,6 +115,10 @@ android {
 
 
 # Changelog 
+28 February 2020 (3.0.65Beta)
+- Fixed bug with Bluetooth Manager Example & Service Example where upon Bluetooth connection, SD logging devices would not show up as connected
+- Added getNumShimmersConnected to ConnectedShimmersListFragment 
+
 9 July 2018 (3.0.64Beta)
 - Addition of FilesListActivity to display list of files for a folder. Files can be selected to be opened in an external application. An example of how to use the FilesListActivity can be found in Efficient Data Arrays Example.
 - Added option to log to CSV file in Logging & ShimmerService
