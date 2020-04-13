@@ -72,7 +72,7 @@ android {
 
 dependencies {
     //compile 'com.shimmerresearch:shimmerDriver:0.3.3'
-//    compile 'org.apache.commons:commons-lang3:3.4'
+    implementation 'org.apache.commons:commons-lang3:3.4'
 //    compile 'org.apache.commons:commons-math3:3.6'
 //    compile 'org.apache.commons:commons-math:2.2'
     compile 'com.google.guava:guava:20.0'
@@ -102,7 +102,7 @@ dependencies {
         exclude group: 'org.apache.commons.math'
     }
     //For fragments:
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'androidx.appcompat:appcompat:1.0.0'
 
 
 /*
@@ -187,36 +187,38 @@ dependencies {
     }
 
 // https://github.com/bintray/gradle-bintray-plugin
-    File file = new File(rootProject.getProjectDir().getAbsolutePath() + '/gradle.properties')
-    if(file.exists()) {
-        bintray {
-            user = shimmer_bintray_username
-            //this usually comes from gradle.properties file in ~/.gradle
-            key = shimmer_bintray_api_key
-            //this usually comes from gradle.properties file in ~/.gradle
 
-            configurations = ['archives']
-
-            // Package info for BinTray
-            pkg {
-                repo = 'Shimmer'
-                // it is the name that appears in bintray when logged
-                name = 'shimmerandroiddriver'
-                desc = ''
-                websiteUrl = ''
-                vcsUrl = 'https://github.com/ShimmerEngineering/ShimmerAndroidAPI'
-                licenses = ['MIT']
-                publish = true
-                publicDownloadNumbers = true
-                version {
-                    name = project.version
-                    desc = ''
-                    released = new Date()
-                    vcsTag = ''
-                }
-            }
-        }
-    }
+//    Note: Comment-in the below only when pushing a new API version to Bintray:
+//    File file = new File(rootProject.getProjectDir().getAbsolutePath() + '/gradle.properties')
+//    if(file.exists()) {
+//        bintray {
+//            user = shimmer_bintray_username
+//            //this usually comes from gradle.properties file in ~/.gradle
+//            key = shimmer_bintray_api_key
+//            //this usually comes from gradle.properties file in ~/.gradle
+//
+//            configurations = ['archives']
+//
+//            // Package info for BinTray
+//            pkg {
+//                repo = 'Shimmer'
+//                // it is the name that appears in bintray when logged
+//                name = 'shimmerandroiddriver'
+//                desc = ''
+//                websiteUrl = ''
+//                vcsUrl = 'https://github.com/ShimmerEngineering/ShimmerAndroidAPI'
+//                licenses = ['MIT']
+//                publish = true
+//                publicDownloadNumbers = true
+//                version {
+//                    name = project.version
+//                    desc = ''
+//                    released = new Date()
+//                    vcsTag = ''
+//                }
+//            }
+//        }
+//    }
 
 	
 }
