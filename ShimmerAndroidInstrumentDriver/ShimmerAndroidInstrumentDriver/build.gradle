@@ -8,7 +8,7 @@ apply plugin: 'com.jfrog.bintray'
 version = '3.0.65Beta'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 29
 
     lintOptions {
         abortOnError false
