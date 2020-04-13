@@ -6,9 +6,9 @@ android {
 
     defaultConfig {
         applicationId "com.shimmerresearch.shimmer3dexample"
-        minSdkVersion 14
         targetSdkVersion 25
         multiDexEnabled true
+        minSdkVersion 14
     }
 
     buildTypes {
