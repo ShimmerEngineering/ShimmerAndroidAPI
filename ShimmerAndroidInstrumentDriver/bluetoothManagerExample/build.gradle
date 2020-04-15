@@ -7,7 +7,7 @@ android {
         multiDexEnabled true
         applicationId "com.shimmerresearch.bluetoothmanagerexample"
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 
