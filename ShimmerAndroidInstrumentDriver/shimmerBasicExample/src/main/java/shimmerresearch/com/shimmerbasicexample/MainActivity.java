@@ -45,6 +45,12 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
     }
 
+    public void disconnectDevice(View v) {
+        if (shimmer!=null){
+            shimmer.disconnect();
+        }
+    }
+
     public void startStreaming(View v) throws InterruptedException, IOException{
         shimmer.startStreaming();
     }
