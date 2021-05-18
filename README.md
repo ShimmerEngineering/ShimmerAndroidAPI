@@ -1,3 +1,45 @@
+# Important ~ Migration to JFrog
+With Bintray being sunset, we are currently in the process of moving to the use of JFrog. As a test, this is a preliminary branch of which you can use to test your applications. Please note this is not the final version as we will be doing more refactoring and updates that have long been scheduled. Should you face any problem please do not hesitate to contact us. Eventually the goal will be to have the master branch updated and using JFrog. We apologize for any inconvenience caused.
+
+It is important to note that for the time being the examples do not work directly with the aar library on JFrog, as such we recommend importing the ShimmerAndroidInstrumentDriver project as is currently done in all the examples we have provided.
+
+# JFrog Gradle Settings
+The gradle file for the example ShimmerBasicExamples have been updated accordingly to the following:-
+
+repositories:-
+
+```
+maven {
+ url 'https://shimmersensing.jfrog.io/artifactory/dummyLcl'
+}
+```
+dependencies:-
+```
+compile(group: 'com.shimmersensing', name: 'rmshimmerdriverpc', version: '1.3')
+```
+
+For further info 
+https://shimmersensing.jfrog.io/ui/repos/tree/General/dummyLcl%2Fcom%2Fshimmersensing%2Frmshimmerbtmanager%2F1.3%2Frmshimmerbtmanager-1.3.jar
+https://shimmersensing.jfrog.io/ui/repos/tree/General/dummyLcl%2Fcom%2Fshimmersensing%2Frmshimmerapi%2F1.3%2Frmshimmerapi-1.3.jar
+
+*Note this is not functional yet with our examples*
+https://shimmersensing.jfrog.io/ui/repos/tree/General/dummyLcl%2Fcom%2Fshimmersensing%2FShimmerAndroidInstrumentDriver%2F3.0.65Beta%2FShimmerAndroidInstrumentDriver-3.0.65Beta.aar
+
+# Bintray Sunset
+The following ways of getting the library is **deprecated**
+repositories:-
+
+```
+ maven {
+        url  "http://dl.bintray.com/shimmerengineering/Shimmer"
+    }
+```
+dependencies:-
+```
+compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Beta_AA-245_AA-246'
+```
+
+
 # ShimmerAndroidAPI 3.0Beta
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
