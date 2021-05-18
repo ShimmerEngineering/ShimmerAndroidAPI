@@ -1,10 +1,8 @@
 # Important ~ Migration to JFrog
 With Bintray being sunset, we are currently in the process of moving to the use of JFrog. As a test, this is a preliminary branch of which you can use to test your applications. Please note this is not the final version as we will be doing more refactoring and updates that have long been scheduled. Should you face any problem please do not hesitate to contact us. Eventually the goal will be to have the master branch updated and using JFrog. We apologize for any inconvenience caused.
 
-It is important to note that for the time being the examples do not work directly with the aar library on JFrog, as such we recommend importing the ShimmerAndroidInstrumentDriver project as is currently done in all the examples we have provided.
-
 # JFrog Gradle Settings
-The gradle file for the example ShimmerBasicExamples have been updated accordingly to the following:-
+The gradle file for the example ShimmerBasicExample has been updated accordingly to the following:-
 
 repositories:-
 
@@ -15,7 +13,21 @@ maven {
 ```
 dependencies:-
 ```
-compile(group: 'com.shimmersensing', name: 'rmshimmerdriverpc', version: '1.3')
+compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.65Beta', ext: 'aar')
+compile(group: 'com.shimmersensing', name: 'rmshimmerapi', version: '1.3') {
+        // excluding org.json which is provided by Android
+ exclude group: 'io.netty'
+ exclude group: 'io.grpc'
+ exclude group: 'com.google.protobuf'
+ exclude group: 'org.apache.commons.math'
+}
+compile(group: 'com.shimmersensing', name: 'rmshimmerbtmanager', version: '1.3') {
+ // excluding org.json which is provided by Android
+ exclude group: 'io.netty'
+ exclude group: 'io.grpc'
+ exclude group: 'com.google.protobuf'
+ exclude group: 'org.apache.commons.math'
+}
 ```
 
 For further info 
