@@ -89,14 +89,14 @@ dependencies {
     compile files('libs/AndroidBluetoothLibrary.jar')
     compile files('libs/androidplot-core-0.5.0-release.jar')
     //compile files('libs/ShimmerDriverML.jar')
-    compile ('com.shimmerresearch.managers.bluetoothmanager:ShimmerBluetoothManager:0.9.41beta_AA-245_AA-246') {
+    compile(group: 'com.shimmersensing', name: 'rmshimmerapi', version: '1.3') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'io.grpc'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
             }
-    compile ('com.shimmerresearch.driver:ShimmerDriver:0.9.137beta_AA-245_AA-246') {
+    compile(group: 'com.shimmersensing', name: 'rmshimmerbtmanager', version: '1.3') {
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'io.grpc'

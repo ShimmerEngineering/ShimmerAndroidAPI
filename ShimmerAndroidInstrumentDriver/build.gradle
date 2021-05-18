@@ -20,7 +20,8 @@ allprojects {
         google()
         jcenter()
         maven {
-            url  "http://dl.bintray.com/shimmerengineering/Shimmer"
+            //url  "http://dl.bintray.com/shimmerengineering/Shimmer"
+            url 'https://shimmersensing.jfrog.io/artifactory/dummyLcl'
         }
     }
 }
