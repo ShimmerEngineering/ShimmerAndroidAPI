@@ -19,6 +19,7 @@ android {
         multiDexEnabled true
         minSdkVersion 14
         targetSdkVersion 14
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -83,7 +84,9 @@ dependencies {
     //compile 'io.grpc:grpc-protobuf-lite:1.0.0-pre1'
     //compile 'io.grpc:grpc-stub:1.0.0-pre1']
 
-
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     //compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     compile files('libs/AndroidBluetoothLibrary.jar')
