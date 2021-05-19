@@ -126,21 +126,13 @@ public class AAPI_00001_Shimmer_GeneralBluetoothShimmer2R {
             if (i % 2 != 0) {
                 shimmer.startStreaming();
                 Thread.sleep(DELAY_DURATION_MS);
-                if (shimmer.isStreaming()) {
-                    assertTrue(true);
-                } else {
-                    assertTrue(false);
-                }
+                assertTrue(shimmer.isStreaming());
             }
             //even value of i will stop streaming
             else {
                 shimmer.stopStreaming();
                 Thread.sleep(DELAY_DURATION_MS);
-                if (shimmer.isStreaming()) {
-                    assertTrue(false);
-                } else {
-                    assertTrue(true);
-                }
+                assertFalse(shimmer.isStreaming());
             }
         }
         System.out.println("GeneralBluetoothShimmer2RTest G : Multiple start and stop streaming");
