@@ -1,5 +1,5 @@
 # Important ~ Migration to JFrog
-With Bintray being sunset, we are currently in the process of moving to the use of JFrog. As a test, this is a preliminary branch of which you can use to test your applications. Please note this is not the final version as we will be doing more refactoring and updates that have long been scheduled. Should you face any problem please do not hesitate to contact us. Eventually the goal will be to have the master branch updated and using JFrog. We apologize for any inconvenience caused.
+With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
 
 # JFrog Gradle Settings
 The gradle file for the example ShimmerBasicExample has been updated accordingly to the following:-
