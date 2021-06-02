@@ -230,11 +230,16 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Shimmer shimmer = new Shimmer(mHandler);
         shimmer.setDelayForBtRespone(true);
         mMapOfBtConnectedShimmers.put(bluetoothAddress, shimmer);
-        ShimmerVerObject sVO = shimmerRadioInitializer.readShimmerVerObject();
-        if (sVO.isShimmerGen3()){
-            return initializeShimmer3(serialPort, shimmer);
-        } else if(sVO.isShimmerGen2()) {
-            return initializeShimmer2r(serialPort, shimmer);
+        try {
+            ShimmerVerObject sVO = shimmerRadioInitializer.readShimmerVerObject();
+            if (sVO.isShimmerGen3()) {
+                return initializeShimmer3(serialPort, shimmer);
+            } else if (sVO.isShimmerGen2()) {
+                return initializeShimmer2r(serialPort, shimmer);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return null;
         }
         return null;
     }

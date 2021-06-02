@@ -1,3 +1,53 @@
+# Important ~ Migration to JFrog
+With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
+
+# JFrog Gradle Settings
+The gradle file for the example ShimmerBasicExample has been updated accordingly to the following:-
+
+repositories:-
+
+```
+maven {
+ url 'https://shimmersensing.jfrog.io/artifactory/ShimmerAPI'
+}
+```
+dependencies:-
+```
+compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.70Beta', ext: 'aar')
+implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    // excluding org.json which is provided by Android
+    exclude group: 'io.netty'
+    exclude group: 'com.google.protobuf'
+    exclude group: 'org.apache.commons.math'
+}
+implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    // excluding org.json which is provided by Android
+    exclude group: 'io.netty'
+    exclude group: 'com.google.protobuf'
+    exclude group: 'org.apache.commons.math'
+}
+```
+
+For further info
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerBluetoothManager
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerDriver
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerAndroidInstrumentDriver
+
+# Bintray Sunset
+The following ways of getting the library is **deprecated**
+repositories:-
+
+```
+ maven {
+        url  "http://dl.bintray.com/shimmerengineering/Shimmer"
+    }
+```
+dependencies:-
+```
+compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Beta_AA-245_AA-246'
+```
+
+
 # ShimmerAndroidAPI 3.0Beta
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
