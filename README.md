@@ -28,12 +28,10 @@ implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9
 }
 ```
 
-For further info 
-https://shimmersensing.jfrog.io/ui/repos/tree/General/dummyLcl%2Fcom%2Fshimmersensing%2Frmshimmerbtmanager%2F1.3%2Frmshimmerbtmanager-1.3.jar
-https://shimmersensing.jfrog.io/ui/repos/tree/General/dummyLcl%2Fcom%2Fshimmersensing%2Frmshimmerapi%2F1.3%2Frmshimmerapi-1.3.jar
-
-*Note this is not functional yet with our examples*
-https://shimmersensing.jfrog.io/ui/repos/tree/General/dummyLcl%2Fcom%2Fshimmersensing%2FShimmerAndroidInstrumentDriver%2F3.0.65Beta%2FShimmerAndroidInstrumentDriver-3.0.65Beta.aar
+For further info
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerBluetoothManager
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerDriver
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerAndroidInstrumentDriver
 
 # Bintray Sunset
 The following ways of getting the library is **deprecated**
