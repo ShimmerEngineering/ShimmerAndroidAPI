@@ -8,25 +8,23 @@ repositories:-
 
 ```
 maven {
- url 'https://shimmersensing.jfrog.io/artifactory/dummyLcl'
+ url 'https://shimmersensing.jfrog.io/artifactory/ShimmerAPI'
 }
 ```
 dependencies:-
 ```
-compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.65Beta', ext: 'aar')
-compile(group: 'com.shimmersensing', name: 'rmshimmerapi', version: '1.3') {
-        // excluding org.json which is provided by Android
- exclude group: 'io.netty'
- exclude group: 'io.grpc'
- exclude group: 'com.google.protobuf'
- exclude group: 'org.apache.commons.math'
+compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.70Beta', ext: 'aar')
+implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    // excluding org.json which is provided by Android
+    exclude group: 'io.netty'
+    exclude group: 'com.google.protobuf'
+    exclude group: 'org.apache.commons.math'
 }
-compile(group: 'com.shimmersensing', name: 'rmshimmerbtmanager', version: '1.3') {
- // excluding org.json which is provided by Android
- exclude group: 'io.netty'
- exclude group: 'io.grpc'
- exclude group: 'com.google.protobuf'
- exclude group: 'org.apache.commons.math'
+implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    // excluding org.json which is provided by Android
+    exclude group: 'io.netty'
+    exclude group: 'com.google.protobuf'
+    exclude group: 'org.apache.commons.math'
 }
 ```
 
