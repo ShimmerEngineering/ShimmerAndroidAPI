@@ -13,7 +13,7 @@ maven {
 ```
 dependencies:-
 ```
-compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.70Beta', ext: 'aar')
+compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.71Beta', ext: 'aar')
 implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
     // excluding org.json which is provided by Android
     exclude group: 'io.netty'
