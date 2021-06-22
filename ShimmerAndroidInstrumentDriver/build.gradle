@@ -31,31 +31,31 @@ allprojects {
         mavenCentral()
         mavenLocal()
     }
-    artifactory {
-        contextUrl = "${artifactory_contextUrl}"
-        publish {
-            repository {
-                repoKey = 'ShimmerAPI'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-            defaults {
-                publications('mavenJava')
-            }
-            publishBuildInfo = true
-            publishArtifacts = true
-            publishPom = true
-        }
-        resolve {
-            repository {
-                repoKey = 'ShimmerAPI'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-        }
-    }
+//    artifactory {
+//        contextUrl = "${artifactory_contextUrl}"
+//        publish {
+//            repository {
+//                repoKey = 'ShimmerAPI'
+//                username = "${artifactory_user}"
+//                password = "${artifactory_password}"
+//                maven = true
+//            }
+//            defaults {
+//                publications('mavenJava')
+//            }
+//            publishBuildInfo = true
+//            publishArtifacts = true
+//            publishPom = true
+//        }
+//        resolve {
+//            repository {
+//                repoKey = 'ShimmerAPI'
+//                username = "${artifactory_user}"
+//                password = "${artifactory_password}"
+//                maven = true
+//            }
+//        }
+//    }
 }
 
 project('ShimmerAndroidInstrumentDriver') {
