@@ -1,6 +1,8 @@
 package com.shimmerresearch.shimmerserviceexample;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -35,8 +37,21 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.grpc.ShimmerGRPC;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import io.grpc.CallOptions;
+import io.grpc.Channel;
+import io.grpc.ClientCall;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.MethodDescriptor;
+import io.grpc.stub.StreamObserver;
 
 public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener {
 
@@ -161,6 +176,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onStart() {
         super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.example.broadcast.MY_NOTIFICATION");
+        registerReceiver(new OjcBroadcastReceiver(), filter);
+        connectGRPC();
     }
 
 
@@ -358,6 +377,117 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         super.onResume();
         Intent intent=new Intent(this, ShimmerService.class);
         getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+
+    private void connectGRPC() {
+        try {
+            Channel channel = ManagedChannelBuilder.forAddress("localhost", 30051).usePlaintext().build();
+            ShimmerServerGrpc.ShimmerServerBlockingStub stub = ShimmerServerGrpc.newBlockingStub(channel);
+            ShimmerGRPC.HelloRequest request = ShimmerGRPC.HelloRequest.newBuilder().build();
+            ShimmerGRPC.HelloReply reply = stub.sayHello(request);
+            Log.e("ShimmerServiceExample", "HelloReply: " + reply);
+//            GreeterGrpc.GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(channel);
+//            HelloRequest request = HelloRequest.newBuilder().setName(message).build();
+//            HelloReply reply = stub.sayHello(request);
+//            return reply.getMessage();
+
+            ShimmerGRPC.StreamRequest streamRequest = ShimmerGRPC.StreamRequest.newBuilder().build();
+            ShimmerServerGrpc.ShimmerServerStub asyncStub = ShimmerServerGrpc.newStub(channel);
+//            Iterator<ShimmerGRPC.ObjectCluster2> iterator = stub.getDataStream(streamRequest);
+
+            StreamObserver<ShimmerGRPC.ObjectCluster2> streamObserver = new StreamObserver<ShimmerGRPC.ObjectCluster2>() {
+                @Override
+                public void onNext(ShimmerGRPC.ObjectCluster2 value) {
+                    ojcCount++;
+                    double delay = System.currentTimeMillis() - value.getCalibratedTimeStamp();
+                    listOfOjcDelay.add(delay);
+                    if(ojcCount % 100000 == 0) {
+                        double totalDelay = 0;
+                        for(Double d : listOfOjcDelay) {
+                            totalDelay += d;
+                        }
+                        double avgDelay = totalDelay/listOfOjcDelay.size();
+                        Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay);
+                    }
+//                    Log.e("ShimmerServiceExample", "OJC received over gRPC!");
+                }
+
+                @Override
+                public void onError(Throwable t) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            };
+            asyncStub.getDataStream(streamRequest, streamObserver);
+
+//            while(iterator.hasNext()) {
+//                ShimmerGRPC.ObjectCluster2 ojc = iterator.next();
+//                ojcCount++;
+//                double delay = System.currentTimeMillis() - ojc.getCalibratedTimeStamp();
+//                listOfOjcDelay.add(delay);
+//                if(ojcCount % 100000 == 0) {
+//                    double totalDelay = 0;
+//                    for(Double d : listOfOjcDelay) {
+//                        totalDelay += d;
+//                    }
+//                    double avgDelay = totalDelay/listOfOjcDelay.size();
+//                    Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay);
+//                }
+//                Log.e("ShimmerServiceExample", "OJC received over gRPC!");
+//            }
+        } catch (Exception e) {
+//            StringWriter sw = new StringWriter();
+//            PrintWriter pw = new PrintWriter(sw);
+//            e.printStackTrace(pw);
+//            pw.flush();
+//            return String.format("Failed... : %n%s", sw);
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    int ojcCount = 0;
+    List<Double> listOfOjcDelay = new ArrayList<>();
+    private class OjcBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            byte[] bytes = intent.getByteArrayExtra("ObjectCluster");
+            if(bytes != null) {
+                ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+                ObjectInput in = null;
+                try {
+                    in = new ObjectInputStream(bis);
+                    Object obj = in.readObject();
+                    if(obj instanceof ObjectCluster) {
+                        ojcCount++;
+                        ObjectCluster ojc = (ObjectCluster)obj;
+                        double delay = System.currentTimeMillis() - ojc.getTimestampMilliSecs();
+                        listOfOjcDelay.add(delay);
+                        if(ojcCount % 100000 == 0) {
+                            double totalDelay = 0;
+                            for(Double d : listOfOjcDelay) {
+                                totalDelay += d;
+                            }
+                            double avgDelay = totalDelay/listOfOjcDelay.size();
+                            Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay);
+                        }
+//                        Log.e("ShimmerServiceExample", "ojcCOunt: " + ojcCount + " | delay now: " + delay + " ms");
+                    }
+                    in.close();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 
 }

@@ -2,8 +2,10 @@ package com.shimmerresearch.bluetoothmanagerexample;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,12 +20,17 @@ import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
+import com.shimmerresearch.driver.Configuration.CHANNEL_UNITS;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Random;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
@@ -178,8 +185,10 @@ public class MainActivity extends AppCompatActivity {
         shimmerDevice.stopStreaming();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void startStreaming(View v){
-        shimmerDevice.startStreaming();
+//        shimmerDevice.startStreaming();
+        startSendingOjcBroadcast();
     }
 
     /**
@@ -265,4 +274,79 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void startSendingOjcBroadcast() {
+//        for(int i =0;i<1920000;i++) {
+        for(int i =0;i<600000;i++) {
+
+//            busySleep(125000); // 8KHz
+//            busySleep(1953125); // 512 Hz
+            busySleep(500000); // 2KHz
+
+            ObjectCluster objectCluster = new ObjectCluster();
+            objectCluster.setShimmerName("DummyShimmer");
+            objectCluster.setMacAddress("0000");
+            objectCluster.setTimeStampMilliSecs(System.currentTimeMillis());
+
+            //GSR_Skin_Conductance
+            //System_Timestamp
+            //PPGtoHR
+            //Fusion_Response
+            objectCluster.addDataToMap("System_Timestamp", CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLISECONDS,System.currentTimeMillis());
+            objectCluster.addDataToMap("GSR_Skin_Conductance", CHANNEL_TYPE.CAL.toString(), CHANNEL_UNITS.U_SIEMENS,1.0+getRandomNumberUsingInts(1,10)/10.0);
+            objectCluster.addDataToMap("PPGtoHR",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.BEATS_PER_MINUTE,getRandomNumberUsingInts(50,60));
+            objectCluster.addDataToMap("Fusion_Response",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.NO_UNITS,getRandomNumberUsingInts(0,3));
+
+            objectCluster.addDataToMap("ECG_LA-RA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_LL-RA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_LL-LA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_Vx-RL_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+
+            objectCluster.addDataToMap("ECG_LA-RA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_LL-RA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_LL-LA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_Vx-RL_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+
+            objectCluster.addDataToMap("ECG_LA-RA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_LL-RA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_LL-LA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+            objectCluster.addDataToMap("ECG_Vx-RL_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+
+//            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//            ObjectOutputStream out = null;
+            try {
+//                out = new ObjectOutputStream(bos);
+//                out.writeObject(objectCluster.buildProtoBufMsg());
+//                out.flush();
+//                byte[] bytes = bos.toByteArray();
+//                out.close();
+
+                Intent intent = new Intent();
+                intent.setAction("com.example.broadcast.MY_NOTIFICATION");
+//                intent.putExtra("ObjectCluster", bytes);
+                intent.putExtra("ObjectCluster", objectCluster.serialize());
+                sendOrderedBroadcast(intent, null);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void busySleep(long nanos) {
+        long elapsed;
+        final long startTime = System.nanoTime();
+        do {
+            elapsed = System.nanoTime() - startTime;
+        } while (elapsed < nanos);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static int getRandomNumberUsingInts(int min, int max) {
+        Random random = new Random();
+        return random.ints(min, max)
+                .findFirst()
+                .getAsInt();
+    }
+
 }
