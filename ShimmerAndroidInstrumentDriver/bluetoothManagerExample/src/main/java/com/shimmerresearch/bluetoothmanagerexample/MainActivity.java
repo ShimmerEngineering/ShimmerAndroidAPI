@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
 //            busySleep(125000); // 8KHz
 //            busySleep(1953125); // 512 Hz
-            busySleep(500000); // 2KHz
+//            busySleep(500000); // 2KHz
 
             ObjectCluster objectCluster = new ObjectCluster();
             objectCluster.setShimmerName("DummyShimmer");
@@ -293,25 +293,25 @@ public class MainActivity extends AppCompatActivity {
             //System_Timestamp
             //PPGtoHR
             //Fusion_Response
-            objectCluster.addDataToMap("System_Timestamp", CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLISECONDS,System.currentTimeMillis());
-            objectCluster.addDataToMap("GSR_Skin_Conductance", CHANNEL_TYPE.CAL.toString(), CHANNEL_UNITS.U_SIEMENS,1.0+getRandomNumberUsingInts(1,10)/10.0);
-            objectCluster.addDataToMap("PPGtoHR",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.BEATS_PER_MINUTE,getRandomNumberUsingInts(50,60));
-            objectCluster.addDataToMap("Fusion_Response",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.NO_UNITS,getRandomNumberUsingInts(0,3));
-
-            objectCluster.addDataToMap("ECG_LA-RA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_LL-RA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_LL-LA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_Vx-RL_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-
-            objectCluster.addDataToMap("ECG_LA-RA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_LL-RA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_LL-LA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_Vx-RL_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-
-            objectCluster.addDataToMap("ECG_LA-RA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_LL-RA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_LL-LA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
-            objectCluster.addDataToMap("ECG_Vx-RL_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("System_Timestamp", CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLISECONDS,System.currentTimeMillis());
+//            objectCluster.addDataToMap("GSR_Skin_Conductance", CHANNEL_TYPE.CAL.toString(), CHANNEL_UNITS.U_SIEMENS,1.0+getRandomNumberUsingInts(1,10)/10.0);
+//            objectCluster.addDataToMap("PPGtoHR",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.BEATS_PER_MINUTE,getRandomNumberUsingInts(50,60));
+//            objectCluster.addDataToMap("Fusion_Response",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.NO_UNITS,getRandomNumberUsingInts(0,3));
+//
+//            objectCluster.addDataToMap("ECG_LA-RA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_LL-RA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_LL-LA_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_Vx-RL_24BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//
+//            objectCluster.addDataToMap("ECG_LA-RA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_LL-RA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_LL-LA_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_Vx-RL_16BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//
+//            objectCluster.addDataToMap("ECG_LA-RA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_LL-RA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_LL-LA_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
+//            objectCluster.addDataToMap("ECG_Vx-RL_8BIT",CHANNEL_TYPE.CAL.toString(),CHANNEL_UNITS.MILLIVOLTS, getRandomNumberUsingInts(1000,2000));
 
 //            ByteArrayOutputStream bos = new ByteArrayOutputStream();
 //            ObjectOutputStream out = null;
@@ -326,7 +326,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction("com.example.broadcast.MY_NOTIFICATION");
 //                intent.putExtra("ObjectCluster", bytes);
                 intent.putExtra("ObjectCluster", objectCluster.serialize());
-                sendOrderedBroadcast(intent, null);
+//                sendOrderedBroadcast(intent, null);
+                sendBroadcast(intent);
             } catch(Exception e) {
                 e.printStackTrace();
             }

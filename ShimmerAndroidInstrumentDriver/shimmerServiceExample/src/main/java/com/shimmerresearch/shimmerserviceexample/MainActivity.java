@@ -408,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             totalDelay += d;
                         }
                         double avgDelay = totalDelay/listOfOjcDelay.size();
-                        Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay);
+                        Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay + " ms | num ojc's received: " + ojcCount);
                     }
 //                    Log.e("ShimmerServiceExample", "OJC received over gRPC!");
                 }
@@ -477,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                                 totalDelay += d;
                             }
                             double avgDelay = totalDelay/listOfOjcDelay.size();
-                            Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay);
+                            Log.e("ShimmerServiceExample", "ojcCount: " + ojcCount + " | avg delay: " + avgDelay + " ms | num ojc's received: " + ojcCount);
                         }
 //                        Log.e("ShimmerServiceExample", "ojcCOunt: " + ojcCount + " | delay now: " + delay + " ms");
                     }
