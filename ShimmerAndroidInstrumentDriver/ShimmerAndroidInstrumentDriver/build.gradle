@@ -87,4 +87,5 @@ dependencies {
         exclude group: 'org.apache.commons.math'
     }
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.clj.fastble:FastBleLib:2.3.4'
 }

@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/bluetoothManagerExample" />
             <option value="$PROJECT_DIR$/efficientDataArrayExample" />
             <option value="$PROJECT_DIR$/shimmer3DOrientationExample" />
+            <option value="$PROJECT_DIR$/shimmerBLEBasicExample" />
             <option value="$PROJECT_DIR$/shimmerBasicExample" />
             <option value="$PROJECT_DIR$/shimmerLegacyExample" />
             <option value="$PROJECT_DIR$/shimmerServiceExample" />
