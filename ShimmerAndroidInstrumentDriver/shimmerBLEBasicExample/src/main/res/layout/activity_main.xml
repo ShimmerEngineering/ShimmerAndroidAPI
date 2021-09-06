@@ -51,4 +51,21 @@
         android:onClick="disconnectDevice"
         android:text="Disconnect" />
 
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Read Prod Config"
+        android:onClick="readProdConfig"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <Button
+        android:id="@+id/button8"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Read Op Config"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp"
+        android:onClick="readOpConfig" />
 </android.widget.LinearLayout>

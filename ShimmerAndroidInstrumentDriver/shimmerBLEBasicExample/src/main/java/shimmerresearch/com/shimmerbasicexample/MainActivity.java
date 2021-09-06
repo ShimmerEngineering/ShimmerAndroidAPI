@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.VerisenseDeviceAndroid;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -18,6 +19,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.exceptions.ShimmerException;
+import com.shimmerresearch.verisense.SensorLIS2DW12;
 import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 import com.clj.fastble.BleManager;
@@ -34,18 +36,17 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 public class MainActivity extends Activity {
 
     private final static String LOG_TAG = "ShimmerBasicExample";
-    Shimmer shimmer;
-
     AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("E7:45:2C:6D:6F:14");
     VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
-    VerisenseDevice device1 = new VerisenseDevice();
+    VerisenseDeviceAndroid device1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BleManager.getInstance().init(getApplication());
-        shimmer = new Shimmer(mHandler);
+
+        device1 = new VerisenseDeviceAndroid(mHandler);
     }
 
     public void connectDevice(View v) {
@@ -59,17 +60,37 @@ public class MainActivity extends Activity {
     }
 
     public void disconnectDevice(View v) {
-        if (shimmer!=null){
-            shimmer.disconnect();
+
+            try {
+                device1.disconnect();
+            } catch (ShimmerException e) {
+                e.printStackTrace();
+            }
+
+    }
+
+    public void readOpConfig(View v) {
+        try {
+            protocol1.readOperationalConfig();
+        } catch (ShimmerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readProdConfig(View v)  {
+        try {
+            protocol1.readProductionConfig();
+        } catch (ShimmerException e) {
+            e.printStackTrace();
         }
     }
 
     public void startStreaming(View v) throws InterruptedException, IOException{
-        protocol1.readStatus();
+        protocol1.startStreaming();
     }
 
     public void stopStreaming(View v) throws IOException{
-        shimmer.stopStreaming();
+        protocol1.stopStreaming();
     }
 
 
@@ -93,12 +114,25 @@ public class MainActivity extends Activity {
                         FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         double timeStampData = timeStampCluster.mData;
                         Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
-                        allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
+                        allFormats = objectCluster.getCollectionOfFormatClusters(SensorLIS2DW12.ObjectClusterSensorName.LIS2DW12_ACC_X);
                         FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         if (accelXCluster!=null) {
                             double accelXData = accelXCluster.mData;
-                            Log.i(LOG_TAG, "Accel LN X: " + accelXData);
+                            Log.i(LOG_TAG, "Accel X: " + accelXData);
                         }
+                        allFormats = objectCluster.getCollectionOfFormatClusters(SensorLIS2DW12.ObjectClusterSensorName.LIS2DW12_ACC_Y);
+                        FormatCluster accelYCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
+                        if (accelXCluster!=null) {
+                            double accelYData = accelYCluster.mData;
+                            Log.i(LOG_TAG, "Accel Y: " + accelYData);
+                        }
+                        allFormats = objectCluster.getCollectionOfFormatClusters(SensorLIS2DW12.ObjectClusterSensorName.LIS2DW12_ACC_Z);
+                        FormatCluster accelZCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
+                        if (accelZCluster!=null) {
+                            double accelZData = accelZCluster.mData;
+                            Log.i(LOG_TAG, "Accel Z: " + accelZData);
+                        }
+
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:
@@ -150,8 +184,7 @@ public class MainActivity extends Activity {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer = new Shimmer(mHandler);
-                shimmer.connect(macAdd, "default");                  //Connect to the selected device
+
             }
 
         }
