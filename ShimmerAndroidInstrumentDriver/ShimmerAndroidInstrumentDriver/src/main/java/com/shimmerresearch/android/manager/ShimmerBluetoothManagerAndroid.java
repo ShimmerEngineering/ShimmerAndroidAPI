@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
 import com.shimmerresearch.androidradiodriver.ShimmerRadioInitializerAndroid;
 import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -37,6 +38,8 @@ import com.shimmerresearch.exceptions.ConnectionExceptionListener;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
+import com.shimmerresearch.verisense.VerisenseDevice;
+import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,7 +95,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
      * @param bluetoothAddress
      * @param context if the context is set, a progress dialog will show, otherwise a toast msg will show
      */
-    public void connectShimmerThroughBTAddress(final String bluetoothAddress,Context context) {
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress, final String deviceName, Context context) {
 
         if(isDevicePaired(bluetoothAddress) || AllowAutoPairing) {
             if (!isDevicePaired(bluetoothAddress)){
@@ -109,7 +112,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                 }
             }
             addDiscoveredDevice(bluetoothAddress);
-            super.connectShimmerThroughBTAddress(bluetoothAddress);
+            //super.connectShimmerThroughBTAddress(bluetoothAddress);
+            BluetoothDeviceDetails bdd = new BluetoothDeviceDetails("",bluetoothAddress,deviceName);
+            super.connectShimmerThroughBTAddress(bdd);
             super.setConnectionExceptionListener(new ConnectionExceptionListener() {
                 @Override
                 public void onConnectionStart(String connectionHandle) {
@@ -144,8 +149,26 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     @Override
+    protected void connectVerisenseDevice(BluetoothDeviceDetails bdd) {
+        AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication(bdd.mShimmerMacId);
+        VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
+        VerisenseDevice verisenseDevice = new VerisenseDevice();
+        verisenseDevice.setMacIdFromUart(bdd.mShimmerMacId);
+        verisenseDevice.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
+        initializeNewShimmerCommon(verisenseDevice);
+        try {
+            verisenseDevice.connect();
+        } catch (ShimmerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+    }
+
+    @Override
     public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
-        connectShimmerThroughBTAddress(bluetoothAddress,null);
+        connectShimmerThroughBTAddress(bluetoothAddress,"",null);
     }
 
     private boolean isDevicePaired(String bluetoothAddress){

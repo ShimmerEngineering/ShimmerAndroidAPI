@@ -12,6 +12,7 @@ import com.shimmerresearch.verisense.communication.AbstractByteCommunication;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
@@ -19,6 +20,8 @@ import com.clj.fastble.callback.BleNotifyCallback;
 import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
+
+import bolts.TaskCompletionSource;
 
 public class AndroidBleRadioByteCommunication extends AbstractByteCommunication {
     BleDevice mBleDevice;
@@ -35,13 +38,14 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
     public AndroidBleRadioByteCommunication(String mac) {
         mMac = mac;
     }
-
+    TaskCompletionSource<String> mTaskConnect = new TaskCompletionSource<>();
     @Override
     public void connect() {
+        mTaskConnect = new TaskCompletionSource<>();
         BleManager.getInstance().connect(mMac, new BleGattCallback() {
             @Override
             public void onStartConnect() {
-
+                System.out.println("Connecting");
             }
 
             @Override
@@ -59,6 +63,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                 mBleDevice = bleDevice;
                 startServiceS(bleDevice);
                 System.out.println(bleDevice.getMac() + " Connected");
+                mTaskConnect.setResult("Connected");
             }
 
             @Override
@@ -66,6 +71,17 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                 System.out.println();
             }
         });
+
+
+        try {
+            boolean result = mTaskConnect.getTask().waitForCompletion(5, TimeUnit.SECONDS);
+            Thread.sleep(1000);
+            if (!result) {
+                System.out.println("Connect fail");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startServiceS(BleDevice bleDevice){
@@ -140,6 +156,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
 
             @Override
             public void onWriteFailure(BleException exception) {
+
                 System.out.println("Write Fail");
             }
         });

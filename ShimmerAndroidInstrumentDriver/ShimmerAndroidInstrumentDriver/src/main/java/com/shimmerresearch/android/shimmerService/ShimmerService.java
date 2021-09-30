@@ -245,7 +245,11 @@ public class ShimmerService extends Service {
 	}
 
 	public void connectShimmer(final String bluetoothAddress,Context context){
-		btManager.connectShimmerThroughBTAddress(bluetoothAddress,context);
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,"",context);
+	}
+
+	public void connectShimmer(final String bluetoothAddress,final String deviceName, Context context){
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,deviceName,context);
 	}
 
 	public void connectShimmer(final String bluetoothAddress){
