@@ -146,9 +146,9 @@ public class DeviceConfigFragment extends Fragment {
                     cloneList.add(0, shimmerDeviceClone);
                     AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                    if(shimmerDeviceClone instanceof Shimmer) {
+                    //if(shimmerDeviceClone instanceof Shimmer) {
                         bluetoothManager.configureShimmer(shimmerDeviceClone);
-                    }
+                    //}
 
                 }
             });

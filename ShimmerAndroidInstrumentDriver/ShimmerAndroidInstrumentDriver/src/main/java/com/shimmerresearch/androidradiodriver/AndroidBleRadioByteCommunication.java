@@ -7,6 +7,8 @@ import android.content.Context;
 import android.os.Build;
 import android.widget.Toast;
 
+import com.clj.fastble.callback.BleMtuChangedCallback;
+import com.shimmerresearch.driverUtilities.UtilShimmer;
 import com.shimmerresearch.verisense.communication.AbstractByteCommunication;
 
 import java.util.Arrays;
@@ -20,6 +22,8 @@ import com.clj.fastble.callback.BleNotifyCallback;
 import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
+
+import org.apache.commons.codec.binary.Hex;
 
 import bolts.TaskCompletionSource;
 
@@ -39,6 +43,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
         mMac = mac;
     }
     TaskCompletionSource<String> mTaskConnect = new TaskCompletionSource<>();
+    TaskCompletionSource<String> mTaskMTU = new TaskCompletionSource<>();
     @Override
     public void connect() {
         mTaskConnect = new TaskCompletionSource<>();
@@ -57,6 +62,27 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                mTaskMTU= new TaskCompletionSource<>();
+                BleManager.getInstance().setMtu(bleDevice, 251, new BleMtuChangedCallback() {
+                    @Override
+                    public void onSetMTUFailure(BleException exception) {
+                        System.out.println("MTU Failure");
+
+                    }
+
+                    @Override
+                    public void onMtuChanged(int mtu) {
+                        System.out.println("MTU Changed: " + mtu);
+                        mTaskMTU.setResult("MTU Changed: " + mtu);
+                    }
+                });
+
+                try {
+                    boolean result = mTaskMTU.getTask().waitForCompletion(3, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 if (mByteCommunicationListener != null) {
                     mByteCommunicationListener.eventConnected();
                 }
@@ -75,7 +101,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
 
         try {
             boolean result = mTaskConnect.getTask().waitForCompletion(5, TimeUnit.SECONDS);
-            Thread.sleep(1000);
+            Thread.sleep(200);
             if (!result) {
                 System.out.println("Connect fail");
             }
@@ -148,10 +174,10 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
 
     @Override
     public void writeBytes(byte[] bytes) {
-        BleManager.getInstance().write(mBleDevice, sid.toString(), txid.toString(), bytes, new BleWriteCallback() {
+        BleManager.getInstance().write(mBleDevice, sid.toString(), txid.toString(), bytes, false, new BleWriteCallback() {
             @Override
             public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                System.out.println("Write Success");
+                System.out.println("Write Success " + UtilShimmer.bytesToHexStringWithSpacesFormatted(justWrite));
             }
 
             @Override

@@ -44,6 +44,7 @@ import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -154,18 +155,22 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     protected void connectVerisenseDevice(BluetoothDeviceDetails bdd) {
         AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication(bdd.mShimmerMacId);
         VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
-        VerisenseDeviceAndroid verisenseDevice = new VerisenseDeviceAndroid(mHandler);
+        final VerisenseDeviceAndroid verisenseDevice = new VerisenseDeviceAndroid(mHandler);
         verisenseDevice.setMacIdFromUart(bdd.mShimmerMacId);
         verisenseDevice.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
         initializeNewShimmerCommon(verisenseDevice);
-        try {
-            verisenseDevice.connect();
-        } catch (ShimmerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Thread thread = new Thread(){
+            public void run(){
 
-
+                try {
+                    verisenseDevice.connect();
+                } catch (ShimmerException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
     }
 
     @Override
@@ -281,6 +286,18 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         ((Shimmer) shimmerDevice).setRadio(serialPort.getBluetoothSocket());
         shimmerDevice.addCommunicationRoute(Configuration.COMMUNICATION_TYPE.BLUETOOTH);
         return shimmerDevice;
+    }
+
+    @Override
+    public void configureShimmer(final ShimmerDevice shimmerClone) {
+        Thread thread = new Thread(){
+            public void run(){
+                configureShimmers(Arrays.asList(shimmerClone));
+            }
+        };
+
+        thread.start();
+
     }
 
     @Override

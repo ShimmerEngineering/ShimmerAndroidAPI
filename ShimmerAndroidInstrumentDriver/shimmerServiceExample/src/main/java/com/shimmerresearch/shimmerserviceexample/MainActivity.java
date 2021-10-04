@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.androidplot.xy.XYPlot;
+import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.supportfragments.ConnectedShimmersListFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.DeviceConfigFragment;
@@ -35,8 +36,12 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.util.List;
+
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 
 public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener {
 
@@ -69,10 +74,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      */
     private ViewPager mViewPager;
 
-
-    //Extra for intent from ShimmerBluetoothDialog
-    public static final String EXTRA_DEVICE_ADDRESS = "device_address";
-
     boolean isServiceStarted = false;
 
     final static String LOG_TAG = "Shimmer";
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        BleManager.getInstance().init(getApplication());
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
@@ -137,14 +138,22 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.start_streaming:
                 if(selectedDeviceAddress != null) {
                     ShimmerDevice mDevice1 = mService.getShimmer(selectedDeviceAddress);
-                    mDevice1.startStreaming();
+                    try {
+                        mDevice1.startStreaming();
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
+                    }
                     signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
                 }
                 return true;
             case R.id.stop_streaming:
                 if(selectedDeviceAddress != null) {
                     ShimmerDevice mDevice2 = mService.getShimmer(selectedDeviceAddress);
-                    mDevice2.stopStreaming();
+                    try {
+                        mDevice2.stopStreaming();
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
+                    }
                     sensorsEnabledFragment.buildSensorsList(mDevice2, this, mService.getBluetoothManager());
                     deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
                 }
@@ -214,7 +223,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
+                String deviceName = data.getStringExtra(EXTRA_DEVICE_NAME);
+                //mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
+
+                mService.connectShimmer(macAdd,deviceName,this);    //Connect to the selected device, and set context to show progress dialog when pairing
+
             }
         }
     }
