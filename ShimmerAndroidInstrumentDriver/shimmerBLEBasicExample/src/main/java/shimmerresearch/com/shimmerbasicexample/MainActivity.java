@@ -19,10 +19,12 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.exceptions.ShimmerException;
-import com.shimmerresearch.verisense.SensorLIS2DW12;
+
 import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 import com.clj.fastble.BleManager;
+import com.shimmerresearch.verisense.sensors.SensorLIS2DW12;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -50,47 +52,100 @@ public class MainActivity extends Activity {
     }
 
     public void connectDevice(View v) {
-        device1.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
-        try {
-            device1.connect();
-        } catch (ShimmerException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+
+        Thread thread = new Thread(){
+            public void run(){
+
+                    device1.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
+                    try {
+                        device1.connect();
+                    } catch (ShimmerException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+
+            }
+        };
+
+        thread.start();
     }
 
     public void disconnectDevice(View v) {
-
-            try {
-                device1.disconnect();
-            } catch (ShimmerException e) {
-                e.printStackTrace();
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    device1.disconnect();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
             }
+        };
+
+        thread.start();
+
 
     }
 
     public void readOpConfig(View v) {
-        try {
-            protocol1.readOperationalConfig();
-        } catch (ShimmerException e) {
-            e.printStackTrace();
-        }
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    protocol1.readOperationalConfig();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+
+
+
+
     }
 
     public void readProdConfig(View v)  {
-        try {
-            protocol1.readProductionConfig();
-        } catch (ShimmerException e) {
-            e.printStackTrace();
-        }
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    protocol1.readProductionConfig();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+
     }
 
-    public void startStreaming(View v) throws InterruptedException, IOException{
-        protocol1.startStreaming();
+    public void startStreaming(View v) throws InterruptedException, IOException, ShimmerException {
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    protocol1.startStreaming();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
     }
 
-    public void stopStreaming(View v) throws IOException{
-        protocol1.stopStreaming();
+    public void stopStreaming(View v) throws IOException, ShimmerException {
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    protocol1.stopStreaming();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+
     }
 
 

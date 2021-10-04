@@ -15,7 +15,6 @@ import com.shimmerresearch.android.VerisenseDeviceAndroid;
 import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
 import com.shimmerresearch.androidradiodriver.ShimmerRadioInitializerAndroid;
 import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
-import com.shimmerresearch.androidradiodriver.VerisenseProtocolByteCommunicationAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerRadioInitializer;
 import com.shimmerresearch.comms.radioProtocol.CommsProtocolRadio;
@@ -26,7 +25,6 @@ import com.shimmerresearch.driver.BasicProcessWithCallBack;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
-import com.shimmerresearch.driver.ShimmerObject;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 import com.shimmerresearch.driverUtilities.BluetoothDeviceDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
@@ -38,9 +36,7 @@ import com.shimmerresearch.exception.DeviceNotPairedException;
 
 import com.shimmerresearch.exceptions.ConnectionExceptionListener;
 import com.shimmerresearch.exceptions.ShimmerException;
-import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
-import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 
 import java.util.ArrayList;
@@ -51,8 +47,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-
-import static android.R.id.list;
 
 /**
  * Created by ASaez on 10-Aug-16.
