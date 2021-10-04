@@ -11,9 +11,11 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.VerisenseDeviceAndroid;
 import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
 import com.shimmerresearch.androidradiodriver.ShimmerRadioInitializerAndroid;
 import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
+import com.shimmerresearch.androidradiodriver.VerisenseProtocolByteCommunicationAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerRadioInitializer;
 import com.shimmerresearch.comms.radioProtocol.CommsProtocolRadio;
@@ -152,7 +154,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     protected void connectVerisenseDevice(BluetoothDeviceDetails bdd) {
         AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication(bdd.mShimmerMacId);
         VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
-        VerisenseDevice verisenseDevice = new VerisenseDevice();
+        VerisenseDeviceAndroid verisenseDevice = new VerisenseDeviceAndroid(mHandler);
         verisenseDevice.setMacIdFromUart(bdd.mShimmerMacId);
         verisenseDevice.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
         initializeNewShimmerCommon(verisenseDevice);
