@@ -196,9 +196,8 @@ public class SignalsToPlotFragment extends ListFragment {
 
     public void setDeviceNotStreamingView() {
         String[] notStreamingMsg = new String[]{"Device not streaming", "Signals to plot can only be displayed when device is streaming"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, notStreamingMsg);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, notStreamingMsg);
         setListAdapter(adapter);
     }
-
 
 }
