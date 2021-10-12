@@ -169,7 +169,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
 
     @Override
     public void disconnect() {
-
+        BleManager.getInstance().disconnect(mBleDevice);
     }
 
     @Override
