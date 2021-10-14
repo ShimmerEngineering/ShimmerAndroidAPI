@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -140,6 +141,23 @@ public class SignalsToPlotFragment extends ListFragment {
             setListAdapter(adapter);
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
             updateCheckboxes();
+
+            shimmerService.mPlotManager.removeAllSignals();
+
+            SparseBooleanArray pos = listView.getCheckedItemPositions();
+            for (int i = 0; i < listView.getCount(); i++) {
+                if (pos.get(i)) {
+                    try {
+                        if(dynamicPlot == null) {
+                            Log.e(LOG_TAG, "dynamicPlot is null!");
+                        }
+                        shimmerService.mPlotManager.addSignal(mList.get(i), dynamicPlot);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Error! Could not add signal: " + e);
+                        e.printStackTrace();
+                    }
+                }
+            }
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

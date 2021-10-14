@@ -355,6 +355,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         plotFragment.setShimmerService(mService);
         plotFragment.clearPlot();
+        plotFragment.setSelectedDeviceAddress(selectedDeviceAddress);
         dynamicPlot = plotFragment.getDynamicPlot();
 
         mService.stopStreamingAllDevices();
