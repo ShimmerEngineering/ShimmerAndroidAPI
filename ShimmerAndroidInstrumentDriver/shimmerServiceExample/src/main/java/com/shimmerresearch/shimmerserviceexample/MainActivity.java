@@ -300,6 +300,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 switch (state) {
                     case CONNECTED:
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                        if(selectedDeviceAddress != null){
+                            ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
+                            deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                        }
                         break;
                     case CONNECTING:
                         break;
