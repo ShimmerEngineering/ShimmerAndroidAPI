@@ -385,12 +385,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case STREAMING_LOGGED_DATA:
                         if(selectedDeviceAddress != null) {
-                            VerisenseDevice mDevice = (VerisenseDevice) mService.getShimmer(selectedDeviceAddress);
-                            //DataSyncFragment.TextViewPayloadIndex.setText(mDevice.getPayloadIndex());
+                            VerisenseDeviceAndroid mDevice = (VerisenseDeviceAndroid) mService.getShimmer(selectedDeviceAddress);
                             try {
-                                DataSyncFragment.TextViewPayloadIndex.setText(mDevice.getPayloadIndex());
+                                DataSyncFragment.TextViewPayloadIndex.setText(Integer.toString(mDevice.getPayloadIndex()));
                             } catch (Exception e) {
-
                             }
                         }
                         break;
@@ -399,7 +397,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext()); //to be safe lets rebuild this
                         break;
                 }
-
             }
 
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {

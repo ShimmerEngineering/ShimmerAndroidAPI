@@ -36,6 +36,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
     UUID txid = UUID.fromString(TxID);
     UUID rxid = UUID.fromString(RxID);
     String mMac;
+    String uuid;
 
     //"DA:A6:19:F0:4A:D7"
     //"E7:45:2C:6D:6F:14"
@@ -192,8 +193,13 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
     public void stop() {
 
     }
+    public String convertMacIDtoUUID(String MacID) {
+        String uuid = "00000000-0000-0000-0000-";
+        return uuid + MacID.replace(":", "");
+    }
 
     public String getUuid() {
-        return "00000000-0000-0000-0000-E7EC37A0D234";
+        //"00000000-0000-0000-0000-E7EC37A0D234"
+        return convertMacIDtoUUID(this.mMac);
     }
 }
