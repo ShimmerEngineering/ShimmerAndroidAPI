@@ -192,4 +192,8 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
     public void stop() {
 
     }
+
+    public String getUuid() {
+        return "00000000-0000-0000-0000-E7EC37A0D234";
+    }
 }
