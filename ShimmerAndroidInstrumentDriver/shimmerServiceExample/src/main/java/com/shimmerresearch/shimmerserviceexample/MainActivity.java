@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if(mSectionsPagerAdapter1.getCount() == 6)
                 {
                     mSectionsPagerAdapter1.remove(4);
+                    mSectionsPagerAdapter1.notifyDataSetChanged();
                 }
                 return true;
             default:
