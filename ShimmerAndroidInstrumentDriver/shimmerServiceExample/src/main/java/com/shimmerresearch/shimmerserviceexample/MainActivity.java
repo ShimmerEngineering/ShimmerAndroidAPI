@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
                 if(mSectionsPagerAdapter1.getCount() == 6)
                 {
-                    mSectionsPagerAdapter1.remove(4);
+                    mSectionsPagerAdapter1.remove(3);
                     mSectionsPagerAdapter1.notifyDataSetChanged();
                 }
                 return true;
@@ -424,13 +424,13 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if(mSectionsPagerAdapter1.getCount() == 5)
             {
                 dataSyncFragment = DataSyncFragment.newInstance();
-                mSectionsPagerAdapter1.add(dataSyncFragment, "Data Sync", 4);
+                mSectionsPagerAdapter1.add(dataSyncFragment, "Data Sync", 3);
             }
         }
         else{
             if(mSectionsPagerAdapter1.getCount() == 6)
             {
-                mSectionsPagerAdapter1.remove(4);
+                mSectionsPagerAdapter1.remove(3);
             }
         }
         mSectionsPagerAdapter1.notifyDataSetChanged();
