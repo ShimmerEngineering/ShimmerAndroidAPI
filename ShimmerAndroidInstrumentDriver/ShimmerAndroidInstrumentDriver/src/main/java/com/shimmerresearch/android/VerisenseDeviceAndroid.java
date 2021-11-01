@@ -4,8 +4,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.os.Handler;
 
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
+import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.verisense.VerisenseDevice;
+import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,15 @@ public class VerisenseDeviceAndroid extends VerisenseDevice {
             if (handler!=null) {
                 handler.obtainMessage(what, object).sendToTarget();
             }
+        }
+    }
+
+    @Override
+    public void sendCallBackMsg(int i, Object ojc){
+        super.sendCallBackMsg(i, ojc);
+
+        if(((CallbackObject)ojc).mMyObject instanceof SyncProgressDetails){
+            sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_SYNC_PROGRESS, -1, -1, ojc);
         }
     }
 }

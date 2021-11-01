@@ -285,6 +285,11 @@ public class PlotFragment extends Fragment {
                             textViewDeviceState.setText(deviceState);
                             //TODO: set the enable logging regarding the user selection
                             break;
+                        case STREAMING_LOGGED_DATA:
+                            deviceState="Data Sync";
+                            textViewDeviceName.setText(mBluetoothAddress);
+                            textViewDeviceState.setText(deviceState);
+                            break;
                         case DISCONNECTED:
                             Log.d(LOG_TAG,"Shimmer No State");
                             mBluetoothAddress=null;
