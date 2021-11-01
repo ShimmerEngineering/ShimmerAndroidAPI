@@ -18,6 +18,7 @@ public class DataSyncFragment extends Fragment {
     public static EditText editTextParticipantName;
     public static EditText editTextTrialName;
     public static TextView TextViewPayloadIndex;
+    public static TextView TextViewSpeed;
 
     public DataSyncFragment() {
         // Required empty public constructor
@@ -34,7 +35,6 @@ public class DataSyncFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         context = getActivity();
-        //TextViewPayloadIndex.setText("aa");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.data_sync, container, false);
     }
@@ -45,6 +45,7 @@ public class DataSyncFragment extends Fragment {
         editTextParticipantName = (EditText) getView().findViewById(R.id.participantName);
         editTextTrialName = (EditText) getView().findViewById(R.id.trialName);
         TextViewPayloadIndex = (TextView) getView().findViewById(R.id.payloadIndex);
+        TextViewSpeed = (TextView) getView().findViewById(R.id.speed);
 
         super.onActivityCreated(savedInstanceState);
     }

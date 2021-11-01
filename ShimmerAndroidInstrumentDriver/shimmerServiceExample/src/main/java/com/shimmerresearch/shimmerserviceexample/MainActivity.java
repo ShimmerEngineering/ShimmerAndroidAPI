@@ -44,6 +44,7 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
 import com.shimmerresearch.verisense.VerisenseDevice;
+import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
 import java.util.List;
@@ -365,6 +366,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
                             deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
                         }
+                        if(dataSyncFragment != null){
+                            DataSyncFragment.TextViewPayloadIndex.setText("");
+                            DataSyncFragment.TextViewSpeed.setText("");
+                        }
+
                         break;
                     case CONNECTING:
                         break;
@@ -383,25 +389,23 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     case SDLOGGING:
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
                         break;
-                    case STREAMING_LOGGED_DATA:
-                        if(selectedDeviceAddress != null) {
-                            VerisenseDeviceAndroid mDevice = (VerisenseDeviceAndroid) mService.getShimmer(selectedDeviceAddress);
-                            try {
-                                DataSyncFragment.TextViewPayloadIndex.setText(Integer.toString(mDevice.getPayloadIndex()));
-                            } catch (Exception e) {
-                            }
-                        }
-                        break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext()); //to be safe lets rebuild this
                         break;
                 }
             }
+            else if(msg.what == Shimmer.MSG_IDENTIFIER_SYNC_PROGRESS){
+                SyncProgressDetails mDetails = (SyncProgressDetails)((CallbackObject)msg.obj).mMyObject;
+                DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
+                DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + Double.toString(mDetails.mTransferRateBytes/1024));
+            }
 
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
                 signalsToPlotFragment.setDeviceNotStreamingView();
             }
+
+
         }
     };
 
@@ -431,7 +435,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             {
                 mSectionsPagerAdapter1.remove(4);
             }
-
         }
         mSectionsPagerAdapter1.notifyDataSetChanged();
 
