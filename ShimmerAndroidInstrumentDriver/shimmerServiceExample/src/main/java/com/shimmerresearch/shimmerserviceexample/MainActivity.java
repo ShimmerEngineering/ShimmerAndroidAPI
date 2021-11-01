@@ -370,7 +370,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             DataSyncFragment.TextViewPayloadIndex.setText("");
                             DataSyncFragment.TextViewSpeed.setText("");
                         }
-
                         break;
                     case CONNECTING:
                         break;
@@ -404,8 +403,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
                 signalsToPlotFragment.setDeviceNotStreamingView();
             }
-
-
         }
     };
 

@@ -50,10 +50,6 @@ public class VerisenseDeviceAndroid extends VerisenseDevice {
             }
         }
     }
-    @Override
-    protected void processMsgFromCallback(ShimmerMsg shimmerMSG) {
-
-    }
 
     @Override
     public void sendCallBackMsg(int i, Object ojc){
