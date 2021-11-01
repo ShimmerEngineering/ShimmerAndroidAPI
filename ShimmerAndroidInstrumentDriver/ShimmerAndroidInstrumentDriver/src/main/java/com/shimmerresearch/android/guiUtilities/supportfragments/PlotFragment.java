@@ -50,6 +50,7 @@ public class PlotFragment extends Fragment {
     static String deviceState = "";
     static TextView textViewDeviceName;
     static TextView textViewDeviceState;
+    static String selectedDeviceAddress;
 
     private static String LOG_TAG = "PlotFragment";
     Button signalsToPlotButton;
@@ -201,8 +202,11 @@ public class PlotFragment extends Fragment {
                             Log.d(LOG_TAG,"Message Fully Initialized Received from Shimmer driver");
                             shimmerService.enableGraphingHandler(true);
                             deviceState = "Connected";
-                            textViewDeviceName.setText(mBluetoothAddress);
-                            textViewDeviceState.setText(deviceState);
+                            if(selectedDeviceAddress.equals(mBluetoothAddress)){
+                                textViewDeviceName.setText(mBluetoothAddress);
+                                textViewDeviceState.setText(deviceState);
+                            }
+
                             break;
                         case SDLOGGING:
                             Log.d(LOG_TAG,"Message Fully Initialized Received from Shimmer driver");
@@ -214,8 +218,10 @@ public class PlotFragment extends Fragment {
                         case CONNECTING:
                             Log.d(LOG_TAG,"Driver is attempting to establish connection with Shimmer device");
                             deviceState = "Connecting";
-                            textViewDeviceName.setText(mBluetoothAddress);
-                            textViewDeviceState.setText(deviceState);
+                            if(selectedDeviceAddress.equals(mBluetoothAddress)){
+                                textViewDeviceName.setText(mBluetoothAddress);
+                                textViewDeviceState.setText(deviceState);
+                            }
                             break;
                         case STREAMING:
                             deviceState="Streaming";
@@ -279,6 +285,11 @@ public class PlotFragment extends Fragment {
                             textViewDeviceState.setText(deviceState);
                             //TODO: set the enable logging regarding the user selection
                             break;
+                        case STREAMING_LOGGED_DATA:
+                            deviceState="Data Sync";
+                            textViewDeviceName.setText(mBluetoothAddress);
+                            textViewDeviceState.setText(deviceState);
+                            break;
                         case DISCONNECTED:
                             Log.d(LOG_TAG,"Shimmer No State");
                             mBluetoothAddress=null;
@@ -324,4 +335,11 @@ public class PlotFragment extends Fragment {
         mPlotDataMap.clear();
         dynamicPlot.clear();
     }
+
+    public void setSelectedDeviceAddress(String address){
+        selectedDeviceAddress = address;
+        textViewDeviceName.setText(address);
+        textViewDeviceState.setText("Connected");
+    }
+
 }

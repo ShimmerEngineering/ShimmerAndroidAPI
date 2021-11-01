@@ -22,6 +22,8 @@
             android:id="@+id/start_streaming"></item>
     <item   android:title="Stop streaming selected device"
             android:id="@+id/stop_streaming"></item>
+    <item   android:title="Data Sync selected device"
+        android:id="@+id/data_sync"></item>
     <item   android:title="Disconnect All Devices"
         android:id="@+id/disconnect_all_devices"></item>
 </menu>

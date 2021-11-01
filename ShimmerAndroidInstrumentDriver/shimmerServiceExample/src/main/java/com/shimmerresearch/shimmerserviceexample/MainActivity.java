@@ -1,9 +1,13 @@
 package com.shimmerresearch.shimmerserviceexample;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,6 +32,7 @@ import com.shimmerresearch.android.guiUtilities.supportfragments.ConnectedShimme
 import com.shimmerresearch.android.guiUtilities.supportfragments.DeviceConfigFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.PlotFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SensorsEnabledFragment;
+import com.shimmerresearch.android.guiUtilities.supportfragments.DataSyncFragment;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SignalsToPlotFragment;
@@ -37,8 +42,13 @@ import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.exceptions.ShimmerException;
+import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
+import com.shimmerresearch.verisense.VerisenseDevice;
+import com.shimmerresearch.verisense.communication.SyncProgressDetails;
+import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
@@ -53,12 +63,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     DeviceConfigFragment deviceConfigFragment;
     PlotFragment plotFragment;
     SignalsToPlotFragment signalsToPlotFragment;
+    DataSyncFragment dataSyncFragment;
     public String selectedDeviceAddress, selectedDeviceName;
     boolean mServiceFirstTime;
 
     XYPlot dynamicPlot;
-
-
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -79,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
+    final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
 
 
     @Override
@@ -92,16 +102,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter1);
-        mViewPager.setOffscreenPageLimit(4);    //Ensure none of the fragments has their view destroyed when off-screen
+        mViewPager.setOffscreenPageLimit(5);    //Ensure none of the fragments has their view destroyed when off-screen
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
-
-        sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
-        connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
-        deviceConfigFragment = DeviceConfigFragment.newInstance();
-        plotFragment = PlotFragment.newInstance();
-        signalsToPlotFragment = SignalsToPlotFragment.newInstance();
 
         //Check if Bluetooth is enabled
         if (!btAdapter.isEnabled()) {
@@ -117,13 +121,30 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
         }
 
-
+        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE )!= PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_WRITE_STORAGE);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.data_sync);
+        if(selectedDeviceAddress != null){
+            ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
+            if(device instanceof VerisenseDeviceAndroid) {
+                item.setVisible(true);
+                return true;
+            }
+        }
+        item.setVisible(false);
         return true;
     }
 
@@ -158,9 +179,25 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
                 }
                 return true;
+            case R.id.data_sync:
+                if(selectedDeviceAddress != null) {
+                    VerisenseDeviceAndroid mDevice3 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
+                    String participantName = DataSyncFragment.editTextParticipantName.getText().toString();
+                    String trialName = DataSyncFragment.editTextTrialName.getText().toString();
+                    mDevice3.setTrialName(trialName);
+                    mDevice3.setParticipantID(participantName);
+                    mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
+                    mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                }
+                return true;
             case R.id.disconnect_all_devices:
                 mService.disconnectAllDevices();
                 connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                if(mSectionsPagerAdapter1.getCount() == 6)
+                {
+                    mSectionsPagerAdapter1.remove(3);
+                    mSectionsPagerAdapter1.notifyDataSetChanged();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -232,54 +269,79 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         }
     }
 
-    public class SectionsPagerAdapter1 extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter1 extends FragmentStatePagerAdapter {
+
+        ArrayList<Fragment> fragmentArrayList = new ArrayList<Fragment>();
+        ArrayList<String> fragmentTitle = new ArrayList<String>();
 
         public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
+            connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
+            sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
+            deviceConfigFragment = DeviceConfigFragment.newInstance();
+            plotFragment = PlotFragment.newInstance();
+            signalsToPlotFragment = SignalsToPlotFragment.newInstance();
+
+            add(connectedShimmersListFragment, "Connected Devices");
+            add(sensorsEnabledFragment, "Enable Sensors");
+            add(deviceConfigFragment, "Device Configuration");
+            add(plotFragment, "Plot");
+            add(signalsToPlotFragment, "Signals to Plot");
         }
 
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-                if(position == 0) {
+            if(position < fragmentArrayList.size()){
+                if(position == 0){
                     connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                    return connectedShimmersListFragment;
                 }
-                else if(position == 1) {
-                    return sensorsEnabledFragment;
-                }
-                else if (position == 2) {
-                    return deviceConfigFragment;
-                }
-                else if (position == 3) {
-                    return plotFragment;
-                }
-                else if (position == 4) {
-                    return signalsToPlotFragment;
-                }
-                else {
-                    return null;
-                }
+                return fragmentArrayList.get(position);
+            }
+            else{
+                return null;
+            }
         }
 
         @Override
         public int getCount() {
-            // Show 5 total pages.
-            return 5;
+            // Show 5 total pages (Show 6 when a verisense device is selected)
+            return fragmentArrayList.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0: return "Connected Devices";
-                case 1: return "Enable Sensors";
-                case 2: return "Device Configuration";
-                case 3: return "Plot";
-                case 4: return "Signals to Plot";
-                default: return "";
+            if(position < fragmentTitle.size()){
+                return fragmentTitle.get(position);
+            }
+            return "";
+        }
+
+        public void add(Fragment fragment, String title, int index)
+        {
+            fragmentArrayList.add(index, fragment);
+            fragmentTitle.add(index, title);
+        }
+
+        public void add(Fragment fragment, String title)
+        {
+            fragmentArrayList.add(fragment);
+            fragmentTitle.add(title);
+        }
+
+        public void remove(int index)
+        {
+            if(fragmentArrayList.size() > 1 && fragmentTitle.size() > 1){
+                fragmentArrayList.remove(index);
+                fragmentTitle.remove(index);
             }
         }
 
+        @Override
+        public int getItemPosition(Object object) {
+            // refresh all fragments when data set changed
+            return PagerAdapter.POSITION_NONE;
+        }
     }
 
     private Handler mHandler = new Handler() {
@@ -300,6 +362,14 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 switch (state) {
                     case CONNECTED:
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                        if(selectedDeviceAddress != null){
+                            ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
+                            deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                        }
+                        if(dataSyncFragment != null){
+                            DataSyncFragment.TextViewPayloadIndex.setText("");
+                            DataSyncFragment.TextViewSpeed.setText("");
+                        }
                         break;
                     case CONNECTING:
                         break;
@@ -323,15 +393,16 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext()); //to be safe lets rebuild this
                         break;
                 }
-
+            }
+            else if(msg.what == Shimmer.MSG_IDENTIFIER_SYNC_PROGRESS){
+                SyncProgressDetails mDetails = (SyncProgressDetails)((CallbackObject)msg.obj).mMyObject;
+                DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
+                DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + Double.toString(mDetails.mTransferRateBytes/1024));
             }
 
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
                 signalsToPlotFragment.setDeviceNotStreamingView();
             }
-
-
-
         }
     };
 
@@ -348,6 +419,22 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         //Pass the selected device to the fragments
         ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
 
+        //add and remove DataSyncFragment based on the type of device
+        if(device instanceof VerisenseDeviceAndroid) {
+            if(mSectionsPagerAdapter1.getCount() == 5)
+            {
+                dataSyncFragment = DataSyncFragment.newInstance();
+                mSectionsPagerAdapter1.add(dataSyncFragment, "Data Sync", 3);
+            }
+        }
+        else{
+            if(mSectionsPagerAdapter1.getCount() == 6)
+            {
+                mSectionsPagerAdapter1.remove(3);
+            }
+        }
+        mSectionsPagerAdapter1.notifyDataSetChanged();
+
         sensorsEnabledFragment.setShimmerService(mService);
         sensorsEnabledFragment.buildSensorsList(device, this, mService.getBluetoothManager());
 
@@ -355,6 +442,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         plotFragment.setShimmerService(mService);
         plotFragment.clearPlot();
+        plotFragment.setSelectedDeviceAddress(selectedDeviceAddress);
         dynamicPlot = plotFragment.getDynamicPlot();
 
         mService.stopStreamingAllDevices();
