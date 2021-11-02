@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     SignalsToPlotFragment signalsToPlotFragment;
     DataSyncFragment dataSyncFragment;
     public String selectedDeviceAddress, selectedDeviceName;
+    String binFileDirectory;
     boolean mServiceFirstTime;
 
     XYPlot dynamicPlot;
@@ -189,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mDevice3.setTrialName(trialName);
                     mDevice3.setParticipantID(participantName);
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
-                    DataSyncFragment.TextViewDirectory.setText("Directory : " + String.format("%s/%s/%s/%s/BinaryFiles", android.os.Environment.getExternalStorageDirectory().getAbsolutePath(), trialName, participantName, UUID));
+                    binFileDirectory = String.format("%s/%s/%s/%s/BinaryFiles", android.os.Environment.getExternalStorageDirectory().getAbsolutePath(), trialName, participantName, UUID);
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
                 }
                 return true;
@@ -403,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             }
             else if(msg.what == Shimmer.MSG_IDENTIFIER_SYNC_PROGRESS){
                 SyncProgressDetails mDetails = (SyncProgressDetails)((CallbackObject)msg.obj).mMyObject;
+                DataSyncFragment.TextViewDirectory.setText("Directory : " + binFileDirectory);
                 DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
                 DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + Double.toString(mDetails.mTransferRateBytes/1024));
             }
