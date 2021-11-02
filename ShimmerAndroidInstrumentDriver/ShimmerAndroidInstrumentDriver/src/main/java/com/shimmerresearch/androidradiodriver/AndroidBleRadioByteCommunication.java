@@ -193,7 +193,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
     public void stop() {
 
     }
-    public String convertMacIDtoUUID(String MacID) {
+    public static String convertMacIDtoUUID(String MacID) {
         String uuid = "00000000-0000-0000-0000-";
         return uuid + MacID.replace(":", "");
     }

@@ -19,6 +19,7 @@ public class DataSyncFragment extends Fragment {
     public static EditText editTextTrialName;
     public static TextView TextViewPayloadIndex;
     public static TextView TextViewSpeed;
+    public static TextView TextViewDirectory;
 
     public DataSyncFragment() {
         // Required empty public constructor
@@ -46,6 +47,7 @@ public class DataSyncFragment extends Fragment {
         editTextTrialName = (EditText) getView().findViewById(R.id.trialName);
         TextViewPayloadIndex = (TextView) getView().findViewById(R.id.payloadIndex);
         TextViewSpeed = (TextView) getView().findViewById(R.id.speed);
+        TextViewDirectory = (TextView) getView().findViewById(R.id.directory);
 
         super.onActivityCreated(savedInstanceState);
     }

@@ -37,6 +37,7 @@ import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SignalsToPlotFragment;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
@@ -184,9 +185,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     VerisenseDeviceAndroid mDevice3 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
                     String participantName = DataSyncFragment.editTextParticipantName.getText().toString();
                     String trialName = DataSyncFragment.editTextTrialName.getText().toString();
+                    String UUID = AndroidBleRadioByteCommunication.convertMacIDtoUUID(selectedDeviceAddress);
                     mDevice3.setTrialName(trialName);
                     mDevice3.setParticipantID(participantName);
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
+                    DataSyncFragment.TextViewDirectory.setText("Directory : " + String.format("%s/%s/%s/%s/BinaryFiles", android.os.Environment.getExternalStorageDirectory().getAbsolutePath(), trialName, participantName, UUID));
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
                 }
                 return true;
@@ -369,6 +372,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         if(dataSyncFragment != null){
                             DataSyncFragment.TextViewPayloadIndex.setText("");
                             DataSyncFragment.TextViewSpeed.setText("");
+                            DataSyncFragment.TextViewDirectory.setText("");
                         }
                         break;
                     case CONNECTING:
@@ -387,6 +391,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case SDLOGGING:
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                        break;
+                    case STREAMING_LOGGED_DATA:
+                        Toast.makeText(getApplicationContext(), "Data Sync: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
