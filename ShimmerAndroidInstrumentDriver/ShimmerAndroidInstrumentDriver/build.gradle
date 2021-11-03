@@ -74,13 +74,13 @@ dependencies {
     compile files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     compile files('libs/AndroidBluetoothLibrary.jar')
     compile files('libs/androidplot-core-0.5.0-release.jar')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManagerDev', version:'JA-56 v0.7'){
+    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManagerDev', version:'JA-56 v0.8'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriverDev', version:'JA-56 v0.7'){
+    implementation (group: 'com.shimmersensing', name: 'ShimmerDriverDev', version:'JA-56 v0.8'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
