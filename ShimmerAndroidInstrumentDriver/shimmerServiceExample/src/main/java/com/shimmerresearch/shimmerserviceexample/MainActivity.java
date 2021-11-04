@@ -43,7 +43,6 @@ import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
-import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
@@ -343,7 +342,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             return PagerAdapter.POSITION_NONE;
         }
     }
-
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             if(msg.what == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE) {
@@ -387,6 +385,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case SDLOGGING:
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                        break;
+                    case STREAMING_LOGGED_DATA:
+                        Toast.makeText(getApplicationContext(), "Data Sync: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
+                        VerisenseDeviceAndroid mDevice3 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
+                        DataSyncFragment.TextViewDirectory.setText("Directory : " + mDevice3.getDataFilePath());
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();

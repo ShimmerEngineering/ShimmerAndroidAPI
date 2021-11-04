@@ -183,7 +183,6 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
 
             @Override
             public void onWriteFailure(BleException exception) {
-
                 System.out.println("Write Fail");
             }
         });
@@ -199,7 +198,6 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
     }
 
     public String getUuid() {
-        //"00000000-0000-0000-0000-E7EC37A0D234"
         return convertMacIDtoUUID(this.mMac);
     }
 }
