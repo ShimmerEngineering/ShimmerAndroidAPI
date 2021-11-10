@@ -21,15 +21,6 @@ public class VerisenseDeviceAndroid extends VerisenseDevice {
         mHandlerList.add(0, handler);
     }
 
-    @Override
-    public boolean setBluetoothRadioState(ShimmerBluetooth.BT_STATE state) {
-        boolean isChanged = super.setBluetoothRadioState(state);
-        this.mDeviceCallbackAdapter.setBluetoothRadioState(state, isChanged);
-        sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                new ObjectCluster(mShimmerUserAssignedName, getMacId(), state));
-        return isChanged;
-    }
-
     private void sendMsgToHandlerListTarget(int what, int arg1, int arg2, Object object) {
         for(Handler handler : mHandlerList) {
             if (handler!=null) {
@@ -57,6 +48,10 @@ public class VerisenseDeviceAndroid extends VerisenseDevice {
 
         if(((CallbackObject)ojc).mMyObject instanceof SyncProgressDetails){
             sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_SYNC_PROGRESS, -1, -1, ojc);
+        }
+        else{
+            sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                    new ObjectCluster(mShimmerUserAssignedName, getMacId(), ((CallbackObject)ojc).mState));
         }
     }
 }
