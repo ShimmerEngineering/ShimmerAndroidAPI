@@ -39,7 +39,16 @@ android {
         exclude 'META-INF/ASL2.0'
     }
 
+    configurations {
+        all {
+            exclude module: 'httpclient'
+            exclude module: 'commons-logging'
+        }
+    }
 
+    lintOptions {
+        warning 'InvalidPackage', 'ExpiredTargetSdkVersion'
+    }
 }
 
 dependencies {
