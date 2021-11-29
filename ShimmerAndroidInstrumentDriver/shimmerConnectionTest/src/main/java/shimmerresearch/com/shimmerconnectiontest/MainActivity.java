@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -19,6 +19,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import shimmerresearch.com.shimmerconnectiontest.BuildConfig;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,8 +28,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.widget.EditText;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
@@ -43,8 +42,8 @@ public class MainActivity extends Activity {
     private EditText editTextTotalIteration;
     private EditText editTextTestProgress;
     private EditText editTextFirmware;
+    private TextView textViewVersion;
 
-    private int interval = 0;
     private int successCount = 0;
     private int failureCount = 0;
     private int totalIteration = 0;
@@ -52,7 +51,6 @@ public class MainActivity extends Activity {
 
     private Shimmer shimmer;
     private String macAdd;
-    private boolean isCurrentIterationSuccess;
     private boolean isTestStarted = false;
     private Timer timer;
 
@@ -67,9 +65,11 @@ public class MainActivity extends Activity {
         editTextTotalIteration = (EditText) findViewById(R.id.testIterations);
         editTextTestProgress = (EditText) findViewById(R.id.testProgress);
         editTextFirmware = (EditText) findViewById(R.id.firmware);
+        textViewVersion = (TextView) findViewById(R.id.version);
 
-        editTextTotalIteration.setText("10");
-        editTextInterval.setText("5");
+        textViewVersion.setText("Shimmer3 BT Connection Test v" + BuildConfig.VERSION_NAME);
+        editTextTotalIteration.setText("100");
+        editTextInterval.setText("10");
     }
 
     public void startTest(View v){
@@ -142,12 +142,6 @@ public class MainActivity extends Activity {
                         case CONNECTED:
                             editTextShimmerStatus.setText("CONNECTED");
                             editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
-//                            if(!isCurrentIterationSuccess){
-//                                isCurrentIterationSuccess = true;
-//                                editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
-//                                successCount += 1;
-//                                editTextSuccessCount.setText(String.valueOf(successCount));
-//                            }
                             break;
                         case CONNECTING:
                             editTextShimmerStatus.setText("CONNECTING");
@@ -193,7 +187,6 @@ public class MainActivity extends Activity {
                 editTextSuccessCount.setText(String.valueOf(successCount));
                 editTextInterval.setEnabled(false);
                 editTextTotalIteration.setEnabled(false);
-                isCurrentIterationSuccess = true;
                 isTestStarted = true;
 
                 timer = new Timer();
@@ -226,8 +219,8 @@ public class MainActivity extends Activity {
                         if(currentIteration == totalIteration){
                             runOnUiThread(new  Runnable() {
                                 public void run() {
-                                editTextInterval.setEnabled(true);
-                                editTextTotalIteration.setEnabled(true);
+                                    editTextInterval.setEnabled(true);
+                                    editTextTotalIteration.setEnabled(true);
                                 }
                             });
                             timer.cancel();
@@ -237,12 +230,11 @@ public class MainActivity extends Activity {
 
                         runOnUiThread(new  Runnable() {
                             public void run() {
-                            editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
-                            currentIteration += 1;
+                                editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
+                                currentIteration += 1;
                             }
                         });
 
-                        //isCurrentIterationSuccess = false;
                         shimmer.connect(macAdd, "default");
                     }
                 }, 0, Integer.parseInt(editTextInterval.getText().toString()) * 1000);
