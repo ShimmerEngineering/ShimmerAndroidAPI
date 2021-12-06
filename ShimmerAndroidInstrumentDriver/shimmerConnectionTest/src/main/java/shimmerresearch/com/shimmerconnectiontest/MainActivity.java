@@ -49,6 +49,10 @@ public class MainActivity extends Activity {
     private int failureCount = 0;
     private int totalIteration = 0;
     private int currentIteration = 0;
+    private int retryCount = 0;
+    private int retryCountLimit = 3;
+    private boolean wasConnecting = false;
+
 
     private Shimmer shimmer;
     private String macAdd;
@@ -68,8 +72,8 @@ public class MainActivity extends Activity {
         editTextTestProgress = (EditText) findViewById(R.id.testProgress);
         editTextFirmware = (EditText) findViewById(R.id.firmware);
 
-        editTextTotalIteration.setText("10");
-        editTextInterval.setText("5");
+        editTextTotalIteration.setText("100");
+        editTextInterval.setText("10");
     }
 
     public void startTest(View v){
@@ -102,6 +106,12 @@ public class MainActivity extends Activity {
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
+                case ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE:
+                    if (((CallbackObject)msg.obj).mIndicator==ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
+                        successCount += 1;
+                        retryCount = 0;
+                    }
+                    break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
                     if ((msg.obj instanceof ObjectCluster)) {
 
@@ -140,6 +150,7 @@ public class MainActivity extends Activity {
 
                     switch (state) {
                         case CONNECTED:
+                            wasConnecting = false;
                             editTextShimmerStatus.setText("CONNECTED");
                             editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
 //                            if(!isCurrentIterationSuccess){
@@ -150,6 +161,7 @@ public class MainActivity extends Activity {
 //                            }
                             break;
                         case CONNECTING:
+                            wasConnecting = true;
                             editTextShimmerStatus.setText("CONNECTING");
                             break;
                         case STREAMING:
@@ -163,6 +175,19 @@ public class MainActivity extends Activity {
                             break;
                         case DISCONNECTED:
                             editTextShimmerStatus.setText("DISCONNECTED");
+                            if (wasConnecting){
+                                try {
+                                    Thread.sleep(200);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                if (retryCount<retryCountLimit) {
+                                    retryCount++;
+                                    Log.i(LOG_TAG, "Retry Count " + Integer.toString(retryCount));
+                                    //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
+                                    shimmer.connect(macAdd, "default");
+                                }
+                            }
                             break;
                     }
                     break;
@@ -210,7 +235,6 @@ public class MainActivity extends Activity {
                                 });
                             }
                             else{
-                                successCount += 1;
                                 runOnUiThread(new  Runnable() {
                                     public void run() {
                                         editTextSuccessCount.setText(String.valueOf(successCount));
@@ -226,8 +250,8 @@ public class MainActivity extends Activity {
                         if(currentIteration == totalIteration){
                             runOnUiThread(new  Runnable() {
                                 public void run() {
-                                editTextInterval.setEnabled(true);
-                                editTextTotalIteration.setEnabled(true);
+                                    editTextInterval.setEnabled(true);
+                                    editTextTotalIteration.setEnabled(true);
                                 }
                             });
                             timer.cancel();
@@ -237,8 +261,8 @@ public class MainActivity extends Activity {
 
                         runOnUiThread(new  Runnable() {
                             public void run() {
-                            editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
-                            currentIteration += 1;
+                                editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
+                                currentIteration += 1;
                             }
                         });
 
