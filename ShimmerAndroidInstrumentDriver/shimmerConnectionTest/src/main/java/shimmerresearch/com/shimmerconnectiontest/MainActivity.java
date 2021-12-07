@@ -185,7 +185,7 @@ public class MainActivity extends Activity {
                                 if (retryCount<retryCountLimit) {
                                     retryCount++;
                                     totalRetries++;
-                                    Log.i(LOG_TAG, "Retry Count " + Integer.toString(retryCount));
+                                    Log.i(LOG_TAG, "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
                                     shimmer.connect(macAdd, "default");
                                 }
@@ -228,6 +228,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
+                        retryCount = 0;
                         if(currentIteration > 0){
                             if(shimmer.getBluetoothRadioState() != ShimmerBluetooth.BT_STATE.CONNECTED){
                                 failureCount += 1;
@@ -241,7 +242,7 @@ public class MainActivity extends Activity {
                             else{
                                 if(shimmer.isInitialised() && shimmer.getBluetoothRadioState() == ShimmerBluetooth.BT_STATE.CONNECTED) {
                                     successCount += 1;
-                                    retryCount = 0;
+
                                     Log.i(LOG_TAG, "Success Count: " + successCount);
                                     runOnUiThread(new Runnable() {
                                         public void run() {
