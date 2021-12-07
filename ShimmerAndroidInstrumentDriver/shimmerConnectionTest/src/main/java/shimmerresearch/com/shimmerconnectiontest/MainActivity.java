@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
         editTextFirmware = (EditText) findViewById(R.id.firmware);
 
         editTextTotalIteration.setText("100");
-        editTextInterval.setText("10");
+        editTextInterval.setText("15");
     }
 
     public void startTest(View v){
@@ -108,8 +108,7 @@ public class MainActivity extends Activity {
             switch (msg.what) {
                 case ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE:
                     if (((CallbackObject)msg.obj).mIndicator==ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
-                        successCount += 1;
-                        retryCount = 0;
+
                     }
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
@@ -225,9 +224,11 @@ public class MainActivity extends Activity {
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
+                        Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
                         if(currentIteration > 0){
                             if(shimmer.getBluetoothRadioState() != ShimmerBluetooth.BT_STATE.CONNECTED){
                                 failureCount += 1;
+                                Log.i(LOG_TAG, "Failure Count: " + failureCount);
                                 runOnUiThread(new  Runnable() {
                                     public void run() {
                                         editTextFailureCount.setText(String.valueOf(failureCount));
@@ -235,17 +236,32 @@ public class MainActivity extends Activity {
                                 });
                             }
                             else{
-                                runOnUiThread(new  Runnable() {
-                                    public void run() {
-                                        editTextSuccessCount.setText(String.valueOf(successCount));
-                                    }
-                                });
+                                if(shimmer.isInitialised() && shimmer.getBluetoothRadioState() == ShimmerBluetooth.BT_STATE.CONNECTED) {
+                                    successCount += 1;
+                                    retryCount = 0;
+                                    Log.i(LOG_TAG, "Success Count: " + successCount);
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            editTextSuccessCount.setText(String.valueOf(successCount));
+                                        }
+                                    });
+                                }
                             }
                         }
 
                         if(shimmer != null){
-                            if (shimmer.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.CONNECTED)) {
-                                shimmer.disconnect();
+                            if (!shimmer.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)) {
+                                try {
+                                    shimmer.disconnect();
+                                    long max = 2000;
+                                    long min = 1000;
+                                    long randomDelay = (long) ((Math.random() * (max - min)) + min);
+                                    // a random wait delay after disconnect to be more realistic
+                                    Thread.sleep(randomDelay);
+                              } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
                         }
 
