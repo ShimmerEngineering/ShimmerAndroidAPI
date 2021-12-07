@@ -244,7 +244,9 @@ public class MainActivity extends Activity {
                         }
 
                         if(shimmer != null){
-                            shimmer.disconnect();
+                            if (shimmer.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.CONNECTED)) {
+                                shimmer.disconnect();
+                            }
                         }
 
                         if(currentIteration == totalIteration){

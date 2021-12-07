@@ -182,7 +182,7 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:paddingTop="30dp"
-        android:text="Shimmer3 BT Connection Test v0.00.00x"
+        android:text="Shimmer3 BT Connection Test v0.00.002"
         android:textAlignment="center"
-        android:textSize="10dp"/>
+        android:textSize="10dp" />
 </android.widget.LinearLayout>
