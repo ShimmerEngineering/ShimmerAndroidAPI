@@ -230,27 +230,24 @@ public class MainActivity extends Activity {
                         Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
                         retryCount = 0;
                         if(currentIteration > 0){
-                            if(shimmer.getBluetoothRadioState() != ShimmerBluetooth.BT_STATE.CONNECTED){
-                                failureCount += 1;
-                                Log.i(LOG_TAG, "Failure Count: " + failureCount);
-                                runOnUiThread(new  Runnable() {
-                                    public void run() {
-                                        editTextFailureCount.setText(String.valueOf(failureCount));
-                                    }
-                                });
-                            }
-                            else{
+
                                 if(shimmer.isInitialised() && shimmer.getBluetoothRadioState() == ShimmerBluetooth.BT_STATE.CONNECTED) {
                                     successCount += 1;
-
                                     Log.i(LOG_TAG, "Success Count: " + successCount);
                                     runOnUiThread(new Runnable() {
                                         public void run() {
                                             editTextSuccessCount.setText(String.valueOf(successCount));
                                         }
                                     });
+                                } else {
+                                    failureCount += 1;
+                                    Log.i(LOG_TAG, "Failure Count: " + failureCount);
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            editTextFailureCount.setText(String.valueOf(failureCount));
+                                        }
+                                    });
                                 }
-                            }
                         }
 
                         if(shimmer != null){
