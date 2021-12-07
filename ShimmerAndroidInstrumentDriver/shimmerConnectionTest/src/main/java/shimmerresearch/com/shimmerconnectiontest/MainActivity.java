@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
         editTextTestProgress = (EditText) findViewById(R.id.testProgress);
         editTextFirmware = (EditText) findViewById(R.id.firmware);
 
-        editTextTotalIteration.setText("100");
+        editTextTotalIteration.setText("30");
         editTextInterval.setText("15");
     }
 
