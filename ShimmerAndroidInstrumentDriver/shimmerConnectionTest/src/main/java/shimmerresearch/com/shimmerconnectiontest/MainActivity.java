@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
     private int currentIteration = 0;
     private int retryCount = 0;
     private int retryCountLimit = 3;
+    private int totalRetries = 0;
     private boolean wasConnecting = false;
 
 
@@ -78,6 +79,7 @@ public class MainActivity extends Activity {
 
     public void startTest(View v){
         if(!isTestStarted){
+            totalRetries = 0;
             Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
             startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
         }
@@ -182,6 +184,7 @@ public class MainActivity extends Activity {
                                 }
                                 if (retryCount<retryCountLimit) {
                                     retryCount++;
+                                    totalRetries++;
                                     Log.i(LOG_TAG, "Retry Count " + Integer.toString(retryCount));
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
                                     shimmer.connect(macAdd, "default");
@@ -250,7 +253,7 @@ public class MainActivity extends Activity {
                         }
 
                         if(shimmer != null){
-                            if (!shimmer.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)) {
+                            //if (!shimmer.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)) {
                                 try {
                                     shimmer.disconnect();
                                     long max = 2000;
@@ -262,7 +265,7 @@ public class MainActivity extends Activity {
                                     e.printStackTrace();
                                 }
 
-                            }
+                            //}
                         }
 
                         if(currentIteration == totalIteration){
