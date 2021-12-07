@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
         editTextFirmware = (EditText) findViewById(R.id.firmware);
 
         editTextTotalIteration.setText("30");
-        editTextInterval.setText("15");
+        editTextInterval.setText("5");
     }
 
     public void startTest(View v){
@@ -110,6 +110,18 @@ public class MainActivity extends Activity {
             switch (msg.what) {
                 case ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE:
                     if (((CallbackObject)msg.obj).mIndicator==ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
+
+                            editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
+                            successCount += 1;
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    editTextSuccessCount.setText(String.valueOf(successCount));
+                                }
+                            });
+                            Log.i(LOG_TAG, "Success Count: " + successCount);
+                            shimmer.disconnect();
+                            timer = new Timer();
+                            timer.schedule(new ConnectTask(),Integer.parseInt(editTextInterval.getText().toString()) * 1000);
 
                     }
                     break;
@@ -154,12 +166,8 @@ public class MainActivity extends Activity {
                             wasConnecting = false;
                             editTextShimmerStatus.setText("CONNECTED");
                             editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
-//                            if(!isCurrentIterationSuccess){
-//                                isCurrentIterationSuccess = true;
-//                                editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
-//                                successCount += 1;
-//                                editTextSuccessCount.setText(String.valueOf(successCount));
-//                            }
+
+
                             break;
                         case CONNECTING:
                             wasConnecting = true;
@@ -187,7 +195,18 @@ public class MainActivity extends Activity {
                                     totalRetries++;
                                     Log.i(LOG_TAG, "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
+                                    shimmer = new Shimmer(mHandler);
                                     shimmer.connect(macAdd, "default");
+                                } else {
+                                    failureCount += 1;
+                                    Log.i(LOG_TAG, "Failure Count: " + failureCount);
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            editTextFailureCount.setText(String.valueOf(failureCount));
+                                        }
+                                    });
+                                    timer = new Timer();
+                                    timer.schedule(new ConnectTask(),Integer.parseInt(editTextInterval.getText().toString()) * 1000);
                                 }
                             }
                             break;
@@ -224,73 +243,47 @@ public class MainActivity extends Activity {
                 isTestStarted = true;
 
                 timer = new Timer();
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
-                        retryCount = 0;
-                        if(currentIteration > 0){
-
-                                if(shimmer.isInitialised() && shimmer.getBluetoothRadioState() == ShimmerBluetooth.BT_STATE.CONNECTED) {
-                                    successCount += 1;
-                                    Log.i(LOG_TAG, "Success Count: " + successCount);
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            editTextSuccessCount.setText(String.valueOf(successCount));
-                                        }
-                                    });
-                                } else {
-                                    failureCount += 1;
-                                    Log.i(LOG_TAG, "Failure Count: " + failureCount);
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            editTextFailureCount.setText(String.valueOf(failureCount));
-                                        }
-                                    });
-                                }
-                        }
-
-                        if(shimmer != null){
-                            //if (!shimmer.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)) {
-                                try {
-                                    shimmer.disconnect();
-                                    long max = 2000;
-                                    long min = 1000;
-                                    long randomDelay = (long) ((Math.random() * (max - min)) + min);
-                                    // a random wait delay after disconnect to be more realistic
-                                    Thread.sleep(randomDelay);
-                              } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                            //}
-                        }
-
-                        if(currentIteration == totalIteration){
-                            runOnUiThread(new  Runnable() {
-                                public void run() {
-                                    editTextInterval.setEnabled(true);
-                                    editTextTotalIteration.setEnabled(true);
-                                }
-                            });
-                            timer.cancel();
-                            isTestStarted = false;
-                            return;
-                        }
-
-                        runOnUiThread(new  Runnable() {
-                            public void run() {
-                                editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
-                                currentIteration += 1;
-                            }
-                        });
-
-                        //isCurrentIterationSuccess = false;
-                        shimmer.connect(macAdd, "default");
-                    }
-                }, 0, Integer.parseInt(editTextInterval.getText().toString()) * 1000);
+                timer.schedule(new ConnectTask(),0);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+    public class ConnectTask extends  TimerTask{
+
+        @Override
+        public void run() {
+
+            Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
+            retryCount = 0;
+
+            if(shimmer != null){
+                shimmer.disconnect();
+            }
+
+            if(currentIteration == totalIteration){
+                runOnUiThread(new  Runnable() {
+                    public void run() {
+                        editTextInterval.setEnabled(true);
+                        editTextTotalIteration.setEnabled(true);
+                    }
+                });
+                timer.cancel();
+                isTestStarted = false;
+                return;
+            }
+
+            runOnUiThread(new  Runnable() {
+                public void run() {
+                    editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
+                    currentIteration += 1;
+                }
+            });
+
+            //isCurrentIterationSuccess = false;
+            shimmer = new Shimmer(mHandler);
+            shimmer.connect(macAdd, "default");
+        }
+    }
+
+
 }
