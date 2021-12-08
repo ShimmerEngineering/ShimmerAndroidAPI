@@ -13,12 +13,14 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,6 +37,8 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 public class MainActivity extends Activity {
 
     private final static String LOG_TAG = "ShimmerConnectionTest";
+
+    ShimmerBluetoothManagerAndroid btManager;
 
     private EditText editTextShimmerStatus;
     private EditText editTextInterval;
@@ -55,7 +59,7 @@ public class MainActivity extends Activity {
     private boolean wasConnecting = false;
 
 
-    private Shimmer shimmer;
+    //private Shimmer shimmer;
     private String macAdd;
     private boolean isCurrentIterationSuccess;
     private boolean isTestStarted = false;
@@ -89,9 +93,8 @@ public class MainActivity extends Activity {
         if(isTestStarted){
             editTextInterval.setEnabled(true);
             editTextTotalIteration.setEnabled(true);
-            if(shimmer != null){
-                shimmer.disconnect();
-            }
+            btManager.disconnectShimmer(macAdd);
+            btManager.removeShimmerDeviceBtConnected(macAdd);
             if(timer != null){
                 timer.cancel();
             }
@@ -111,7 +114,7 @@ public class MainActivity extends Activity {
                 case ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE:
                     if (((CallbackObject)msg.obj).mIndicator==ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
 
-                            editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
+                            editTextFirmware.setText(btManager.getShimmer(macAdd).getFirmwareVersionParsed());
                             successCount += 1;
                             runOnUiThread(new Runnable() {
                                 public void run() {
@@ -119,7 +122,7 @@ public class MainActivity extends Activity {
                                 }
                             });
                             Log.i(LOG_TAG, "Success Count: " + successCount);
-                            shimmer.disconnect();
+                            btManager.disconnectShimmer(macAdd);
                             timer = new Timer();
                             timer.schedule(new ConnectTask(),Integer.parseInt(editTextInterval.getText().toString()) * 1000);
 
@@ -165,12 +168,11 @@ public class MainActivity extends Activity {
                         case CONNECTED:
                             wasConnecting = false;
                             editTextShimmerStatus.setText("CONNECTED");
-                            editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
-
-
+                            if (btManager.getShimmer(macAdd)!=null) {
+                                editTextFirmware.setText(btManager.getShimmer(macAdd).getFirmwareVersionParsed());
+                            }
                             break;
                         case CONNECTING:
-                            wasConnecting = true;
                             editTextShimmerStatus.setText("CONNECTING");
                             break;
                         case STREAMING:
@@ -195,8 +197,9 @@ public class MainActivity extends Activity {
                                     totalRetries++;
                                     Log.i(LOG_TAG, "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
-                                    shimmer = new Shimmer(mHandler);
-                                    shimmer.connect(macAdd, "default");
+                                    btManager.removeShimmerDeviceBtConnected(macAdd);
+                                    btManager.connectShimmerThroughBTAddress(macAdd);
+                                    wasConnecting = true;
                                 } else {
                                     failureCount += 1;
                                     Log.i(LOG_TAG, "Failure Count: " + failureCount);
@@ -229,7 +232,11 @@ public class MainActivity extends Activity {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer = new Shimmer(mHandler);
+                try {
+                    btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 totalIteration = Integer.parseInt(editTextTotalIteration.getText().toString());
                 currentIteration = 0;
@@ -256,8 +263,12 @@ public class MainActivity extends Activity {
             Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
             retryCount = 0;
 
-            if(shimmer != null){
-                shimmer.disconnect();
+            if(btManager.getShimmer(macAdd) != null){
+                try {
+                    btManager.getShimmer(macAdd).disconnect();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
             }
 
             if(currentIteration == totalIteration){
@@ -280,8 +291,9 @@ public class MainActivity extends Activity {
             });
 
             //isCurrentIterationSuccess = false;
-            shimmer = new Shimmer(mHandler);
-            shimmer.connect(macAdd, "default");
+            btManager.removeShimmerDeviceBtConnected(macAdd);
+            btManager.connectShimmerThroughBTAddress(macAdd);
+            wasConnecting = true;
         }
     }
 
