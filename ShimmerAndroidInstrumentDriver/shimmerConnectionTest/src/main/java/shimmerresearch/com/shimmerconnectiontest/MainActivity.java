@@ -2,6 +2,7 @@ package shimmerresearch.com.shimmerconnectiontest;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,6 +44,11 @@ public class MainActivity extends Activity {
     private EditText editTextTotalIteration;
     private EditText editTextTestProgress;
     private EditText editTextFirmware;
+    private EditText editTextAndroidDeviceModel;
+    private EditText editTextShimmerDeviceName;
+    private EditText editTextRetryCountLimit;
+    private EditText editTextRetryCount;
+    private EditText editTextTotalRetries;
 
     private int interval = 0;
     private int successCount = 0;
@@ -72,7 +78,14 @@ public class MainActivity extends Activity {
         editTextTotalIteration = (EditText) findViewById(R.id.testIterations);
         editTextTestProgress = (EditText) findViewById(R.id.testProgress);
         editTextFirmware = (EditText) findViewById(R.id.firmware);
+        editTextAndroidDeviceModel = (EditText) findViewById(R.id.androidDeviceModel);
+        editTextShimmerDeviceName = (EditText) findViewById(R.id.shimmerDeviceName);
+        editTextRetryCountLimit = (EditText) findViewById(R.id.retryCountLimit);
+        editTextRetryCount = (EditText) findViewById(R.id.retryCount);
+        editTextTotalRetries = (EditText) findViewById(R.id.totalRetries);
 
+        editTextAndroidDeviceModel.setText(Build.MANUFACTURER + " " + Build.PRODUCT);
+        editTextRetryCountLimit.setText("3");
         editTextTotalIteration.setText("30");
         editTextInterval.setText("15");
     }
@@ -80,6 +93,9 @@ public class MainActivity extends Activity {
     public void startTest(View v){
         if(!isTestStarted){
             totalRetries = 0;
+            if(shimmer != null){
+                shimmer.disconnect();
+            }
             Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
             startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
         }
@@ -89,9 +105,7 @@ public class MainActivity extends Activity {
         if(isTestStarted){
             editTextInterval.setEnabled(true);
             editTextTotalIteration.setEnabled(true);
-            if(shimmer != null){
-                shimmer.disconnect();
-            }
+            editTextRetryCountLimit.setEnabled(true);
             if(timer != null){
                 timer.cancel();
             }
@@ -154,6 +168,7 @@ public class MainActivity extends Activity {
                             wasConnecting = false;
                             editTextShimmerStatus.setText("CONNECTED");
                             editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
+                            editTextShimmerDeviceName.setText(((ObjectCluster) msg.obj).getShimmerName());
 //                            if(!isCurrentIterationSuccess){
 //                                isCurrentIterationSuccess = true;
 //                                editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
@@ -185,6 +200,8 @@ public class MainActivity extends Activity {
                                 if (retryCount<retryCountLimit) {
                                     retryCount++;
                                     totalRetries++;
+                                    editTextRetryCount.setText(Integer.toString(retryCount));
+                                    editTextTotalRetries.setText(Integer.toString(totalRetries));
                                     Log.i(LOG_TAG, "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
                                     shimmer.connect(macAdd, "default");
@@ -213,13 +230,17 @@ public class MainActivity extends Activity {
                 shimmer = new Shimmer(mHandler);
 
                 totalIteration = Integer.parseInt(editTextTotalIteration.getText().toString());
+                retryCountLimit = Integer.parseInt(editTextRetryCountLimit.getText().toString());
                 currentIteration = 0;
                 successCount = 0;
                 failureCount = 0;
                 editTextFailureCount.setText(String.valueOf(failureCount));
                 editTextSuccessCount.setText(String.valueOf(successCount));
+                editTextTotalRetries.setText(String.valueOf(totalRetries));
+                editTextTestProgress.setText("0 of" + String.valueOf(totalIteration));
                 editTextInterval.setEnabled(false);
                 editTextTotalIteration.setEnabled(false);
+                editTextRetryCountLimit.setEnabled(false);
                 isCurrentIterationSuccess = true;
                 isTestStarted = true;
 
@@ -229,6 +250,11 @@ public class MainActivity extends Activity {
                     public void run() {
                         Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
                         retryCount = 0;
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                editTextRetryCount.setText(String.valueOf(retryCount));
+                            }
+                        });
                         if(currentIteration > 0){
 
                                 if(shimmer.isInitialised() && shimmer.getBluetoothRadioState() == ShimmerBluetooth.BT_STATE.CONNECTED) {
@@ -271,6 +297,7 @@ public class MainActivity extends Activity {
                                 public void run() {
                                     editTextInterval.setEnabled(true);
                                     editTextTotalIteration.setEnabled(true);
+                                    editTextRetryCountLimit.setEnabled(true);
                                 }
                             });
                             timer.cancel();
