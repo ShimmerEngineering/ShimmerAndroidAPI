@@ -6,10 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -19,13 +17,9 @@ import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
-import com.shimmerresearch.driver.ShimmerDevice;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -53,19 +47,19 @@ public class MainActivity extends Activity {
     private int interval = 0;
     private int successCount = 0;
     private int failureCount = 0;
-    private int totalIteration = 0;
+    private int totalIterationLimit = 10;
     private int currentIteration = 0;
     private int retryCount = 0;
     private int retryCountLimit = 5;
+    private int durationBetweenTest = 1;
     private int totalRetries = 0;
-    private boolean wasConnecting = false;
-
 
     private Shimmer shimmer;
     private String macAdd;
     private boolean isCurrentIterationSuccess;
     private boolean isTestStarted = false;
     private Timer timer;
+    HashMap<Integer,Integer> ResultMap = new HashMap<>(); //-1,0,1 , unknown, fail, pass
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +80,8 @@ public class MainActivity extends Activity {
 
         editTextAndroidDeviceModel.setText(Build.MANUFACTURER + " " + Build.PRODUCT);
         editTextRetryCountLimit.setText(Integer.toString(retryCountLimit));
-        editTextTotalIteration.setText("5");
-        editTextInterval.setText("1");
+        editTextTotalIteration.setText(Integer.toString(totalIterationLimit));
+        editTextInterval.setText(Integer.toString(durationBetweenTest));
     }
 
     public void startTest(View v){
@@ -127,6 +121,7 @@ public class MainActivity extends Activity {
 
                             editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
                             successCount += 1;
+                            ResultMap.put(currentIteration,1);
                             runOnUiThread(new Runnable() {
                                 public void run() {
                                     editTextSuccessCount.setText(String.valueOf(successCount));
@@ -178,15 +173,13 @@ public class MainActivity extends Activity {
 
                     switch (state) {
                         case CONNECTED:
-                            wasConnecting = false;
                             editTextShimmerStatus.setText("CONNECTED");
                             editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
 
                             editTextShimmerDeviceName.setText(((ObjectCluster) msg.obj).getShimmerName());
-
+                            ResultMap.put(currentIteration,1);
                             break;
                         case CONNECTING:
-                            wasConnecting = true;
                             editTextShimmerStatus.setText("CONNECTING");
                             break;
                         case STREAMING:
@@ -200,13 +193,13 @@ public class MainActivity extends Activity {
                             break;
                         case DISCONNECTED:
                             editTextShimmerStatus.setText("DISCONNECTED");
-                            if (wasConnecting){
+                            if (ResultMap.get(currentIteration)==-1){
+                                Log.i(LOG_TAG, "Disconnected State " + "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                 if (retryCount<retryCountLimit) {
                                     retryCount++;
                                     totalRetries++;
                                     editTextRetryCount.setText(Integer.toString(retryCount));
                                     editTextTotalRetries.setText(Integer.toString(totalRetries));
-                                    Log.i(LOG_TAG, "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
                                     try {
                                         Thread.sleep(500);
@@ -215,18 +208,25 @@ public class MainActivity extends Activity {
                                     }
                                     shimmer = null;
                                     shimmer = new Shimmer(mHandler);
+                                    Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     shimmer.connect(macAdd, "default");
                                 } else {
-                                    retryCount = 0;
-                                    failureCount += 1;
-                                    Log.i(LOG_TAG, "Failure Count: " + failureCount);
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            editTextFailureCount.setText(String.valueOf(failureCount));
-                                        }
-                                    });
-                                    timer.cancel();
-                                    if (isTestStarted) {
+
+                                    if (ResultMap.get(currentIteration)==-1) {
+                                        ResultMap.put(currentIteration, 0);
+
+                                        timer.cancel();
+                                        failureCount += 1;
+                                        runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                editTextFailureCount.setText(String.valueOf(failureCount));
+                                                }
+                                        });
+                                    }
+                                    if (isTestStarted && currentIteration< totalIterationLimit) {
+
+                                        Log.i(LOG_TAG, "Failure Count: " + failureCount);
+
                                         timer = new Timer();
                                         timer.schedule(new ConnectTask(), Integer.parseInt(editTextInterval.getText().toString()) * 1000);
                                     }
@@ -254,7 +254,7 @@ public class MainActivity extends Activity {
                 macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 shimmer = new Shimmer(mHandler);
 
-                totalIteration = Integer.parseInt(editTextTotalIteration.getText().toString());
+                totalIterationLimit = Integer.parseInt(editTextTotalIteration.getText().toString());
                 retryCountLimit = Integer.parseInt(editTextRetryCountLimit.getText().toString());
                 currentIteration = 0;
                 successCount = 0;
@@ -262,7 +262,7 @@ public class MainActivity extends Activity {
                 editTextFailureCount.setText(String.valueOf(failureCount));
                 editTextSuccessCount.setText(String.valueOf(successCount));
                 editTextTotalRetries.setText(String.valueOf(totalRetries));
-                editTextTestProgress.setText("0 of" + String.valueOf(totalIteration));
+                editTextTestProgress.setText("0 of" + String.valueOf(totalIterationLimit));
                 editTextInterval.setEnabled(false);
                 editTextTotalIteration.setEnabled(false);
                 editTextRetryCountLimit.setEnabled(false);
@@ -282,11 +282,8 @@ public class MainActivity extends Activity {
                 Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
                 retryCount = 0;
                 editTextRetryCount.setText(Integer.toString(retryCount));
-                if (shimmer != null) {
-                    shimmer.disconnect();
-                }
 
-                if (currentIteration == totalIteration) {
+                if (currentIteration >= totalIterationLimit) {
                     runOnUiThread(new Runnable() {
                         public void run() {
                             editTextInterval.setEnabled(true);
@@ -297,17 +294,20 @@ public class MainActivity extends Activity {
                     isTestStarted = false;
                     return;
                 } else {
+                    currentIteration += 1;
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
-                            currentIteration += 1;
+                            editTextTestProgress.setText(String.valueOf(currentIteration) + " of " + String.valueOf(totalIterationLimit));
+
                         }
                     });
+                    //isCurrentIterationSuccess = false;
+                    ResultMap.put(currentIteration,-1);
+                    shimmer = null;
+                    shimmer = new Shimmer(mHandler);
+                    shimmer.connect(macAdd, "default");
                 }
-                //isCurrentIterationSuccess = false;
-                shimmer = null;
-                shimmer = new Shimmer(mHandler);
-                shimmer.connect(macAdd, "default");
+
             }
         }
     }
