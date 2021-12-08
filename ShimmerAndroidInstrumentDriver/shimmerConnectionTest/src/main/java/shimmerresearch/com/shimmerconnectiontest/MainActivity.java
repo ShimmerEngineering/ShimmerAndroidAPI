@@ -2,6 +2,7 @@ package shimmerresearch.com.shimmerconnectiontest;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -47,6 +48,11 @@ public class MainActivity extends Activity {
     private EditText editTextTotalIteration;
     private EditText editTextTestProgress;
     private EditText editTextFirmware;
+    private EditText editTextAndroidDeviceModel;
+    private EditText editTextShimmerDeviceName;
+    private EditText editTextRetryCountLimit;
+    private EditText editTextRetryCount;
+    private EditText editTextTotalRetries;
 
     private int interval = 0;
     private int successCount = 0;
@@ -54,7 +60,7 @@ public class MainActivity extends Activity {
     private int totalIteration = 0;
     private int currentIteration = 0;
     private int retryCount = 0;
-    private int retryCountLimit = 3;
+    private int retryCountLimit = 5;
     private int totalRetries = 0;
     private boolean wasConnecting = false;
 
@@ -76,14 +82,24 @@ public class MainActivity extends Activity {
         editTextTotalIteration = (EditText) findViewById(R.id.testIterations);
         editTextTestProgress = (EditText) findViewById(R.id.testProgress);
         editTextFirmware = (EditText) findViewById(R.id.firmware);
+        editTextAndroidDeviceModel = (EditText) findViewById(R.id.androidDeviceModel);
+        editTextShimmerDeviceName = (EditText) findViewById(R.id.shimmerDeviceName);
+        editTextRetryCountLimit = (EditText) findViewById(R.id.retryCountLimit);
+        editTextRetryCount = (EditText) findViewById(R.id.retryCount);
+        editTextTotalRetries = (EditText) findViewById(R.id.totalRetries);
 
-        editTextTotalIteration.setText("30");
-        editTextInterval.setText("5");
+        editTextAndroidDeviceModel.setText(Build.MANUFACTURER + " " + Build.PRODUCT);
+        editTextRetryCountLimit.setText(Integer.toString(retryCountLimit));
+        editTextTotalIteration.setText("5");
+        editTextInterval.setText("1");
     }
 
     public void startTest(View v){
         if(!isTestStarted){
             totalRetries = 0;
+            if (btManager.getShimmer(macAdd)!=null) {
+                btManager.disconnectShimmer(macAdd);
+            }
             Intent intent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
             startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
         }
@@ -95,6 +111,8 @@ public class MainActivity extends Activity {
             editTextTotalIteration.setEnabled(true);
             btManager.disconnectShimmer(macAdd);
             btManager.removeShimmerDeviceBtConnected(macAdd);
+            editTextRetryCountLimit.setEnabled(true);
+
             if(timer != null){
                 timer.cancel();
             }
@@ -123,9 +141,10 @@ public class MainActivity extends Activity {
                             });
                             Log.i(LOG_TAG, "Success Count: " + successCount);
                             btManager.disconnectShimmer(macAdd);
+                        if (isTestStarted) {
                             timer = new Timer();
-                            timer.schedule(new ConnectTask(),Integer.parseInt(editTextInterval.getText().toString()) * 1000);
-
+                            timer.schedule(new ConnectTask(), Integer.parseInt(editTextInterval.getText().toString()) * 1000);
+                        }
                     }
                     break;
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
@@ -171,6 +190,7 @@ public class MainActivity extends Activity {
                             if (btManager.getShimmer(macAdd)!=null) {
                                 editTextFirmware.setText(btManager.getShimmer(macAdd).getFirmwareVersionParsed());
                             }
+                            editTextShimmerDeviceName.setText(((ObjectCluster) msg.obj).getShimmerName());
                             break;
                         case CONNECTING:
                             editTextShimmerStatus.setText("CONNECTING");
@@ -187,20 +207,23 @@ public class MainActivity extends Activity {
                         case DISCONNECTED:
                             editTextShimmerStatus.setText("DISCONNECTED");
                             if (wasConnecting){
-                                try {
-                                    Thread.sleep(200);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
                                 if (retryCount<retryCountLimit) {
                                     retryCount++;
                                     totalRetries++;
+                                    editTextRetryCount.setText(Integer.toString(retryCount));
+                                    editTextTotalRetries.setText(Integer.toString(totalRetries));
                                     Log.i(LOG_TAG, "Retry Count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     //Toast.makeText(getApplicationContext(), "Retry Count " + Integer.toString(retryCount), Toast.LENGTH_SHORT).show();
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                     btManager.removeShimmerDeviceBtConnected(macAdd);
                                     btManager.connectShimmerThroughBTAddress(macAdd);
                                     wasConnecting = true;
                                 } else {
+                                    retryCount = 0;
                                     failureCount += 1;
                                     Log.i(LOG_TAG, "Failure Count: " + failureCount);
                                     runOnUiThread(new Runnable() {
@@ -208,8 +231,11 @@ public class MainActivity extends Activity {
                                             editTextFailureCount.setText(String.valueOf(failureCount));
                                         }
                                     });
-                                    timer = new Timer();
-                                    timer.schedule(new ConnectTask(),Integer.parseInt(editTextInterval.getText().toString()) * 1000);
+                                    timer.cancel();
+                                    if (isTestStarted) {
+                                        timer = new Timer();
+                                        timer.schedule(new ConnectTask(), Integer.parseInt(editTextInterval.getText().toString()) * 1000);
+                                    }
                                 }
                             }
                             break;
@@ -239,13 +265,17 @@ public class MainActivity extends Activity {
                 }
 
                 totalIteration = Integer.parseInt(editTextTotalIteration.getText().toString());
+                retryCountLimit = Integer.parseInt(editTextRetryCountLimit.getText().toString());
                 currentIteration = 0;
                 successCount = 0;
                 failureCount = 0;
                 editTextFailureCount.setText(String.valueOf(failureCount));
                 editTextSuccessCount.setText(String.valueOf(successCount));
+                editTextTotalRetries.setText(String.valueOf(totalRetries));
+                editTextTestProgress.setText("0 of" + String.valueOf(totalIteration));
                 editTextInterval.setEnabled(false);
                 editTextTotalIteration.setEnabled(false);
+                editTextRetryCountLimit.setEnabled(false);
                 isCurrentIterationSuccess = true;
                 isTestStarted = true;
 
@@ -256,44 +286,56 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
     public class ConnectTask extends  TimerTask{
-
         @Override
         public void run() {
-
             Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
-            retryCount = 0;
+            if (isTestStarted) {
+                Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
+                retryCount = 0;
+                editTextRetryCount.setText(Integer.toString(retryCount));
 
-            if(btManager.getShimmer(macAdd) != null){
-                try {
-                    btManager.getShimmer(macAdd).disconnect();
-                } catch (ShimmerException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if(currentIteration == totalIteration){
-                runOnUiThread(new  Runnable() {
-                    public void run() {
-                        editTextInterval.setEnabled(true);
-                        editTextTotalIteration.setEnabled(true);
+                if (btManager.getShimmer(macAdd) != null) {
+                    try {
+                        btManager.getShimmer(macAdd).disconnect();
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
                     }
-                });
-                timer.cancel();
-                isTestStarted = false;
-                return;
-            }
-
-            runOnUiThread(new  Runnable() {
-                public void run() {
-                    editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
-                    currentIteration += 1;
                 }
-            });
 
-            //isCurrentIterationSuccess = false;
-            btManager.removeShimmerDeviceBtConnected(macAdd);
-            btManager.connectShimmerThroughBTAddress(macAdd);
-            wasConnecting = true;
+                if (currentIteration == totalIteration) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            editTextInterval.setEnabled(true);
+                            editTextTotalIteration.setEnabled(true);
+                        }
+                    });
+                    timer.cancel();
+                    isTestStarted = false;
+                    return;
+                }
+                if (currentIteration == totalIteration) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            editTextInterval.setEnabled(true);
+                            editTextTotalIteration.setEnabled(true);
+                        }
+                    });
+                    timer.cancel();
+                    isTestStarted = false;
+                    return;
+                } else {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            editTextTestProgress.setText(String.valueOf(currentIteration + 1) + " of " + String.valueOf(totalIteration));
+                            currentIteration += 1;
+                        }
+                    });
+                }
+                //isCurrentIterationSuccess = false;
+                btManager.removeShimmerDeviceBtConnected(macAdd);
+                btManager.connectShimmerThroughBTAddress(macAdd);
+                wasConnecting = true;
+            }
         }
     }
 
