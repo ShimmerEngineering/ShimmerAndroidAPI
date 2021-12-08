@@ -238,8 +238,7 @@ public class MainActivity extends Activity {
 
                                 } else {
                                     wasConnecting = false;
-                                    retryCount = 0;
-                                    failureCount += 1;
+
                                     Log.i(LOG_TAG, "Failure Count: " + failureCount);
                                     runOnUiThread(new Runnable() {
                                         public void run() {
@@ -249,7 +248,8 @@ public class MainActivity extends Activity {
                                     timer.cancel();
                                     if (isTestStarted) {
                                         timer = new Timer();
-                                        if (currentIteration == totalIteration) {
+                                        if (currentIteration < totalIteration) {
+                                            failureCount += 1;
                                             timer.schedule(new ConnectTask(), Integer.parseInt(editTextInterval.getText().toString()) * 1000);
                                         }
                                     }
