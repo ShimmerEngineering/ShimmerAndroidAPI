@@ -19,6 +19,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,14 +50,13 @@ public class MainActivity extends Activity {
     private int interval = 0;
     private int successCount = 0;
     private int failureCount = 0;
-    private int totalIterationLimit = 10;
+    private int totalIterationLimit = 1;
     private int currentIteration = 0;
     private int retryCount = 0;
     private int retryCountLimit = 5;
     private int durationBetweenTest = 1;
     private int totalRetries = 0;
 
-    private Shimmer shimmer;
     private String macAdd;
     private boolean isCurrentIterationSuccess;
     private boolean isTestStarted = false;
@@ -128,7 +128,7 @@ public class MainActivity extends Activity {
                 case ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE:
                     if (((CallbackObject)msg.obj).mIndicator==ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
 
-                            editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
+
                             successCount += 1;
                             ResultMap.put(currentIteration,1);
                             runOnUiThread(new Runnable() {
@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
                                 }
                             });
                             Log.i(LOG_TAG, "Success Count: " + successCount);
-                            shimmer.disconnect();
+                            btManager.disconnectShimmer(macAdd);
                         if (isTestStarted) {
                             timer = new Timer();
                             timer.schedule(new ConnectTask(), Integer.parseInt(editTextInterval.getText().toString()) * 1000);
@@ -183,8 +183,6 @@ public class MainActivity extends Activity {
                     switch (state) {
                         case CONNECTED:
                             editTextShimmerStatus.setText("CONNECTED");
-                            editTextFirmware.setText(shimmer.getFirmwareVersionParsed());
-
                             editTextShimmerDeviceName.setText(((ObjectCluster) msg.obj).getShimmerName());
                             ResultMap.put(currentIteration,1);
                             break;
@@ -219,10 +217,23 @@ public class MainActivity extends Activity {
                                     //shimmer = new Shimmer(mHandler);
                                     //shimmer.connect(macAdd, "default");
                                     ShimmerDevice device = btManager.getShimmer(macAdd);
+                                    if (device!=null)
+                                    if (!device.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)){
+                                        try {
+                                            device.disconnect();
+                                        } catch (ShimmerException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                     device = null;
                                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     btManager.removeShimmerDeviceBtConnected(macAdd);
                                     btManager.connectShimmerThroughBTAddress(macAdd);
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                 } else {
 
                                     if (ResultMap.get(currentIteration)==-1) {
@@ -265,8 +276,6 @@ public class MainActivity extends Activity {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer = new Shimmer(mHandler);
-
                 totalIterationLimit = Integer.parseInt(editTextTotalIteration.getText().toString());
                 retryCountLimit = Integer.parseInt(editTextRetryCountLimit.getText().toString());
                 currentIteration = 0;
@@ -320,6 +329,14 @@ public class MainActivity extends Activity {
                     //shimmer = new Shimmer(mHandler);
                     //shimmer.connect(macAdd, "default");
                     ShimmerDevice device = btManager.getShimmer(macAdd);
+                    if (device!=null)
+                    if (!device.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)){
+                        try {
+                            device.disconnect();
+                        } catch (ShimmerException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     device = null;
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
