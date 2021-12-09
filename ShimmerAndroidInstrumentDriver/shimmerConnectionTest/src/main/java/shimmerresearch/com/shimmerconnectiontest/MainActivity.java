@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
     private int interval = 0;
     private int successCount = 0;
     private int failureCount = 0;
-    private int totalIterationLimit = 1;
+    private int totalIterationLimit = 10;
     private int currentIteration = 0;
     private int retryCount = 0;
     private int retryCountLimit = 5;
@@ -228,6 +228,7 @@ public class MainActivity extends Activity {
                                     device = null;
                                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     btManager.removeShimmerDeviceBtConnected(macAdd);
+                                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
                                     btManager.connectShimmerThroughBTAddress(macAdd);
                                     try {
                                         Thread.sleep(500);
@@ -340,6 +341,7 @@ public class MainActivity extends Activity {
                     device = null;
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
+                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
                     btManager.connectShimmerThroughBTAddress(macAdd);
                 }
 
