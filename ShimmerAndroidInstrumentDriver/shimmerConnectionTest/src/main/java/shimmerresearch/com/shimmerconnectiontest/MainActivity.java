@@ -206,8 +206,8 @@ public class MainActivity extends Activity {
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-                                    shimmer = null;
-                                    shimmer = new Shimmer(mHandler);
+                                    //shimmer = null;
+                                    //shimmer = new Shimmer(mHandler);
                                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     shimmer.connect(macAdd, "default");
                                 } else {
@@ -303,8 +303,8 @@ public class MainActivity extends Activity {
                     });
                     //isCurrentIterationSuccess = false;
                     ResultMap.put(currentIteration,-1);
-                    shimmer = null;
-                    shimmer = new Shimmer(mHandler);
+                    //shimmer = null;
+                    //shimmer = new Shimmer(mHandler);
                     shimmer.connect(macAdd, "default");
                 }
 
