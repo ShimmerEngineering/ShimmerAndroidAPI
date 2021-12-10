@@ -304,7 +304,11 @@ public class MainActivity extends Activity {
             if (isTestStarted) {
                 Log.i(LOG_TAG, "Current Iteration: " + currentIteration);
                 retryCount = 0;
-                editTextRetryCount.setText(Integer.toString(retryCount));
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        editTextRetryCount.setText(Integer.toString(retryCount));
+                    }
+                });
 
                 if (currentIteration >= totalIterationLimit) {
                     runOnUiThread(new Runnable() {
