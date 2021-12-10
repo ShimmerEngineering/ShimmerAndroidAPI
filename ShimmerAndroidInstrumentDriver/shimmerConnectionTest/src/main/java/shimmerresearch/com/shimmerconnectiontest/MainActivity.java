@@ -216,16 +216,6 @@ public class MainActivity extends Activity {
                                     //shimmer = null;
                                     //shimmer = new Shimmer(mHandler);
                                     //shimmer.connect(macAdd, "default");
-                                    ShimmerDevice device = btManager.getShimmer(macAdd);
-                                    if (device!=null)
-                                    if (!device.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)){
-                                        try {
-                                            device.disconnect();
-                                        } catch (ShimmerException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    device = null;
                                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     btManager.removeShimmerDeviceBtConnected(macAdd);
                                     btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
@@ -333,16 +323,6 @@ public class MainActivity extends Activity {
                     //shimmer = null;
                     //shimmer = new Shimmer(mHandler);
                     //shimmer.connect(macAdd, "default");
-                    ShimmerDevice device = btManager.getShimmer(macAdd);
-                    if (device!=null)
-                    if (!device.getBluetoothRadioState().equals(ShimmerBluetooth.BT_STATE.DISCONNECTED)){
-                        try {
-                            device.disconnect();
-                        } catch (ShimmerException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    device = null;
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
                     btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
