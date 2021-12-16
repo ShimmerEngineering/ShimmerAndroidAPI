@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
     private int interval = 0;
     private int successCount = 0;
     private int failureCount = 0;
-    private int totalIterationLimit = 10;
+    private int totalIterationLimit = 1;
     private int currentIteration = 0;
     private int retryCount = 0;
     private int retryCountLimit = 5;
@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
                                 }
                             });
                             Log.i(LOG_TAG, "Success Count: " + successCount);
-                            btManager.disconnectShimmer(macAdd);
+                            //btManager.disconnectShimmer(macAdd);
                         if (isTestStarted) {
                             timer = new Timer();
                             timer.schedule(new ConnectTask(), Integer.parseInt(editTextInterval.getText().toString()) * 1000);
@@ -155,12 +155,6 @@ public class MainActivity extends Activity {
                         FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         double timeStampData = timeStampCluster.mData;
                         Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
-                        allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
-                        FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        if (accelXCluster!=null) {
-                            double accelXData = accelXCluster.mData;
-                            Log.i(LOG_TAG, "Accel LN X: " + accelXData);
-                        }
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:
@@ -288,6 +282,35 @@ public class MainActivity extends Activity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    public void startStreaming(View view) {
+        try {
+            //both commented out code below, and all devices were tested
+            //Shimmer shimmer = (Shimmer)btManager.getShimmer(macAdd);
+            //shimmer.startStreaming();
+            btManager.startStreamingAllDevices();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopStreaming(View view) {
+        try {
+            //both commented out code below, and all devices were tested
+            //Shimmer shimmer = (Shimmer)btManager.getShimmer(macAdd);
+            //shimmer.stopStreaming();
+            btManager.stopStreamingAllDevices();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void disconnect(View view) {
+        //both commented out code below, and all devices were tested
+        //btManager.disconnectShimmer(macAdd);
+        btManager.disconnectAllDevices();
+    }
+
     public class ConnectTask extends  TimerTask{
         @Override
         public void run() {

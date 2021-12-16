@@ -257,11 +257,35 @@
         android:id="@+id/button50"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Start Test"
+        android:text="Connect"
         android:onClick="startTest"
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="447dp" />
     <Button
+        android:id="@+id/buttonStartStreaming"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:onClick="startStreaming"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+    <Button
+        android:id="@+id/buttonStopStreaming"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:onClick="stopStreaming"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+    <Button
+        android:id="@+id/buttonDisconnect"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Disconnect"
+        android:onClick="disconnect"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+    <!--<Button
         android:id="@+id/button60"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
@@ -269,6 +293,8 @@
         android:onClick="stopTest"
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="447dp" />
+        -->
+
 
     <TextView
         android:id="@+id/version"
