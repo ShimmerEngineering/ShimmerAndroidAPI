@@ -286,8 +286,7 @@ public class MainActivity extends Activity {
     public void startStreaming(View view) {
         try {
             //both commented out code below, and all devices were tested
-            Shimmer shimmer = (Shimmer)btManager.getShimmer(macAdd);
-            shimmer.startStreaming();
+            btManager.startStreaming(macAdd);
             //btManager.startStreamingAllDevices();
         } catch (Exception e) {
             e.printStackTrace();
@@ -297,8 +296,7 @@ public class MainActivity extends Activity {
     public void stopStreaming(View view) {
         try {
             //both commented out code below, and all devices were tested
-            Shimmer shimmer = (Shimmer)btManager.getShimmer(macAdd);
-            shimmer.stopStreaming();
+            btManager.stopStreaming(macAdd);
             //btManager.stopStreamingAllDevices();
         } catch (Exception e) {
             e.printStackTrace();
