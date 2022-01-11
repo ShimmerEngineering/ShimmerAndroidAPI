@@ -7,3 +7,4 @@ This API Is made up of the following projects
 - [ShimmerBasicExample](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/tree/master/ShimmerAndroidInstrumentDriver/shimmerBasicExample)
 - [ShimmerLegacyExample](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/tree/master/ShimmerAndroidInstrumentDriver/shimmerLegacyExample)
 - [ShimmerServiceExample](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/tree/master/ShimmerAndroidInstrumentDriver/shimmerServiceExample)
+- [ShimmerConnectionTest](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/tree/AA-259_6/ShimmerAndroidInstrumentDriver/shimmerConnectionTest)
