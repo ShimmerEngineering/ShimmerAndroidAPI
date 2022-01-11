@@ -1,3 +1,22 @@
+# Known Issues
+While this does have a dependency on the environment you are in (e.g. whether there is significant radio noise in the Bluetooth spectrum) in general we've found that the rate of connecting to a Shimmer3 device on the first try varies across Android devices. The following gives an example of the results we've seen, where percentage of success is the number of times the Android Phone Model is able to connect successfully to a Shimmer device the first time of trying:-
+
+| Android Phone Model  | Percentage of Success |
+| ------------- | ------------- |
+| Nokia 2.3  | 96%  |
+| Pocophone F1  | 60%  |
+| Redmi Note4 | 97%  |
+| Redmi 9AT  | 99%  |
+| Samsung j3 | 97%  |
+| Samsung Galaxy A5 | 99% |
+| Samsung Galaxy A10 | 99% |
+| Xiaomi Redmi 9A | 99% |
+| Pixel 3A | 77% |
+| OnePlus 5 | 60% |
+
+From a users perspective to improve the success rate of connecting the first time seamlessly, we recommend using logic in the background which will automatically try to connect to the Shimmer device should the first time fail. An example implementation of this logic can be found in the project/app shimmerConnectionTest. Please refer to the readme of said project for further details.
+
+
 # Important ~ Migration to JFrog
 With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
 
