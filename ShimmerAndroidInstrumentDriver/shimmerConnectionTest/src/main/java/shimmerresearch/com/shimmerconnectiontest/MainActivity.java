@@ -286,9 +286,8 @@ public class MainActivity extends Activity {
     public void startStreaming(View view) {
         try {
             //both commented out code below, and all devices were tested
-            //Shimmer shimmer = (Shimmer)btManager.getShimmer(macAdd);
-            //shimmer.startStreaming();
-            btManager.startStreamingAllDevices();
+            btManager.startStreaming(macAdd);
+            //btManager.startStreamingAllDevices();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -297,9 +296,8 @@ public class MainActivity extends Activity {
     public void stopStreaming(View view) {
         try {
             //both commented out code below, and all devices were tested
-            //Shimmer shimmer = (Shimmer)btManager.getShimmer(macAdd);
-            //shimmer.stopStreaming();
-            btManager.stopStreamingAllDevices();
+            btManager.stopStreaming(macAdd);
+            //btManager.stopStreamingAllDevices();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -347,8 +345,10 @@ public class MainActivity extends Activity {
                     //shimmer = new Shimmer(mHandler);
                     //shimmer.connect(macAdd, "default");
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
+                    Shimmer shimmer = new Shimmer(mHandler);
+                    shimmer.setMacIdFromUart(macAdd);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
-                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
+                    btManager.putShimmerGlobalMap(macAdd, shimmer);
                     btManager.connectShimmerThroughBTAddress(macAdd);
                 }
 
