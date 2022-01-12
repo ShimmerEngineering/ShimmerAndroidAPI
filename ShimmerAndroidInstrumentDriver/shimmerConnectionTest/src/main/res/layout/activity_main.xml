@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.widget.LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="shimmerresearch.com.shimmerconnectiontest.MainActivity"
+    android:orientation="vertical"
+    android:gravity="center">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/shimmerDeviceNameLabel"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="Device Name"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/androidDeviceModelLabel"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Phone Model"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/shimmerDeviceName"
+            android:layout_width="130dp"
+            android:layout_height="40dp"
+            android:inputType="none"
+            android:enabled="false"
+            android:textAlignment="center"
+            android:textSize="12dp" />
+        <EditText
+            android:id="@+id/androidDeviceModel"
+            android:layout_width="170dp"
+            android:layout_height="40dp"
+            android:inputType="none"
+            android:enabled="false"
+            android:textAlignment="center"
+            android:textSize="12dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/testIterationsLabel"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:text="Test Iterations"
+            android:textAlignment="center"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/intervalLabel"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="BT Connection Attempt Interval(s)"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/retryCountLimitLabel"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Retry Count Limit"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/testIterations"
+            android:layout_width="90dp"
+            android:layout_height="40dp"
+            android:inputType="text"
+            android:textAlignment="center"
+            android:textSize="14dp" />
+        <EditText
+            android:id="@+id/interval"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:inputType="text"
+            android:textAlignment="center"
+            android:textSize="14dp" />
+        <EditText
+            android:id="@+id/retryCountLimit"
+            android:layout_width="90dp"
+            android:layout_height="40dp"
+            android:inputType="text"
+            android:textAlignment="center"
+            android:textSize="14dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/statusLabel"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:text="Shimmer Status"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/retryCountLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Retry Count"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/firmwareLabel"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Firmware"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/shimmerStatus"
+            android:layout_width="110dp"
+            android:layout_height="40dp"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:textSize="11dp" />
+        <EditText
+            android:id="@+id/retryCount"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:textSize="14dp" />
+        <EditText
+            android:id="@+id/firmware"
+            android:layout_width="110dp"
+            android:layout_height="40dp"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:textSize="10dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/testProgressLabel"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Test Progress"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/successLabel"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="Success"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/failLabel"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="Fail"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/totalRetriesLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Total Retries"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/testProgress"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:text=""
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/success"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:textSize="16dp" />
+        <EditText
+            android:id="@+id/fail"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:textSize="16dp" />
+        <EditText
+            android:id="@+id/totalRetries"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:enabled="false"
+            android:textSize="16dp" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/button50"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Start Test"
+        android:onClick="startTest"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+    <Button
+        android:id="@+id/button60"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Stop Test"
+        android:onClick="stopTest"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dp"
+        android:text="Shimmer3 BT Connection Test v0.00.005"
+        android:textAlignment="center"
+        android:textSize="10dp" />
+</android.widget.LinearLayout>
