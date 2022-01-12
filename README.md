@@ -1,13 +1,63 @@
+# Important ~ Migration to JFrog
+With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
+
+# JFrog Gradle Settings
+The gradle file for the example ShimmerBasicExample has been updated accordingly to the following:-
+
+repositories:-
+
+```
+maven {
+ url 'https://shimmersensing.jfrog.io/artifactory/ShimmerAPI'
+}
+```
+dependencies:-
+```
+compile(group: 'com.shimmersensing', name: 'ShimmerAndroidInstrumentDriver', version: '3.0.71Beta', ext: 'aar')
+implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    // excluding org.json which is provided by Android
+    exclude group: 'io.netty'
+    exclude group: 'com.google.protobuf'
+    exclude group: 'org.apache.commons.math'
+}
+implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    // excluding org.json which is provided by Android
+    exclude group: 'io.netty'
+    exclude group: 'com.google.protobuf'
+    exclude group: 'org.apache.commons.math'
+}
+```
+
+For further info
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerBluetoothManager
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerDriver
+https://shimmersensing.jfrog.io/ui/repos/tree/General/ShimmerAPI%2Fcom%2Fshimmersensing%2FShimmerAndroidInstrumentDriver
+
+# Bintray Sunset
+The following ways of getting the library is **deprecated**
+repositories:-
+
+```
+ maven {
+        url  "http://dl.bintray.com/shimmerengineering/Shimmer"
+    }
+```
+dependencies:-
+```
+compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Beta_AA-245_AA-246'
+```
+
+
 # ShimmerAndroidAPI 3.0Beta
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is 3.0.64Beta.
+The latest version is 3.0.65Beta.
 
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
 An example of how to use this arrays data structure can be found in Efficient Data Array Example.
-
+We recommend first time users go through the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). 
 
 # Frequently Asked Questions
 
@@ -115,6 +165,10 @@ android {
 
 
 # Changelog 
+28 February 2020 (3.0.65Beta)
+- Fixed bug with Bluetooth Manager Example & Service Example where upon Bluetooth connection, SD logging devices would not show up as connected
+- Added getNumShimmersConnected to ConnectedShimmersListFragment 
+
 9 July 2018 (3.0.64Beta)
 - Addition of FilesListActivity to display list of files for a folder. Files can be selected to be opened in an external application. An example of how to use the FilesListActivity can be found in Efficient Data Arrays Example.
 - Added option to log to CSV file in Logging & ShimmerService

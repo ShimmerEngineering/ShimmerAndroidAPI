@@ -157,4 +157,12 @@ public class ConnectedShimmersListFragment extends ListFragment {
         }
     }
 
+    public int getNumShimmersConnected() {
+        if(shimmerDeviceList != null) {
+            return shimmerDeviceList.size();
+        } else {
+            return 0;
+        }
+    }
+
 }

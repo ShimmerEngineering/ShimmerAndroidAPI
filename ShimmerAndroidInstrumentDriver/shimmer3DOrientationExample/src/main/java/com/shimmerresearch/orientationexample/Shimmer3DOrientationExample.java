@@ -82,9 +82,9 @@ public class Shimmer3DOrientationExample extends Activity {
 		fm3d = new Matrix3d();
 		m3d = new Matrix3d();
 		invm3d.setIdentity();
-		mShimmerDevice1 = new Shimmer(this, mHandler,"RightArm", 51.2, 0, 0, Shimmer.SENSOR_ACCEL|Shimmer.SENSOR_GYRO|Shimmer.SENSOR_MAG, false); 
-		//mShimmerDevice1.enableOnTheFlyGyroCal(true, 102, 1.2);
-		mShimmerDevice1.enable3DOrientation(true);
+		Integer[] arraySensorID ={Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL,Configuration.Shimmer3.SENSOR_ID.SHIMMER_MPU9X50_GYRO,Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM303_MAG};
+		// TODO Auto-generated method stub
+		mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0);
 		buttonReset.setOnClickListener(new OnClickListener(){
 
 			public void onClick(View arg0) {

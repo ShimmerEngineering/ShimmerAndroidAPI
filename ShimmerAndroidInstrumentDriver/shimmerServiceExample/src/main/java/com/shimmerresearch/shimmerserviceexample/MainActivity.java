@@ -178,8 +178,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
 
             //if there is a device connected display it on the fragment
-            List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
-            connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
+            connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
 
         }
 
@@ -287,8 +286,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 }
                 switch (state) {
                     case CONNECTED:
-                        List<ShimmerDevice> deviceList = mService.getListOfConnectedDevices();
-                        connectedShimmersListFragment.buildShimmersConnectedListView(deviceList, getApplicationContext());
+                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
                         break;
                     case CONNECTING:
                         break;
@@ -305,9 +303,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         }
                         break;
                     case SDLOGGING:
+                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
+                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext()); //to be safe lets rebuild this
                         break;
                 }
 
