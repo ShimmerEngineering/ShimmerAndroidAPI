@@ -324,8 +324,10 @@ public class MainActivity extends Activity {
                     //shimmer = new Shimmer(mHandler);
                     //shimmer.connect(macAdd, "default");
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
+                    Shimmer shimmer = new Shimmer(mHandler);
+                    shimmer.setMacIdFromUart(macAdd);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
-                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
+                    btManager.putShimmerGlobalMap(macAdd, shimmer);
                     btManager.connectShimmerThroughBTAddress(macAdd);
                 }
 
