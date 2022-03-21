@@ -96,7 +96,6 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     /**
      * @param bluetoothAddress
      * @param context if the context is set, a progress dialog will show, otherwise a toast msg will show
-     * @exception DeviceNotPairedException if device is not paired and AllowAutoPairing is disabled
      */
     public void connectShimmerThroughBTAddress(final String bluetoothAddress,Context context) {
 
