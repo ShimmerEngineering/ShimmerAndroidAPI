@@ -122,7 +122,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                         String action = intent.getAction();
                         if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)){
                             if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                                mProgressDialog.dismiss();
+                                if(mProgressDialog != null){
+                                    mProgressDialog.dismiss();
+                                }
                                 addDiscoveredDevice(bluetoothAddress);
                                 ShimmerBluetoothManagerAndroid.super.connectShimmerThroughBTAddress(bluetoothAddress);
                                 ShimmerBluetoothManagerAndroid.super.setConnectionExceptionListener(new ConnectionExceptionListener() {
@@ -154,7 +156,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                             }
                             else if (device.getBondState() == BluetoothDevice.BOND_NONE){
                                 if (context!=null) {
-                                    mProgressDialog.dismiss();
+                                    if(mProgressDialog != null){
+                                        mProgressDialog.dismiss();
+                                    }
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setMessage("Failed to pair device " + bluetoothAddress + " , please try again...")
                                             .setTitle("Pairing Failed");
