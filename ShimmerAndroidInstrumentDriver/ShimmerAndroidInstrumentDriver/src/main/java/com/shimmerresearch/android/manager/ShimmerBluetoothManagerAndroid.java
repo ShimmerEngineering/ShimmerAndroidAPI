@@ -2,6 +2,7 @@ package com.shimmerresearch.android.manager;
 
 
 import android.app.ProgressDialog;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -57,6 +58,7 @@ import static android.R.id.list;
 
 public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     ProgressDialog mProgressDialog;
+    AlertDialog mAlertDialog;
     private static final String TAG = ShimmerBluetoothManagerAndroid.class.getSimpleName();
     private static final String DEFAULT_SHIMMER_NAME = "ShimmerDevice";
 
@@ -121,6 +123,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                         String action = intent.getAction();
                         if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)){
                             if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+                                mProgressDialog.dismiss();
                                 addDiscoveredDevice(bluetoothAddress);
                                 ShimmerBluetoothManagerAndroid.super.connectShimmerThroughBTAddress(bluetoothAddress);
                                 ShimmerBluetoothManagerAndroid.super.setConnectionExceptionListener(new ConnectionExceptionListener() {
@@ -151,7 +154,18 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                                 });
                             }
                             else if (device.getBondState() == BluetoothDevice.BOND_NONE){
-                                Toast.makeText(mContext, "Failed to pair device, please try again...", Toast.LENGTH_LONG).show();
+                                if (context!=null) {
+                                    mProgressDialog.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                    builder.setMessage("Failed to pair device " + bluetoothAddress + " , please try again...")
+                                            .setTitle("Pairing Failed");
+                                    if(mAlertDialog == null){
+                                        mAlertDialog = builder.create();
+                                    }
+                                    mAlertDialog.show();
+                                } else {
+                                    Toast.makeText(mContext, "Failed to pair device, please try again...", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     }
