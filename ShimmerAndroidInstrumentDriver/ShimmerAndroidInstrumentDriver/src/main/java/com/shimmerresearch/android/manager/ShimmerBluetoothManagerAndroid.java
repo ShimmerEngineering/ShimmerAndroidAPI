@@ -5,6 +5,9 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -91,11 +94,14 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     /**
      * @param bluetoothAddress
      * @param context if the context is set, a progress dialog will show, otherwise a toast msg will show
+     * @exception DeviceNotPairedException if device is not paired and AllowAutoPairing is disabled
      */
     public void connectShimmerThroughBTAddress(final String bluetoothAddress,Context context) {
 
         if(isDevicePaired(bluetoothAddress) || AllowAutoPairing) {
             if (!isDevicePaired(bluetoothAddress)){
+                final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(bluetoothAddress);
+                device.createBond();
                 if (context!=null) {
                     //Toast.makeText(mContext, "Attempting to pair device, please wait...", Toast.LENGTH_LONG).show();
                     final ProgressDialog progress = new ProgressDialog(context);
@@ -107,42 +113,89 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                 } else {
                     Toast.makeText(mContext, "Attempting to pair device, please wait...", Toast.LENGTH_LONG).show();
                 }
+
+                BroadcastReceiver receiver;
+                receiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        String action = intent.getAction();
+                        if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)){
+                            if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+                                addDiscoveredDevice(bluetoothAddress);
+                                ShimmerBluetoothManagerAndroid.super.connectShimmerThroughBTAddress(bluetoothAddress);
+                                ShimmerBluetoothManagerAndroid.super.setConnectionExceptionListener(new ConnectionExceptionListener() {
+                                    @Override
+                                    public void onConnectionStart(String connectionHandle) {
+
+                                    }
+
+                                    @Override
+                                    public void onConnectionException(Exception exception) {
+                                        if (mProgressDialog!=null) {
+                                            mProgressDialog.dismiss();
+                                        }
+                                        mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                                                new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
+
+                                    }
+
+                                    @Override
+                                    public void onConnectStartException(String connectionHandle) {
+                                        if (mProgressDialog!=null) {
+                                            mProgressDialog.dismiss();
+                                        }
+                                        mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                                                new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
+
+                                    }
+                                });
+                            }
+                            else if (device.getBondState() == BluetoothDevice.BOND_NONE){
+                                Toast.makeText(mContext, "Failed to pair device, please try again...", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                };
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+                filter.addAction(BluetoothDevice.ACTION_FOUND);
+                mContext.registerReceiver(receiver, filter);
             }
-            addDiscoveredDevice(bluetoothAddress);
-            super.connectShimmerThroughBTAddress(bluetoothAddress);
-            super.setConnectionExceptionListener(new ConnectionExceptionListener() {
-                @Override
-                public void onConnectionStart(String connectionHandle) {
+            else{
+                addDiscoveredDevice(bluetoothAddress);
+                ShimmerBluetoothManagerAndroid.super.connectShimmerThroughBTAddress(bluetoothAddress);
+                ShimmerBluetoothManagerAndroid.super.setConnectionExceptionListener(new ConnectionExceptionListener() {
+                    @Override
+                    public void onConnectionStart(String connectionHandle) {
 
-                }
-
-                @Override
-                public void onConnectionException(Exception exception) {
-                    if (mProgressDialog!=null) {
-                        mProgressDialog.dismiss();
                     }
-                    mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                            new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
 
-                }
+                    @Override
+                    public void onConnectionException(Exception exception) {
+                        if (mProgressDialog!=null) {
+                            mProgressDialog.dismiss();
+                        }
+                        mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                                new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
 
-                @Override
-                public void onConnectStartException(String connectionHandle) {
-                    if (mProgressDialog!=null) {
-                        mProgressDialog.dismiss();
                     }
-                    mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                            new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
 
-                }
-            });
+                    @Override
+                    public void onConnectStartException(String connectionHandle) {
+                        if (mProgressDialog!=null) {
+                            mProgressDialog.dismiss();
+                        }
+                        mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                                new ObjectCluster("", bluetoothAddress, ShimmerBluetooth.BT_STATE.DISCONNECTED)).sendToTarget();
+
+                    }
+                });
+            }
         }
         else{
             String msg = "Device " + bluetoothAddress + " not paired";
             throw new DeviceNotPairedException(bluetoothAddress, msg);
         }
     }
-
     @Override
     public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
         connectShimmerThroughBTAddress(bluetoothAddress,null);
