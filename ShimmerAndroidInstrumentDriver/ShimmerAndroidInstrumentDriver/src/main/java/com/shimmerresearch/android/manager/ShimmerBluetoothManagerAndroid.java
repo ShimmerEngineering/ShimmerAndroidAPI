@@ -23,7 +23,6 @@ import com.shimmerresearch.driver.BasicProcessWithCallBack;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
-import com.shimmerresearch.driver.ShimmerObject;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 import com.shimmerresearch.driverUtilities.BluetoothDeviceDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
@@ -35,7 +34,6 @@ import com.shimmerresearch.exception.DeviceNotPairedException;
 
 import com.shimmerresearch.exceptions.ConnectionExceptionListener;
 import com.shimmerresearch.exceptions.ShimmerException;
-import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
 
 import java.util.ArrayList;
@@ -45,8 +43,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-
-import static android.R.id.list;
 
 /**
  * Created by ASaez on 10-Aug-16.
@@ -89,8 +85,19 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     /**
-     * @param bluetoothAddress
+     * When true, will attempt to pair the device if the device is not paired. User will have to manually key in the pairing key.
+     * @param enable
+     */
+    public void enablePairingOnConnect(boolean enable){
+        AllowAutoPairing = enable;
+    }
+
+    /**
+     * See also {@link #connectShimmerThroughBTAddress(String)}.
+     * @param bluetoothAddress in the form of XX:XX:XX:XX:XX:XX
      * @param context if the context is set, a progress dialog will show, otherwise a toast msg will show
+     * @exception IllegalArgumentException if bluetoothAddress is invalid, note this will only occur when {@link #enablePairingOnConnect(boolean)} is enabled
+     * @exception DeviceNotPairedException if the device is not paired
      */
     public void connectShimmerThroughBTAddress(final String bluetoothAddress,Context context) {
 
@@ -143,12 +150,23 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         }
     }
 
+    /**
+     * See also {@link #connectShimmerThroughBTAddress(String,Context)}.
+     * @param bluetoothAddress in the form of XX:XX:XX:XX:XX:XX
+     * @exception IllegalArgumentException if bluetoothAddress is invalid, note this will only occur when {@link #enablePairingOnConnect(boolean)} is enabled
+     * @exception DeviceNotPairedException if the device is not paired
+     */
     @Override
     public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
         connectShimmerThroughBTAddress(bluetoothAddress,null);
     }
 
-    private boolean isDevicePaired(String bluetoothAddress){
+    /**
+     * Using the specified bluetooth address in the form of XX:XX:XX:XX:XX:XX check if the device is currently paired to the android device
+     * @param bluetoothAddress
+     * @return true if the device is paired
+     */
+    public boolean isDevicePaired(String bluetoothAddress){
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         for(BluetoothDevice device: pairedDevices){
             if(device.getAddress().equals(bluetoothAddress)){
