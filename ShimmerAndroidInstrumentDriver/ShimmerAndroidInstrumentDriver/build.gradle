@@ -94,4 +94,8 @@ dependencies {
         exclude group: 'com.parse.bolts'
     }
     implementation "org.webkit:android-jsc:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
