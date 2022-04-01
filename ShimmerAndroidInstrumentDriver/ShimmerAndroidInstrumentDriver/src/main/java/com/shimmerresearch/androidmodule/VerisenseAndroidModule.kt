@@ -98,8 +98,8 @@ class VerisenseAndroidModule(reactContext: ReactApplicationContext) : ReactConte
     }
 
     @ReactMethod
-    fun connect() {
-        val radio1 = AndroidBleRadioByteCommunication("CB:3F:94:5F:84:E6")
+    fun connect(macAdd: String) {
+        val radio1 = AndroidBleRadioByteCommunication(macAdd)
         val protocol1 = VerisenseProtocolByteCommunication(radio1)
 
         BleManager.getInstance().init(reactApplicationContext.applicationContext as Application)
