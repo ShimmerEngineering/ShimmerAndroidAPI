@@ -1,3 +1,6 @@
+# Introduction
+This API can be used to communicate with a Shimmer3 device via Bluetooth. A good starting point will be the [quick start guide](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Quick-Start-Guide) and the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki)
+
 # Known Issues
 While this does have a dependency on the environment you are in (e.g. whether there is significant radio noise in the Bluetooth spectrum) in general we've found that the rate of connecting to a Shimmer3 device on the first try varies across Android devices. The following gives an example of the results we've seen, where percentage of success is the number of times the Android Phone Model is able to connect successfully to a Shimmer device the first time of trying:-
 
