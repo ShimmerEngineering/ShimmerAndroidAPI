@@ -135,15 +135,21 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.data_sync);
+        MenuItem item1 = menu.findItem(R.id.data_sync);
+        MenuItem item2 = menu.findItem(R.id.disable_logging);
+        MenuItem item3 = menu.findItem(R.id.erase_data);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
             if(device instanceof VerisenseDeviceAndroid) {
-                item.setVisible(true);
+                item1.setVisible(true);
+                item2.setVisible(true);
+                item3.setVisible(true);
                 return true;
             }
         }
-        item.setVisible(false);
+        item1.setVisible(false);
+        item2.setVisible(false);
+        item3.setVisible(false);
         return true;
     }
 
