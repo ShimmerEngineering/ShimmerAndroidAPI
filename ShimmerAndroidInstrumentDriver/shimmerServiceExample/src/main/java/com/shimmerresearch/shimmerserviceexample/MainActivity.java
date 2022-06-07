@@ -189,6 +189,27 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
                 }
                 return true;
+            case R.id.disable_logging:
+                if(selectedDeviceAddress != null) {
+                    try {
+                        VerisenseDeviceAndroid mDevice1 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
+                        mDevice1.setRecordingEnabled(false);
+                        byte[] opConfig = mDevice1.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
+                        mDevice1.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeOperationalConfig(opConfig);
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
+                    }
+                }
+            case R.id.erase_data:
+                if(selectedDeviceAddress != null) {
+                    try {
+                        VerisenseDeviceAndroid mDevice1 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
+                        mDevice1.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeEraseLoggedData();
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
             case R.id.disconnect_all_devices:
                 mService.disconnectAllDevices();
                 connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
@@ -207,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     protected void onStart() {
         super.onStart();
     }
-
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -342,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             return PagerAdapter.POSITION_NONE;
         }
     }
+
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             if(msg.what == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE) {

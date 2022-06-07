@@ -24,6 +24,10 @@
             android:id="@+id/stop_streaming"></item>
     <item   android:title="Data Sync selected device"
         android:id="@+id/data_sync"></item>
+    <item   android:title="Erase data"
+        android:id="@+id/erase_data"></item>
+    <item   android:title="Disable logging"
+        android:id="@+id/disable_logging"></item>
     <item   android:title="Disconnect All Devices"
         android:id="@+id/disconnect_all_devices"></item>
 </menu>
