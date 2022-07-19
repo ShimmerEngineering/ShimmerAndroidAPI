@@ -24,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.androidplot.xy.XYPlot;
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
@@ -43,6 +42,7 @@ import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
+import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
@@ -198,19 +198,22 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.disable_logging:
                 if(selectedDeviceAddress != null) {
                     try {
-                        VerisenseDeviceAndroid mDevice1 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
-                        mDevice1.setRecordingEnabled(false);
-                        byte[] opConfig = mDevice1.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
-                        mDevice1.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeOperationalConfig(opConfig);
+                        VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                        VerisenseDevice mDeviceClone = mDevice.deepClone();
+                        mDeviceClone.setRecordingEnabled(false);
+                        byte[] opConfig = mDeviceClone.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
+                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeOperationalConfig(opConfig);
+                        Toast.makeText(this, "Logging disabled", Toast.LENGTH_SHORT).show();
                     } catch (ShimmerException e) {
                         e.printStackTrace();
                     }
                 }
+                return true;
             case R.id.erase_data:
                 if(selectedDeviceAddress != null) {
                     try {
-                        VerisenseDeviceAndroid mDevice1 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
-                        mDevice1.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeEraseLoggedData();
+                        VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeEraseLoggedData();
                     } catch (ShimmerException e) {
                         e.printStackTrace();
                     }
