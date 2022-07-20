@@ -186,7 +186,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mDevice3.setTrialName(trialName);
                     mDevice3.setParticipantID(participantName);
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
-                    mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                    try{
+                        mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                    } catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                 }
                 return true;
             case R.id.disconnect_all_devices:
