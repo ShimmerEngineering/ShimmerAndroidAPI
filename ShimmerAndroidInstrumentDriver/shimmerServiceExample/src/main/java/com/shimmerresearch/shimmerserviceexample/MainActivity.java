@@ -192,7 +192,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mDevice3.setTrialName(trialName);
                     mDevice3.setParticipantID(participantName);
                     mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
-                    mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                    try{
+                        mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                    } catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                 }
                 return true;
             case R.id.disable_logging:
@@ -418,8 +423,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case STREAMING_LOGGED_DATA:
                         Toast.makeText(getApplicationContext(), "Data Sync: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
-                        VerisenseDeviceAndroid mDevice3 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
-                        DataSyncFragment.TextViewDirectory.setText("Directory : " + mDevice3.getDataFilePath());
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
@@ -431,6 +434,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 SyncProgressDetails mDetails = (SyncProgressDetails)((CallbackObject)msg.obj).mMyObject;
                 DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
                 DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + Double.toString(mDetails.mTransferRateBytes/1024));
+                DataSyncFragment.TextViewDirectory.setText("Bin file path : " + mDetails.mBinFilePath);
+
             }
 
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
