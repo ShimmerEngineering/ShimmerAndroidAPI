@@ -45,13 +45,12 @@ public class VerisenseDeviceAndroid extends VerisenseDevice {
     @Override
     public void sendCallBackMsg(int i, Object ojc){
         super.sendCallBackMsg(i, ojc);
-
-        if(((CallbackObject)ojc).mMyObject instanceof SyncProgressDetails){
-            sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_SYNC_PROGRESS, -1, -1, ojc);
+        if(i == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE){
+            sendMsgToHandlerListTarget(i, -1, -1,
+                    new ObjectCluster(mShimmerUserAssignedName, getMacId(), ((CallbackObject)ojc).mState));
         }
         else{
-            sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                    new ObjectCluster(mShimmerUserAssignedName, getMacId(), ((CallbackObject)ojc).mState));
+            sendMsgToHandlerListTarget(i, -1, -1, ojc);
         }
     }
 }
