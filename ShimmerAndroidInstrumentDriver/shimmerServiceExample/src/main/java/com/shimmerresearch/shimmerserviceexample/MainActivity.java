@@ -448,6 +448,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         if(dataSyncFragment != null){
                             DataSyncFragment.TextViewPayloadIndex.setText("");
                             DataSyncFragment.TextViewSpeed.setText("");
+                            DataSyncFragment.editTextTrialName.setEnabled(true);
+                            DataSyncFragment.editTextParticipantName.setEnabled(true);
                         }
                         break;
                     case CONNECTING:
@@ -469,6 +471,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case STREAMING_LOGGED_DATA:
                         Toast.makeText(getApplicationContext(), "Data Sync: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
+                        DataSyncFragment.editTextTrialName.setEnabled(false);
+                        DataSyncFragment.editTextParticipantName.setEnabled(false);
                         break;
                     case DISCONNECTED:
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
