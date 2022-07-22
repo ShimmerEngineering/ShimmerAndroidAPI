@@ -2,6 +2,7 @@ package com.shimmerresearch.shimmerserviceexample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
@@ -52,7 +53,15 @@ import java.util.ArrayList;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 
+import bolts.Continuation;
+import bolts.Task;
+
 public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener {
+
+    final static String LOG_TAG = "Shimmer";
+    final static String SERVICE_TAG = "ShimmerService";
+    final static int REQUEST_CONNECT_SHIMMER = 2;
+    final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
@@ -64,9 +73,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     SignalsToPlotFragment signalsToPlotFragment;
     DataSyncFragment dataSyncFragment;
     public String selectedDeviceAddress, selectedDeviceName;
-    boolean mServiceFirstTime;
-
     XYPlot dynamicPlot;
+    boolean isServiceStarted = false;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -82,14 +91,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      */
     private ViewPager mViewPager;
 
-    boolean isServiceStarted = false;
-
-    final static String LOG_TAG = "Shimmer";
-    final static String SERVICE_TAG = "ShimmerService";
-    final static int REQUEST_CONNECT_SHIMMER = 2;
-    final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter1);
         mViewPager.setOffscreenPageLimit(5);    //Ensure none of the fragments has their view destroyed when off-screen
-
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
 
@@ -140,10 +140,15 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuItem item3 = menu.findItem(R.id.erase_data);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
-            if(device instanceof VerisenseDeviceAndroid) {
+            if(device instanceof VerisenseDevice) {
                 item1.setVisible(true);
                 item2.setVisible(true);
                 item3.setVisible(true);
+                if (((VerisenseDevice)device).isRecordingEnabled()){
+                    item2.setTitle("Disable Logging");
+                    return true;
+                }
+                item2.setTitle("Enable Logging");
                 return true;
             }
         }
@@ -163,10 +168,14 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.start_streaming:
                 if(selectedDeviceAddress != null) {
-                    ShimmerDevice mDevice1 = mService.getShimmer(selectedDeviceAddress);
+                    ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
                     try {
-                        mDevice1.startStreaming();
+                        mDevice.startStreaming();
+                        mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
                     } catch (ShimmerException e) {
+                        if(e.getMessage() == "A task is still ongoing"){
+                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                        }
                         e.printStackTrace();
                     }
                     signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
@@ -174,52 +183,83 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.stop_streaming:
                 if(selectedDeviceAddress != null) {
-                    ShimmerDevice mDevice2 = mService.getShimmer(selectedDeviceAddress);
+                    ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
                     try {
-                        mDevice2.stopStreaming();
+                        mDevice.stopStreaming();
                     } catch (ShimmerException e) {
                         e.printStackTrace();
                     }
-                    sensorsEnabledFragment.buildSensorsList(mDevice2, this, mService.getBluetoothManager());
-                    deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
+                    sensorsEnabledFragment.buildSensorsList(mDevice, this, mService.getBluetoothManager());
+                    deviceConfigFragment.buildDeviceConfigList(mDevice, this, mService.getBluetoothManager());
                 }
                 return true;
             case R.id.data_sync:
                 if(selectedDeviceAddress != null) {
-                    VerisenseDeviceAndroid mDevice3 = (VerisenseDeviceAndroid)mService.getShimmer(selectedDeviceAddress);
+                    VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
                     String participantName = DataSyncFragment.editTextParticipantName.getText().toString();
-                    String trialName = DataSyncFragment.editTextTrialName.getText().toString();
-                    mDevice3.setTrialName(trialName);
-                    mDevice3.setParticipantID(participantName);
-                    mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
-                    try{
-                        mDevice3.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
-                    } catch (Exception ex){
-                        ex.printStackTrace();
+                    if(participantName.isEmpty()){
+                        participantName = "Default Participant";
+                        DataSyncFragment.editTextParticipantName.setText(participantName);
                     }
-
+                    String trialName = DataSyncFragment.editTextTrialName.getText().toString();
+                    if(trialName.isEmpty()){
+                        trialName = "Default trial";
+                        DataSyncFragment.editTextTrialName.setText(trialName);
+                    }
+                    mViewPager.setCurrentItem(3);
+                    mDevice.setTrialName(trialName);
+                    mDevice.setParticipantID(participantName);
+                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
+                    try{
+                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                    } catch (Exception e){
+                        if(e.getMessage() == "A task is still ongoing"){
+                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                        }
+                        e.printStackTrace();
+                    }
                 }
                 return true;
             case R.id.disable_logging:
                 if(selectedDeviceAddress != null) {
+                    VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                    VerisenseDevice mDeviceClone = mDevice.deepClone();
+                    boolean logging = !mDevice.isRecordingEnabled();
+                    mDeviceClone.setRecordingEnabled(logging);
+                    byte[] opConfig = mDeviceClone.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
                     try {
-                        VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
-                        VerisenseDevice mDeviceClone = mDevice.deepClone();
-                        mDeviceClone.setRecordingEnabled(false);
-                        byte[] opConfig = mDeviceClone.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
-                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeOperationalConfig(opConfig);
-                        Toast.makeText(this, "Logging disabled", Toast.LENGTH_SHORT).show();
+                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeAndReadOperationalConfig(opConfig);
+                        Toast.makeText(this, logging?"Logging Enabled":"Logging Disabled", Toast.LENGTH_SHORT).show();
                     } catch (ShimmerException e) {
+                        if(e.getMessage() == "A task is still ongoing"){
+                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                        }
                         e.printStackTrace();
                     }
                 }
                 return true;
             case R.id.erase_data:
                 if(selectedDeviceAddress != null) {
+                    VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                    final ProgressDialog progress = new ProgressDialog(this);
+                    progress.setTitle("Erasing data");
+                    progress.setMessage("Please wait for the operation to complete...");
+                    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+                    progress.show();
                     try {
-                        VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
-                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeEraseLoggedData();
+                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).eraseDataTask().continueWith(new Continuation<Boolean, Void>() {
+                            @Override
+                            public Void then(Task<Boolean> completed) throws Exception {
+                                progress.dismiss();
+                                Toast.makeText(getApplicationContext(), "erased data completed", Toast.LENGTH_LONG).show();
+                                return null;
+                            }
+                        });
                     } catch (ShimmerException e) {
+                        progress.dismiss();
+                        if(e.getMessage() == "A task is still ongoing"){
+                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                        }
                         e.printStackTrace();
                     }
                 }
@@ -227,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.disconnect_all_devices:
                 mService.disconnectAllDevices();
                 connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                if(mSectionsPagerAdapter1.getCount() == 6)
+                if(mSectionsPagerAdapter1.getCount() == mSectionsPagerAdapter1.VERISENSE_PAGE_COUNT)
                 {
                     mSectionsPagerAdapter1.remove(3);
                     mSectionsPagerAdapter1.notifyDataSetChanged();
@@ -304,6 +344,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     public class SectionsPagerAdapter1 extends FragmentStatePagerAdapter {
 
+        final static int VERISENSE_PAGE_COUNT = 6;
+        final static int SHIMMER3_PAGE_COUNT = 5;
         ArrayList<Fragment> fragmentArrayList = new ArrayList<Fragment>();
         ArrayList<String> fragmentTitle = new ArrayList<String>();
 
@@ -435,7 +477,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
                 DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + Double.toString(mDetails.mTransferRateBytes/1024));
                 DataSyncFragment.TextViewDirectory.setText("Bin file path : " + mDetails.mBinFilePath);
-
+            }
+            else if(msg.what == Shimmer.MSG_IDENTIFIER_NOTIFICATION_MESSAGE){
+                if(((CallbackObject)msg.obj).mIndicator == Shimmer.NOTIFICATION_SHIMMER_FULLY_INITIALIZED){
+                    Toast.makeText(getApplicationContext(), "Device fully initialized: ", Toast.LENGTH_SHORT).show();
+                }
             }
 
             if(msg.arg1 == Shimmer.MSG_STATE_STOP_STREAMING) {
@@ -449,42 +495,51 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
      * @param macAddress
      */
     @Override
-    public void onShimmerDeviceSelected(String macAddress, String deviceName) {
-        Toast.makeText(this, "Selected Device: " + deviceName + "\n" + macAddress, Toast.LENGTH_SHORT).show();
-        selectedDeviceAddress = macAddress;
-        selectedDeviceName = deviceName;
+    public void onShimmerDeviceSelected(String macAddress, String deviceName, Boolean selected) {
+        if(selected){
+            Toast.makeText(this, "Selected Device: " + deviceName + "\n" + macAddress, Toast.LENGTH_SHORT).show();
+            selectedDeviceAddress = macAddress;
+            selectedDeviceName = deviceName;
 
-        //Pass the selected device to the fragments
-        ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
+            //Pass the selected device to the fragments
+            ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
 
-        //add and remove DataSyncFragment based on the type of device
-        if(device instanceof VerisenseDeviceAndroid) {
-            if(mSectionsPagerAdapter1.getCount() == 5)
-            {
-                dataSyncFragment = DataSyncFragment.newInstance();
-                mSectionsPagerAdapter1.add(dataSyncFragment, "Data Sync", 3);
+            //add and remove DataSyncFragment based on the type of device
+            if(device instanceof VerisenseDeviceAndroid) {
+                if(mSectionsPagerAdapter1.getCount() == mSectionsPagerAdapter1.SHIMMER3_PAGE_COUNT)
+                {
+                    dataSyncFragment = DataSyncFragment.newInstance();
+                    mSectionsPagerAdapter1.add(dataSyncFragment, "Data Sync", 3);
+                }
             }
+            else{
+                if(mSectionsPagerAdapter1.getCount() == mSectionsPagerAdapter1.VERISENSE_PAGE_COUNT)
+                {
+                    mSectionsPagerAdapter1.remove(3);
+                }
+            }
+            mSectionsPagerAdapter1.notifyDataSetChanged();
+
+            sensorsEnabledFragment.setShimmerService(mService);
+            sensorsEnabledFragment.buildSensorsList(device, this, mService.getBluetoothManager());
+
+            deviceConfigFragment.buildDeviceConfigList(device, this, mService.getBluetoothManager());
+
+            plotFragment.setShimmerService(mService);
+            plotFragment.clearPlot();
+            plotFragment.setSelectedDeviceAddress(selectedDeviceAddress);
+            dynamicPlot = plotFragment.getDynamicPlot();
+
+            mService.stopStreamingAllDevices();
+            signalsToPlotFragment.setDeviceNotStreamingView();
         }
         else{
             if(mSectionsPagerAdapter1.getCount() == 6)
             {
                 mSectionsPagerAdapter1.remove(3);
             }
+            mSectionsPagerAdapter1.notifyDataSetChanged();
         }
-        mSectionsPagerAdapter1.notifyDataSetChanged();
-
-        sensorsEnabledFragment.setShimmerService(mService);
-        sensorsEnabledFragment.buildSensorsList(device, this, mService.getBluetoothManager());
-
-        deviceConfigFragment.buildDeviceConfigList(device, this, mService.getBluetoothManager());
-
-        plotFragment.setShimmerService(mService);
-        plotFragment.clearPlot();
-        plotFragment.setSelectedDeviceAddress(selectedDeviceAddress);
-        dynamicPlot = plotFragment.getDynamicPlot();
-
-        mService.stopStreamingAllDevices();
-        signalsToPlotFragment.setDeviceNotStreamingView();
     }
 
     @Override
