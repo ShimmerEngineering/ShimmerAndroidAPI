@@ -49,6 +49,7 @@ import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        final Toast otherTaskOngoingToast = Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG);
         switch (item.getItemId()) {
             case R.id.connect_device:
                 Intent pairedDevicesIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
@@ -174,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
                     } catch (ShimmerException e) {
                         if(e.getMessage() == "A task is still ongoing"){
-                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                            otherTaskOngoingToast.show();
                         }
                         e.printStackTrace();
                     }
@@ -187,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     try {
                         mDevice.stopStreaming();
                     } catch (ShimmerException e) {
+                        if(e.getMessage() == "A task is still ongoing"){
+                            otherTaskOngoingToast.show();
+                        }
                         e.printStackTrace();
                     }
                     sensorsEnabledFragment.buildSensorsList(mDevice, this, mService.getBluetoothManager());
@@ -214,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
                     } catch (Exception e){
                         if(e.getMessage() == "A task is still ongoing"){
-                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                            otherTaskOngoingToast.show();
                         }
                         e.printStackTrace();
                     }
@@ -232,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         Toast.makeText(this, logging?"Logging Enabled":"Logging Disabled", Toast.LENGTH_SHORT).show();
                     } catch (ShimmerException e) {
                         if(e.getMessage() == "A task is still ongoing"){
-                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
+                            otherTaskOngoingToast.show();
                         }
                         e.printStackTrace();
                     }
@@ -240,28 +245,26 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.erase_data:
                 if(selectedDeviceAddress != null) {
-                    VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                    final VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
                     final ProgressDialog progress = new ProgressDialog(this);
                     progress.setTitle("Erasing data");
                     progress.setMessage("Please wait for the operation to complete...");
                     progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
                     progress.show();
-                    try {
-                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).eraseDataTask().continueWith(new Continuation<Boolean, Void>() {
-                            @Override
-                            public Void then(Task<Boolean> completed) throws Exception {
+                    new Thread(){
+                        public void run(){
+                            try {
+                                mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).eraseDataTask().waitForCompletion(60, TimeUnit.SECONDS);
                                 progress.dismiss();
-                                Toast.makeText(getApplicationContext(), "erased data completed", Toast.LENGTH_LONG).show();
-                                return null;
+                            } catch (ShimmerException | InterruptedException e) {
+                                progress.dismiss();
+                                if(e.getMessage() == "A task is still ongoing"){
+                                    otherTaskOngoingToast.show();
+                                }
+                                e.printStackTrace();
                             }
-                        });
-                    } catch (ShimmerException e) {
-                        progress.dismiss();
-                        if(e.getMessage() == "A task is still ongoing"){
-                            Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG).show();
                         }
-                        e.printStackTrace();
-                    }
+                    }.start();
                 }
                 return true;
             case R.id.disconnect_all_devices:
@@ -272,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mSectionsPagerAdapter1.remove(3);
                     mSectionsPagerAdapter1.notifyDataSetChanged();
                 }
+                mViewPager.setCurrentItem(0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
