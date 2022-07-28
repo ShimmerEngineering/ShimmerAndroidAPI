@@ -276,6 +276,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mSectionsPagerAdapter1.notifyDataSetChanged();
                 }
                 mViewPager.setCurrentItem(0);
+                selectedDeviceAddress = null;
+                selectedDeviceName = null;
+                connectedShimmersListFragment.removeSelectedDevice();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -154,6 +154,11 @@ public class ConnectedShimmersListFragment extends ListFragment {
         }
     }
 
+    public void removeSelectedDevice(){
+        selectedDeviceAddress = null;
+        selectedDevicePos = -1;
+    }
+
     public int getNumShimmersConnected() {
         if(shimmerDeviceList != null) {
             return shimmerDeviceList.size();
