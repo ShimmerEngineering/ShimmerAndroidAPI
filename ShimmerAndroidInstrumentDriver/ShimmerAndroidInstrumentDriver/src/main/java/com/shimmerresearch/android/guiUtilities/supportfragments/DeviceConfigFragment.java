@@ -24,6 +24,7 @@ import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
 import com.shimmerresearch.driverUtilities.SensorDetails;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,10 +49,14 @@ public class DeviceConfigFragment extends Fragment {
         final Map<String, ConfigOptionDetailsSensor> configOptionsMap = shimmerDevice.getConfigOptionsMap();
         shimmerDeviceClone = shimmerDevice.deepClone();
         Map<Integer, SensorDetails> sensorMap = shimmerDevice.getSensorMap();
-        List<String> listOfKeys = new ArrayList<String>();
+        final List<String> listOfKeys = new ArrayList<String>();
         for (SensorDetails sd:sensorMap.values()) {
             if (sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated!=null && sd.isEnabled()) {
-                listOfKeys.addAll(sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated);
+                for(String configOptionKey:sd.mSensorDetailsRef.mListOfConfigOptionKeysAssociated){
+                    if(!listOfKeys.contains(configOptionKey)){
+                        listOfKeys.add(configOptionKey);
+                    }
+                }
             }
         }
 
@@ -135,9 +140,10 @@ public class DeviceConfigFragment extends Fragment {
         if(expandListView.getFooterViewsCount() == 0) {
             LinearLayout buttonLayout = new LinearLayout(context);
             buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+            buttonLayout.setOrientation(LinearLayout.VERTICAL);
             Button writeConfigButton = new Button(context);
             Button resetListButton = new Button(context);
+            Button setDefaultConfigButton = new Button(context);
             writeConfigButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -161,10 +167,38 @@ public class DeviceConfigFragment extends Fragment {
                     Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
                 }
             });
+            setDefaultConfigButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Map<String, Integer> defaultConfigMap = new HashMap<String, Integer>();
+                    defaultConfigMap.put("Accel_Range", 3);
+                    defaultConfigMap.put("Gyro_Range", 3);
+                    defaultConfigMap.put("Accel_Rate", 2);
+                    defaultConfigMap.put("Mode", 1);
+                    defaultConfigMap.put("Accel_Gyro_Rate", 6);
+                    defaultConfigMap.put("LP Mode", 1);
+                    defaultConfigMap.put("Range", 3);
+
+                    shimmerDeviceClone = shimmerDevice.deepClone();
+                    for(String key : listOfKeys) {
+                        if(defaultConfigMap.containsKey(key)){
+                            final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
+                            if(cods != null){
+                                shimmerDeviceClone.setConfigValueUsingConfigLabel(key, cods.mConfigValues[defaultConfigMap.get(key)]);
+                            }
+                        }
+                    }
+                    expandListAdapter.updateCloneDevice(shimmerDeviceClone);
+                    expandListAdapter.notifyDataSetChanged();
+                    Toast.makeText(context, "Settings have been set to default", Toast.LENGTH_SHORT).show();
+                }
+            });
             writeConfigButton.setText("Write config to Shimmer");
             resetListButton.setText("Reset settings");
+            setDefaultConfigButton.setText("Set default config");
             buttonLayout.addView(resetListButton);
             buttonLayout.addView(writeConfigButton);
+            buttonLayout.addView(setDefaultConfigButton);
             expandListView.addFooterView(buttonLayout);
         }
 
