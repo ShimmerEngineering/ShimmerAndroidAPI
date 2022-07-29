@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 import com.androidplot.xy.XYPlot;
 import com.clj.fastble.BleManager;
@@ -200,29 +201,31 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.data_sync:
                 if(selectedDeviceAddress != null) {
-                    VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
-                    String participantName = DataSyncFragment.editTextParticipantName.getText().toString();
-                    if(participantName.isEmpty()){
-                        participantName = "Default Participant";
-                        DataSyncFragment.editTextParticipantName.setText(participantName);
+                    if(DataSyncFragment.editTextParticipantName.getText().toString().isEmpty()){
+                        DataSyncFragment.editTextParticipantName.setText("Default Participant");
                     }
-                    String trialName = DataSyncFragment.editTextTrialName.getText().toString();
-                    if(trialName.isEmpty()){
-                        trialName = "Default trial";
-                        DataSyncFragment.editTextTrialName.setText(trialName);
+                    if(DataSyncFragment.editTextTrialName.getText().toString().isEmpty()){
+                        DataSyncFragment.editTextTrialName.setText("Default trial");
                     }
                     mViewPager.setCurrentItem(3);
-                    mDevice.setTrialName(trialName);
-                    mDevice.setParticipantID(participantName);
-                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
-                    try{
-                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
-                    } catch (Exception e){
-                        if(e.getMessage() == "A task is still ongoing"){
-                            otherTaskOngoingToast.show();
+
+                    DataSyncFragment.ButtonDataSync.setVisibility(View.VISIBLE);
+                    DataSyncFragment.ButtonDataSync.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                            mDevice.setTrialName(DataSyncFragment.editTextParticipantName.getText().toString());
+                            mDevice.setParticipantID(DataSyncFragment.editTextTrialName.getText().toString());
+                            mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
+                            try{
+                                mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                            } catch (Exception e){
+                                if(e.getMessage() == "A task is still ongoing"){
+                                    otherTaskOngoingToast.show();
+                                }
+                                e.printStackTrace();
+                            }
                         }
-                        e.printStackTrace();
-                    }
+                    });
                 }
                 return true;
             case R.id.disable_logging:
@@ -486,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             else if(msg.what == Shimmer.MSG_IDENTIFIER_SYNC_PROGRESS){
                 SyncProgressDetails mDetails = (SyncProgressDetails)((CallbackObject)msg.obj).mMyObject;
                 DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
-                DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + Double.toString(mDetails.mTransferRateBytes/1024));
+                DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + String.format("%.2f", mDetails.mTransferRateBytes/1024));
                 DataSyncFragment.TextViewDirectory.setText("Bin file path : " + mDetails.mBinFilePath);
             }
             else if(msg.what == Shimmer.MSG_IDENTIFIER_NOTIFICATION_MESSAGE){

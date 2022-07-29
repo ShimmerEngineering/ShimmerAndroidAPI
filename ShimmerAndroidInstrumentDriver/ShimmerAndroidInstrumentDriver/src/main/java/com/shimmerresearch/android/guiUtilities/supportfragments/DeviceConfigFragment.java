@@ -178,6 +178,7 @@ public class DeviceConfigFragment extends Fragment {
                     defaultConfigMap.put("Accel_Gyro_Rate", 6);
                     defaultConfigMap.put("LP Mode", 1);
                     defaultConfigMap.put("Range", 3);
+                    defaultConfigMap.put("PPG Rate", 3);
 
                     shimmerDeviceClone = shimmerDevice.deepClone();
                     for(String key : listOfKeys) {
