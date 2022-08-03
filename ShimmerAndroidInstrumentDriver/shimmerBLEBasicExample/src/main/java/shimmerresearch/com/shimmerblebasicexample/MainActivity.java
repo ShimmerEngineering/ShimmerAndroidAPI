@@ -1,4 +1,4 @@
-package shimmerresearch.com.shimmerbasicexample;
+package shimmerresearch.com.shimmerblebasicexample;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -37,7 +37,7 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 
 public class MainActivity extends Activity {
 
-    private final static String LOG_TAG = "ShimmerBasicExample";
+    private final static String LOG_TAG = "ShimmerBLEBasicExample";
     AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("E7:45:2C:6D:6F:14");
     VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
     VerisenseDeviceAndroid device1;

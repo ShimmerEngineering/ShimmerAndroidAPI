@@ -1,4 +1,4 @@
-package shimmerresearch.com.shimmerbasicexample;
+package com.shimmerresearch.shimmerblebasicexample;
 
 import org.junit.Test;
 
