@@ -22,6 +22,7 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 import com.shimmerresearch.driverUtilities.ConfigOptionDetailsSensor;
 import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.verisense.VerisenseDevice;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -143,7 +144,6 @@ public class DeviceConfigFragment extends Fragment {
             buttonLayout.setOrientation(LinearLayout.VERTICAL);
             Button writeConfigButton = new Button(context);
             Button resetListButton = new Button(context);
-            Button setDefaultConfigButton = new Button(context);
             writeConfigButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -167,39 +167,43 @@ public class DeviceConfigFragment extends Fragment {
                     Toast.makeText(context, "Settings have been reset", Toast.LENGTH_SHORT).show();
                 }
             });
-            setDefaultConfigButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final Map<String, Integer> defaultConfigMap = new HashMap<String, Integer>();
-                    defaultConfigMap.put("Accel_Range", 3);
-                    defaultConfigMap.put("Gyro_Range", 3);
-                    defaultConfigMap.put("Accel_Rate", 2);
-                    defaultConfigMap.put("Mode", 1);
-                    defaultConfigMap.put("Accel_Gyro_Rate", 6);
-                    defaultConfigMap.put("LP Mode", 1);
-                    defaultConfigMap.put("Range", 3);
-                    defaultConfigMap.put("PPG Rate", 3);
-
-                    shimmerDeviceClone = shimmerDevice.deepClone();
-                    for(String key : listOfKeys) {
-                        if(defaultConfigMap.containsKey(key)){
-                            final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
-                            if(cods != null){
-                                shimmerDeviceClone.setConfigValueUsingConfigLabel(key, cods.mConfigValues[defaultConfigMap.get(key)]);
-                            }
-                        }
-                    }
-                    expandListAdapter.updateCloneDevice(shimmerDeviceClone);
-                    expandListAdapter.notifyDataSetChanged();
-                    Toast.makeText(context, "Settings have been set to default", Toast.LENGTH_SHORT).show();
-                }
-            });
             writeConfigButton.setText("Write config to Shimmer");
             resetListButton.setText("Reset settings");
-            setDefaultConfigButton.setText("Set default config");
+
+            if(shimmerDevice instanceof VerisenseDevice){
+                Button setDefaultConfigButton = new Button(context);
+                setDefaultConfigButton.setText("Set default config");
+                setDefaultConfigButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Map<String, Integer> defaultConfigMap = new HashMap<String, Integer>();
+                        defaultConfigMap.put("Accel_Range", 3);
+                        defaultConfigMap.put("Gyro_Range", 3);
+                        defaultConfigMap.put("Accel_Rate", 2);
+                        defaultConfigMap.put("Mode", 1);
+                        defaultConfigMap.put("Accel_Gyro_Rate", 6);
+                        defaultConfigMap.put("LP Mode", 1);
+                        defaultConfigMap.put("Range", 3);
+                        defaultConfigMap.put("PPG Rate", 3);
+
+                        shimmerDeviceClone = shimmerDevice.deepClone();
+                        for(String key : listOfKeys) {
+                            if(defaultConfigMap.containsKey(key)){
+                                final ConfigOptionDetailsSensor cods = configOptionsMap.get(key);
+                                if(cods != null){
+                                    shimmerDeviceClone.setConfigValueUsingConfigLabel(key, cods.mConfigValues[defaultConfigMap.get(key)]);
+                                }
+                            }
+                        }
+                        expandListAdapter.updateCloneDevice(shimmerDeviceClone);
+                        expandListAdapter.notifyDataSetChanged();
+                        Toast.makeText(context, "Settings have been set to default", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                buttonLayout.addView(setDefaultConfigButton);
+            }
             buttonLayout.addView(resetListButton);
             buttonLayout.addView(writeConfigButton);
-            buttonLayout.addView(setDefaultConfigButton);
             expandListView.addFooterView(buttonLayout);
         }
 
