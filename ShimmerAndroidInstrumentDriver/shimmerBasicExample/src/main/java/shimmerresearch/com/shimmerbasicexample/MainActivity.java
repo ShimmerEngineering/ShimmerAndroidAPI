@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -21,16 +24,17 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     private final static String LOG_TAG = "ShimmerBasicExample";
     Shimmer shimmer;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,39 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         shimmer = new Shimmer(mHandler);
+        spinner = (Spinner) findViewById(R.id.crcSpinner);
+        spinner.setEnabled(false);
+        // Spinner click listener
+        spinner.setOnItemSelectedListener(this);
+        List<String> categories = new ArrayList<String>();
+        categories.add("Disable crc");
+        categories.add("Enable 1 byte CRC");
+        categories.add("Enable 2 byte CRC");
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        switch(position) {
+            case 0:
+                shimmer.disableBtCommsCrc();
+                break;
+            case 1:
+                shimmer.enableBtCommsOneByteCrc();
+                break;
+            case 2:
+                shimmer.enableBtCommsTwoByteCrc();
+                break;
+            default:
+        }
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
     }
 
     public void connectDevice(View v) {
@@ -107,6 +144,21 @@ public class MainActivity extends Activity {
 
                     switch (state) {
                         case CONNECTED:
+                            if(shimmer.getFirmwareVersionCode() >= 8){
+                                spinner.setEnabled(true);
+                                switch(shimmer.getBtCommsCrcModeIfFwSupported()) {
+                                    case OFF:
+                                        spinner.setSelection(0);
+                                        break;
+                                    case ONE_BYTE_CRC:
+                                        spinner.setSelection(1);
+                                        break;
+                                    case TWO_BYTE_CRC:
+                                        spinner.setSelection(2);
+                                        break;
+                                    default:
+                                }
+                            }
                             break;
                         case CONNECTING:
                             break;
@@ -117,6 +169,8 @@ public class MainActivity extends Activity {
                         case SDLOGGING:
                             break;
                         case DISCONNECTED:
+                            spinner.setEnabled(false);
+                            spinner.setSelection(0);
                             break;
                     }
                     break;
