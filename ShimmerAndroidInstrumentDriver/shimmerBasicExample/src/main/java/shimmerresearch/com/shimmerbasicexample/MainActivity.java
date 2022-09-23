@@ -167,6 +167,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                         case CONNECTING:
                             break;
                         case STREAMING:
+                            spinner.setEnabled(false);
                             break;
                         case STREAMING_AND_SDLOGGING:
                             break;
