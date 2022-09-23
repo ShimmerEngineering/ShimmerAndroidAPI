@@ -59,17 +59,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        switch(position) {
-            case 0:
-                shimmer.disableBtCommsCrc();
-                break;
-            case 1:
-                shimmer.enableBtCommsOneByteCrc();
-                break;
-            case 2:
-                shimmer.enableBtCommsTwoByteCrc();
-                break;
-            default:
+        if(spinner.isEnabled()){
+            switch(position) {
+                case 0:
+                    shimmer.disableBtCommsCrc();
+                    break;
+                case 1:
+                    shimmer.enableBtCommsOneByteCrc();
+                    break;
+                case 2:
+                    shimmer.enableBtCommsTwoByteCrc();
+                    break;
+                default:
+            }
         }
     }
 
@@ -145,19 +147,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                     switch (state) {
                         case CONNECTED:
                             if(shimmer.getFirmwareVersionCode() >= 8){
-                                spinner.setEnabled(true);
-                                switch(shimmer.getBtCommsCrcModeIfFwSupported()) {
-                                    case OFF:
-                                        spinner.setSelection(0);
-                                        break;
-                                    case ONE_BYTE_CRC:
-                                        spinner.setSelection(1);
-                                        break;
-                                    case TWO_BYTE_CRC:
-                                        spinner.setSelection(2);
-                                        break;
-                                    default:
+                                if(!spinner.isEnabled()){
+                                    switch(shimmer.getBtCommsCrcModeIfFwSupported()) {
+                                        case OFF:
+                                            spinner.setSelection(0);
+                                            break;
+                                        case ONE_BYTE_CRC:
+                                            spinner.setSelection(1);
+                                            break;
+                                        case TWO_BYTE_CRC:
+                                            spinner.setSelection(2);
+                                            break;
+                                        default:
+                                    }
                                 }
+                                spinner.setEnabled(true);
                             }
                             break;
                         case CONNECTING:
