@@ -31,13 +31,13 @@ android {
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManagerDev', version:'0.9.47alpha'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    implementation (group: 'com.shimmersensing', name: 'ShimmerDriverDev', version:'0.9.143alpha'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
