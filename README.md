@@ -74,7 +74,7 @@ compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Bet
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is 3.0.65Beta.
+The latest version is 3.0.73Beta.
 
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
