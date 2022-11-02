@@ -53,5 +53,11 @@
         android:layout_height="wrap_content"
         android:onClick="disconnectDevice"
         android:text="Disconnect" />
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="setBlinkLED"
+        android:text="Set Blink LED" />
 
 </android.widget.LinearLayout>

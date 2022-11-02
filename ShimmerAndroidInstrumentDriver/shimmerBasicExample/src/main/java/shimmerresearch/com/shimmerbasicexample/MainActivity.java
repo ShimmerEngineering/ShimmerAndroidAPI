@@ -90,6 +90,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         }
     }
 
+    int current = 0;
+    public void setBlinkLED(View v) {
+        if (shimmer!=null){
+            System.out.println("To write : " + current%3);
+            shimmer.writeLEDCommand(current%3);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Current LED status : " + shimmer.getCurrentLEDStatus());
+            current++;
+        }
+    }
+
     public void startStreaming(View v) throws InterruptedException, IOException{
         shimmer.startStreaming();
     }
