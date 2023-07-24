@@ -2,7 +2,7 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.artifactory'
+//apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 version = '3.0.72Beta'
@@ -71,6 +71,31 @@ publishing {
     }
 }
 */
+
+def getArtificatId = { ->
+    return "ShimmerAndroidInstrumentDriver" // Replace with library name ID
+}
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId = 'com.shimmerresearch' // Replace with your package's group/organization name
+            artifactId = 'shimmerandroidinstrumentdriver' // Replace with the name of your package
+            version = '3.1.0_alpha' // Replace with your package version
+            artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ShimmerEngineering/ShimmerAndroidAPI")
+            credentials {
+                username = "useyourowncredentialshere"
+                password = "useyourowncredentialshere"
+            }
+        }
+    }
+}
 
 dependencies {
     compile 'com.google.guava:guava:20.0'
