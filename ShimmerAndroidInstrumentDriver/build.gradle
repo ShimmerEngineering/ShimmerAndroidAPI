@@ -25,8 +25,12 @@ allprojects {
     repositories {
         google()
         maven {
-            url  "https://shimmersensing.jfrog.io/artifactory/ShimmerAPI"
-
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ShimmerEngineering/Shimmer-Java-Android-API")
+            credentials {
+                username = "useyourowncredentialshere"
+                password = "useyourowncredentialshere"
+            }
         }
         mavenCentral()
         mavenLocal()

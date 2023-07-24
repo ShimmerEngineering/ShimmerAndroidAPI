@@ -56,6 +56,9 @@ android {
     }
 }
 
+
+
+/*
 publishing {
     artifactoryPublish.dependsOn('build')
     publications {
@@ -67,6 +70,7 @@ publishing {
         }
     }
 }
+*/
 
 dependencies {
     compile 'com.google.guava:guava:20.0'
@@ -74,13 +78,13 @@ dependencies {
     compile files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     compile files('libs/AndroidBluetoothLibrary.jar')
     compile files('libs/androidplot-core-0.5.0-release.jar')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.0_alpha'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.0_alpha'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
