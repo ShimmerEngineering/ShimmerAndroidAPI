@@ -19,6 +19,13 @@ While this does have a dependency on the environment you are in (e.g. whether th
 
 From a users perspective to improve the success rate of connecting the first time seamlessly, we recommend using logic in the background which will automatically try to connect to the Shimmer device should the first time fail. An example implementation of this logic can be found in the project/app shimmerConnectionTest. Please refer to the readme of said project for further details. Using said logic we have found significant improvements on the poor performing phones like the Pocophone F1 and the OnePlus 5.
 
+# Important ~ Migration to Github Packages
+With JFrog removing services we have migrated to using Github Packages. This would be a good [starting point](https://docs.github.com/en/packages/learn-github-packages/installing-a-package).
+https://github.com/ShimmerEngineering?tab=packages&repo_name=ShimmerAndroidAPI 
+with the following above we have made available the last two versions which were on JFrog 3.0.73 and 3.0.74
+
+the following is also relevant that the Shimmer Java Android API is not a public repository
+https://github.com/ShimmerEngineering?tab=packages&repo_name=Shimmer-Java-Android-API
 
 # Important ~ Migration to JFrog
 With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
