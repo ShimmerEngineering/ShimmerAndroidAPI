@@ -148,7 +148,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                         case CONNECTED:
                             if(shimmer.getFirmwareVersionCode() >= 8){
                                 if(!spinner.isEnabled()){
-                                    switch(shimmer.getBtCommsCrcModeIfFwSupported()) {
+                                    switch(shimmer.getCurrentBtCommsCrcMode()) {
                                         case OFF:
                                             spinner.setSelection(0);
                                             break;
