@@ -2,6 +2,7 @@
 This example is only applicable for Shimmer3 devices onwards. For Shimmer2 devices, please see the Legacy Example
 
 - This example demonstrates connecting and streaming data from a Shimmer directly, without the use of the Bluetooth Manager
+- This example assume you have pre-configured you device and have the Low Noise Accelerometer enabled
 - The build.gradle file shows how to retrieve the library from bintray. Take note of the following:-
 
 ```

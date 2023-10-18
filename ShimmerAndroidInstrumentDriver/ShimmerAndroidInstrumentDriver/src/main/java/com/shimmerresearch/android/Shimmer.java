@@ -1177,7 +1177,7 @@ public class Shimmer extends ShimmerBluetooth{
 			mInStream.readFully(b,0,numberofBytes);
 			return(b);
 		} catch (IOException e) {
-
+			connectionLost();
 			System.out.println("Connection Lost");
 			e.printStackTrace();
 		}

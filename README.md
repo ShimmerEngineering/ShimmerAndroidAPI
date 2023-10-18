@@ -1,3 +1,32 @@
+# Introduction
+This API can be used to communicate with a Shimmer3 device via Bluetooth. A good starting point will be the [quick start guide](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Quick-Start-Guide) and the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki)
+
+# Known Issues
+While this does have a dependency on the environment you are in (e.g. whether there is significant radio noise in the Bluetooth spectrum) in general we've found that the rate of connecting to a Shimmer3 device on the first try varies across Android devices. The following gives an example of the results we've seen, where percentage of success is the number of times the Android Phone Model is able to connect successfully to a Shimmer device the first time of trying:-
+
+| Android Phone Model  | Percentage of Success |
+| ------------- | ------------- |
+| Nokia 2.3  | 96%  |
+| Pocophone F1  | 60%  |
+| Redmi Note4 | 97%  |
+| Redmi 9AT  | 99%  |
+| Samsung j3 | 97%  |
+| Samsung Galaxy A5 | 99% |
+| Samsung Galaxy A10 | 99% |
+| Xiaomi Redmi 9A | 99% |
+| Pixel 3A | 77% |
+| OnePlus 5 | 60% |
+
+From a users perspective to improve the success rate of connecting the first time seamlessly, we recommend using logic in the background which will automatically try to connect to the Shimmer device should the first time fail. An example implementation of this logic can be found in the project/app shimmerConnectionTest. Please refer to the readme of said project for further details. Using said logic we have found significant improvements on the poor performing phones like the Pocophone F1 and the OnePlus 5.
+
+# Important ~ Migration to Github Packages
+With JFrog removing services we have migrated to using Github Packages. This would be a good [starting point](https://docs.github.com/en/packages/learn-github-packages/installing-a-package).
+https://github.com/ShimmerEngineering?tab=packages&repo_name=ShimmerAndroidAPI 
+with the following above we have made available the last two versions which were on JFrog 3.0.73 and 3.0.74
+
+the following is also relevant that the Shimmer Java Android API is not a public repository
+https://github.com/ShimmerEngineering?tab=packages&repo_name=Shimmer-Java-Android-API
+
 # Important ~ Migration to JFrog
 With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
 
@@ -52,7 +81,7 @@ compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Bet
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is 3.0.65Beta.
+The latest version is 3.0.73Beta.
 
 The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
 Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 

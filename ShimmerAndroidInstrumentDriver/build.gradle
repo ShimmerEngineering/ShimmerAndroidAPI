@@ -11,22 +11,59 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.5.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath('org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0')
+        //classpath('org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0')
     }
 }
 // Plugin used to upload authenticated files to BinTray through Gradle
-plugins {
+/*plugins {
     id "com.jfrog.artifactory" version "4.21.0"
 }
 apply plugin: 'com.jfrog.artifactory'
+*/
 apply plugin: 'maven-publish'
 
 allprojects {
     repositories {
         google()
         maven {
-            url  "https://shimmersensing.jfrog.io/artifactory/ShimmerAPI"
-
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ShimmerEngineering/Shimmer-Java-Android-API")
+            credentials {
+                /* Create gradle.properties file in GRADLE_USER_HOME/.gradle/ 
+                (e.g. C:/Users/YourUsername/.gradle/) with the two lines listed below. Fill in your 
+                Github ID and personal access token - as generated through the Github Developer 
+                Settings page. The token needs to have "read:packages" scope enabled on it: 
+                    gpr.usr=GITHUB_USER_ID 
+                    gpr.key=PERSONAL_ACCESS_TOKEN 
+                */
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+		        /* should the above not work key in your username and password directly e.g.
+  		        username = "username"
+  		        password = "password"
+                DO NOT commit your username and password
+    		    */
+            }
+        }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ShimmerEngineering/ShimmerAndroidAPI")
+            credentials {
+                /* Create gradle.properties file in GRADLE_USER_HOME/.gradle/ 
+                (e.g. C:/Users/YourUsername/.gradle/) with the two lines listed below. Fill in your 
+                Github ID and personal access token - as generated through the Github Developer 
+                Settings page. The token needs to have "read:packages" scope enabled on it: 
+                    gpr.usr=GITHUB_USER_ID 
+                    gpr.key=PERSONAL_ACCESS_TOKEN 
+                */
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+		        /* should the above not work key in your username and password directly e.g.
+  		        username = "username"
+  		        password = "password"
+                DO NOT commit your username and password
+    		    */
+            }
         }
         mavenCentral()
         mavenLocal()
@@ -57,22 +94,4 @@ allprojects {
 //            }
 //        }
 //    }
-}
-
-project('ShimmerAndroidInstrumentDriver') {
-    artifactoryPublish.dependsOn('build')
-    publishing {
-        publications {
-            ShimmerAndroidInstrumentDriver(MavenPublication) {
-                groupId = 'com.shimmersensing'
-                version = project.version
-                artifactId project.getName()
-                artifact("$buildDir/outputs/aar/ShimmerAndroidInstrumentDriver}-release.aar")
-            }
-        }
-    }
-
-    artifactoryPublish {
-        publications(publishing.publications.ShimmerAndroidInstrumentDriver)
-    }
 }

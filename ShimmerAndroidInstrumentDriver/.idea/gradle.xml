@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/shimmer3DOrientationExample" />
             <option value="$PROJECT_DIR$/shimmerBLEBasicExample" />
             <option value="$PROJECT_DIR$/shimmerBasicExample" />
+            <option value="$PROJECT_DIR$/shimmerConnectionTest" />
             <option value="$PROJECT_DIR$/shimmerLegacyExample" />
             <option value="$PROJECT_DIR$/shimmerServiceExample" />
           </set>

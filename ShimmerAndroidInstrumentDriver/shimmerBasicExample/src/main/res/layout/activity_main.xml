@@ -43,7 +43,10 @@
         android:layout_height="wrap_content"
         android:onClick="connectDevice"
         android:text="Connect" />
-
+    <Spinner
+        android:id="@+id/crcSpinner"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content" />
     <Button
         android:id="@+id/button6"
         android:layout_width="200dp"
