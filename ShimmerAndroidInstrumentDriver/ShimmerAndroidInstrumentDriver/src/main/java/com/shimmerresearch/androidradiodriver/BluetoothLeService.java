@@ -18,7 +18,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.shimmerresearch.driverUtilities.UtilShimmer;
 import com.shimmerresearch.verisense.communication.ByteCommunicationListener;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
     TaskCompletionSource<Boolean> mTaskConnect = new TaskCompletionSource<Boolean>();
     TaskCompletionSource<Boolean> mTaskWrite = new TaskCompletionSource<Boolean>();
-    TaskCompletionSource<String> mTaskMTU = new TaskCompletionSource<>();
+    TaskCompletionSource<Boolean> mTaskMTU = new TaskCompletionSource<Boolean>();
     String TxID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
     String RxID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
     String ServiceID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
@@ -72,15 +71,15 @@ public class BluetoothLeService extends Service {
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
 
-                //mTaskMTU= new TaskCompletionSource<>();
+                mTaskMTU= new TaskCompletionSource<Boolean>();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    //gatt.requestMtu(251);
-                    /*
+                    gatt.requestMtu(251);
+
                     try {
                         boolean result = mTaskMTU.getTask().waitForCompletion(3, TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    }*/
+                    }
                 }
                 if (mByteCommunicationListener != null) {
                     mByteCommunicationListener.eventConnected();
@@ -137,9 +136,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            Log.d(TAG, "onCharacteristicRead characteristic:" + characteristic);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(TAG, "onCharacteristicRead charac.getvalue():" + characteristic.getValue() + "status: " + status);
                 setCharacteristicNotification(characteristic, true);
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
@@ -148,28 +145,13 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
 
-            Log.d(TAG, "HEREEE onCharacteristicChanged charac.getvalue():" + UtilShimmer.bytesToHexStringWithSpacesFormatted(characteristic.getValue()));
+            mByteCommunicationListener.eventNewBytesReceived(characteristic.getValue());
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
         }
         @Override
         public void onMtuChanged(BluetoothGatt gatt, int mtu, int status){
             Log.d(TAG, "MTU Changed: " + mtu);
-            //mTaskMTU.setResult("MTU Changed: " + mtu);
-        }
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status){
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(TAG, "onCharacteristicWrite charac.getvalue():" + UtilShimmer.bytesToHexStringWithSpacesFormatted(characteristic.getValue()) + "status: " + status);
-                //setCharacteristicNotification(characteristic, true);
-                //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            }else{
-                Log.d(TAG, "onCharacteristicWrite not GATT_SUCCESS, status: " + status);
-            }
-            mTaskWrite.setResult(true);
-        }
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-
+            mTaskMTU.setResult(true);
         }
     };
 
@@ -180,33 +162,10 @@ public class BluetoothLeService extends Service {
     private void broadcastUpdate(final String action,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        // This is special handling for the Heart Rate Measurement profile.  Data parsing is
-        // carried out as per profile specifications:
-        // http://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-
-        /*
-        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-        int flag = characteristic.getProperties();
-        int format = -1;
-        if ((flag & 0x01) != 0) {
-            format = BluetoothGattCharacteristic.FORMAT_UINT16;
-            Log.d(TAG, "Heart rate format UINT16.");
-        } else {
-            format = BluetoothGattCharacteristic.FORMAT_UINT8;
-            Log.d(TAG, "Heart rate format UINT8.");
-        }
-        final int heartRate = characteristic.getIntValue(format, 1);
-        Log.d(TAG, String.format("Received heart rate: %d", heartRate));
-        intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-    } else {
-         */
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 try{
-                    System.out.println("To call eventNewBytesReceived" + UtilShimmer.bytesToHexStringWithSpacesFormatted(data));
-
-                    //mByteCommunicationListener.eventNewBytesReceived(data);
                     final StringBuilder stringBuilder = new StringBuilder(data.length);
                     for(byte byteChar : data)
                         stringBuilder.append(String.format("%02X ", byteChar));
@@ -217,7 +176,6 @@ public class BluetoothLeService extends Service {
                 }
 
             }
-
         sendBroadcast(intent);
     }
     public class LocalBinder extends Binder {
@@ -375,14 +333,13 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-        /*
-        // This is specific to Heart Rate Measurement.
-        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            bluetoothGatt.writeDescriptor(descriptor);
+
+        //Enabled remote notifications
+        BluetoothGattDescriptor desc = characteristic.getDescriptor(CCCD_ID);
+        if(desc != null) {
+            desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(desc);
         }
-         */
     }
     /**
      * Retrieves a list of supported GATT services on the connected device. This should be
@@ -426,37 +383,15 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
-        //byte[] value = new byte[1];
-        //value[0] = (byte) (21 & 0xFF);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             charac.setValue(data);
         }
+
         setCharacteristicNotification(charac, true);
-        //Enabled remote notifications
-        BluetoothGattDescriptor desc = charac.getDescriptor(CCCD_ID);
-        if(desc != null){
-            desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(desc);
-        }else{
-            System.out.println("DESC null, charac: " + UtilShimmer.bytesToHexStringWithSpacesFormatted(charac.getValue()));
-        }
 
         boolean status = false;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            mTaskWrite = new TaskCompletionSource<Boolean>();
-            System.out.println("WRITEEE" + UtilShimmer.bytesToHexStringWithSpacesFormatted(charac.getValue()));
-            //status = mBluetoothGatt.writeCharacteristic(charac);
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
             status = mBluetoothGatt.writeCharacteristic(charac);
-
-            try {
-                boolean result = mTaskWrite.getTask().waitForCompletion(5, TimeUnit.SECONDS);
-                Thread.sleep(200);
-                if (!result) {
-                    System.out.println("Write fail");
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         return status;
     }
