@@ -65,29 +65,17 @@ public class BluetoothLeService extends Service {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                Log.i(TAG, "Connected to GATT server.");
+                intentAction = ACTION_GATT_CONNECTED;
+                mConnectionState = STATE_CONNECTED;
+                broadcastUpdate(intentAction);
                 // Attempts to discover services after successful connection.
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
-                intentAction = ACTION_GATT_CONNECTED;
-                mConnectionState = STATE_CONNECTED;
 
-                mTaskMTU= new TaskCompletionSource<Boolean>();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    gatt.requestMtu(251);
-
-                    try {
-                        boolean result = mTaskMTU.getTask().waitForCompletion(3, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
                 if (mByteCommunicationListener != null) {
                     mByteCommunicationListener.eventConnected();
                 }
-
-                broadcastUpdate(intentAction);
-                Log.i(TAG, "Connected to GATT server.");
-
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
@@ -127,6 +115,9 @@ public class BluetoothLeService extends Service {
                     Log.i(TAG, "Service characteristic not found for UUID: " + sid);
                 }
                 mTaskConnect.setResult(true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    gatt.requestMtu(251);
+                }
             } else {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
             }
@@ -146,12 +137,11 @@ public class BluetoothLeService extends Service {
                                             BluetoothGattCharacteristic characteristic) {
 
             mByteCommunicationListener.eventNewBytesReceived(characteristic.getValue());
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+            //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
         }
         @Override
         public void onMtuChanged(BluetoothGatt gatt, int mtu, int status){
             Log.d(TAG, "MTU Changed: " + mtu);
-            mTaskMTU.setResult(true);
         }
     };
 
@@ -174,7 +164,6 @@ public class BluetoothLeService extends Service {
                 }catch(Exception ex){
                     System.out.println(ex.getMessage());
                 }
-
             }
         sendBroadcast(intent);
     }
@@ -387,7 +376,7 @@ public class BluetoothLeService extends Service {
             charac.setValue(data);
         }
 
-        setCharacteristicNotification(charac, true);
+        //setCharacteristicNotification(charac, true);
 
         boolean status = false;
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
