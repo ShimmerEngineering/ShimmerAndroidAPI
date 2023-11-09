@@ -142,6 +142,9 @@ public class BluetoothLeService extends Service {
         @Override
         public void onMtuChanged(BluetoothGatt gatt, int mtu, int status){
             Log.d(TAG, "MTU Changed: " + mtu);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+            }
         }
     };
 

@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     BluetoothAdapter btAdapter;
     //String deviceAddress = "C9:61:17:53:74:02";
     String deviceAddress = "C0:04:19:85:9A:D5";
-
+    TextView throughputTxtView;
+    boolean isSpeedTest = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOG_TAG, "BluetoothLe Service started");
             Toast.makeText(this, "BluetoothLe Service started", Toast.LENGTH_SHORT).show();
         }
+        throughputTxtView = (TextView)findViewById(R.id.throughputTxtView);
     }
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -100,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             mService = null;
             isServiceStarted = false;
             Log.d(SERVICE_TAG, "BluetoothLe Service Disconnected");
+            isSpeedTest = false;
         }
     };
 
@@ -116,9 +120,12 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 //connected = true;
                 //updateConnectionState(R.string.connected);
+                throughputTxtView.setText("CONNECTED");
+
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 //connected = false;
                 //updateConnectionState(R.string.disconnected);
+                throughputTxtView.setText("DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 //displayGattServices(mService.getSupportedGattServices());
@@ -156,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-
             }
         };
 
@@ -167,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(){
             public void run(){
                 try {
+                    isSpeedTest = false;
                     device1a.disconnect();
                 } catch (ShimmerException e) {
                     e.printStackTrace();
@@ -244,8 +251,13 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(){
             public void run(){
                 try {
+                    isSpeedTest = true;
                     protocol1a.startSpeedTest();
+                    while(isSpeedTest){
+                        throughputTxtView.setText(protocol1a.dataTransferRate);
+                    }
                 } catch (ShimmerException e) {
+                    isSpeedTest = false;
                     e.printStackTrace();
                 }
             }
@@ -258,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(){
             public void run(){
                 try {
+                    isSpeedTest = false;
                     protocol1a.stopSpeedTest();
                 } catch (ShimmerException e) {
                     e.printStackTrace();

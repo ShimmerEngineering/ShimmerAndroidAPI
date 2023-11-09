@@ -87,4 +87,11 @@
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="447dp" />
 
+    <TextView
+        android:id="@+id/throughputTxtView"
+        android:layout_width="246dp"
+        android:layout_height="61dp"
+        android:text="TextView"
+        android:textAlignment="center" />
+
 </android.widget.LinearLayout>
