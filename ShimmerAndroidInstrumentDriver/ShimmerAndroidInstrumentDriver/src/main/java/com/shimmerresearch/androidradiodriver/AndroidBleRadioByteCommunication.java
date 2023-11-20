@@ -94,6 +94,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
 
                 if (mByteCommunicationListener != null) {
                     mByteCommunicationListener.eventConnected();
@@ -181,7 +182,11 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                         @Override
                         public void onCharacteristicChanged(byte[] data) {
                             if (mByteCommunicationListener != null) {
-                                mByteCommunicationListener.eventNewBytesReceived(data);
+                                try{
+                                    mByteCommunicationListener.eventNewBytesReceived(data);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     });
