@@ -34,18 +34,18 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
-
+    protected Handler mHandler;
     private final static String LOG_TAG = "Shimmer3BLEBasicExample";
-    //Shimmer3BLEAndroid shimmer1 = new Shimmer3BLEAndroid("C0:04:19:85:9A:D5");
-    //Shimmer3BLEAndroid shimmer1 = new Shimmer3BLEAndroid("00:06:66:E7:B5:B9");
-    Shimmer3BLEAndroid shimmer1 = new Shimmer3BLEAndroid("E8:EB:1B:97:67:FC");
-//E8EB1B9767FC
+    Shimmer3BLEAndroid shimmer1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BleManager.getInstance().init(getApplication());
 
+        this.mHandler = handler;
+        shimmer1 = new Shimmer3BLEAndroid("E8:EB:1B:97:67:FC", this.mHandler);
         SensorDataReceived sdr = this.new SensorDataReceived();
         sdr.setWaitForData(shimmer1);
 
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Messages from the Shimmer device including sensor data are received here
      */
-    Handler mHandler = new Handler() {
+    Handler handler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {

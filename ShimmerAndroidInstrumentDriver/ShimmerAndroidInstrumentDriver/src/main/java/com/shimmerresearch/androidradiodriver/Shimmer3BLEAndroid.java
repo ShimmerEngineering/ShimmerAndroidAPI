@@ -70,7 +70,7 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
     /**
      * Initialize a ble radio
      *
-     * @param mac mac address of the verisense device e.g. d0:2b:46:3d:a2:bb
+     * @param mac mac address of the Shimmer3 BLE device e.g. d0:2b:46:3d:a2:bb
      */
     public Shimmer3BLEAndroid(String mac) {
         mMac = mac;
@@ -86,10 +86,12 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
     @Override
     public void sendCallBackMsg(int msgid,Object obj){
-        mHandler.obtainMessage(msgid, obj).sendToTarget();
+        if (mHandler != null) {
+            mHandler.obtainMessage(msgid, obj).sendToTarget();
+        }
     }
     /**
-     * Connect to the verisense device
+     * Connect to the Shimmer3 BLE device
      */
     @Override
     public void connect(String s, String s1) {
@@ -135,11 +137,13 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
                 startServiceS(bleDevice);
                 System.out.println(bleDevice.getMac() + " Connected");
                 mTaskConnect.setResult("Connected");
-                mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                        new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED)).sendToTarget();
+                //mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                        //new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED)).sendToTarget();
+                sendCallBackMsg(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED));
                 Bundle bundle = new Bundle();
                 bundle.putString(TOAST, "Device connection established");
                 sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+
                 mIOThread = new IOThread();
                 mIOThread.start();
                 if (mUseProcessingThread){
@@ -152,8 +156,10 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                        new ObjectCluster("", bleDevice.getMac(), BT_STATE.DISCONNECTED)).sendToTarget();
+                //mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                        //new ObjectCluster("", bleDevice.getMac(), BT_STATE.DISCONNECTED)).sendToTarget();
+                sendCallBackMsg(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, new ObjectCluster("", bleDevice.getMac(), BT_STATE.DISCONNECTED));
+
                 Bundle bundle = new Bundle();
                 bundle.putString(TOAST, "Device connection was lost");
                 sendMsgToHandlerList(MESSAGE_TOAST, bundle);

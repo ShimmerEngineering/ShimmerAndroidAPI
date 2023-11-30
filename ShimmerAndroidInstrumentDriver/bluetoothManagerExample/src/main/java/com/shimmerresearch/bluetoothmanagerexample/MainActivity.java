@@ -55,8 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     ShimmerBluetoothManagerAndroid btManager;
     ShimmerDevice shimmerDevice;
-    String shimmerBtAdd = "E8:EB:1B:97:67:FC";  //Put the address of the Shimmer device you want to connect here
-    //String shimmerBtAdd = "00:06:66:BA:D1:E5";  //Put the address of the Shimmer device you want to connect here
+    String shimmerBtAdd;
 
     ShimmerBluetoothManagerAndroid.BT_TYPE preferredBtType;
     final static String LOG_TAG = "BluetoothManagerExample";
