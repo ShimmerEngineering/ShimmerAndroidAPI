@@ -8,7 +8,7 @@ apply plugin: 'maven-publish'
 version = '3.0.72Beta'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
 
     lintOptions {
         abortOnError false
@@ -18,7 +18,7 @@ android {
         // Enabling multidex support.
         multiDexEnabled true
         minSdkVersion 14
-        targetSdkVersion 14
+        targetSdkVersion 26
     }
 
     buildTypes {
