@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected Handler mHandler;
     private final static String LOG_TAG = "Shimmer3BLEBasicExample";
     Shimmer3BLEAndroid shimmer1;
+    String macAddress = "E8:EB:1B:97:67:FC";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         BleManager.getInstance().init(getApplication());
 
         this.mHandler = handler;
-        shimmer1 = new Shimmer3BLEAndroid("E8:EB:1B:97:67:FC", this.mHandler);
+        shimmer1 = new Shimmer3BLEAndroid(macAddress, this.mHandler);
         SensorDataReceived sdr = this.new SensorDataReceived();
         sdr.setWaitForData(shimmer1);
 
