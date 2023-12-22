@@ -66,12 +66,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{
-                            Manifest.permission.BLUETOOTH_ADVERTISE,
-                            Manifest.permission.BLUETOOTH_CONNECT,
-                            Manifest.permission.BLUETOOTH_SCAN,
-                            Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                requestPermissions(new String[]{
+                                Manifest.permission.BLUETOOTH_ADVERTISE,
+                                Manifest.permission.BLUETOOTH_CONNECT,
+                                Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.ACCESS_FINE_LOCATION},
+                        0);
+            }else{
+                requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION},
+                        0);
+            }
         }
 
 // Register for broadcasts when a device is discovered.
