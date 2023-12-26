@@ -148,23 +148,23 @@ public class MainActivity extends AppCompatActivity {
                         FormatCluster timeStampCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         double timeStampData = timeStampCluster.mData;
                         Log.i(LOG_TAG, "Time Stamp: " + timeStampData);
-                        allFormats = objectCluster.getCollectionOfFormatClusters(SensorLIS2DW12.ObjectClusterSensorName.LIS2DW12_ACC_X);
+                        allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
                         FormatCluster accelXCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         if (accelXCluster!=null) {
                             double accelXData = accelXCluster.mData;
-                            Log.i(LOG_TAG, "Accel X: " + accelXData);
+                            Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
-                        allFormats = objectCluster.getCollectionOfFormatClusters(SensorLIS2DW12.ObjectClusterSensorName.LIS2DW12_ACC_Y);
+                        allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
                         FormatCluster accelYCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
-                        if (accelXCluster!=null) {
+                        if (accelYCluster!=null) {
                             double accelYData = accelYCluster.mData;
-                            Log.i(LOG_TAG, "Accel Y: " + accelYData);
+                            Log.i(LOG_TAG, "Accel LN Y: " + accelYData);
                         }
-                        allFormats = objectCluster.getCollectionOfFormatClusters(SensorLIS2DW12.ObjectClusterSensorName.LIS2DW12_ACC_Z);
+                        allFormats = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X);
                         FormatCluster accelZCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormats,"CAL"));
                         if (accelZCluster!=null) {
                             double accelZData = accelZCluster.mData;
-                            Log.i(LOG_TAG, "Accel Z: " + accelZData);
+                            Log.i(LOG_TAG, "Accel LN Z: " + accelZData);
                         }
 
                     }
