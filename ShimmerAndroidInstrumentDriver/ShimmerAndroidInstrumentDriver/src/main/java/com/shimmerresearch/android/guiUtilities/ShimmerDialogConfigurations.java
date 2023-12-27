@@ -29,6 +29,7 @@ import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.androidinstrumentdriver.R;
+import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
@@ -224,6 +225,8 @@ public class ShimmerDialogConfigurations {
 
                         if (shimmerDeviceClone instanceof Shimmer) {
                             bluetoothManager.configureShimmer(shimmerDeviceClone);
+                        }else if(shimmerDeviceClone instanceof Shimmer3BLEAndroid) {
+                            bluetoothManager.configureShimmer(shimmerDeviceClone);
                         }
                     }
                 })
@@ -329,6 +332,8 @@ public class ShimmerDialogConfigurations {
                                     ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                                 } else if (shimmerDevice instanceof Shimmer4Android){
                                     ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
+                                }else if(shimmerDeviceClone instanceof Shimmer3BLEAndroid) {
+                                    ((Shimmer3BLEAndroid)shimmerDevice).writeBytes(shimmerDeviceClone.getShimmerConfigBytes());
                                 }
                             }
                         });
@@ -363,6 +368,8 @@ public class ShimmerDialogConfigurations {
                             ((Shimmer)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         } else if (shimmerDevice instanceof Shimmer4Android){
                             ((Shimmer4Android)shimmerDevice).writeConfigBytes(shimmerDeviceClone.getShimmerConfigBytes());
+                        }else if(shimmerDeviceClone instanceof Shimmer3BLEAndroid) {
+                            ((Shimmer3BLEAndroid)shimmerDevice).writeBytes(shimmerDeviceClone.getShimmerConfigBytes());
                         }
                     }
                 });
@@ -414,6 +421,8 @@ public class ShimmerDialogConfigurations {
                                     bluetoothManager.configureShimmer(shimmerDeviceClone);
                                     //((Shimmer)shimmerDevice).configureShimmer(shimmerDeviceClone);
                                 } else if (shimmerDevice instanceof Shimmer4Android){
+                                    bluetoothManager.configureShimmer(shimmerDeviceClone);
+                                }else if(shimmerDevice instanceof Shimmer3BLEAndroid) {
                                     bluetoothManager.configureShimmer(shimmerDeviceClone);
                                 }
                             }
@@ -531,6 +540,8 @@ public class ShimmerDialogConfigurations {
         if (clone instanceof Shimmer) {
             bluetoothManager.configureShimmer(clone);
         } else if (clone instanceof Shimmer4Android){
+            bluetoothManager.configureShimmer(clone);
+        } else if (clone instanceof Shimmer3BLEAndroid){
             bluetoothManager.configureShimmer(clone);
         }
 
