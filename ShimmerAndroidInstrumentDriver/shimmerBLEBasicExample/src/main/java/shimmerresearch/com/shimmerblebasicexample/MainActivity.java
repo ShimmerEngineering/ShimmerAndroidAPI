@@ -38,7 +38,8 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 public class MainActivity extends Activity {
 
     private final static String LOG_TAG = "ShimmerBLEBasicExample";
-    AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("E7:45:2C:6D:6F:14");
+    AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("C0:04:19:85:9A:D5");
+    //AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("C9:61:17:53:74:02");
     VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
     VerisenseDeviceAndroid device1;
 
@@ -138,6 +139,34 @@ public class MainActivity extends Activity {
             public void run(){
                 try {
                     protocol1.stopStreaming();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+
+    }
+    public void startSpeedTest(View v) throws IOException, ShimmerException {
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    protocol1.startSpeedTest();
+                } catch (ShimmerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+
+    }
+    public void stopSpeedTest(View v) throws IOException, ShimmerException {
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    protocol1.stopSpeedTest();
                 } catch (ShimmerException e) {
                     e.printStackTrace();
                 }

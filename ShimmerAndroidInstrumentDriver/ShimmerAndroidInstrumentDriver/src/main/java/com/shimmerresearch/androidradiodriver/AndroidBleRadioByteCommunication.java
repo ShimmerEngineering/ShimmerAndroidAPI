@@ -1,5 +1,6 @@
 package com.shimmerresearch.androidradiodriver;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -94,6 +95,9 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+                }
 
                 if (mByteCommunicationListener != null) {
                     mByteCommunicationListener.eventConnected();
@@ -101,6 +105,9 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                 mBleDevice = bleDevice;
                 startServiceS(bleDevice);
                 System.out.println(bleDevice.getMac() + " Connected");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED);
+                }
                 mTaskConnect.setResult("Connected");
             }
 
@@ -181,7 +188,11 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
                         @Override
                         public void onCharacteristicChanged(byte[] data) {
                             if (mByteCommunicationListener != null) {
-                                mByteCommunicationListener.eventNewBytesReceived(data);
+                                try{
+                                    mByteCommunicationListener.eventNewBytesReceived(data);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     });

@@ -23,8 +23,8 @@
         android:id="@+id/button2"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Start Streaming"
         android:onClick="startStreaming"
+        android:text="Start Streaming"
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="447dp" />
 
@@ -68,4 +68,23 @@
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="447dp"
         android:onClick="readOpConfig" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="startSpeedTest"
+        android:text="Start Speed Test"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="205dp"
+        android:layout_height="wrap_content"
+        android:onClick="stopSpeedTest"
+        android:text="Stop Speed Test"
+        tools:layout_editor_absoluteX="133dp"
+        tools:layout_editor_absoluteY="447dp" />
+
 </android.widget.LinearLayout>
