@@ -1,4 +1,4 @@
-package shimmerresearch.com.shimmerblebasicexample;
+package shimmerresearch.com.verisenseblebasicexample;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

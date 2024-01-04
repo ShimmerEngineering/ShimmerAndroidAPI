@@ -1,4 +1,4 @@
-package shimmerresearch.com.shimmerblebasicexample;
+package shimmerresearch.com.verisenseblebasicexample;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,8 +11,7 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
-import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
-import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
+import com.shimmerresearch.androidradiodriver.VerisenseBleAndroidRadioByteCommunication;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
@@ -20,25 +19,21 @@ import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.exceptions.ShimmerException;
 
-import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.verisense.sensors.SensorLIS2DW12;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
 public class MainActivity extends Activity {
 
-    private final static String LOG_TAG = "ShimmerBLEBasicExample";
-    AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("C0:04:19:85:9A:D5");
+    private final static String LOG_TAG = "VeriBLEBasicExample";
+    String macAddress = "C0:04:19:85:9A:D5";
+
+    VerisenseBleAndroidRadioByteCommunication radio1 = new VerisenseBleAndroidRadioByteCommunication(macAddress);
     //AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("C9:61:17:53:74:02");
     VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
     VerisenseDeviceAndroid device1;

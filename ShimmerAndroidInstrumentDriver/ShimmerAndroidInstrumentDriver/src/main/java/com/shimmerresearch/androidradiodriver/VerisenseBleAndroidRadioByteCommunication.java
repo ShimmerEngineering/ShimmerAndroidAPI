@@ -31,7 +31,7 @@ import bolts.TaskCompletionSource;
 /**
  * Each instance of this class represents a ble radio that is used to communicate with a verisense device
  */
-public class AndroidBleRadioByteCommunication extends AbstractByteCommunication {
+public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommunication {
     BleDevice mBleDevice;
     String TxID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
     String RxID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
@@ -48,7 +48,7 @@ public class AndroidBleRadioByteCommunication extends AbstractByteCommunication 
      * Initialize a ble radio
      * @param mac  mac address of the verisense device e.g. d0:2b:46:3d:a2:bb
      */
-    public AndroidBleRadioByteCommunication(String mac) {
+    public VerisenseBleAndroidRadioByteCommunication(String mac) {
         mMac = mac;
     }
     TaskCompletionSource<String> mTaskConnect = new TaskCompletionSource<>();

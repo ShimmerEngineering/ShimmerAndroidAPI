@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
-import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
+import com.shimmerresearch.androidradiodriver.VerisenseBleAndroidRadioByteCommunication;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
@@ -31,16 +31,16 @@ import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final static String LOG_TAG = "ShimmerBLEBasicExample";
-    AndroidBleRadioByteCommunication radio1 = new AndroidBleRadioByteCommunication("C0:04:19:85:9A:D5");
+    private final static String LOG_TAG = "MultiVeriBLEExample";
+    VerisenseBleAndroidRadioByteCommunication radio1 = new VerisenseBleAndroidRadioByteCommunication("C0:04:19:85:9A:D5");
     VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
     VerisenseDeviceAndroid device1;
 
-    AndroidBleRadioByteCommunication radio2 = new AndroidBleRadioByteCommunication("C9:61:17:53:74:02");
+    VerisenseBleAndroidRadioByteCommunication radio2 = new VerisenseBleAndroidRadioByteCommunication("C9:61:17:53:74:02");
     VerisenseProtocolByteCommunication protocol2 = new VerisenseProtocolByteCommunication(radio2);
     VerisenseDeviceAndroid device2;
 //BTHLE\Dev_f2527c20d97e
-    AndroidBleRadioByteCommunication radio3 = new AndroidBleRadioByteCommunication("F2:52:7C:20:D9:7E");
+    VerisenseBleAndroidRadioByteCommunication radio3 = new VerisenseBleAndroidRadioByteCommunication("F2:52:7C:20:D9:7E");
     VerisenseProtocolByteCommunication protocol3 = new VerisenseProtocolByteCommunication(radio3);
     VerisenseDeviceAndroid device3;
     TextView txtViewThroughput1;

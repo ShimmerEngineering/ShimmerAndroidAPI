@@ -14,8 +14,6 @@ import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
-import com.shimmerresearch.android.VerisenseDeviceAndroid;
-import com.shimmerresearch.androidradiodriver.AndroidBleRadioByteCommunication;
 import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.BasicProcessWithCallBack;
@@ -27,8 +25,6 @@ import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.sensors.kionix.SensorKionixAccel;
-import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
-import com.shimmerresearch.verisense.sensors.SensorLIS2DW12;
 
 import java.io.IOException;
 import java.util.Collection;
