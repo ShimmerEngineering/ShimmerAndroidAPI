@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 //apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
-version = '3.0.72Beta'
+version = '3.0.73Beta'
 
 android {
     compileSdkVersion 26
