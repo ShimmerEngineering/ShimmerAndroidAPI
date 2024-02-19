@@ -33,12 +33,12 @@ import bolts.TaskCompletionSource;
  */
 public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommunication {
     BleDevice mBleDevice;
-    String TxID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
-    String RxID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
-    String ServiceID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
-    UUID sid = UUID.fromString(ServiceID);
-    UUID txid = UUID.fromString(TxID);
-    UUID rxid = UUID.fromString(RxID);
+    protected String TxID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
+    protected String RxID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+    protected String ServiceID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+    protected UUID sid;
+    protected UUID txid;
+    protected UUID rxid;
     String mMac;
     String uuid;
 
@@ -50,6 +50,10 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
      */
     public VerisenseBleAndroidRadioByteCommunication(String mac) {
         mMac = mac;
+        sid = UUID.fromString(ServiceID);
+        txid = UUID.fromString(TxID);
+        rxid = UUID.fromString(RxID);
+
     }
     TaskCompletionSource<String> mTaskConnect = new TaskCompletionSource<>();
     TaskCompletionSource<String> mTaskMTU = new TaskCompletionSource<>();
