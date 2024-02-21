@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -26,7 +27,7 @@ import com.shimmerresearch.shimmer3.communication.SpeedTestProtocol;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
-    SpeedTestProtocol protocol;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,20 +47,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //ShimmerSerialPortAndroid portspp = new ShimmerSerialPortAndroid("E8:EB:1B:71:3E:36",true);
-        //TestRadioSerialPort portspp = new TestRadioSerialPort();
-        Shimmer3BleAndroidRadioByteCommunication port = new Shimmer3BleAndroidRadioByteCommunication("E8:EB:1B:71:3E:36");
-        //Shimmer3RAndroidRadioByteCommunication port = new Shimmer3RAndroidRadioByteCommunication("E8:EB:1B:71:3E:36");
-        //SerialPortByteCommunication port = new SerialPortByteCommunication(portspp);
-        protocol = new SpeedTestProtocol(port);
-        try {
-            protocol.connect();
 
-            //portspp.rxBytes(100);
 
-        } catch (ShimmerException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
@@ -75,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        protocol.startSpeedTest();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;

@@ -20,6 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity   android:name="com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="@string/select_device">
+        </activity>
     </application>
 
 </manifest>
