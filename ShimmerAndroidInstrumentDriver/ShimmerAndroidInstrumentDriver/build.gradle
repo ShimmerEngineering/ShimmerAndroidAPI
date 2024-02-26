@@ -75,6 +75,7 @@ publishing {
 def getArtificatId = { ->
     return "ShimmerAndroidInstrumentDriver" // Replace with library name ID
 }
+/*
 publishing {
     publications {
         bar(MavenPublication) {
@@ -90,14 +91,14 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/ShimmerEngineering/ShimmerAndroidAPI")
             credentials {
-                /**Create github.properties in root project folder file with gpra.usr=GITHUB_USER_ID  & gpra.key=PERSONAL_ACCESS_TOKEN**/
+                //Create github.properties in root project folder file with gpra.usr=GITHUB_USER_ID  & gpra.key=PERSONAL_ACCESS_TOKEN
                 username = githubProperties['gpra.usr'] ?: System.getenv("GPRA_USER")
                 password = githubProperties['gpra.key'] ?: System.getenv("GPRA_API_KEY")
             }
         }
     }
 }
-
+*/
 dependencies {
     compile 'com.google.guava:guava:20.0'
     compile 'java3d:vecmath:1.3.1'
