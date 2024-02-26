@@ -2,8 +2,9 @@ package com.shimmerresearch.shimmerserviceexample;
 
 import android.app.Activity;
 import android.os.Message;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,9 +12,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -35,6 +37,7 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.util.List;
 
@@ -54,14 +57,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     XYPlot dynamicPlot;
 
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter1 mSectionsPagerAdapter1;
 
     /**
@@ -137,14 +132,22 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.start_streaming:
                 if(selectedDeviceAddress != null) {
                     ShimmerDevice mDevice1 = mService.getShimmer(selectedDeviceAddress);
-                    mDevice1.startStreaming();
+                    try {
+                        mDevice1.startStreaming();
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
+                    }
                     signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
                 }
                 return true;
             case R.id.stop_streaming:
                 if(selectedDeviceAddress != null) {
                     ShimmerDevice mDevice2 = mService.getShimmer(selectedDeviceAddress);
-                    mDevice2.stopStreaming();
+                    try {
+                        mDevice2.stopStreaming();
+                    } catch (ShimmerException e) {
+                        e.printStackTrace();
+                    }
                     sensorsEnabledFragment.buildSensorsList(mDevice2, this, mService.getBluetoothManager());
                     deviceConfigFragment.buildDeviceConfigList(mDevice2, this, mService.getBluetoothManager());
                 }
