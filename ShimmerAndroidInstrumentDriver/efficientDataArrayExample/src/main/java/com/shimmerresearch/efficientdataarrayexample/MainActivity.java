@@ -21,6 +21,7 @@ import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -95,7 +96,11 @@ public class MainActivity extends Activity {
             shimmer.enablePCTimeStamps(false);
             //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
             shimmer.enableArraysDataStructure(true);
-            btManager.startStreaming(bluetoothAdd);
+            try {
+                btManager.startStreaming(bluetoothAdd);
+            } catch (ShimmerException e) {
+                e.printStackTrace();
+            }
         } else {
             Toast.makeText(this, "Can't start streaming\nShimmer device is not connected", Toast.LENGTH_SHORT).show();
         }
@@ -112,7 +117,11 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
 
-            btManager.stopStreaming(bluetoothAdd);
+            try {
+                btManager.stopStreaming(bluetoothAdd);
+            } catch (ShimmerException e) {
+                e.printStackTrace();
+            }
         } else {
             Toast.makeText(this, "Can't stop streaming\nShimmer device is not connected", Toast.LENGTH_SHORT).show();
         }

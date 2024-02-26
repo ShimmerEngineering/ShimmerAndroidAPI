@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
 
 
 
     defaultConfig {
         applicationId "com.shimmerresearch.efficientdataarrayexample"
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -39,6 +39,10 @@ android {
         exclude 'META-INF/ASL2.0'
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
 }
 
@@ -50,16 +54,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile project(path: ':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.2_alpha'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.2_alpha'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
     }
 }

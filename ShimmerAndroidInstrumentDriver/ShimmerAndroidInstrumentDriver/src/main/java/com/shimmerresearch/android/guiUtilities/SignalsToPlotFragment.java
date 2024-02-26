@@ -3,7 +3,6 @@ package com.shimmerresearch.android.guiUtilities;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.util.Log;
@@ -11,6 +10,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import androidx.annotation.Nullable;
 
 import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;

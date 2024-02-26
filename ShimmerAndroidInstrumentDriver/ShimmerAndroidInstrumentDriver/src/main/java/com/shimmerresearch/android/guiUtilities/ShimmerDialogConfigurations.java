@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
