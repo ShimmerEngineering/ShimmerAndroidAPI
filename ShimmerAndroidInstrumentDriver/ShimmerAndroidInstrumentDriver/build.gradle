@@ -8,7 +8,7 @@ apply plugin: 'maven-publish'
 version = '3.0.73Beta'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 33
 
     lintOptions {
         abortOnError false
@@ -18,7 +18,7 @@ android {
         // Enabling multidex support.
         multiDexEnabled true
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 33
     }
 
     buildTypes {
@@ -105,20 +105,6 @@ dependencies {
     compile files('libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     compile files('libs/AndroidBluetoothLibrary.jar')
     compile files('libs/androidplot-core-0.5.0-release.jar')
-    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.2_alpha'){
-
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-
-    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.2_alpha'){
-
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-    }
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.clj.fastble:FastBleLib:2.3.4'
 }

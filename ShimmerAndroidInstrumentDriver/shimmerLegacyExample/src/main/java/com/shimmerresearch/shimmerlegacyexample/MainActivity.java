@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +21,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -141,11 +142,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startStreaming(View v) {
-        btManager.startStreaming(shimmerBtAdd);
+        try {
+            btManager.startStreaming(shimmerBtAdd);
+        } catch (ShimmerException e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopStreaming(View v) {
-        btManager.stopStreaming(shimmerBtAdd);
+        try {
+            btManager.stopStreaming(shimmerBtAdd);
+        } catch (ShimmerException e) {
+            e.printStackTrace();
+        }
     }
 
     public void disconnectDevice(View v){

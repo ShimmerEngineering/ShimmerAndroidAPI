@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,6 +21,7 @@ import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -95,7 +96,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     }
 
     public void startStreaming(View v) throws InterruptedException, IOException{
-        shimmer.startStreaming();
+        try {
+            shimmer.startStreaming();
+        } catch (ShimmerException e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopStreaming(View v) throws IOException{

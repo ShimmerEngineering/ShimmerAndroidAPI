@@ -49,20 +49,6 @@ android {
 
 dependencies {
     implementation project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.2_alpha'){
-
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-
-    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.2_alpha'){
-
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-    }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

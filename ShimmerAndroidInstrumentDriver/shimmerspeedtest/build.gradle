@@ -43,20 +43,6 @@ android {
 dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.2_alpha'){
-
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-
-    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.2_alpha'){
-
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-    }
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     implementation 'android.arch.navigation:navigation-fragment:1.0.0'
     implementation 'android.arch.navigation:navigation-ui:1.0.0'

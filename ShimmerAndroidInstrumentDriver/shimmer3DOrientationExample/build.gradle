@@ -36,18 +36,6 @@ android {
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanagerdev', version:'JA-90_v0.4'){
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-    implementation (group: 'com.shimmerresearch', name: 'shimmerdriverdev', version:'JA-90_v0.4'){
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
     compile 'org.apache.commons:commons-math:2.2'
     compile 'org.apache.commons:commons-lang3:3.4'
     provided files('../ShimmerAndroidInstrumentDriver/libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
