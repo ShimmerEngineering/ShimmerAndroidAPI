@@ -42,7 +42,7 @@ android {
 
 dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    compile project(':ShimmerAndroidInstrumentDriver')
+    implementation project(':ShimmerAndroidInstrumentDriver')
     implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.2_alpha'){
 
         // excluding org.json which is provided by Android

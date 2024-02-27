@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
+import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.androidradiodriver.VerisenseBleAndroidRadioByteCommunication;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER;
 
 public class MainActivity extends Activity {
 
@@ -49,21 +51,9 @@ public class MainActivity extends Activity {
 
     public void connectDevice(View v) {
 
-        Thread thread = new Thread(){
-            public void run(){
+        Intent pairedDevicesIntent = new Intent(this.getApplicationContext(), ShimmerBluetoothDialog.class);
+        startActivityForResult(pairedDevicesIntent, REQUEST_CONNECT_SHIMMER);
 
-                    device1.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
-                    try {
-                        device1.connect();
-                    } catch (ShimmerException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-
-            }
-        };
-
-        thread.start();
     }
 
     public void disconnectDevice(View v) {
@@ -259,11 +249,28 @@ public class MainActivity extends Activity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+        if(requestCode == REQUEST_CONNECT_SHIMMER) {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
+                radio1 = new VerisenseBleAndroidRadioByteCommunication(macAdd);
+                protocol1 = new VerisenseProtocolByteCommunication(radio1);
 
+                Thread thread = new Thread(){
+                    public void run(){
+
+                        device1.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
+                        try {
+                            device1.connect();
+                        } catch (ShimmerException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+
+                    }
+                };
+
+                thread.start();
             }
 
         }
