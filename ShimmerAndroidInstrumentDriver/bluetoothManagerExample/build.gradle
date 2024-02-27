@@ -1,13 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 
     defaultConfig {
         multiDexEnabled true
         applicationId "com.shimmerresearch.bluetoothmanagerexample"
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -44,13 +49,13 @@ android {
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanagerdev', version:'JA-90_v0.4'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerdriverdev', version:'JA-90_v0.4'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'

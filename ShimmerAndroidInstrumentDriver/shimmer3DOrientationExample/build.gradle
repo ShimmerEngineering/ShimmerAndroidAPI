@@ -27,17 +27,22 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanagerdev', version:'JA-90_v0.4'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
+    implementation (group: 'com.shimmerresearch', name: 'shimmerdriverdev', version:'JA-90_v0.4'){
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'

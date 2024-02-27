@@ -64,6 +64,7 @@ import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
+import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.tools.Logging;
 import com.shimmerresearch.tools.PlotManagerAndroid;
 
@@ -245,7 +246,11 @@ public class ShimmerService extends Service {
 	}
 
 	public void connectShimmer(final String bluetoothAddress,Context context){
-		btManager.connectShimmerThroughBTAddress(bluetoothAddress,context);
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,"",context);
+	}
+
+	public void connectShimmer(final String bluetoothAddress,final String deviceName, Context context){
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,deviceName,context);
 	}
 
 	public void connectShimmer(final String bluetoothAddress){
@@ -915,8 +920,8 @@ public class ShimmerService extends Service {
 	}
 */
 
-	public void startStreaming(String bluetoothAddress) {
-		btManager.startStreaming(bluetoothAddress);
+	public void startStreaming(String bluetoothAddress) throws Exception{
+			btManager.startStreaming(bluetoothAddress);
 	}
 
 	/**
@@ -1008,8 +1013,8 @@ public class ShimmerService extends Service {
 	}
 */
 
-	public void stopStreaming(String bluetoothAddress) {
-		btManager.stopStreaming(bluetoothAddress);
+	public void stopStreaming(String bluetoothAddress) throws Exception{
+			btManager.stopStreaming(bluetoothAddress);
 	}
 
 	/**

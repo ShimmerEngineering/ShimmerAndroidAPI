@@ -4,6 +4,11 @@ package com.shimmerresearch.android.manager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
@@ -11,6 +16,9 @@ import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
+import com.shimmerresearch.android.VerisenseDeviceAndroid;
+import com.shimmerresearch.androidradiodriver.VerisenseBleAndroidRadioByteCommunication;
+import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.androidradiodriver.ShimmerRadioInitializerAndroid;
 import com.shimmerresearch.androidradiodriver.ShimmerSerialPortAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -35,8 +43,10 @@ import com.shimmerresearch.exception.DeviceNotPairedException;
 import com.shimmerresearch.exceptions.ConnectionExceptionListener;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.managers.bluetoothManager.ShimmerBluetoothManager;
+import com.shimmerresearch.verisense.communication.VerisenseProtocolByteCommunication;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,6 +67,11 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     Context mContext;
     protected Handler mHandler;
     private boolean AllowAutoPairing = true;
+
+    public enum BT_TYPE{
+        BT_CLASSIC,
+        BLE
+    }
 
     public ShimmerBluetoothManagerAndroid(Context context, Handler handler) throws Exception {
         super();
@@ -99,7 +114,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
      * @exception IllegalArgumentException if bluetoothAddress is invalid, note this will only occur when {@link #enablePairingOnConnect(boolean)} is enabled
      * @exception DeviceNotPairedException if the device is not paired
      */
-    public void connectShimmerThroughBTAddress(final String bluetoothAddress,Context context) {
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress, final String deviceName, Context context) {
 
         if(isDevicePaired(bluetoothAddress) || AllowAutoPairing) {
             if (!isDevicePaired(bluetoothAddress)){
@@ -116,7 +131,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                 }
             }
             addDiscoveredDevice(bluetoothAddress);
-            super.connectShimmerThroughBTAddress(bluetoothAddress);
+            //super.connectShimmerThroughBTAddress(bluetoothAddress);
+            BluetoothDeviceDetails bdd = new BluetoothDeviceDetails("",bluetoothAddress,deviceName);
+            super.connectShimmerThroughBTAddress(bdd);
             super.setConnectionExceptionListener(new ConnectionExceptionListener() {
                 @Override
                 public void onConnectionStart(String connectionHandle) {
@@ -157,8 +174,126 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
      * @exception DeviceNotPairedException if the device is not paired
      */
     @Override
+    protected void connectVerisenseDevice(BluetoothDeviceDetails bdd) {
+        VerisenseBleAndroidRadioByteCommunication radio1 = new VerisenseBleAndroidRadioByteCommunication(bdd.mShimmerMacId);
+        VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
+        final VerisenseDeviceAndroid verisenseDevice = new VerisenseDeviceAndroid(mHandler);
+        verisenseDevice.setMacIdFromUart(bdd.mShimmerMacId);
+        verisenseDevice.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
+        initializeNewShimmerCommon(verisenseDevice);
+        Thread thread = new Thread(){
+            public void run(){
+
+                try {
+                    verisenseDevice.connect();
+                } catch (ShimmerException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+    }
+
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress, BT_TYPE btType) {
+        if(btType.equals(BT_TYPE.BT_CLASSIC)){
+            connectShimmerThroughBTAddress(bluetoothAddress);
+        }else{
+            connectShimmer3BLEThroughBTAddress(bluetoothAddress,"",null);
+        }
+    }
+    @Override
     public void connectShimmerThroughBTAddress(final String bluetoothAddress) {
-        connectShimmerThroughBTAddress(bluetoothAddress,null);
+
+        //scanLeDevice(bluetoothAddress);
+        //doDiscovery();
+        connectShimmerThroughBTAddress(bluetoothAddress,"",null);
+    }
+
+    public void connectShimmer3BLEThroughBTAddress(final String bluetoothAddress, final String deviceName, Context context){
+        final Shimmer3BLEAndroid shimmer3BLE = new Shimmer3BLEAndroid(bluetoothAddress, mHandler);
+        shimmer3BLE.setMacIdFromUart(bluetoothAddress);
+        initializeNewShimmerCommon(shimmer3BLE);
+        Thread thread = new Thread(){
+            public void run(){
+                shimmer3BLE.connect(bluetoothAddress, "default");
+            }
+        };
+        thread.start();
+    }
+
+    //BT Classic Scan
+    private void doDiscovery() {
+
+        // If we're already discovering, stop it
+        if (mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
+
+        // Request discover from BluetoothAdapter
+        mBluetoothAdapter.startDiscovery();
+    }
+
+    private BluetoothLeScanner bluetoothLeScanner;
+    private boolean scanning;
+    private Handler handler = new Handler();
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 10000;
+    List<BluetoothDevice> listScanBleDevice = new ArrayList<BluetoothDevice>();
+
+    //BLE Scan
+    private void scanLeDevice(String deviceMacAddress) {
+        getScannedBleDevices();
+        bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        if (!scanning) {
+            // Stops scanning after a predefined scan period.
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scanning = false;
+                    bluetoothLeScanner.stopScan(leScanCallback);
+                }
+            }, SCAN_PERIOD);
+
+            scanning = true;
+            scanForAllBleDevices();
+            //scanForSpecificBleDevices(deviceMacAddress);
+
+        } else {
+            scanning = false;
+            bluetoothLeScanner.stopScan(leScanCallback);
+        }
+    }
+    private void scanForAllBleDevices() {
+        bluetoothLeScanner.startScan(leScanCallback);
+    }
+    private void scanForSpecificBleDevices(String deviceMacAddress) {
+        List<ScanFilter> scanFilters = new ArrayList<>();
+        ScanFilter filter = new ScanFilter.Builder().setDeviceAddress(deviceMacAddress).build();
+        scanFilters.add(filter);
+        ScanSettings scanSettings = new ScanSettings.Builder().build();
+        bluetoothLeScanner.startScan(scanFilters, scanSettings, leScanCallback);
+    }
+
+        // Device scan callback.
+    private ScanCallback leScanCallback =
+            new ScanCallback() {
+                @Override
+                public void onScanResult(int callbackType, ScanResult result) {
+                    super.onScanResult(callbackType, result);
+                    BluetoothDevice bledevice = result.getDevice();
+                    if(!listScanBleDevice.contains(result.getDevice())){
+                        listScanBleDevice.add(result.getDevice());
+                    }
+                }
+            };
+
+    private void getScannedBleDevices(){
+        for(BluetoothDevice dev : listScanBleDevice)
+        {
+            System.out.println(dev.getAddress());
+        }
+
     }
 
     /**
@@ -277,6 +412,18 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     }
 
     @Override
+    public void configureShimmer(final ShimmerDevice shimmerClone) {
+        Thread thread = new Thread(){
+            public void run(){
+                configureShimmers(Arrays.asList(shimmerClone));
+            }
+        };
+
+        thread.start();
+
+    }
+
+    @Override
     protected Shimmer4sdk createNewShimmer4(String comport, String bluetoothAddress) {
         if(mProgressDialog!=null){
             mProgressDialog.dismiss();
@@ -317,7 +464,10 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
         }
     }
-
+    @Override
+    protected BluetoothDeviceDetails getBluetoothDeviceDetails(String connectionHandle) {
+        return (BluetoothDeviceDetails)this.mMapOfParsedBtComPorts.get(connectionHandle);
+    }
 
     private void addDiscoveredDevice(String bluetoothAddress){
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(bluetoothAddress);

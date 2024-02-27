@@ -42,17 +42,22 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
+
     implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.2_alpha'){
+
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'
         exclude group: 'org.apache.commons.math'
     }
+
     implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.2_alpha'){
+
         // excluding org.json which is provided by Android
         exclude group: 'io.netty'
         exclude group: 'com.google.protobuf'

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -142,6 +143,23 @@ public class SignalsToPlotFragment extends ListFragment {
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
             updateCheckboxes();
 
+            shimmerService.mPlotManager.removeAllSignals();
+
+            SparseBooleanArray pos = listView.getCheckedItemPositions();
+            for (int i = 0; i < listView.getCount(); i++) {
+                if (pos.get(i)) {
+                    try {
+                        if(dynamicPlot == null) {
+                            Log.e(LOG_TAG, "dynamicPlot is null!");
+                        }
+                        shimmerService.mPlotManager.addSignal(mList.get(i), dynamicPlot);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Error! Could not add signal: " + e);
+                        e.printStackTrace();
+                    }
+                }
+            }
+
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -197,9 +215,8 @@ public class SignalsToPlotFragment extends ListFragment {
 
     public void setDeviceNotStreamingView() {
         String[] notStreamingMsg = new String[]{"Device not streaming", "Signals to plot can only be displayed when device is streaming"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, notStreamingMsg);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, notStreamingMsg);
         setListAdapter(adapter);
     }
-
 
 }

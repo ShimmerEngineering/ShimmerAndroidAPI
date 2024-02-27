@@ -24,6 +24,7 @@ import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 import com.shimmerresearch.driverUtilities.SensorDetails;
 import com.shimmerresearch.driverUtilities.SensorGroupingDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerObject;
+import com.shimmerresearch.verisense.VerisenseDevice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +165,7 @@ public class SensorsEnabledFragment extends ListFragment {
                         //TODO: Change this when AssembleShimmerConfig has been updated:
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                        if (shimmerDevice instanceof Shimmer) {
+                        if (shimmerDevice instanceof Shimmer || shimmerDevice instanceof VerisenseDevice) {
                             //((Shimmer)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                             /*try {
                                 Thread.sleep(1000);

@@ -33,6 +33,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerObject;
+import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.shimmer3dexample.R;
 /**
  * The initial Android Activity, setting and initiating
@@ -191,8 +192,12 @@ public class Shimmer3DOrientationExample extends Activity {
 	                    	 Log.d("ConnectionStatus","Successful");
 	                    	 //because the default mag range for Shimmer2 and 3 are 0 and 1 respectively, please be aware of what range you use when calibrating using Shimmer 9DOF Cal App, and use the same range here
 							 mShimmerDevice1.enableOnTheFlyGyroCal(true, 102, 1.2);
-							 mShimmerDevice1.startStreaming();
-	                         break;
+							 try {
+								 mShimmerDevice1.startStreaming();
+							 } catch (ShimmerException e) {
+								 e.printStackTrace();
+							 }
+							 break;
 	                    /* case INITIALISED:
 
 
@@ -279,8 +284,12 @@ public class Shimmer3DOrientationExample extends Activity {
 	    				if (mShimmerDevice1.getStreamingStatus()){
 	    					mShimmerDevice1.stopStreaming();
 	    					mShimmerDevice1.enableLowPowerMag(data.getExtras().getBoolean("Enable"));
-	    					mShimmerDevice1.startStreaming();
-	    				} else {
+							try {
+								mShimmerDevice1.startStreaming();
+							} catch (ShimmerException e) {
+								e.printStackTrace();
+							}
+						} else {
 	    					mShimmerDevice1.enableLowPowerMag(data.getExtras().getBoolean("Enable"));
 	    				}
 	    			} else if (data.getExtras().getString("Command").equals("Gyro")) {

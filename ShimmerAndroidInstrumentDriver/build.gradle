@@ -67,6 +67,7 @@ allprojects {
         }
         mavenCentral()
         mavenLocal()
+        jcenter()
     }
 //    artifactory {
 //        contextUrl = "${artifactory_contextUrl}"

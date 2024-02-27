@@ -57,6 +57,7 @@ public class ShimmerBluetoothDialog extends Activity {
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
+    public static String EXTRA_DEVICE_NAME = "device_name";
 
 
     // Member fields
@@ -181,10 +182,11 @@ public class ShimmerBluetoothDialog extends Activity {
             // Get the device MAC address, which is the last 17 chars in the View
             String info = ((TextView) v).getText().toString();
             String address = info.substring(info.length() - 17);
-
+            String devicename = info.split("\n")[0];
             // Create the result Intent and include the MAC address
             Intent intent = new Intent();
             intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+            intent.putExtra(EXTRA_DEVICE_NAME, devicename);
 
             Toast.makeText(getApplicationContext(),"Device Selected " +  "-> "+ address, Toast.LENGTH_SHORT).show();
             setResult(Activity.RESULT_OK, intent);              // Set result and finish this Activity

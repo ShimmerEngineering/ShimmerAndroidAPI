@@ -152,6 +152,7 @@ import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
+import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
 
 import java.io.ByteArrayInputStream;
@@ -989,7 +990,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 
 
-
+	@Override
 	protected void inquiryDone() {
 		//TODO: Delete this...
 //		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
@@ -1001,6 +1002,7 @@ public class Shimmer extends ShimmerBluetooth{
 		isReadyForStreaming();
 	}   
 
+	@Override
 	protected void isReadyForStreaming(){
 		//TODO: Delete this...
 //		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
@@ -1030,7 +1032,12 @@ public class Shimmer extends ShimmerBluetooth{
 		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
 		if(mAutoStartStreaming){
-			startStreaming();
+			try {
+				startStreaming();
+			} catch (ShimmerException e) {
+				connectionLost();
+				e.printStackTrace();
+			}
 		}
 	}
 
