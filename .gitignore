@@ -97,3 +97,4 @@ lint/tmp/
 *.hprof
 gradle.properties
 ShimmerAndroidInstrumentDriver/.idea/jarRepositories.xml
+ShimmerAndroidInstrumentDriver/.idea/gradle.xml
