@@ -10,7 +10,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
@@ -102,8 +105,17 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN}, 110);
+
+        } else {
+            startServiceandBTManager();
+        }
+
         setContentView(R.layout.activity_main);
-        BleManager.getInstance().init(getApplication());
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
@@ -121,72 +133,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
         else {*/
-            Intent intent = new Intent(this, ShimmerService.class);
-            startService(intent);
-            getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            Log.d(LOG_TAG, "Shimmer Service started");
-            Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
+
         //}
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                if (this.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    if (this.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("This app needs background location access");
-                        builder.setMessage("Please grant location access so this app can detect beacons in the background.");
-                        builder.setPositiveButton(android.R.string.ok, null);
-                        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @TargetApi(23)
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                                        PERMISSION_REQUEST_BACKGROUND_LOCATION);
-                            }
 
-                        });
-                        builder.show();
-                    }
-                    else {
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("Functionality limited");
-                        builder.setMessage("Since background location access has not been granted, this app will not be able to discover beacons in the background.  Please go to Settings -> Applications -> Permissions and grant background location access to this app.");
-                        builder.setPositiveButton(android.R.string.ok, null);
-                        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                            }
-
-                        });
-                        builder.show();
-                    }
-
-                }
-            } else {
-                if (!this.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                            PERMISSION_REQUEST_FINE_LOCATION);
-                }
-                else {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons.  Please go to Settings -> Applications -> Permissions and grant location access to this app.");
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                        }
-
-                    });
-                    builder.show();
-                }
-
-            }
-        }
 
 /*
         if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE )!= PackageManager.PERMISSION_GRANTED) {
@@ -200,6 +149,27 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ){
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            startServiceandBTManager();
+        }
+    }
+
+    protected void startServiceandBTManager(){
+        BleManager.getInstance().init(getApplication());
+        Intent intent = new Intent(this, ShimmerService.class);
+        startService(intent);
+        getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(LOG_TAG, "Shimmer Service started");
+        Toast.makeText(this, "Shimmer Service started", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -634,8 +604,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent=new Intent(this, ShimmerService.class);
-        getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(this, ShimmerService.class);
+            getApplicationContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
 }
