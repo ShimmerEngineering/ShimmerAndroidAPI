@@ -322,6 +322,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 selectedDeviceName = null;
                 connectedShimmersListFragment.removeSelectedDevice();
                 return true;
+            case R.id.enable_write_to_csv:
+                mService.setEnableLogging(true);
+                return true;
+            case R.id.disable_write_to_csv:
+                mService.setEnableLogging(false);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

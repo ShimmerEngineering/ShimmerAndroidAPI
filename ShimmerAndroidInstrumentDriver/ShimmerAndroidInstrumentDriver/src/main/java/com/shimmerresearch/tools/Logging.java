@@ -109,7 +109,13 @@ public class Logging {
 	public Logging(String myName, String delimiter, String folderName, ShimmerService.FILE_TYPE fileType) {
 		mFileName=myName;
 		mDelimiter=delimiter;
-		File root = new File(Environment.getExternalStorageDirectory() + "/"+folderName);
+		File root;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+			root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS+ "/"+folderName);
+		} else {
+			root = new File(Environment.getExternalStorageDirectory() + "/"+folderName); //android 13 no longer allows this
+		}
+
 		if(!root.exists()) {
 			if(root.mkdir()); //directory is created;
 		}
