@@ -41,9 +41,11 @@ package com.shimmerresearch.android.shimmerService;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -68,6 +70,7 @@ import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.tools.Logging;
 import com.shimmerresearch.tools.PlotManagerAndroid;
 
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,6 +94,10 @@ public class ShimmerService extends Service {
 	protected Handler mHandlerGraph=null;
 	private boolean mGraphing=false;
 	public String mLogFileName="Default";
+
+	public Uri mFileURI= null;
+	public ContentResolver mResolver = null;
+	public Context mContext = null;
 	Filter mFilter;
 	Filter mLPFilterECG;
 	Filter mHPFilterECG;
@@ -432,9 +439,17 @@ public class ShimmerService extends Service {
 					char[] bA=objectCluster.getMacAddress().toCharArray();
 					Logging shimmerLog;
 					if (mLogFileName.equals("Default")){
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", mLogFolderName, mLoggingFileType);
+						if(mFileURI==null) {
+							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+						} else {
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+						}
 					} else {
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", mLogFolderName, mLoggingFileType);
+						if(mFileURI==null) {
+							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
+						}else {
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+						}
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
 					if (mLogShimmer.get(objectCluster.getMacAddress())==null){
@@ -1135,7 +1150,12 @@ public class ShimmerService extends Service {
 	public void closeAndRemoveFile(String bluetoothAddress){
 		if (mLogShimmer.get(bluetoothAddress)!=null){
 			mLogShimmer.get(bluetoothAddress).closeFile();
-			MediaScannerConnection.scanFile(this, new String[] { mLogShimmer.get(bluetoothAddress).getAbsoluteName() }, null, null);
+
+			try {
+				MediaScannerConnection.scanFile(this, new String[] { mLogShimmer.get(bluetoothAddress).getAbsoluteName() }, null, null);
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 			mLogShimmer.remove(bluetoothAddress);
 
 		}

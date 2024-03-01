@@ -5,8 +5,10 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Message;
 
@@ -14,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
@@ -32,6 +35,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +65,13 @@ import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -323,6 +334,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 connectedShimmersListFragment.removeSelectedDevice();
                 return true;
             case R.id.enable_write_to_csv:
+                Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+                startActivityForResult(intent, 99);
+
                 mService.setEnableLogging(true);
                 return true;
             case R.id.disable_write_to_csv:
@@ -369,6 +384,29 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+            if (resultCode == RESULT_OK && requestCode == 99) {
+                if (data != null) {
+                    Uri treeUri = data.getData();
+                    mService.mFileURI = treeUri;
+                    mService.mResolver = getContentResolver();
+                    mService.mContext = this;
+                    /*
+                    DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
+                    DocumentFile newF = pickedDir.createFile("text/comma-separated-values", "newshimmer.csv");
+                    try {
+                        OutputStream outputStream = getContentResolver().openOutputStream(newF.getUri());
+                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+                        writer.write("test");
+                        writer.close();
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    */
+                }
+            }
         if (requestCode == 1) { //The system Bluetooth enable dialog has returned a result
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, ShimmerService.class);
