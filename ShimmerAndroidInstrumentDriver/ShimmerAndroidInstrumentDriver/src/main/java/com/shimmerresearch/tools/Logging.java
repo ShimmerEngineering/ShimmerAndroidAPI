@@ -70,7 +70,8 @@ public class Logging {
 	BufferedWriter writer=null;
 	File outputFile;
 	String mDelimiter=","; //default is comma
-	
+
+	@Deprecated
 	/**
 	 * @param myName is the file name which will be used
 	 */
@@ -80,7 +81,8 @@ public class Logging {
 		Log.d("AbsolutePath", root.getAbsolutePath());
 		outputFile = new File(root, mFileName+".dat");
 	}
-	
+
+	@Deprecated
 	public Logging(String myName, String delimiter){
 		mFileName=myName;
 		mDelimiter=delimiter;
@@ -88,7 +90,8 @@ public class Logging {
 		Log.d("AbsolutePath", root.getAbsolutePath());
 		outputFile = new File(root, mFileName+".dat");
 	}
-	
+
+	@Deprecated
 	/**
 	 * Constructor with default file output type (.dat)
 	 * @param myName
@@ -105,6 +108,7 @@ public class Logging {
 		outputFile = new File(root, mFileName+ "." + ShimmerService.FILE_TYPE.DAT.getName());
 	}
 
+	@Deprecated
 	/**
 	 * Constructor to select output file type
 	 * @param myName
@@ -142,7 +146,11 @@ public class Logging {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
 
 				DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeURI);
-				mNewFile = pickedDir.createFile("text/comma-separated-values", myName);
+				if (fileType.equals(ShimmerService.FILE_TYPE.CSV)) {
+					mNewFile = pickedDir.createFile("text/comma-separated-values", myName);
+				} else if (fileType.equals(ShimmerService.FILE_TYPE.DAT)) {
+					mNewFile = pickedDir.createFile("application/dat", myName+"."+ShimmerService.FILE_TYPE.DAT.toString().toLowerCase());
+				}
 				mContext = context;
 		}
 

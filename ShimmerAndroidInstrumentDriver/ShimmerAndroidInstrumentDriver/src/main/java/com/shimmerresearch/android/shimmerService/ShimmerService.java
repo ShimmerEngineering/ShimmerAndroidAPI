@@ -448,7 +448,7 @@ public class ShimmerService extends Service {
 						if(mFileURI==null) {
 							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
 						}else {
-							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
 						}
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
