@@ -63,6 +63,9 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     private static final String TAG = ShimmerBluetoothManagerAndroid.class.getSimpleName();
     private static final String DEFAULT_SHIMMER_NAME = "ShimmerDevice";
 
+    static final String VERISENSE_NAME_NO_PAIRING_REQUIRED = "Verisense-00";
+
+
     BluetoothAdapter mBluetoothAdapter;
     Context mContext;
     protected Handler mHandler;
@@ -107,6 +110,13 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         AllowAutoPairing = enable;
     }
 
+    public boolean checkIfDeviceRequiresPairing(String deviceName){
+        if(deviceName.contains(VERISENSE_NAME_NO_PAIRING_REQUIRED)){
+            return false;
+        }
+        return true;
+    }
+
     /**
      * See also {@link #connectShimmerThroughBTAddress(String)}.
      * @param bluetoothAddress in the form of XX:XX:XX:XX:XX:XX
@@ -117,7 +127,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void connectShimmerThroughBTAddress(final String bluetoothAddress, final String deviceName, Context context) {
 
         if(isDevicePaired(bluetoothAddress) || AllowAutoPairing) {
-            if (!isDevicePaired(bluetoothAddress)){
+            if (!isDevicePaired(bluetoothAddress) && checkIfDeviceRequiresPairing(deviceName)){
                 if (context!=null) {
                     //Toast.makeText(mContext, "Attempting to pair device, please wait...", Toast.LENGTH_LONG).show();
                     final ProgressDialog progress = new ProgressDialog(context);
