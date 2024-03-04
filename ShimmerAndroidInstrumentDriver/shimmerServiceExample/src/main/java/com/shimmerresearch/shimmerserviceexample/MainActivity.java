@@ -118,9 +118,27 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         super.onCreate(savedInstanceState);
 
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+        boolean permissionGranted = true;
+        {
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        }
+        if (!permissionGranted) {
             // Should we show an explanation?
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN}, 110);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 110);
 
         } else {
             startServiceandBTManager();
@@ -511,7 +529,14 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             return PagerAdapter.POSITION_NONE;
         }
     }
-
+    int mNumberOfCurrentlyConnectedDevices=0;
+    public boolean isNumberOfConnectedDevicesChanged(){
+        if(mService.getListOfConnectedDevices().size()!=mNumberOfCurrentlyConnectedDevices){
+            mNumberOfCurrentlyConnectedDevices = mService.getListOfConnectedDevices().size();
+            return true;
+        }
+        return false;
+    }
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             if(msg.what == ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE) {
@@ -529,10 +554,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 }
                 switch (state) {
                     case CONNECTED:
-                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-                        if(selectedDeviceAddress != null){
-                            ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
-                            deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                        if(isNumberOfConnectedDevicesChanged()) {
+                            connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                            if (selectedDeviceAddress != null) {
+                                ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
+                                deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                            }
                         }
                         if(dataSyncFragment != null){
                             DataSyncFragment.TextViewPayloadIndex.setText("");
@@ -564,6 +591,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         DataSyncFragment.editTextParticipantName.setEnabled(false);
                         break;
                     case DISCONNECTED:
+                        isNumberOfConnectedDevicesChanged();
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
                         connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext()); //to be safe lets rebuild this
                         break;
