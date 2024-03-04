@@ -61,6 +61,7 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.exceptions.ShimmerException;
 
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
+import com.shimmerresearch.tools.FileUtils;
 import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
@@ -280,18 +281,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     DataSyncFragment.ButtonDataSync.setVisibility(View.VISIBLE);
                     DataSyncFragment.ButtonDataSync.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
-                            VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
-                            mDevice.setTrialName(DataSyncFragment.editTextParticipantName.getText().toString());
-                            mDevice.setParticipantID(DataSyncFragment.editTextTrialName.getText().toString());
-                            mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath());
-                            try{
-                                mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
-                            } catch (Exception e){
-                                if(e.getMessage() == "A task is still ongoing"){
-                                    otherTaskOngoingToast.show();
-                                }
-                                e.printStackTrace();
-                            }
+                            Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+                            startActivityForResult(intent, 100);
                         }
                     });
                 }
@@ -403,12 +395,39 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+            if (resultCode == RESULT_OK && requestCode == 100) {
+                if (data != null) {
+                    Uri treeUri = data.getData();
+                    VerisenseDevice mDevice = (VerisenseDevice) mService.getShimmer(selectedDeviceAddress);
+                    mDevice.setTrialName(DataSyncFragment.editTextParticipantName.getText().toString());
+                    mDevice.setParticipantID(DataSyncFragment.editTextTrialName.getText().toString());
+                    DocumentFile pickedDir = DocumentFile.fromTreeUri(MainActivity.this, treeUri);
+                    DocumentFile mNewFile = pickedDir.createFile("application/bin", "test.bin");
+                    FileUtils futils = new FileUtils(MainActivity.this);
+                    System.out.println(futils.getPath(mNewFile.getUri()));
+                    File file = new File(futils.getPath(mNewFile.getUri()));
+                    System.out.println(file.getParentFile().getAbsolutePath());
+                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(file.getParentFile().getAbsolutePath());
+                    try {
+                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
+                    } catch (Exception e) {
+                        if (e.getMessage() == "A task is still ongoing") {
+                            //otherTaskOngoingToast.show();
+                        }
+                        e.printStackTrace();
+                    }
+                }
+            }
+
             if (resultCode == RESULT_OK && requestCode == 99) {
                 if (data != null) {
                     Uri treeUri = data.getData();
                     mService.mFileURI = treeUri;
                     mService.mResolver = getContentResolver();
                     mService.mContext = this;
+                    FileUtils futils = new FileUtils(MainActivity.this);
+                    System.out.println(futils.getPath(treeUri));
+
                     /*
                     DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
                     DocumentFile newF = pickedDir.createFile("text/comma-separated-values", "newshimmer.csv");
