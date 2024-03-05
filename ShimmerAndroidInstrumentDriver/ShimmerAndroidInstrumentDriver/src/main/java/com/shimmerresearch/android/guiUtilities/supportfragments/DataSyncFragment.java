@@ -15,13 +15,13 @@ import com.shimmerresearch.androidinstrumentdriver.R;
 
 public class DataSyncFragment extends Fragment {
 
-    static Context context;
-    public static EditText editTextParticipantName;
-    public static EditText editTextTrialName;
-    public static TextView TextViewPayloadIndex;
-    public static TextView TextViewSpeed;
-    public static TextView TextViewDirectory;
-    public static Button ButtonDataSync;
+    Context context;
+    public EditText editTextParticipantName;
+    public EditText editTextTrialName;
+    public TextView TextViewPayloadIndex;
+    public TextView TextViewSpeed;
+    public TextView TextViewDirectory;
+    public Button ButtonDataSync;
 
     public DataSyncFragment() {
         // Required empty public constructor
@@ -50,7 +50,6 @@ public class DataSyncFragment extends Fragment {
         TextViewPayloadIndex = (TextView) getView().findViewById(R.id.payloadIndex);
         TextViewSpeed = (TextView) getView().findViewById(R.id.speed);
         TextViewDirectory = (TextView) getView().findViewById(R.id.directory);
-        ButtonDataSync.setVisibility(View.GONE);
         super.onActivityCreated(savedInstanceState);
     }
 }

@@ -30,9 +30,11 @@ public class FileUtils {
     public FileUtils(Context context) {
         this.context = context;
     }
-
+    public enum UriType {
+        FILE, FOLDER; // These are the constants of the enum
+    }
     @SuppressLint("NewApi")
-    public String getPath(final Uri uri) {
+    public String getPath(final Uri uri, UriType uritype) {
         // check here to KITKAT or new version
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         String selection = null;
@@ -43,7 +45,13 @@ public class FileUtils {
             // ExternalStorageProvider
 
             if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
+                String docId = "";
+                if(uritype.equals(UriType.FOLDER)) {
+                    docId = DocumentsContract.getTreeDocumentId(uri);
+                } else if(uritype.equals(UriType.FILE)) {
+                    docId = DocumentsContract.getDocumentId(uri);
+                }
+
                 final String[] split = docId.split(":");
                 final String type = split[0];
 

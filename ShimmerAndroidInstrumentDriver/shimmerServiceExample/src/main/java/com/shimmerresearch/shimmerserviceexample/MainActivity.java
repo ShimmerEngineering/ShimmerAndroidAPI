@@ -270,22 +270,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.data_sync:
                 if(selectedDeviceAddress != null) {
-                    if(DataSyncFragment.editTextParticipantName.getText().toString().isEmpty()){
-                        DataSyncFragment.editTextParticipantName.setText("Default Participant");
-                    }
-                    if(DataSyncFragment.editTextTrialName.getText().toString().isEmpty()){
-                        DataSyncFragment.editTextTrialName.setText("Default trial");
-                    }
-                    mViewPager.setCurrentItem(3);
-
-                    DataSyncFragment.ButtonDataSync.setVisibility(View.VISIBLE);
-                    DataSyncFragment.ButtonDataSync.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-
-                            startActivityForResult(intent, 100);
-                        }
-                    });
+                    mViewPager.setCurrentItem(5);
                 }
                 return true;
             case R.id.disable_logging:
@@ -399,15 +384,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if (data != null) {
                     Uri treeUri = data.getData();
                     VerisenseDevice mDevice = (VerisenseDevice) mService.getShimmer(selectedDeviceAddress);
-                    mDevice.setTrialName(DataSyncFragment.editTextParticipantName.getText().toString());
-                    mDevice.setParticipantID(DataSyncFragment.editTextTrialName.getText().toString());
-                    DocumentFile pickedDir = DocumentFile.fromTreeUri(MainActivity.this, treeUri);
-                    DocumentFile mNewFile = pickedDir.createFile("application/bin", "test.bin");
+                    mDevice.setTrialName(dataSyncFragment.editTextTrialName.getText().toString());
+                    mDevice.setParticipantID(dataSyncFragment.editTextParticipantName.getText().toString());
                     FileUtils futils = new FileUtils(MainActivity.this);
-                    System.out.println(futils.getPath(mNewFile.getUri()));
-                    File file = new File(futils.getPath(mNewFile.getUri()));
-                    System.out.println(file.getParentFile().getAbsolutePath());
-                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(file.getParentFile().getAbsolutePath());
+                    File file = new File(futils.getPath(treeUri, FileUtils.UriType.FOLDER));
+                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(file.getAbsolutePath());
                     try {
                         mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
                     } catch (Exception e) {
@@ -425,8 +406,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mService.mFileURI = treeUri;
                     mService.mResolver = getContentResolver();
                     mService.mContext = this;
-                    FileUtils futils = new FileUtils(MainActivity.this);
-                    System.out.println(futils.getPath(treeUri));
+
+
+
+
 
                     /*
                     DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
@@ -481,6 +464,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
+            dataSyncFragment = DataSyncFragment.newInstance();
             connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
             sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
             deviceConfigFragment = DeviceConfigFragment.newInstance();
@@ -492,6 +476,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             add(deviceConfigFragment, "Device Configuration");
             add(plotFragment, "Plot");
             add(signalsToPlotFragment, "Signals to Plot");
+            add(dataSyncFragment, "Verisense Sync");
         }
 
         @Override
@@ -581,11 +566,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             }
                         }
                         if(dataSyncFragment != null){
-                            DataSyncFragment.TextViewPayloadIndex.setText("");
-                            DataSyncFragment.TextViewSpeed.setText("");
-                            DataSyncFragment.editTextTrialName.setEnabled(true);
-                            DataSyncFragment.editTextParticipantName.setEnabled(true);
+                            dataSyncFragment.TextViewPayloadIndex.setText("");
+                            dataSyncFragment.TextViewSpeed.setText("");
+                            dataSyncFragment.editTextTrialName.setEnabled(true);
+                            dataSyncFragment.editTextParticipantName.setEnabled(true);
                         }
+
                         break;
                     case CONNECTING:
                         break;
@@ -606,8 +592,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         break;
                     case STREAMING_LOGGED_DATA:
                         Toast.makeText(getApplicationContext(), "Data Sync: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
-                        DataSyncFragment.editTextTrialName.setEnabled(false);
-                        DataSyncFragment.editTextParticipantName.setEnabled(false);
+                        dataSyncFragment.editTextTrialName.setEnabled(false);
+                        dataSyncFragment.editTextParticipantName.setEnabled(false);
                         break;
                     case DISCONNECTED:
                         isNumberOfConnectedDevicesChanged();
@@ -618,9 +604,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             }
             else if(msg.what == Shimmer.MSG_IDENTIFIER_SYNC_PROGRESS){
                 SyncProgressDetails mDetails = (SyncProgressDetails)((CallbackObject)msg.obj).mMyObject;
-                DataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
-                DataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + String.format("%.2f", mDetails.mTransferRateBytes/1024));
-                DataSyncFragment.TextViewDirectory.setText("Bin file path : " + mDetails.mBinFilePath);
+                dataSyncFragment.TextViewPayloadIndex.setText("Current Payload Index : " + Integer.toString(mDetails.mPayloadIndex));
+                dataSyncFragment.TextViewSpeed.setText("Speed(KBps) : " + String.format("%.2f", mDetails.mTransferRateBytes/1024));
+                dataSyncFragment.TextViewDirectory.setText("Bin file path : " + mDetails.mBinFilePath);
             }
             else if(msg.what == Shimmer.MSG_IDENTIFIER_NOTIFICATION_MESSAGE){
                 if(((CallbackObject)msg.obj).mIndicator == Shimmer.NOTIFICATION_SHIMMER_FULLY_INITIALIZED){
@@ -649,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
 
             //add and remove DataSyncFragment based on the type of device
+            /*
             if(device instanceof VerisenseDeviceAndroid) {
                 if(mSectionsPagerAdapter1.getCount() == mSectionsPagerAdapter1.SHIMMER3_PAGE_COUNT)
                 {
@@ -661,7 +648,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 {
                     mSectionsPagerAdapter1.remove(3);
                 }
-            }
+            }*/
+
             mSectionsPagerAdapter1.notifyDataSetChanged();
 
             sensorsEnabledFragment.setShimmerService(mService);
@@ -676,6 +664,26 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
             mService.stopStreamingAllDevices();
             signalsToPlotFragment.setDeviceNotStreamingView();
+
+            if (device instanceof VerisenseDevice) {
+                if (dataSyncFragment.editTextParticipantName.getText().toString().isEmpty()) {
+                    dataSyncFragment.editTextParticipantName.setText("Default Participant");
+                }
+                if (dataSyncFragment.editTextTrialName.getText().toString().isEmpty()) {
+                    dataSyncFragment.editTextTrialName.setText("Default trial");
+                }
+
+                dataSyncFragment.ButtonDataSync.setVisibility(View.VISIBLE);
+                dataSyncFragment.ButtonDataSync.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+                        startActivityForResult(intent, 100);
+                    }
+                });
+            }
+
+
         }
         else{
             if(mSectionsPagerAdapter1.getCount() == 6)
