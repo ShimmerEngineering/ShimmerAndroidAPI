@@ -686,10 +686,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         }
         else{
-            if(mSectionsPagerAdapter1.getCount() == 6)
-            {
-                mSectionsPagerAdapter1.remove(3);
-            }
             mSectionsPagerAdapter1.notifyDataSetChanged();
         }
     }
