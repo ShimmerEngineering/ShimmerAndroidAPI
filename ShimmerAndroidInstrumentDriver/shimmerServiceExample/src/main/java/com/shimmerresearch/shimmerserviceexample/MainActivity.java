@@ -2,23 +2,16 @@ package com.shimmerresearch.shimmerserviceexample;
 
 import android.Manifest;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 
 
 import android.bluetooth.BluetoothAdapter;
@@ -35,7 +28,6 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,35 +56,22 @@ import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
 import com.shimmerresearch.tools.FileUtils;
 import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
-import com.shimmerresearch.android.VerisenseDeviceAndroid;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 
-import bolts.Continuation;
-import bolts.Task;
-
 public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener {
 
-
-    private static final int PERMISSION_REQUEST_BACKGROUND_LOCATION = 1;
-    private static final int PERMISSION_REQUEST_FINE_LOCATION = 2;
+    private static final int PERMISSION_FILE_REQUEST_SHIMMER = 99;
+    private static final int PERMISSION_FILE_REQUEST_VERISENSE = 100;
 
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
-    final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
@@ -331,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.enable_write_to_csv:
                 Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
-                startActivityForResult(intent, 99);
+                startActivityForResult(intent, PERMISSION_FILE_REQUEST_SHIMMER);
 
                 mService.setEnableLogging(true);
                 return true;
@@ -380,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-            if (resultCode == RESULT_OK && requestCode == 100) {
+            if (resultCode == RESULT_OK && requestCode == PERMISSION_FILE_REQUEST_VERISENSE) {
                 if (data != null) {
                     Uri treeUri = data.getData();
                     VerisenseDevice mDevice = (VerisenseDevice) mService.getShimmer(selectedDeviceAddress);
@@ -400,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 }
             }
 
-            if (resultCode == RESULT_OK && requestCode == 99) {
+            if (resultCode == RESULT_OK && requestCode == PERMISSION_FILE_REQUEST_SHIMMER) {
                 if (data != null) {
                     Uri treeUri = data.getData();
                     mService.mFileURI = treeUri;
@@ -678,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     public void onClick(View v) {
                         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
-                        startActivityForResult(intent, 100);
+                        startActivityForResult(intent, PERMISSION_FILE_REQUEST_VERISENSE);
                     }
                 });
             }
