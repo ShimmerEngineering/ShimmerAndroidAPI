@@ -152,8 +152,11 @@ import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
+import com.shimmerresearch.driverUtilities.UtilShimmer;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -662,6 +665,34 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 	}
+
+	/**this is to clear the buffer
+	 *
+	 */
+	@Override
+	protected void clearSerialBuffer() {
+		startTimerCheckForSerialPortClear();
+		byte[] buffer = new byte[0];
+		while (availableBytes() != 0) {
+//			int available = availableBytes();
+			if (bytesAvailableToBeRead()) {
+				//AA-283 : the clearing of the serial bytes , is too slow when streaming 1024Hz (e.g. exg test)
+				buffer = readBytes(availableBytes());
+
+				if (mSerialPortReadTimeout) {
+					break;
+				}
+			}
+		}
+
+		if (buffer.length > 0) {
+			String msg = "Clearing Buffer:\t\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(buffer);
+			printLogDataForDebugging(msg);
+		}
+
+		stopTimerCheckForSerialPortClear();
+	}
+
 
 	/**
 	 * Write to the ConnectedThread in an unsynchronized manner
