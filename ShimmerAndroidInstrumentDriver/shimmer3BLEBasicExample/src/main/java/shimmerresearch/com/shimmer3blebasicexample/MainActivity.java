@@ -2,11 +2,16 @@ package shimmerresearch.com.shimmer3blebasicexample;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +19,7 @@ import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.BasicProcessWithCallBack;
@@ -30,6 +36,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
+    final static int REQUEST_CONNECT_SHIMMER = 2;
     protected Handler mHandler;
     private final static String LOG_TAG = "Shimmer3BLEBasicExample";
     Shimmer3BLEAndroid shimmer1;
@@ -38,28 +45,46 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        boolean permissionGranted = true;
+        {
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        }
+        if (!permissionGranted) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 110);
+
+        }
+
+
         setContentView(R.layout.activity_main);
         BleManager.getInstance().init(getApplication());
 
         this.mHandler = handler;
-        shimmer1 = new Shimmer3BLEAndroid(macAddress, this.mHandler);
-        SensorDataReceived sdr = this.new SensorDataReceived();
-        sdr.setWaitForData(shimmer1);
+
 
     }
 
     public void connectDevice(View v) {
-
-        Thread thread = new Thread(){
-            public void run(){
-
-                //device1.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
-                shimmer1.connect("E8:EB:1B:97:67:FC", "default");
-
-            }
-        };
-
-        thread.start();
+        Intent pairedDevicesIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
+        startActivityForResult(pairedDevicesIntent, REQUEST_CONNECT_SHIMMER);
+        //device1.setProtocol(Configuration.COMMUNICATION_TYPE.BLUETOOTH, protocol1);
+        //shimmer1.connect("E8:EB:1B:97:67:FC", "default");
     }
 
     public void disconnectDevice(View v) {
@@ -210,11 +235,21 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+        if(requestCode == REQUEST_CONNECT_SHIMMER) {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
+                shimmer1 = new Shimmer3BLEAndroid(macAdd, this.mHandler);
+                SensorDataReceived sdr = this.new SensorDataReceived();
+                sdr.setWaitForData(shimmer1);
 
+                Thread thread = new Thread(){
+                    public void run(){
+                        shimmer1.connect(macAdd, "default");
+                    }
+                };
+
+                thread.start();
             }
 
         }

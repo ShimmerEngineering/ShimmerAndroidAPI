@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "shimmerresearch.com.shimmer3blebasicexample"
-        minSdkVersion 18
-        targetSdkVersion 28
+        minSdkVersion 17
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
