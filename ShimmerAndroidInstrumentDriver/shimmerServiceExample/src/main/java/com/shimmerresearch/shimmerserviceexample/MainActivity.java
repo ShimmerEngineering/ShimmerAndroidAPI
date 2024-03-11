@@ -297,11 +297,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             case R.id.disconnect_all_devices:
                 mService.disconnectAllDevices();
                 connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                if(mSectionsPagerAdapter1.getCount() == mSectionsPagerAdapter1.VERISENSE_PAGE_COUNT)
-                {
-                    mSectionsPagerAdapter1.remove(3);
-                    mSectionsPagerAdapter1.notifyDataSetChanged();
-                }
                 mViewPager.setCurrentItem(0);
                 selectedDeviceAddress = null;
                 selectedDeviceName = null;
