@@ -663,6 +663,171 @@ public class Shimmer extends ShimmerBluetooth{
 
 	}
 
+	@Override
+	protected void clearSingleDataPacketFromBuffers(byte[] bufferTemp, int packetSize) {
+		byte[] fullBuffer = mByteArrayOutputStream.toByteArray();
+		byte[] keepBuffer = new byte[fullBuffer.length-packetSize];
+		System.arraycopy(fullBuffer,packetSize,keepBuffer,0,keepBuffer.length);
+		this.mByteArrayOutputStream.reset();
+		try {
+			this.mByteArrayOutputStream.write(keepBuffer);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		if (this.mEnablePCTimeStamps) {
+			for(int i = 0; i < packetSize; ++i) {
+				try {
+					this.mListofPCTimeStamps.remove(0);
+				} catch (Exception var5) {
+					this.consolePrintException(var5.getMessage(), var5.getStackTrace());
+				}
+			}
+		}
+
+	}
+
+	@Override
+	protected void processPacket() {
+		setIamAlive(true);
+		byte[] allBytes = mByteArrayOutputStream.toByteArray();
+		byte[] bufferTemp = new byte[getPacketSizeWithCrc()+2];
+		System.arraycopy(allBytes,0,bufferTemp,0,bufferTemp.length);
+		//Data packet followed by another data packet
+		if(bufferTemp[0]==DATA_PACKET
+				&& bufferTemp[getPacketSizeWithCrc()+1]==DATA_PACKET){
+
+			if (mBtCommsCrcModeCurrent != BT_CRC_MODE.OFF && !checkCrc(bufferTemp, getPacketSize() + 1)) {
+				discardFirstBufferByte();
+				return;
+			}
+
+			//Handle the data packet
+			processDataPacket(bufferTemp);
+			clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+1);
+		}
+
+		//Data packet followed by an ACK (suggesting an ACK in response to a SET BT command or else a BT response command)
+		else if(bufferTemp[0]==DATA_PACKET
+				&& bufferTemp[getPacketSizeWithCrc()+1]==ACK_COMMAND_PROCESSED){
+			if(bufferTemp.length>getPacketSizeWithCrc()+2){
+
+				if(bufferTemp[getPacketSizeWithCrc()+2]==DATA_PACKET){
+					//Firstly handle the data packet
+					processDataPacket(bufferTemp);
+					clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+2);
+
+					//Then handle the ACK from the last SET command
+					if(isKnownSetCommand(mCurrentCommand)){
+						stopTimerCheckForAckOrResp(); //cancel the ack timer
+						mWaitForAck=false;
+
+						processAckFromSetCommand(mCurrentCommand);
+
+						mTransactionCompleted = true;
+						setInstructionStackLock(false);
+					}
+					printLogDataForDebugging("Ack Received for Command: \t\t\t" + btCommandToString(mCurrentCommand));
+				}
+
+				//this is for LogAndStream support, command is transmitted and ack received
+				else if(isSupportedInStreamCmds() && bufferTemp[getPacketSizeWithCrc()+2]==INSTREAM_CMD_RESPONSE){
+					printLogDataForDebugging("COMMAND TXed and ACK RECEIVED IN STREAM");
+					printLogDataForDebugging("INS CMD RESP");
+
+					//Firstly handle the in-stream response
+					stopTimerCheckForAckOrResp(); //cancel the ack timer
+					mWaitForResponse=false;
+					mWaitForAck=false;
+
+					processInstreamResponse();
+
+					// Need to remove here because it is an
+					// in-stream response while streaming so not
+					// handled elsewhere
+					if(getListofInstructions().size()>0){
+						removeInstruction(0);
+					}
+
+					mTransactionCompleted=true;
+					setInstructionStackLock(false);
+
+					//Then process the Data packet
+					processDataPacket(bufferTemp);
+					clearBuffers();
+				}
+				else {
+					printLogDataForDebugging("Unknown parsing error while streaming");
+				}
+			}
+			if(mByteArrayOutputStream.size()>getPacketSizeWithCrc()+2){
+				printLogDataForDebugging("Unknown packet error (check with JC):\tExpected: " + (getPacketSizeWithCrc()+2) + "bytes but buffer contains " + mByteArrayOutputStream.size() + "bytes");
+				discardFirstBufferByte(); //throw the first byte away
+			}
+
+		}
+		//TODO: ACK in bufferTemp[0] not handled
+		//else if
+		else {
+			printLogDataForDebugging("Packet syncing problem:\tExpected: " + (getPacketSizeWithCrc()+2) + "bytes. Buffer contains " + mByteArrayOutputStream.size() + "bytes"
+					+ "\nBuffer = " + UtilShimmer.bytesToHexStringWithSpacesFormatted(mByteArrayOutputStream.toByteArray()));
+			discardFirstBufferByte(); //throw the first byte away
+		}
+	}
+
+	@Override
+	protected void processWhileStreaming() {
+		byte[] byteBuffer = readBytes(availableBytes());
+		if(byteBuffer!=null){
+			try {
+				mByteArrayOutputStream.write(byteBuffer);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			//Everytime a byte is received the timestamp is taken
+			if(mEnablePCTimeStamps) {
+				for (int index:byteBuffer) {
+					mListofPCTimeStamps.add(System.currentTimeMillis());
+				}
+			}
+		}
+		else {
+			printLogDataForDebugging("readbyte null");
+		}
+
+		//If there is a full packet and the subsequent sequence number of following packet
+		if(mByteArrayOutputStream.size()>=getPacketSizeWithCrc()+2){ // +2 because there are two acks
+			processPacket();
+		}
+	}
+
+
+	/**this is to clear the buffer
+	 *
+	 */
+	@Override
+	protected void clearSerialBuffer() {
+		startTimerCheckForSerialPortClear();
+		byte[] buffer = new byte[0];
+		while (availableBytes() != 0) {
+//			int available = availableBytes();
+			if (bytesAvailableToBeRead()) {
+				//AA-283 : the clearing of the serial bytes , is too slow when streaming 1024Hz (e.g. exg test)
+				buffer = readBytes(availableBytes());
+
+				if (mSerialPortReadTimeout) {
+					break;
+				}
+			}
+		}
+
+		if (buffer.length > 0) {
+			String msg = "Clearing Buffer:\t\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(buffer);
+			printLogDataForDebugging(msg);
+		}
+
+		stopTimerCheckForSerialPortClear();
+	}
+
 	/**
 	 * Write to the ConnectedThread in an unsynchronized manner
 	 * @param out The bytes to write
