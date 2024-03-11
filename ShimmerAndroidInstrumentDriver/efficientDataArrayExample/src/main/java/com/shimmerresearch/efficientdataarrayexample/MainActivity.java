@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +23,8 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
+import com.shimmerresearch.tools.FileUtils;
+import com.shimmerresearch.verisense.VerisenseDevice;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,9 +33,14 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * This example demonstrates the use of the arrays data structure, {@link ObjectCluster#sensorDataArray}, in the following scenarios:
@@ -45,13 +53,13 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.RE
  * Switching to using the arrays can improve packet reception rate on slower Android devices.
  */
 public class MainActivity extends Activity {
-
+    private static final int PERMISSION_FILE_REQUEST_SHIMMER = 99;
     ShimmerBluetoothManagerAndroid btManager;
     private String bluetoothAdd = "";
     private final static String LOG_TAG = "ArraysExample";
     private final static String CSV_FILE_NAME_PREFIX = "Data";
     private final static String APP_FOLDER_NAME = "ShimmerArraysExample";
-    private final static String APP_DIR_PATH = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + APP_FOLDER_NAME + File.separator;
+    private String APP_DIR_PATH = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + APP_FOLDER_NAME + File.separator;
     /** This can be found in the Manifest */
     private final static String APP_FILE_PROVIDER_AUTHORITY = "com.shimmerresearch.efficientdataarrayexample.fileprovider";
     private final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
@@ -66,21 +74,45 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        try {
-            btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //Check if permission to write to external storage has been granted
-        if (Build.VERSION.SDK_INT >= 23) {
-            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE )!= PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        PERMISSIONS_REQUEST_WRITE_STORAGE);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        boolean permissionGranted = true;
+        {
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
             }
         }
+        if (!permissionGranted) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 110);
 
+        } else {
+
+            Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+            startActivityForResult(intent, PERMISSION_FILE_REQUEST_SHIMMER);
+
+
+            try {
+                btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public void connectDevice(View v) {
@@ -108,15 +140,6 @@ public class MainActivity extends Activity {
 
     public void stopStreaming(View v) {
         if(btManager.getShimmer(bluetoothAdd) != null) {
-            try {   //Stop CSV writing
-                bw.flush();
-                bw.close();
-                fw.close();
-                firstTimeWrite = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
             try {
                 btManager.stopStreaming(bluetoothAdd);
             } catch (ShimmerException e) {
@@ -143,8 +166,52 @@ public class MainActivity extends Activity {
             }
 
         }
+        if (resultCode == RESULT_OK && requestCode == PERMISSION_FILE_REQUEST_SHIMMER) {
+            if (data != null) {
+                Uri treeUri = data.getData();
+                FileUtils futils = new FileUtils(MainActivity.this);
+                File file = new File(futils.getPath(treeUri, FileUtils.UriType.FOLDER));
+                APP_DIR_PATH = file.getAbsolutePath();
+            }
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private void writeDataToFile(ObjectCluster objc) {
+        if (firstTimeWrite) {
+            //Write headers on first-time
+            for (String channelName : objc.sensorDataArray.mSensorNames) {
+                try {
+                    bw.write(channelName + ",");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                bw.write("\n");
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
+            firstTimeWrite = false;
+        }
+        for (double calData : objc.sensorDataArray.mCalData) {
+            String dataString = String.valueOf(calData);
+            try {
+                bw.write(dataString + ",");
+            } catch (IOException e3) {
+                e3.printStackTrace();
+            }
+        }
+        try {
+            bw.write("\n");
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        }
+    }
+
 
     Handler mHandler = new Handler() {
 
@@ -154,69 +221,88 @@ public class MainActivity extends Activity {
             switch (msg.what) {
                 case ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET:
                     if ((msg.obj instanceof ObjectCluster)) {
-                        ObjectCluster objc = (ObjectCluster) msg.obj;
 
-                        /**
-                         * ---------- Printing a channel to Logcat ----------
-                         */
-                        //Method 1 - retrieve data from the ObjectCluster using get method
-                        double data = objc.getFormatClusterValue(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X, ChannelDetails.CHANNEL_TYPE.CAL.toString());
-                        Log.i(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
 
-                        //Method 2a - retrieve data from the ObjectCluster by manually parsing the arrays
-                        int index = -1;
-                        for(int i=0; i<objc.sensorDataArray.mSensorNames.length; i++) {
-                            if(objc.sensorDataArray.mSensorNames[i] != null) {
-                                if (objc.sensorDataArray.mSensorNames[i].equals(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X)) {
-                                    index = i;
+                            ObjectCluster objc = (ObjectCluster) msg.obj;
+
+                            /**
+                             * ---------- Printing a channel to Logcat ----------
+                             */
+                            //Method 1 - retrieve data from the ObjectCluster using get method
+                            double data = objc.getFormatClusterValue(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X, ChannelDetails.CHANNEL_TYPE.CAL.toString());
+                            Log.i(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
+
+                            //Method 2a - retrieve data from the ObjectCluster by manually parsing the arrays
+                            int index = -1;
+                            for (int i = 0; i < objc.sensorDataArray.mSensorNames.length; i++) {
+                                if (objc.sensorDataArray.mSensorNames[i] != null) {
+                                    if (objc.sensorDataArray.mSensorNames[i].equals(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X)) {
+                                        index = i;
+                                    }
                                 }
                             }
-                        }
-                        if(index != -1) {
-                            //Index was found
-                            data = objc.sensorDataArray.mCalData[index];
-                            Log.w(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
-                        }
+                            if (index != -1) {
+                                //Index was found
+                                data = objc.sensorDataArray.mCalData[index];
+                                Log.w(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
+                            }
 
-                        //Method 2b - retrieve data from the ObjectCluster by getting the index, then accessing the arrays
-                        index = objc.getIndexForChannelName(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X);
-                        if(index != -1) {
-                            data = objc.sensorDataArray.mCalData[index];
-                            Log.e(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
-                        }
+                            //Method 2b - retrieve data from the ObjectCluster by getting the index, then accessing the arrays
+                            index = objc.getIndexForChannelName(Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X);
+                            if (index != -1) {
+                                data = objc.sensorDataArray.mCalData[index];
+                                Log.e(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_WR_X + " data: " + data);
+                            }
 
-                        /**
-                         * ---------- Writing all channels of CAL data to CSV file ----------
-                         */
-                        if(firstTimeWrite) {
-                            //Write headers on first-time
-                            for(String channelName : objc.sensorDataArray.mSensorNames) {
+                            //Method 2b - retrieve data from the ObjectCluster by getting the index, then accessing the arrays
+                            index = objc.getIndexForChannelName(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_OVERALL);
+                            if (index != -1) {
+                                data = objc.sensorDataArray.mCalData[index];
+                                Log.e(LOG_TAG, Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_OVERALL + " data: " + data);
+                            }
+
+                            /**
+                             * ---------- Writing all channels of CAL data to CSV file ----------
+                             */
+/*
+                            if (firstTimeWrite) {
+                                //Write headers on first-time
+                                for (String channelName : objc.sensorDataArray.mSensorNames) {
+                                    try {
+                                        bw.write(channelName + ",");
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 try {
-                                    bw.write(channelName + ",");
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    bw.write("\n");
+                                } catch (IOException e2) {
+                                    e2.printStackTrace();
+                                }
+                                firstTimeWrite = false;
+                            }
+                            for (double calData : objc.sensorDataArray.mCalData) {
+                                String dataString = String.valueOf(calData);
+                                try {
+                                    bw.write(dataString + ",");
+                                } catch (IOException e3) {
+                                    e3.printStackTrace();
                                 }
                             }
                             try {
                                 bw.write("\n");
-                            } catch(IOException e2) {
+                            } catch (IOException e2) {
                                 e2.printStackTrace();
                             }
-                            firstTimeWrite = false;
-                        }
-                        for(double calData : objc.sensorDataArray.mCalData) {
-                            String dataString = String.valueOf(calData);
-                            try {
-                                bw.write(dataString + ",");
-                            } catch(IOException e3) {
-                                e3.printStackTrace();
+*/
+
+                        // Execute file writing task in a separate thread
+                        executor.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                writeDataToFile(objc);
                             }
-                        }
-                        try {
-                            bw.write("\n");
-                        } catch(IOException e2) {
-                            e2.printStackTrace();
-                        }
+                        });
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:
@@ -237,6 +323,16 @@ public class MainActivity extends Activity {
                     }
                     switch (state) {
                         case CONNECTED:
+                            if (bw!=null && firstTimeWrite) {
+                                try {   //Stop CSV writing
+                                    bw.flush();
+                                    bw.close();
+                                    fw.close();
+                                    firstTimeWrite = true;
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             break;
                         case CONNECTING:
                             break;
@@ -263,13 +359,7 @@ public class MainActivity extends Activity {
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == PERMISSIONS_REQUEST_WRITE_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(this, "Error! Permission not granted. App will now close", Toast.LENGTH_LONG).show();
-                finish();
-            }
-        }
+
     }
 
     /**
