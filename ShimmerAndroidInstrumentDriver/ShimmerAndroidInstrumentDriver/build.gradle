@@ -2,10 +2,7 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-//apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
-
-version = '3.0.73Beta'
 
 android {
     compileSdkVersion 33
@@ -92,8 +89,8 @@ publishing {
             url = uri("https://maven.pkg.github.com/ShimmerEngineering/ShimmerAndroidAPI")
             credentials {
                 //Create github.properties in root project folder file with gpra.usr=GITHUB_USER_ID  & gpra.key=PERSONAL_ACCESS_TOKEN
-                username = githubProperties['gpra.usr'] ?: System.getenv("GPRA_USER")
-                password = githubProperties['gpra.key'] ?: System.getenv("GPRA_API_KEY")
+                username = project.findProperty('gpra.usr')
+                password = project.findProperty('gpra.key')
             }
         }
     }
