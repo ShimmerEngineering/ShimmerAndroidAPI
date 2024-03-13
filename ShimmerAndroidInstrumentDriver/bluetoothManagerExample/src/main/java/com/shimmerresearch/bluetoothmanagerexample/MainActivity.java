@@ -326,6 +326,18 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER);
     }
 
+    /**
+     * Called when the disconnect button is clicked
+     * @param v
+     */
+    public void disconnectDevice(View v) {
+        try {
+            ((ShimmerBluetooth)shimmerDevice).disconnect();
+        } catch (ShimmerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void startSDLogging(View v) {
         ((ShimmerBluetooth)shimmerDevice).writeConfigTime(System.currentTimeMillis());
         shimmerDevice.startSDLogging();
