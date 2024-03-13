@@ -398,4 +398,5 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
         try{ looper.loop(); }
         catch(RuntimeException e){}
-    }}
+    }
+}

@@ -3,9 +3,13 @@ package com.shimmerresearch.shimmerserviceexample;
 import android.Manifest;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
@@ -45,6 +49,7 @@ import com.shimmerresearch.android.guiUtilities.supportfragments.DataSyncFragmen
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SignalsToPlotFragment;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -421,9 +426,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 String deviceName = data.getStringExtra(EXTRA_DEVICE_NAME);
+
+                showBtTypeConnectionOption();
+
                 //mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
 
-                mService.connectShimmer(macAdd,deviceName,this);    //Connect to the selected device, and set context to show progress dialog when pairing
+                mService.connectShimmer(macAdd,deviceName,preferredBtType,this);    //Connect to the selected device, and set context to show progress dialog when pairing
 
             }
         }
@@ -507,6 +515,30 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             return PagerAdapter.POSITION_NONE;
         }
     }
+    ShimmerBluetoothManagerAndroid.BT_TYPE preferredBtType;
+    Looper looper = Looper.myLooper();
+
+    public void showBtTypeConnectionOption(){
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setMessage("Choose preferred Bluetooth type");
+        alertDialog.setButton( Dialog.BUTTON_POSITIVE, "BT CLASSIC", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                looper.quit();
+            };
+        });
+        alertDialog.setButton( Dialog.BUTTON_NEGATIVE, "BLE", new DialogInterface.OnClickListener()    {
+            public void onClick(DialogInterface dialog, int which) {
+                preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BLE;
+                looper.quit();
+            };
+        });
+        alertDialog.show();
+        try{ looper.loop(); }
+        catch(RuntimeException e){}
+    }
+
     int mNumberOfCurrentlyConnectedDevices=0;
     public boolean isNumberOfConnectedDevicesChanged(){
         if(mService.getListOfConnectedDevices().size()!=mNumberOfCurrentlyConnectedDevices){

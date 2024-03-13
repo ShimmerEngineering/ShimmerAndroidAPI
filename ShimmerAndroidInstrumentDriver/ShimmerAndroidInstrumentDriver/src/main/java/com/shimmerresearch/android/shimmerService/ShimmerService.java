@@ -260,6 +260,11 @@ public class ShimmerService extends Service {
 		btManager.connectShimmerThroughBTAddress(bluetoothAddress,deviceName,context);
 	}
 
+	public void connectShimmer(final String bluetoothAddress,final String deviceName, ShimmerBluetoothManagerAndroid.BT_TYPE preferredBtType, Context context){
+
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress, preferredBtType);   //Connect to the selected device
+	}
+
 	public void connectShimmer(final String bluetoothAddress){
 		btManager.connectShimmerThroughBTAddress(bluetoothAddress);
 	}
