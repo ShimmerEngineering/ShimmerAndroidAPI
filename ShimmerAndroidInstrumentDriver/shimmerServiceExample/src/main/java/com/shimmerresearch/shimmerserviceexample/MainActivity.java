@@ -51,6 +51,7 @@ import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SignalsToPlotFragment;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
@@ -639,7 +640,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
             //Pass the selected device to the fragments
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
-
+            if (device instanceof Shimmer3BLEAndroid) { //Due to BLE using the main thread the timer needs to be stopped otherwise no response will be received due to the main thread executing the following code below to generate the fragments
+                ((ShimmerBluetooth) device).stopTimerReadStatus();
+            }
             //add and remove DataSyncFragment based on the type of device
             /*
             if(device instanceof VerisenseDeviceAndroid) {
@@ -688,7 +691,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     }
                 });
             }
-
+            if (device instanceof Shimmer3BLEAndroid) { //Due to BLE using the main thread the timer needs to be stopped otherwise no response will be received due to the main thread executing the following code below to generate the fragments
+                ((ShimmerBluetooth) device).startTimerReadStatus(); // restart the timer
+            }
 
         }
         else{
