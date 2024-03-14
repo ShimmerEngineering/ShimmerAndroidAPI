@@ -12,9 +12,12 @@ import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Quat4d;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,7 +30,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
@@ -64,12 +71,8 @@ public class Shimmer3DOrientationExample extends Activity {
     private Shimmer mShimmerDevice1 = null;
 	static final int REQUEST_CONNECT_SHIMMER = 2;
 	static final int REQUEST_CONFIGURE_SHIMMER = 3;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.exercise);
 
+	protected void setup(){
 		t= new MyGLSurfaceView(this);
 		//Create an Instance with this Activity
 		glSurface = (GLSurfaceView)findViewById(R.id.graphics_glsurfaceview1);
@@ -83,16 +86,14 @@ public class Shimmer3DOrientationExample extends Activity {
 		fm3d = new Matrix3d();
 		m3d = new Matrix3d();
 		invm3d.setIdentity();
-		Integer[] arraySensorID ={Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL,Configuration.Shimmer3.SENSOR_ID.SHIMMER_MPU9X50_GYRO,Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM303_MAG};
 		// TODO Auto-generated method stub
-		mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0);
 		buttonReset.setOnClickListener(new OnClickListener(){
 
 			public void onClick(View arg0) {
 				invm3d.setIdentity();
 			}
-        	
-        });
+
+		});
 
 		buttonSet.setOnClickListener(new OnClickListener(){
 
@@ -101,16 +102,70 @@ public class Shimmer3DOrientationExample extends Activity {
 				invm3d.set(m3d);
 				invm3d.invert();
 			}
-        	
-        });
-	
-		 mTVQ1 = (TextView)findViewById(R.id.textViewQ1);
-		 mTVQ2 = (TextView)findViewById(R.id.textViewQ2);
-		 mTVQ3 = (TextView)findViewById(R.id.textViewQ3);
-		 mTVQ4 = (TextView)findViewById(R.id.textViewQ4);
-		
+
+		});
+
+		mTVQ1 = (TextView)findViewById(R.id.textViewQ1);
+		mTVQ2 = (TextView)findViewById(R.id.textViewQ2);
+		mTVQ3 = (TextView)findViewById(R.id.textViewQ3);
+		mTVQ4 = (TextView)findViewById(R.id.textViewQ4);
+
 	}
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.exercise);
+		boolean permissionGranted = true;
+		int permissionCheck = 0;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+
+			if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+				permissionGranted = false;
+			}
+			permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+			if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+				permissionGranted = false;
+			}
+		} else {
+			permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+			if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+				permissionGranted = false;
+			}
+		}
+		permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+		if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+			permissionGranted = false;
+		}
+		permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+		if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+			permissionGranted = false;
+		}
+
+
+		if (!permissionGranted) {
+			// Should we show an explanation?
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 110);
+			} else {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 110);
+			}
+		} else {
+
+			Integer[] arraySensorID ={Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL,Configuration.Shimmer3.SENSOR_ID.SHIMMER_MPU9X50_GYRO,Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM303_MAG};
+			mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0);
+		}
+		setup();
+	}
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		if (requestCode == 110){
+			Integer[] arraySensorID ={Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL,Configuration.Shimmer3.SENSOR_ID.SHIMMER_MPU9X50_GYRO,Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM303_MAG};
+			mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0);
+
+		}
+	}
 	/**
 	 * Remember to resume the glSurface
 	 */
