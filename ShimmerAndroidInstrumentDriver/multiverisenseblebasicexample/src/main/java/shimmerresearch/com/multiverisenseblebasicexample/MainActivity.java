@@ -2,11 +2,17 @@ package shimmerresearch.com.multiverisenseblebasicexample;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +22,7 @@ import android.widget.Toast;
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.VerisenseDeviceAndroid;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.androidradiodriver.VerisenseBleAndroidRadioByteCommunication;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -32,7 +39,7 @@ import java.util.Collection;
 public class MainActivity extends AppCompatActivity {
 
     private final static String LOG_TAG = "MultiVeriBLEExample";
-    VerisenseBleAndroidRadioByteCommunication radio1 = new VerisenseBleAndroidRadioByteCommunication("C0:04:19:85:9A:D5");
+    VerisenseBleAndroidRadioByteCommunication radio1 = new VerisenseBleAndroidRadioByteCommunication("DA:A6:19:F0:4A:D7");
     VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
     VerisenseDeviceAndroid device1;
 
@@ -57,10 +64,57 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BleManager.getInstance().init(getApplication());
-        device1 = new VerisenseDeviceAndroid(mHandler);
-        device2 = new VerisenseDeviceAndroid(mHandler);
-        device3 = new VerisenseDeviceAndroid(mHandler);
+        boolean permissionGranted = true;
+        int permissionCheck = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        } else {
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        }
+        permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            permissionGranted = false;
+        }
+        permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            permissionGranted = false;
+        }
+
+
+        if (!permissionGranted) {
+            // Should we show an explanation?
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 110);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 110);
+            }
+        } else {
+            BleManager.getInstance().init(getApplication());
+            device1 = new VerisenseDeviceAndroid(mHandler);
+            device2 = new VerisenseDeviceAndroid(mHandler);
+            device3 = new VerisenseDeviceAndroid(mHandler);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 110){
+            BleManager.getInstance().init(getApplication());
+            device1 = new VerisenseDeviceAndroid(mHandler);
+            device2 = new VerisenseDeviceAndroid(mHandler);
+            device3 = new VerisenseDeviceAndroid(mHandler);
+        }
     }
 
     //Sensor 1
