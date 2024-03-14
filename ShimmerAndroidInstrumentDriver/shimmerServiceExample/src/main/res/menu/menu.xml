@@ -22,7 +22,9 @@
             android:id="@+id/start_streaming"></item>
     <item   android:title="Stop streaming selected device"
             android:id="@+id/stop_streaming"></item>
-    <item   android:title="Data Sync selected device"
+    <item   android:title="Set Sampling Rate"
+        android:id="@+id/set_sampling_rate"></item>
+    <item   android:title="Set Sampling Rate"
         android:id="@+id/data_sync"></item>
     <item   android:title="Erase data"
         android:id="@+id/erase_data"></item>
@@ -34,4 +36,5 @@
         android:id="@+id/enable_write_to_csv"></item>
     <item   android:title="Disable Write To CSV"
         android:id="@+id/disable_write_to_csv"></item>
+
 </menu>

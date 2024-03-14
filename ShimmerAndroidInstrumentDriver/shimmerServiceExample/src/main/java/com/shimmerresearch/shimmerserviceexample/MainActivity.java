@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 import com.androidplot.xy.XYPlot;
 import com.clj.fastble.BleManager;
@@ -226,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                     ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
                     try {
+                        ((ShimmerBluetooth)mDevice).stopTimerReadBattStatus();
                         mDevice.startStreaming();
                         mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
                     } catch (ShimmerException e) {
@@ -317,6 +319,41 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 return true;
             case R.id.disable_write_to_csv:
                 mService.setEnableLogging(false);
+                return true;
+            case R.id.set_sampling_rate:
+
+                // Create an AlertDialog Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Enter Sampling Rate");
+
+                // Inflate the dialog layout
+                final EditText editTextSamplingRate = new EditText(this);
+                builder.setView(editTextSamplingRate);
+                // Add OK button
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String samplingRateStr = editTextSamplingRate.getText().toString();
+                        // Convert the input to integer
+                        double samplingRate = Double.parseDouble(samplingRateStr);
+
+                        // Call a method to write sampling rate or do whatever you need
+                        ShimmerBluetooth device = (ShimmerBluetooth) mService.getShimmer(selectedDeviceAddress);
+                        device.writeShimmerAndSensorsSamplingRate(samplingRate);
+
+                    }
+                });
+
+                // Add Cancel button
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+                builder.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
