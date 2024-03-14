@@ -128,6 +128,7 @@ public class MainActivity extends Activity {
             shimmer.enablePCTimeStamps(false);
             //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
             shimmer.enableArraysDataStructure(true);
+            ((ShimmerBluetooth)shimmer).stopTimerReadBattStatus();
             try {
                 btManager.startStreaming(bluetoothAdd);
             } catch (ShimmerException e) {
@@ -141,6 +142,7 @@ public class MainActivity extends Activity {
     public void stopStreaming(View v) {
         if(btManager.getShimmer(bluetoothAdd) != null) {
             try {
+                Shimmer shimmer = (Shimmer) btManager.getShimmer(bluetoothAdd);
                 btManager.stopStreaming(bluetoothAdd);
             } catch (ShimmerException e) {
                 e.printStackTrace();
@@ -180,12 +182,32 @@ public class MainActivity extends Activity {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    private int countNonNulls(String[] dataArray){
+        int count =0;
+        for (String data:dataArray){
+            if (data!=null){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    int numberOfChannels = 0;
     private void writeDataToFile(ObjectCluster objc) {
         if (firstTimeWrite) {
             //Write headers on first-time
+            numberOfChannels = countNonNulls(objc.sensorDataArray.mSensorNames);
+            int count = 1;
             for (String channelName : objc.sensorDataArray.mSensorNames) {
                 try {
-                    bw.write(channelName + ",");
+                    if(channelName!=null) {
+                        if (count < numberOfChannels) {
+                            bw.write(channelName + ",");
+                        } else {
+                            bw.write(channelName);
+                        }
+                    }
+                   count++;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -197,10 +219,19 @@ public class MainActivity extends Activity {
             }
             firstTimeWrite = false;
         }
+        int count = 1;
         for (double calData : objc.sensorDataArray.mCalData) {
+
             String dataString = String.valueOf(calData);
             try {
-                bw.write(dataString + ",");
+                if(objc.sensorDataArray.mSensorNames[count-1]!=null) {
+                    if (count < numberOfChannels) {
+                        bw.write(dataString + ",");
+                    } else {
+                        bw.write(dataString);
+                    }
+                }
+                count++;
             } catch (IOException e3) {
                 e3.printStackTrace();
             }
