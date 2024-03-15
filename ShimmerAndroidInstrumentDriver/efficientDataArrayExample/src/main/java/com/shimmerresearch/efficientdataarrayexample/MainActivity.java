@@ -140,7 +140,6 @@ public class MainActivity extends Activity {
             shimmer.enablePCTimeStamps(false);
             //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
             shimmer.enableArraysDataStructure(true);
-            ((ShimmerBluetooth)shimmer).stopTimerReadBattStatus();
             try {
                 btManager.startStreaming(bluetoothAdd);
             } catch (ShimmerException e) {

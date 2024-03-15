@@ -151,6 +151,7 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
+import com.shimmerresearch.driverUtilities.ShimmerBattStatusDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.driverUtilities.UtilShimmer;
 import com.shimmerresearch.exceptions.ShimmerException;
@@ -712,12 +713,15 @@ public class Shimmer extends ShimmerBluetooth{
 		//Data packet followed by an ACK (suggesting an ACK in response to a SET BT command or else a BT response command)
 		else if(bufferTemp[0]==DATA_PACKET
 				&& bufferTemp[getPacketSizeWithCrc()+1]==ACK_COMMAND_PROCESSED){
-			if(bufferTemp.length>getPacketSizeWithCrc()+2){
 
+			if(mByteArrayOutputStream.size()>getPacketSizeWithCrc()+2){
+				allBytes = mByteArrayOutputStream.toByteArray();
+				bufferTemp = new byte[getPacketSizeWithCrc()+3]; //check if the next byte is data packet
+				System.arraycopy(allBytes,0,bufferTemp,0,bufferTemp.length);
 				if(bufferTemp[getPacketSizeWithCrc()+2]==DATA_PACKET){
 					//Firstly handle the data packet
 					processDataPacket(bufferTemp);
-					clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+2);
+					clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+2); //clear an extra byte which is the ack
 
 					//Then handle the ACK from the last SET command
 					if(isKnownSetCommand(mCurrentCommand)){
@@ -776,6 +780,76 @@ public class Shimmer extends ShimmerBluetooth{
 			discardFirstBufferByte(); //throw the first byte away
 		}
 	}
+
+	/** process responses to in-stream response */
+	@Override
+	protected void processInstreamResponse() {
+		//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
+		if (mByteArrayOutputStream.size() > getPacketSizeWithCrc() + 3) {
+			byte[] allBytes = mByteArrayOutputStream.toByteArray();
+			byte[] bufferTemp = new byte[getPacketSizeWithCrc() + 4]; //check if the next byte is data packet
+			System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+			if (bufferTemp != null) {
+				byte inStreamResponseCommand = bufferTemp[bufferTemp.length - 1];
+				consolePrintLn("In-stream received = " + btCommandToString(inStreamResponseCommand));
+
+				if (inStreamResponseCommand == DIR_RESPONSE) {
+					byte[] responseData = readBytes(1, inStreamResponseCommand);
+					if (responseData != null) {
+						int directoryNameLength = responseData[0];
+						byte[] bufferDirectoryName = new byte[directoryNameLength];
+						bufferDirectoryName = readBytes(directoryNameLength, inStreamResponseCommand);
+						if (bufferDirectoryName != null) {
+							String tempDirectory = new String(bufferDirectoryName);
+							mDirectoryName = tempDirectory;
+							printLogDataForDebugging("Directory Name = " + mDirectoryName);
+						}
+					}
+				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
+					if (mByteArrayOutputStream.size() >= bufferTemp.length+1) {
+						allBytes = mByteArrayOutputStream.toByteArray();
+						bufferTemp = new byte[bufferTemp.length + 1]; //check if the next byte is data packet
+						System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+						byte[] responseData = new byte[1];
+						System.arraycopy(bufferTemp, bufferTemp.length-responseData.length, responseData, 0, responseData.length);
+						if (responseData != null) {
+							parseStatusByte(responseData[0]);
+
+							if (!isSupportedRtcStateInStatus()) {
+								if (!mIsSensing && !isInitialised()) {
+									writeRealTimeClock();
+								}
+							} else {
+								//New case to make sure RTC is set if it hasn't been already
+								if (!isSDLogging() && (!isInitialised() || !mIsRtcSet)) {
+									writeRealTimeClock();
+								}
+							}
+
+							eventLogAndStreamStatusChanged(mCurrentCommand);
+						}
+					}
+				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
+					if (mByteArrayOutputStream.size() >= bufferTemp.length+3) {
+						allBytes = mByteArrayOutputStream.toByteArray();
+						bufferTemp = new byte[bufferTemp.length+3]; //check if the next byte is data packet
+						System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+						byte[] responseData = new byte[3];
+						System.arraycopy(bufferTemp, bufferTemp.length-responseData.length, responseData, 0, responseData.length);
+						if (responseData != null) {
+							ShimmerBattStatusDetails battStatusDetails = new ShimmerBattStatusDetails(((responseData[1] & 0xFF) << 8) + (responseData[0] & 0xFF), responseData[2]);
+							setBattStatusDetails(battStatusDetails);
+							printLogDataForDebugging("Battery Status:"
+									+ "\tVoltage=" + battStatusDetails.getBattVoltageParsed()
+									+ "\tCharging status=" + battStatusDetails.getChargingStatusParsed()
+									+ "\tBatt %=" + battStatusDetails.getEstimatedChargePercentageParsed());
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 	@Override
 	protected void processWhileStreaming() {

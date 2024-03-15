@@ -227,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                     ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
                     try {
-                        ((ShimmerBluetooth)mDevice).stopTimerReadBattStatus();
                         mDevice.startStreaming();
                         mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
                     } catch (ShimmerException e) {
@@ -251,8 +250,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         }
                         e.printStackTrace();
                     }
-                    sensorsEnabledFragment.buildSensorsList(mDevice, this, mService.getBluetoothManager());
-                    deviceConfigFragment.buildDeviceConfigList(mDevice, this, mService.getBluetoothManager());
                 }
                 return true;
             case R.id.data_sync:
