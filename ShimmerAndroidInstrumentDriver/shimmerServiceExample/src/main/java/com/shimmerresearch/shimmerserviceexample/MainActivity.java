@@ -325,6 +325,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                 // Inflate the dialog layout
                 final EditText editTextSamplingRate = new EditText(this);
+                if (selectedDeviceAddress.isEmpty()){
+                    return true;
+                }
+                ShimmerBluetooth device = (ShimmerBluetooth) mService.getShimmer(selectedDeviceAddress);
+                editTextSamplingRate.setText(Double.toString(device.getSamplingRateShimmer()));
                 builder.setView(editTextSamplingRate);
                 // Add OK button
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -335,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         double samplingRate = Double.parseDouble(samplingRateStr);
 
                         // Call a method to write sampling rate or do whatever you need
-                        ShimmerBluetooth device = (ShimmerBluetooth) mService.getShimmer(selectedDeviceAddress);
+
                         device.writeShimmerAndSensorsSamplingRate(samplingRate);
 
                     }

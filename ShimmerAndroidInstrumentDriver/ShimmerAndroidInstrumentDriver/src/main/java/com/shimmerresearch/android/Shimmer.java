@@ -759,17 +759,20 @@ public class Shimmer extends ShimmerBluetooth{
 					setInstructionStackLock(false);
 
 					//Then process the Data packet
-					processDataPacket(bufferTemp);
-					clearBuffers();
+					//processDataPacket(bufferTemp);
+					//clearBuffers();
 				}
 				else {
 					printLogDataForDebugging("Unknown parsing error while streaming");
+					discardFirstBufferByte(); //throw the first byte away
 				}
 			}
+			/*
 			if(mByteArrayOutputStream.size()>getPacketSizeWithCrc()+2){
 				printLogDataForDebugging("Unknown packet error (check with JC):\tExpected: " + (getPacketSizeWithCrc()+2) + "bytes but buffer contains " + mByteArrayOutputStream.size() + "bytes");
 				discardFirstBufferByte(); //throw the first byte away
 			}
+			 */
 
 		}
 		//TODO: ACK in bufferTemp[0] not handled
@@ -781,37 +784,46 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 	}
 
+	protected byte[] getDataFromArrayOutputStream(int extraBytesLength){
+		if (mByteArrayOutputStream.size() >= getPacketSizeWithCrc() + extraBytesLength) {
+			byte[] allBytes = mByteArrayOutputStream.toByteArray();
+			byte[] bufferTemp = new byte[getPacketSizeWithCrc() + extraBytesLength]; //check if the next byte is data packet
+			System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+			return bufferTemp;
+		}
+		return null;
+	}
+
 	/** process responses to in-stream response */
 	@Override
 	protected void processInstreamResponse() {
 		//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
-		if (mByteArrayOutputStream.size() > getPacketSizeWithCrc() + 3) {
-			byte[] allBytes = mByteArrayOutputStream.toByteArray();
-			byte[] bufferTemp = new byte[getPacketSizeWithCrc() + 4]; //check if the next byte is data packet
-			System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+			byte[] bufferTemp = getDataFromArrayOutputStream(4);
 			if (bufferTemp != null) {
 				byte inStreamResponseCommand = bufferTemp[bufferTemp.length - 1];
 				consolePrintLn("In-stream received = " + btCommandToString(inStreamResponseCommand));
 
 				if (inStreamResponseCommand == DIR_RESPONSE) {
-					byte[] responseData = readBytes(1, inStreamResponseCommand);
-					if (responseData != null) {
-						int directoryNameLength = responseData[0];
+					//byte[] responseData = readBytes(1, inStreamResponseCommand);
+					bufferTemp = getDataFromArrayOutputStream(5);
+					if (bufferTemp != null) {
+						int directoryNameLength = bufferTemp[bufferTemp.length-1];
 						byte[] bufferDirectoryName = new byte[directoryNameLength];
-						bufferDirectoryName = readBytes(directoryNameLength, inStreamResponseCommand);
+						bufferTemp = getDataFromArrayOutputStream(5+directoryNameLength);
+						System.arraycopy(bufferTemp, bufferTemp.length - bufferDirectoryName.length, bufferDirectoryName, 0, bufferDirectoryName.length);
 						if (bufferDirectoryName != null) {
 							String tempDirectory = new String(bufferDirectoryName);
 							mDirectoryName = tempDirectory;
 							printLogDataForDebugging("Directory Name = " + mDirectoryName);
 						}
+						processDataPacket(bufferTemp);
+						clearSingleDataPacketFromBuffers(bufferTemp,bufferTemp.length+mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
-					if (mByteArrayOutputStream.size() >= bufferTemp.length+1) {
-						allBytes = mByteArrayOutputStream.toByteArray();
-						bufferTemp = new byte[bufferTemp.length + 1]; //check if the next byte is data packet
-						System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+					bufferTemp = getDataFromArrayOutputStream(5);
+					if (bufferTemp!=null) {
 						byte[] responseData = new byte[1];
-						System.arraycopy(bufferTemp, bufferTemp.length-responseData.length, responseData, 0, responseData.length);
+						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
 						if (responseData != null) {
 							parseStatusByte(responseData[0]);
 
@@ -825,17 +837,16 @@ public class Shimmer extends ShimmerBluetooth{
 									writeRealTimeClock();
 								}
 							}
-
 							eventLogAndStreamStatusChanged(mCurrentCommand);
+							processDataPacket(bufferTemp);
+							clearSingleDataPacketFromBuffers(bufferTemp,bufferTemp.length+mBtCommsCrcModeCurrent.getNumCrcBytes());
 						}
 					}
 				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
-					if (mByteArrayOutputStream.size() >= bufferTemp.length+3) {
-						allBytes = mByteArrayOutputStream.toByteArray();
-						bufferTemp = new byte[bufferTemp.length+3]; //check if the next byte is data packet
-						System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+					bufferTemp = getDataFromArrayOutputStream(7);
+					if (bufferTemp!=null) {
 						byte[] responseData = new byte[3];
-						System.arraycopy(bufferTemp, bufferTemp.length-responseData.length, responseData, 0, responseData.length);
+						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
 						if (responseData != null) {
 							ShimmerBattStatusDetails battStatusDetails = new ShimmerBattStatusDetails(((responseData[1] & 0xFF) << 8) + (responseData[0] & 0xFF), responseData[2]);
 							setBattStatusDetails(battStatusDetails);
@@ -844,10 +855,15 @@ public class Shimmer extends ShimmerBluetooth{
 									+ "\tCharging status=" + battStatusDetails.getChargingStatusParsed()
 									+ "\tBatt %=" + battStatusDetails.getEstimatedChargePercentageParsed());
 						}
+						processDataPacket(bufferTemp);
+						clearSingleDataPacketFromBuffers(bufferTemp,bufferTemp.length+mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
+
+				} else {
+					discardFirstBufferByte();
 				}
 			}
-		}
+
 	}
 
 
