@@ -797,7 +797,11 @@ public class Shimmer extends ShimmerBluetooth{
 	/** process responses to in-stream response */
 	@Override
 	protected void processInstreamResponse() {
-		//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
+
+		if (mBluetoothRadioState.equals(BT_STATE.CONNECTED)){
+			super.processInstreamResponse();
+		} else if (mBluetoothRadioState.equals(BT_STATE.STREAMING)){
+			//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
 			byte[] bufferTemp = getDataFromArrayOutputStream(4);
 			if (bufferTemp != null) {
 				byte inStreamResponseCommand = bufferTemp[bufferTemp.length - 1];
@@ -807,9 +811,9 @@ public class Shimmer extends ShimmerBluetooth{
 					//byte[] responseData = readBytes(1, inStreamResponseCommand);
 					bufferTemp = getDataFromArrayOutputStream(5);
 					if (bufferTemp != null) {
-						int directoryNameLength = bufferTemp[bufferTemp.length-1];
+						int directoryNameLength = bufferTemp[bufferTemp.length - 1];
 						byte[] bufferDirectoryName = new byte[directoryNameLength];
-						bufferTemp = getDataFromArrayOutputStream(5+directoryNameLength);
+						bufferTemp = getDataFromArrayOutputStream(5 + directoryNameLength);
 						System.arraycopy(bufferTemp, bufferTemp.length - bufferDirectoryName.length, bufferDirectoryName, 0, bufferDirectoryName.length);
 						if (bufferDirectoryName != null) {
 							String tempDirectory = new String(bufferDirectoryName);
@@ -817,11 +821,11 @@ public class Shimmer extends ShimmerBluetooth{
 							printLogDataForDebugging("Directory Name = " + mDirectoryName);
 						}
 						processDataPacket(bufferTemp);
-						clearSingleDataPacketFromBuffers(bufferTemp,bufferTemp.length+mBtCommsCrcModeCurrent.getNumCrcBytes());
+						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
 					bufferTemp = getDataFromArrayOutputStream(5);
-					if (bufferTemp!=null) {
+					if (bufferTemp != null) {
 						byte[] responseData = new byte[1];
 						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
 						if (responseData != null) {
@@ -839,12 +843,12 @@ public class Shimmer extends ShimmerBluetooth{
 							}
 							eventLogAndStreamStatusChanged(mCurrentCommand);
 							processDataPacket(bufferTemp);
-							clearSingleDataPacketFromBuffers(bufferTemp,bufferTemp.length+mBtCommsCrcModeCurrent.getNumCrcBytes());
+							clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 						}
 					}
 				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
 					bufferTemp = getDataFromArrayOutputStream(7);
-					if (bufferTemp!=null) {
+					if (bufferTemp != null) {
 						byte[] responseData = new byte[3];
 						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
 						if (responseData != null) {
@@ -856,14 +860,14 @@ public class Shimmer extends ShimmerBluetooth{
 									+ "\tBatt %=" + battStatusDetails.getEstimatedChargePercentageParsed());
 						}
 						processDataPacket(bufferTemp);
-						clearSingleDataPacketFromBuffers(bufferTemp,bufferTemp.length+mBtCommsCrcModeCurrent.getNumCrcBytes());
+						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 
 				} else {
 					discardFirstBufferByte();
 				}
 			}
-
+		}
 	}
 
 

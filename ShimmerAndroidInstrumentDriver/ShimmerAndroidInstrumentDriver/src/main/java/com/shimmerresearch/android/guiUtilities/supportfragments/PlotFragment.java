@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.Nullable;
@@ -40,6 +41,8 @@ import com.shimmerresearch.tools.PlotManagerAndroid;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
 
@@ -51,6 +54,7 @@ public class PlotFragment extends Fragment {
     static String deviceState = "";
     static TextView textViewDeviceName;
     static TextView textViewDeviceState;
+    static TextView textViewPRR;
     static String selectedDeviceAddress;
 
     private static String LOG_TAG = "PlotFragment";
@@ -93,7 +97,7 @@ public class PlotFragment extends Fragment {
         initPlot();
         textViewDeviceName = (TextView) getView().findViewById(R.id.textViewDeviceName);
         textViewDeviceState = (TextView) getView().findViewById(R.id.textViewDeviceState);
-
+        textViewPRR = (TextView) getView().findViewById(R.id.textViewPRR);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -178,8 +182,23 @@ public class PlotFragment extends Fragment {
         }
         shimmerService.mPlotManager.updateDynamicPlot(dynamicPlot);
     }
+    static Timer timer = null;
+    static class PRRTask extends TimerTask {
+        @Override
+        public void run() {
+            double value = shimmerService.getShimmer(mBluetoothAddress).getPacketReceptionRateOverall();
+            final String formattedValue = String.format("%.2f", value);
 
-
+            Handler mainHandler = new Handler(Looper.getMainLooper());
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // Update UI elements here
+                    textViewPRR.setText(formattedValue);
+                }
+            });
+        }
+    }
     private static Handler graphHandler = new Handler() {
 
 
@@ -200,6 +219,10 @@ public class PlotFragment extends Fragment {
                     }
                     switch (state) {
                         case CONNECTED:
+                            if (timer!=null){
+                                timer.cancel();
+                                timer = new Timer();
+                            }
                             Log.d(LOG_TAG,"Message Fully Initialized Received from Shimmer driver");
                             shimmerService.enableGraphingHandler(true);
                             deviceState = "Connected";
@@ -225,6 +248,17 @@ public class PlotFragment extends Fragment {
                             }
                             break;
                         case STREAMING:
+
+                            if (timer!=null){
+                                timer.cancel();
+                                timer = new Timer();
+                            } else {
+                                timer = new Timer();
+                            }
+                            // Schedule a task to be executed after a delay of 2 seconds
+                            timer.schedule(new PRRTask(), 0 , 2000);
+
+
                             deviceState="Streaming";
                             textViewDeviceName.setText(mBluetoothAddress);
                             textViewDeviceState.setText(deviceState);
@@ -297,6 +331,12 @@ public class PlotFragment extends Fragment {
                             deviceState = "Disconnected";
                             textViewDeviceName.setText("Unknown");
                             textViewDeviceState.setText(deviceState);
+                            break;
+                        case CONFIGURING:
+                            break;
+                        case CONNECTION_LOST:
+                            break;
+                        case CONNECTION_FAILED:
                             break;
                     }
 
