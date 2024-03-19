@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
-import com.shimmerresearch.android.VerisenseDeviceAndroid;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
