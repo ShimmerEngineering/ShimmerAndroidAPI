@@ -249,6 +249,12 @@ public class Shimmer extends ShimmerBluetooth{
 		setUseInfoMemConfigMethod(true);
 	}
 
+	protected  void unregisterDisconnectListener(){
+		if(mContext!=null) {
+			mContext.unregisterReceiver(mReceiver);
+		}
+	}
+
 	protected  void registerDisconnectListener(){
 		if(mContext!=null) {
 			BluetoothAdapter bluetoothAdapter = null;
@@ -277,7 +283,6 @@ public class Shimmer extends ShimmerBluetooth{
 		mSetupDeviceWhileConnecting=false;
 		mUseProcessingThread = true;
 		mContext = context;
-		registerDisconnectListener();
 	}
 	// The BroadcastReceiver that listens for discovered devices and
 	// changes the title when discovery is finished
@@ -311,7 +316,6 @@ public class Shimmer extends ShimmerBluetooth{
 		mSetupDeviceWhileConnecting = false;
 		mUseProcessingThread = true;
 		mContext = context;
-		registerDisconnectListener();
 	}
 
 	/**
@@ -496,7 +500,6 @@ public class Shimmer extends ShimmerBluetooth{
 		setupOrientation(orientation, samplingRate);
 		mUseProcessingThread = true;
 		mContext = context;
-		registerDisconnectListener();
 	}
 
 	/** Shimmer2R Constructor
@@ -517,7 +520,6 @@ public class Shimmer extends ShimmerBluetooth{
 		setupOrientation(orientation, samplingRate);
 		mUseProcessingThread = true;
 		mContext = context;
-		registerDisconnectListener();
 	}
 
 	/**
@@ -543,7 +545,6 @@ public class Shimmer extends ShimmerBluetooth{
 		setEnableCalibration(enableCalibration);
 		mUseProcessingThread = true;
 		mContext = context;
-		registerDisconnectListener();
 	}
 
 	/**
@@ -568,7 +569,6 @@ public class Shimmer extends ShimmerBluetooth{
 		setEnableCalibration(enableCalibration);
 		mUseProcessingThread = true;
 		mContext = context;
-		registerDisconnectListener();
 	}
 
 	/**
@@ -593,6 +593,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param bluetoothLibrary Supported libraries are 'default' and 'gerdavax'  
 	 */
 	public synchronized void connect(final String address, String bluetoothLibrary) {
+		registerDisconnectListener();
 		mIamAlive = false;
 		getListofInstructions().clear();
 		mFirstTime=true;
@@ -1665,6 +1666,7 @@ public class Shimmer extends ShimmerBluetooth{
 			mIsConnected = false;
 			mIsStreaming = false;
 			mIsInitialised = false;
+			unregisterDisconnectListener();
 		}
 		
 		// Give the new state to the Handler so the UI Activity can update
