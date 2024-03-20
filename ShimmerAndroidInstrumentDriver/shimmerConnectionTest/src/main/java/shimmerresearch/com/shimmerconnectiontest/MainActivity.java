@@ -251,7 +251,7 @@ public class MainActivity extends Activity {
                                     //shimmer.connect(macAdd, "default");
                                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     btManager.removeShimmerDeviceBtConnected(macAdd);
-                                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
+                                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler,MainActivity.this));
                                     btManager.connectShimmerThroughBTAddress(macAdd);
                                     try {
                                         Thread.sleep(500);
@@ -357,7 +357,7 @@ public class MainActivity extends Activity {
                     //shimmer = new Shimmer(mHandler);
                     //shimmer.connect(macAdd, "default");
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
-                    Shimmer shimmer = new Shimmer(mHandler);
+                    Shimmer shimmer = new Shimmer(mHandler, MainActivity.this);
                     shimmer.setMacIdFromUart(macAdd);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
                     btManager.putShimmerGlobalMap(macAdd, shimmer);

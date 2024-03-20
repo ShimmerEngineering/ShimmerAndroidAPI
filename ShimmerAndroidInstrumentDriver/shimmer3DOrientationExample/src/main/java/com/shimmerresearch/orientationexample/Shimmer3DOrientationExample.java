@@ -154,7 +154,7 @@ public class Shimmer3DOrientationExample extends Activity {
 		} else {
 
 			Integer[] arraySensorID ={Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL,Configuration.Shimmer3.SENSOR_ID.SHIMMER_MPU9X50_GYRO,Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM303_MAG};
-			mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0);
+			mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0, Shimmer3DOrientationExample.this);
 		}
 		setup();
 	}
@@ -162,7 +162,7 @@ public class Shimmer3DOrientationExample extends Activity {
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		if (requestCode == 110){
 			Integer[] arraySensorID ={Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL,Configuration.Shimmer3.SENSOR_ID.SHIMMER_MPU9X50_GYRO,Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM303_MAG};
-			mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0);
+			mShimmerDevice1 = new Shimmer(mHandler,"test",51.2,1, 4, arraySensorID, 1, 0, 1, 0,Shimmer3DOrientationExample.this);
 
 		}
 	}

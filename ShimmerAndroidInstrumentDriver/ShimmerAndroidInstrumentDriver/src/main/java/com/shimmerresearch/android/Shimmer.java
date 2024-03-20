@@ -132,15 +132,22 @@
 
 package com.shimmerresearch.android;
 
+import static android.content.Context.BLUETOOTH_SERVICE;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -226,6 +233,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public static final int MSG_STATE_STREAMING = 4;
 	public static final int MSG_STATE_STOP_STREAMING = 5;
 
+	transient private Context mContext;
 	protected String mClassName="Shimmer";
 
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
@@ -241,11 +249,26 @@ public class Shimmer extends ShimmerBluetooth{
 		setUseInfoMemConfigMethod(true);
 	}
 
+	protected  void registerDisconnectListener(){
+		if(mContext!=null) {
+			BluetoothAdapter bluetoothAdapter = null;
+			if (android.os.Build.VERSION.SDK_INT >= 18) {
+				BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(BLUETOOTH_SERVICE);
+				bluetoothAdapter = bluetoothManager.getAdapter();
+			} else bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+			IntentFilter filter = new IntentFilter(bluetoothAdapter.ACTION_STATE_CHANGED);
+			filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+			filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+			mContext.registerReceiver(mReceiver, filter);
+		}
+	}
+
 	/**
 	 * This constructor is for applications that only require one Handler.
 	 * @param handler add handler to receive msgs from the shimmer class
 	 */
-	public Shimmer(Handler handler) {
+	public Shimmer(Handler handler, Context context) {
 		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -253,20 +276,42 @@ public class Shimmer extends ShimmerBluetooth{
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
 		mUseProcessingThread = true;
+		mContext = context;
+		registerDisconnectListener();
 	}
+	// The BroadcastReceiver that listens for discovered devices and
+	// changes the title when discovery is finished
+	transient private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			// When discovery finds a device
+			if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+				BluetoothDevice device = intent
+						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+				String macAdd = device.getAddress();
+				if (macAdd.equals(mMyBluetoothAddress)){
+					connectionLost();
+				}
+			}
+		}
+	};
 
 	/**
 	 * This constructor is for applications requiring more than one Handler so as to receive the msg
 	 * in multiple threads.
 	 * @param handlerList this is an ArrayList containing multiple Handlers
 	 */
-	public Shimmer(ArrayList<Handler> handlerList) {
+	public Shimmer(ArrayList<Handler> handlerList, Context context) {
 		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList = handlerList;
 		mSetupDeviceWhileConnecting = false;
 		mUseProcessingThread = true;
+		mContext = context;
+		registerDisconnectListener();
 	}
 
 	/**
@@ -441,14 +486,17 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param magRange
 	 * @param orientation
 	 * @param pressureResolution
+	 * @param context
 	 */
-	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution){
+	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, Context context){
 		super(userAssignedName, samplingRate, sensorIdsToEnable, accelRange, gsrRange, gyroRange, magRange, pressureResolution);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
 		mUseProcessingThread = true;
+		mContext = context;
+		registerDisconnectListener();
 	}
 
 	/** Shimmer2R Constructor
@@ -460,7 +508,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param magGain
 	 * @param orientation
 	 */
-	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation) {
+	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, Context context) {
 		super(myName,samplingRate, setEnabledSensors, accelRange, gsrRange, magGain);
 		setupOrientation(orientation, samplingRate);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -468,6 +516,8 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
 		mUseProcessingThread = true;
+		mContext = context;
+		registerDisconnectListener();
 	}
 
 	/**
@@ -484,7 +534,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param pressureResolution
 	 * @param enableCalibration
 	 */
-	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, boolean enableCalibration){
+	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, boolean enableCalibration, Context context){
 		super(userAssignedName, samplingRate, sensorIdsToEnable, accelRange, gsrRange, gyroRange, magRange, pressureResolution);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -492,6 +542,8 @@ public class Shimmer extends ShimmerBluetooth{
 		setupOrientation(orientation, samplingRate);
 		setEnableCalibration(enableCalibration);
 		mUseProcessingThread = true;
+		mContext = context;
+		registerDisconnectListener();
 	}
 
 	/**
@@ -506,7 +558,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param orientation
 	 * @param enableCalibration
 	 */
-	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, boolean enableCalibration) {
+	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, boolean enableCalibration, Context context) {
 		super(myName,samplingRate, setEnabledSensors, accelRange, gsrRange, magGain);
 		setupOrientation(orientation, samplingRate);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -515,8 +567,9 @@ public class Shimmer extends ShimmerBluetooth{
 		setupOrientation(orientation, samplingRate);
 		setEnableCalibration(enableCalibration);
 		mUseProcessingThread = true;
+		mContext = context;
+		registerDisconnectListener();
 	}
-
 
 	/**
 	 * Set the current state of the chat connection
@@ -543,7 +596,6 @@ public class Shimmer extends ShimmerBluetooth{
 		mIamAlive = false;
 		getListofInstructions().clear();
 		mFirstTime=true;
-
 
 		if (bluetoothLibrary=="default"){
 			mMyBluetoothAddress=address;

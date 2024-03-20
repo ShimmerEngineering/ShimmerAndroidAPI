@@ -105,7 +105,7 @@ public class FirstFragment extends Fragment {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 String deviceName = data.getStringExtra(EXTRA_DEVICE_NAME);
-                shimmer = new Shimmer(mHandler);
+                shimmer = new Shimmer(mHandler,getActivity().getApplicationContext());
                 VerisenseBleAndroidRadioByteCommunication port = null;
                 if (deviceName.toUpperCase().contains("SHIMMER3-")) {
                     port = new Shimmer3BleAndroidRadioByteCommunication(macAdd);

@@ -390,7 +390,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
             mProgressDialog.dismiss();
         }
         ShimmerSerialPortAndroid serialPort = (ShimmerSerialPortAndroid) shimmerRadioInitializer.getSerialCommPort();
-        Shimmer shimmer = new Shimmer(mHandler);
+        Shimmer shimmer = new Shimmer(mHandler, mContext);
         shimmer.setDelayForBtRespone(true);
         mMapOfBtConnectedShimmers.put(bluetoothAddress, shimmer);
         try {

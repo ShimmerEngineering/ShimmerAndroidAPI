@@ -186,17 +186,19 @@ public class PlotFragment extends Fragment {
     static class PRRTask extends TimerTask {
         @Override
         public void run() {
-            double value = shimmerService.getShimmer(mBluetoothAddress).getPacketReceptionRateOverall();
-            final String formattedValue = String.format("%.2f", value);
+            if (shimmerService.getShimmer(mBluetoothAddress)!=null) {
+                double value = shimmerService.getShimmer(mBluetoothAddress).getPacketReceptionRateOverall();
+                final String formattedValue = String.format("%.2f", value);
 
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    // Update UI elements here
-                    textViewPRR.setText(formattedValue);
-                }
-            });
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Update UI elements here
+                        textViewPRR.setText(formattedValue);
+                    }
+                });
+            }
         }
     }
     private static Handler graphHandler = new Handler() {
@@ -331,6 +333,10 @@ public class PlotFragment extends Fragment {
                             deviceState = "Disconnected";
                             textViewDeviceName.setText("Unknown");
                             textViewDeviceState.setText(deviceState);
+                            if (timer!=null) {
+                                timer.cancel();
+                                timer = null;
+                            }
                             break;
                         case CONFIGURING:
                             break;
