@@ -193,18 +193,28 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuItem item1 = menu.findItem(R.id.data_sync);
         MenuItem item2 = menu.findItem(R.id.disable_logging);
         MenuItem item3 = menu.findItem(R.id.erase_data);
+        MenuItem item4 = menu.findItem(R.id.set_sampling_rate);
+        MenuItem item5 = menu.findItem(R.id.enable_write_to_csv);
+        MenuItem item6 = menu.findItem(R.id.disable_write_to_csv);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
             if(device instanceof VerisenseDevice) {
                 item1.setVisible(true);
                 item2.setVisible(true);
                 item3.setVisible(true);
+                item4.setVisible(false);
+                item5.setVisible(false);
+                item6.setVisible(false);
                 if (((VerisenseDevice)device).isRecordingEnabled()){
                     item2.setTitle("Disable Logging");
                     return true;
                 }
                 item2.setTitle("Enable Logging");
                 return true;
+            } else {
+                item4.setVisible(true);
+                item5.setVisible(true);
+                item6.setVisible(true);
             }
         }
         item1.setVisible(false);
@@ -466,12 +476,15 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                 String deviceName = data.getStringExtra(EXTRA_DEVICE_NAME);
+                if (deviceName.contains(VerisenseDevice.VERISENSE_PREFIX)){
 
-                showBtTypeConnectionOption();
+                } else {
+                    showBtTypeConnectionOption();
 
+                }
+                mService.connectShimmer(macAdd,deviceName,preferredBtType,this);    //Connect to the selected device, and set context to show progress dialog when pairing
                 //mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
 
-                mService.connectShimmer(macAdd,deviceName,preferredBtType,this);    //Connect to the selected device, and set context to show progress dialog when pairing
 
             }
         }

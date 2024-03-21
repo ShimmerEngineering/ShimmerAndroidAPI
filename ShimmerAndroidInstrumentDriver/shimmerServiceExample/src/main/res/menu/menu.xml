@@ -24,7 +24,7 @@
             android:id="@+id/stop_streaming"></item>
     <item   android:title="Set Sampling Rate"
         android:id="@+id/set_sampling_rate"></item>
-    <item   android:title="Set Sampling Rate"
+    <item   android:title="Data Sync"
         android:id="@+id/data_sync"></item>
     <item   android:title="Erase data"
         android:id="@+id/erase_data"></item>

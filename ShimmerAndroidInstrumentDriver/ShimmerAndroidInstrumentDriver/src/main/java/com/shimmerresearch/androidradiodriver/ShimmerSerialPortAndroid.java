@@ -51,7 +51,7 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
 
     @Override
     public void connect(){
-
+        System.out.println("initialize process shimmer serial port android");
         if (mState == ShimmerBluetooth.BT_STATE.DISCONNECTED) {
 
             createBluetoothSocket();

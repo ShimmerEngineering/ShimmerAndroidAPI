@@ -251,12 +251,17 @@ public class Shimmer extends ShimmerBluetooth{
 
 	protected  void unregisterDisconnectListener(){
 		if(mContext!=null) {
-			mContext.unregisterReceiver(mReceiver);
+			try {
+				mContext.unregisterReceiver(mReceiver);
+			} catch (Exception ex){
+				System.out.println(ex);
+			}
 		}
 	}
 
 	protected  void registerDisconnectListener(){
 		if(mContext!=null) {
+			System.out.println("initialize process 0) register disconnect listener");
 			BluetoothAdapter bluetoothAdapter = null;
 			if (android.os.Build.VERSION.SDK_INT >= 18) {
 				BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(BLUETOOTH_SERVICE);
@@ -650,6 +655,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param socket  The BluetoothSocket on which the connection was made
 	 */
 	public synchronized void connected(BluetoothSocket socket) {
+		System.out.println("initialize process 2) connected and start initialize");
 		// Cancel the thread that completed the connection
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 		// Cancel any thread currently running a connection
@@ -1061,6 +1067,7 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		public void run() {
+			System.out.println("initialize process 1) start connecting thread");
 			setName("ConnectThread");
 
 			// Always cancel discovery because it will slow down a connection
@@ -1800,16 +1807,14 @@ public class Shimmer extends ShimmerBluetooth{
 //		}
 //	}
 	public void setRadio(BluetoothSocket socket){
-
+		System.out.println("initialize process set radio");
+		registerDisconnectListener();
 		if (socket.isConnected()){
 			setBluetoothRadioState(BT_STATE.CONNECTING);
 			mMyBluetoothAddress = socket.getRemoteDevice().getAddress();
 			connected(socket);
 		}
-
-
-
-}
+	}
 
 	private void sendMsgToHandlerList(int obtainMessage) {
 		for(Handler handler : mHandlerList) {

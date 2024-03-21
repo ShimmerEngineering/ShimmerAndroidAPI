@@ -65,10 +65,12 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.BluetoothDeviceDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.tools.Logging;
 import com.shimmerresearch.tools.PlotManagerAndroid;
+import com.shimmerresearch.verisense.VerisenseDevice;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -261,8 +263,21 @@ public class ShimmerService extends Service {
 	}
 
 	public void connectShimmer(final String bluetoothAddress,final String deviceName, ShimmerBluetoothManagerAndroid.BT_TYPE preferredBtType, Context context){
+		boolean isVerisense = false;
+		if (deviceName!=null){
+			if (deviceName.contains(VerisenseDevice.VERISENSE_PREFIX)) {
+				isVerisense = true;
+			}
+		}
 
-		btManager.connectShimmerThroughBTAddress(bluetoothAddress, preferredBtType);   //Connect to the selected device
+		if (isVerisense){
+			btManager.connectVerisenseDevice(new BluetoothDeviceDetails("",bluetoothAddress,deviceName));
+		} else {
+			btManager.connectShimmerThroughBTAddress(bluetoothAddress, preferredBtType);   //Connect to the selected device
+		}
+
+
+
 	}
 
 	public void connectShimmer(final String bluetoothAddress){

@@ -184,7 +184,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
      * @exception DeviceNotPairedException if the device is not paired
      */
     @Override
-    protected void connectVerisenseDevice(BluetoothDeviceDetails bdd) {
+    public void connectVerisenseDevice(BluetoothDeviceDetails bdd) {
         VerisenseBleAndroidRadioByteCommunication radio1 = new VerisenseBleAndroidRadioByteCommunication(bdd.mShimmerMacId);
         VerisenseProtocolByteCommunication protocol1 = new VerisenseProtocolByteCommunication(radio1);
         final VerisenseDeviceAndroid verisenseDevice = new VerisenseDeviceAndroid(mHandler);
