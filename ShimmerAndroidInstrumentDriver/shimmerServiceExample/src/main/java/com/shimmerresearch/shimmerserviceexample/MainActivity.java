@@ -608,7 +608,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                             connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
                             if (selectedDeviceAddress != null) {
                                 ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
-                                deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                                if (mDevice!=null) {
+                                    deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                                }
                             }
                         }
                         if(dataSyncFragment != null){
@@ -736,6 +738,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         }
         else{
+            selectedDeviceAddress = null;
             mSectionsPagerAdapter1.notifyDataSetChanged();
         }
     }
