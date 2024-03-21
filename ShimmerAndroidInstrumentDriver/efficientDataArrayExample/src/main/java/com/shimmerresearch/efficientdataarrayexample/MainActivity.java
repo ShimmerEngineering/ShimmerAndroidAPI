@@ -30,6 +30,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +43,7 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.RE
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * This example demonstrates the use of the arrays data structure, {@link ObjectCluster#sensorDataArray}, in the following scenarios:
@@ -65,11 +68,11 @@ public class MainActivity extends Activity {
     private final static int PERMISSIONS_REQUEST_WRITE_STORAGE = 5;
 
     //Write to CSV variables
-    private FileWriter fw;
+    //private FileWriter fw;
     private BufferedWriter bw;
     private File file;
     boolean firstTimeWrite = true;
-
+    Uri mTreeUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,9 +186,9 @@ public class MainActivity extends Activity {
         }
         if (resultCode == RESULT_OK && requestCode == PERMISSION_FILE_REQUEST_SHIMMER) {
             if (data != null) {
-                Uri treeUri = data.getData();
+                mTreeUri = data.getData();
                 FileUtils futils = new FileUtils(MainActivity.this);
-                File file = new File(futils.getPath(treeUri, FileUtils.UriType.FOLDER));
+                File file = new File(futils.getPath(mTreeUri, FileUtils.UriType.FOLDER));
                 APP_DIR_PATH = file.getAbsolutePath();
             }
         }
@@ -367,11 +370,11 @@ public class MainActivity extends Activity {
                     }
                     switch (state) {
                         case CONNECTED:
-                            if (bw!=null && firstTimeWrite) {
+                            if (bw!=null && !firstTimeWrite) {
                                 try {   //Stop CSV writing
                                     bw.flush();
                                     bw.close();
-                                    fw.close();
+                                    //fw.close();
                                     firstTimeWrite = true;
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -429,18 +432,22 @@ public class MainActivity extends Activity {
             dir.mkdir();
         }
 
-        String fileName = CSV_FILE_NAME_PREFIX + "_" + new SimpleDateFormat("dd-MM-yy_HHmm").format(new Date()) + ".csv";
+        String fileName = CSV_FILE_NAME_PREFIX + "_" + new SimpleDateFormat("dd-MM-yy_HHmm").format(new Date());
         String filePath = APP_DIR_PATH + File.separator + fileName;
-        file = new File(filePath);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
+        DocumentFile pickedDir = DocumentFile.fromTreeUri(MainActivity.this, mTreeUri);
+        DocumentFile newFile = pickedDir.createFile("text/comma-separated-values", fileName);
+        if (newFile != null) {
+            try {
+                OutputStream outputStream = MainActivity.this.getContentResolver().openOutputStream(newFile.getUri());
+                bw = new BufferedWriter(new OutputStreamWriter(outputStream));
+            } catch (IOException e) {
+                System.out.println();
             }
-            fw = new FileWriter(file.getAbsoluteFile());
-            bw = new BufferedWriter(fw);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+
         }
+
+
     }
 
     /**
