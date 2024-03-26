@@ -553,6 +553,7 @@ public class ShimmerService extends Service {
 					sendBroadcast(intent);
 					break;
 				case DISCONNECTED:
+					btManager.removeShimmerDeviceBtConnected(macAddress);
 					intent.putExtra("ShimmerBluetoothAddress", macAddress );
 					intent.putExtra("ShimmerDeviceName", shimmerName );
 					intent.putExtra("ShimmerState",BT_STATE.DISCONNECTED);
