@@ -18,6 +18,7 @@ import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
@@ -165,7 +166,7 @@ public class SensorsEnabledFragment extends ListFragment {
                         //TODO: Change this when AssembleShimmerConfig has been updated:
                         AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                        if (shimmerDevice instanceof Shimmer || shimmerDevice instanceof VerisenseDevice) {
+                        if (shimmerDevice instanceof Shimmer || shimmerDevice instanceof VerisenseDevice || shimmerDevice instanceof Shimmer3BLEAndroid) {
                             //((Shimmer)device).writeConfigBytes(shimmerDeviceClone.getShimmerInfoMemBytes());
                             /*try {
                                 Thread.sleep(1000);
