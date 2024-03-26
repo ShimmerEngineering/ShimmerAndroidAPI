@@ -663,9 +663,11 @@ public class Shimmer extends ShimmerBluetooth{
 		// Start the thread to manage the connection and perform transmissions
 		mConnectedThread = new ConnectedThread(socket);
 		mIOThread = new IOThread();
+		mIOThread.setName("IO Thread " + socket.getRemoteDevice().getAddress());
 		mIOThread.start();
 		if (mUseProcessingThread){
 			mPThread = new ProcessingThread();
+			mPThread.setName("P Thread " + socket.getRemoteDevice().getAddress());
 			mPThread.start();
 		}
 
