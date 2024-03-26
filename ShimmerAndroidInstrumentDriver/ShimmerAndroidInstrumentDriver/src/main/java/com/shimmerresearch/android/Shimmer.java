@@ -682,7 +682,7 @@ public class Shimmer extends ShimmerBluetooth{
 	/**
 	 * Stop all threads
 	 */
-	public synchronized void stop() {
+	public void stop() {
 		if (mTimerReadStatus!=null) {
 			mTimerReadStatus.cancel();
 			mTimerReadStatus.purge();
@@ -715,12 +715,7 @@ public class Shimmer extends ShimmerBluetooth{
 			mConnectThread = null;
 		}
 		if (mConnectedThread != null) {
-			try {
-				wait(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			mConnectedThread.cancel(); 
+			mConnectedThread.cancel();
 			mConnectedThread = null;
 		}
 
