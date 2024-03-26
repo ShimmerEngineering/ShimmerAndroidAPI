@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -39,6 +38,8 @@ import com.shimmerresearch.tools.PlotManagerAndroid;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import pl.flex_it.androidplot.XYSeriesShimmer;
 

@@ -35,16 +35,23 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
     transient private BluetoothSocket mBluetoothSocket;
     transient private DataInputStream mInStream;
     transient private OutputStream mOutStream;
+    private transient SerialPortListener mShimmerSerialEventCallback;
+    private boolean mUseListenerThread;
 
     public ShimmerSerialPortAndroid(String bluetoothAddress){
         mBluetoothAddress = bluetoothAddress;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
+    public ShimmerSerialPortAndroid(String bluetoothAddress, boolean useListenerThread){
+        mBluetoothAddress = bluetoothAddress;
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mUseListenerThread = useListenerThread;
+    }
 
     @Override
     public void connect(){
-
+        System.out.println("initialize process shimmer serial port android");
         if (mState == ShimmerBluetooth.BT_STATE.DISCONNECTED) {
 
             createBluetoothSocket();
@@ -95,6 +102,9 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
             InputStream tmpIn = mBluetoothSocket.getInputStream();
             mInStream =  new DataInputStream(tmpIn);
             mOutStream = mBluetoothSocket.getOutputStream();
+            if(mUseListenerThread) {
+                startListening();
+            }
         } catch (IOException e) {
             catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
             return false;
@@ -257,7 +267,7 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
 
     @Override
     public void registerSerialPortRxEventCallback(SerialPortListener serialPortListener) {
-
+        mShimmerSerialEventCallback = serialPortListener;
     }
 
     private void catchException(Exception e, int errorCode)  {
@@ -267,7 +277,39 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
     }
 
 
+    public void startListening() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        // Read data from the input stream
 
+                        int availableBytes = mInStream.available();
+
+                        if (availableBytes < 1) {
+                            // End of stream
+
+                        } else {
+                            // Notify listeners with the read data
+                            mShimmerSerialEventCallback.serialPortRxEvent(availableBytes);
+                        }
+
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        mInStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.start();
+    }
 
     public BluetoothSocket getBluetoothSocket(){
         return mBluetoothSocket;

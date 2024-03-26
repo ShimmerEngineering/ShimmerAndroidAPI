@@ -60,7 +60,8 @@
         android:id="@+id/button"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:onClick="openLogFilesList"
         android:text="List CSV Log Files"
-        android:onClick="openLogFilesList"/>
+        android:visibility="invisible" />
 
 </android.widget.LinearLayout>

@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
 //    compileSdkVersion 23
-    compileSdkVersion 25
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.shimmerresearch.shimmer3dexample"
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 33
         multiDexEnabled true
     }
 
@@ -27,22 +27,15 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     compile project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmersensing', name: 'ShimmerBluetoothManager', version:'0.9.42beta'){
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-    implementation (group: 'com.shimmersensing', name: 'ShimmerDriver', version:'0.9.138beta'){
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
     compile 'org.apache.commons:commons-math:2.2'
     compile 'org.apache.commons:commons-lang3:3.4'
     provided files('../ShimmerAndroidInstrumentDriver/libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')

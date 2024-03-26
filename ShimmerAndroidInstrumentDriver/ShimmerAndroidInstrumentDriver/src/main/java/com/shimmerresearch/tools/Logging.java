@@ -43,11 +43,17 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.Iterator;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import com.google.common.collect.Multimap;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
@@ -64,7 +70,8 @@ public class Logging {
 	BufferedWriter writer=null;
 	File outputFile;
 	String mDelimiter=","; //default is comma
-	
+
+	@Deprecated
 	/**
 	 * @param myName is the file name which will be used
 	 */
@@ -74,7 +81,8 @@ public class Logging {
 		Log.d("AbsolutePath", root.getAbsolutePath());
 		outputFile = new File(root, mFileName+".dat");
 	}
-	
+
+	@Deprecated
 	public Logging(String myName, String delimiter){
 		mFileName=myName;
 		mDelimiter=delimiter;
@@ -82,7 +90,8 @@ public class Logging {
 		Log.d("AbsolutePath", root.getAbsolutePath());
 		outputFile = new File(root, mFileName+".dat");
 	}
-	
+
+	@Deprecated
 	/**
 	 * Constructor with default file output type (.dat)
 	 * @param myName
@@ -99,6 +108,7 @@ public class Logging {
 		outputFile = new File(root, mFileName+ "." + ShimmerService.FILE_TYPE.DAT.getName());
 	}
 
+	@Deprecated
 	/**
 	 * Constructor to select output file type
 	 * @param myName
@@ -109,13 +119,44 @@ public class Logging {
 	public Logging(String myName, String delimiter, String folderName, ShimmerService.FILE_TYPE fileType) {
 		mFileName=myName;
 		mDelimiter=delimiter;
-		File root = new File(Environment.getExternalStorageDirectory() + "/"+folderName);
+		File root;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+			root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS+ "/"+folderName);
+		} else {
+			root = new File(Environment.getExternalStorageDirectory() + "/"+folderName); //android 13 no longer allows this
+		}
+
 		if(!root.exists()) {
-			if(root.mkdir()); //directory is created;
+			if(root.mkdir()){
+				System.out.println();//directory is created;
+			} else {
+
+			}
 		}
 		outputFile = new File(root, mFileName + "." + fileType.getName());
 	}
-	
+	DocumentFile mNewFile = null;
+	Context mContext = null;
+	public Logging(Uri treeURI, Context context, String myName, String delimiter, String folderName, ShimmerService.FILE_TYPE fileType) {
+		mFileName=myName;
+		mDelimiter=delimiter;
+
+		File root;
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+
+				DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeURI);
+				if (fileType.equals(ShimmerService.FILE_TYPE.CSV)) {
+					mNewFile = pickedDir.createFile("text/comma-separated-values", myName);
+				} else if (fileType.equals(ShimmerService.FILE_TYPE.DAT)) {
+					mNewFile = pickedDir.createFile("application/dat", myName+"."+ShimmerService.FILE_TYPE.DAT.toString().toLowerCase());
+				}
+				mContext = context;
+		}
+
+
+	}
+
 	
 	/**
 	 * This function takes an object cluster and logs all the data within it. User should note that the function will write over prior files with the same name.
@@ -126,8 +167,12 @@ public class Logging {
 
 		try {
 			if (mFirstWrite==true) {
-				writer = new BufferedWriter(new FileWriter(outputFile,true));
-				
+				if (mNewFile != null){
+					OutputStream outputStream = mContext.getContentResolver().openOutputStream(mNewFile.getUri());
+					writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+				} else {
+					writer = new BufferedWriter(new FileWriter(outputFile, true));
+				}
 	    		//First retrieve all the unique keys from the objectClusterLog
 				Multimap<String, FormatCluster> m = objectClusterLog.getPropertyCluster();
 
@@ -154,7 +199,7 @@ public class Logging {
 				 	}
 			// write header to a file
 			
-			writer = new BufferedWriter(new FileWriter(outputFile,false));
+			//writer = new BufferedWriter(new FileWriter(outputFile,false));
 			
 			for (int k=0;k<mSensorNames.length;k++) { 
                 writer.write(objectClusterLog.getShimmerName());
@@ -227,7 +272,10 @@ public class Logging {
 		return outputFile;
 	}
 	
-	public String getAbsoluteName(){
+	public String getAbsoluteName() throws Exception {
+		if (mNewFile !=null){
+			throw new Exception("Unsupported when using treeURI");
+		}
 		return outputFile.getAbsolutePath();
 	}
 	
