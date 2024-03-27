@@ -986,6 +986,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @see ConnectedThread write(byte[])
 	 */
 	public void write(byte[] out) {
+		/*
 		// Create temporary object
 		ConnectedThread r;
 		// Synchronize a copy of the ConnectedThread
@@ -996,6 +997,8 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		// Perform the write unsynchronized
 		r.write(out);
+		*/
+		mConnectedThread.write(out);
 	}
 
 	/**
