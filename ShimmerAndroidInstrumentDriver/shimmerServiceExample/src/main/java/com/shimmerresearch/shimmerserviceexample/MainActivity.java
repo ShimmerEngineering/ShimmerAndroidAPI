@@ -51,6 +51,7 @@ import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.android.guiUtilities.ShimmerDialogConfigurations;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SignalsToPlotFragment;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
+import com.shimmerresearch.android.protocol.VerisenseProtocolByteCommunicationAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -417,7 +418,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     mDevice.setParticipantID(dataSyncFragment.editTextParticipantName.getText().toString());
                     FileUtils futils = new FileUtils(MainActivity.this);
                     File file = new File(futils.getPath(treeUri, FileUtils.UriType.FOLDER));
-                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).setRootPathForBinFile(file.getAbsolutePath());
+                    ((VerisenseProtocolByteCommunicationAndroid)mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH)).enableWriteToBinFile(MainActivity.this,treeUri);
+
                     try {
                         mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).readLoggedData();
                     } catch (Exception e) {
