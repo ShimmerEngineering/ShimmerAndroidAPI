@@ -58,6 +58,7 @@ import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
 import com.shimmerresearch.exceptions.ShimmerException;
 
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
@@ -351,8 +352,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         double samplingRate = Double.parseDouble(samplingRateStr);
 
                         // Call a method to write sampling rate or do whatever you need
-
-                        device.writeShimmerAndSensorsSamplingRate(samplingRate);
+                        ShimmerDevice clone = device.deepClone();
+                        clone.setSamplingRateShimmer(samplingRate);
+                        AssembleShimmerConfig.generateSingleShimmerConfig(clone, COMMUNICATION_TYPE.BLUETOOTH);
+                        mService.configureShimmer(clone);
+                        //device.writeShimmerAndSensorsSamplingRate(samplingRate);
 
                     }
                 });
