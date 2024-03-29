@@ -174,6 +174,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                             double accelXData = accelXCluster.mData;
                             Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
+
+                        Collection<FormatCluster> allFormatsPRR = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_OVERALL);
+                        FormatCluster prrCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormatsPRR,"CAL"));
+                        double PRR = prrCluster.mData;
+                        Log.i(LOG_TAG, "Packet Reception Rate: " + PRR);
+
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:
