@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         } else {
 
         }
-        shimmer = new Shimmer(mHandler);
+        shimmer = new Shimmer(mHandler,MainActivity.this);
         spinner = (Spinner) findViewById(R.id.crcSpinner);
         spinner.setEnabled(false);
         // Spinner click listener
@@ -251,7 +251,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer = new Shimmer(mHandler);
+                shimmer = new Shimmer(mHandler,MainActivity.this);
                 shimmer.connect(macAdd, "default");                  //Connect to the selected device
             }
 
