@@ -3,10 +3,14 @@ package shimmerresearch.com.shimmerbasicexample;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
@@ -21,6 +26,7 @@ import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.exceptions.ShimmerException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,10 +48,45 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
-                0);
-        shimmer = new Shimmer(mHandler);
+        boolean permissionGranted = true;
+        int permissionCheck = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        } else {
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        }
+        permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            permissionGranted = false;
+        }
+        permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            permissionGranted = false;
+        }
+
+
+        if (!permissionGranted) {
+            // Should we show an explanation?
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 110);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 110);
+            }
+        } else {
+
+        }
+        shimmer = new Shimmer(mHandler,MainActivity.this);
         spinner = (Spinner) findViewById(R.id.crcSpinner);
         spinner.setEnabled(false);
         // Spinner click listener
@@ -95,7 +136,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     }
 
     public void startStreaming(View v) throws InterruptedException, IOException{
-        shimmer.startStreaming();
+        try {
+            shimmer.startStreaming();
+        } catch (ShimmerException e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopStreaming(View v) throws IOException{
@@ -129,6 +174,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                             double accelXData = accelXCluster.mData;
                             Log.i(LOG_TAG, "Accel LN X: " + accelXData);
                         }
+
+                        Collection<FormatCluster> allFormatsPRR = objectCluster.getCollectionOfFormatClusters(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_OVERALL);
+                        FormatCluster prrCluster = ((FormatCluster)ObjectCluster.returnFormatCluster(allFormatsPRR,"CAL"));
+                        double PRR = prrCluster.mData;
+                        Log.i(LOG_TAG, "Packet Reception Rate: " + PRR);
+
                     }
                     break;
                 case Shimmer.MESSAGE_TOAST:
@@ -200,7 +251,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer = new Shimmer(mHandler);
+                shimmer = new Shimmer(mHandler,MainActivity.this);
                 shimmer.connect(macAdd, "default");                  //Connect to the selected device
             }
 

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.shimmerresearch.shimmerserviceexample"
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -37,30 +37,21 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
 }
 
 dependencies {
-    compile project(':ShimmerAndroidInstrumentDriver')
-    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.10.0_alpha'){
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.10.0_alpha'){
-        // excluding org.json which is provided by Android
-        exclude group: 'io.netty'
-        exclude group: 'com.google.protobuf'
-        exclude group: 'org.apache.commons.math'
-    }
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':ShimmerAndroidInstrumentDriver')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:multidex:1.0.3'
 }

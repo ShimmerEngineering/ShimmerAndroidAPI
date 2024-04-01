@@ -132,15 +132,22 @@
 
 package com.shimmerresearch.android;
 
+import static android.content.Context.BLUETOOTH_SERVICE;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -151,8 +158,13 @@ import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driver.shimmer4sdk.Shimmer4sdk;
+import com.shimmerresearch.driverUtilities.ShimmerBattStatusDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
+import com.shimmerresearch.driverUtilities.UtilShimmer;
+import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.exgConfig.ExGConfigOptionDetails;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -221,6 +233,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public static final int MSG_STATE_STREAMING = 4;
 	public static final int MSG_STATE_STOP_STREAMING = 5;
 
+	transient private Context mContext;
 	protected String mClassName="Shimmer";
 
 	private int mBluetoothLib=0;												// 0 = default lib, 1 = arduino lib
@@ -236,11 +249,37 @@ public class Shimmer extends ShimmerBluetooth{
 		setUseInfoMemConfigMethod(true);
 	}
 
+	protected  void unregisterDisconnectListener(){
+		if(mContext!=null) {
+			try {
+				mContext.unregisterReceiver(mReceiver);
+			} catch (Exception ex){
+				System.out.println(ex);
+			}
+		}
+	}
+
+	protected  void registerDisconnectListener(){
+		if(mContext!=null) {
+			System.out.println("initialize process 0) register disconnect listener");
+			BluetoothAdapter bluetoothAdapter = null;
+			if (android.os.Build.VERSION.SDK_INT >= 18) {
+				BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(BLUETOOTH_SERVICE);
+				bluetoothAdapter = bluetoothManager.getAdapter();
+			} else bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+			IntentFilter filter = new IntentFilter(bluetoothAdapter.ACTION_STATE_CHANGED);
+			filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+			filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+			mContext.registerReceiver(mReceiver, filter);
+		}
+	}
+
 	/**
 	 * This constructor is for applications that only require one Handler.
 	 * @param handler add handler to receive msgs from the shimmer class
 	 */
-	public Shimmer(Handler handler) {
+	public Shimmer(Handler handler, Context context) {
 		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -248,20 +287,40 @@ public class Shimmer extends ShimmerBluetooth{
 //		mContinousSync=continousSync;
 		mSetupDeviceWhileConnecting=false;
 		mUseProcessingThread = true;
+		mContext = context;
 	}
+	// The BroadcastReceiver that listens for discovered devices and
+	// changes the title when discovery is finished
+	transient private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			// When discovery finds a device
+			if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+				BluetoothDevice device = intent
+						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+				String macAdd = device.getAddress();
+				if (macAdd.equals(mMyBluetoothAddress)){
+					connectionLost();
+				}
+			}
+		}
+	};
 
 	/**
 	 * This constructor is for applications requiring more than one Handler so as to receive the msg
 	 * in multiple threads.
 	 * @param handlerList this is an ArrayList containing multiple Handlers
 	 */
-	public Shimmer(ArrayList<Handler> handlerList) {
+	public Shimmer(ArrayList<Handler> handlerList, Context context) {
 		super();
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList = handlerList;
 		mSetupDeviceWhileConnecting = false;
 		mUseProcessingThread = true;
+		mContext = context;
 	}
 
 	/**
@@ -436,14 +495,16 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param magRange
 	 * @param orientation
 	 * @param pressureResolution
+	 * @param context
 	 */
-	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution){
+	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, Context context){
 		super(userAssignedName, samplingRate, sensorIdsToEnable, accelRange, gsrRange, gyroRange, magRange, pressureResolution);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
 		mUseProcessingThread = true;
+		mContext = context;
 	}
 
 	/** Shimmer2R Constructor
@@ -455,7 +516,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param magGain
 	 * @param orientation
 	 */
-	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation) {
+	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, Context context) {
 		super(myName,samplingRate, setEnabledSensors, accelRange, gsrRange, magGain);
 		setupOrientation(orientation, samplingRate);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -463,6 +524,7 @@ public class Shimmer extends ShimmerBluetooth{
 		mHandlerList.add(handler);
 		setupOrientation(orientation, samplingRate);
 		mUseProcessingThread = true;
+		mContext = context;
 	}
 
 	/**
@@ -479,7 +541,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param pressureResolution
 	 * @param enableCalibration
 	 */
-	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, boolean enableCalibration){
+	public Shimmer(Handler handler, String userAssignedName, double samplingRate, int accelRange, int gsrRange, Integer[] sensorIdsToEnable, int gyroRange, int magRange, int orientation, int pressureResolution, boolean enableCalibration, Context context){
 		super(userAssignedName, samplingRate, sensorIdsToEnable, accelRange, gsrRange, gyroRange, magRange, pressureResolution);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mBluetoothRadioState = BT_STATE.DISCONNECTED;
@@ -487,6 +549,7 @@ public class Shimmer extends ShimmerBluetooth{
 		setupOrientation(orientation, samplingRate);
 		setEnableCalibration(enableCalibration);
 		mUseProcessingThread = true;
+		mContext = context;
 	}
 
 	/**
@@ -501,7 +564,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param orientation
 	 * @param enableCalibration
 	 */
-	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, boolean enableCalibration) {
+	public Shimmer(Handler handler, String myName, double samplingRate, int accelRange, int gsrRange, int setEnabledSensors, int magGain, int orientation, boolean enableCalibration, Context context) {
 		super(myName,samplingRate, setEnabledSensors, accelRange, gsrRange, magGain);
 		setupOrientation(orientation, samplingRate);
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -510,8 +573,8 @@ public class Shimmer extends ShimmerBluetooth{
 		setupOrientation(orientation, samplingRate);
 		setEnableCalibration(enableCalibration);
 		mUseProcessingThread = true;
+		mContext = context;
 	}
-
 
 	/**
 	 * Set the current state of the chat connection
@@ -535,10 +598,10 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param bluetoothLibrary Supported libraries are 'default' and 'gerdavax'  
 	 */
 	public synchronized void connect(final String address, String bluetoothLibrary) {
+		registerDisconnectListener();
 		mIamAlive = false;
 		getListofInstructions().clear();
 		mFirstTime=true;
-
 
 		if (bluetoothLibrary=="default"){
 			mMyBluetoothAddress=address;
@@ -592,6 +655,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @param socket  The BluetoothSocket on which the connection was made
 	 */
 	public synchronized void connected(BluetoothSocket socket) {
+		System.out.println("initialize process 2) connected and start initialize");
 		// Cancel the thread that completed the connection
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 		// Cancel any thread currently running a connection
@@ -599,9 +663,11 @@ public class Shimmer extends ShimmerBluetooth{
 		// Start the thread to manage the connection and perform transmissions
 		mConnectedThread = new ConnectedThread(socket);
 		mIOThread = new IOThread();
+		mIOThread.setName("IO Thread " + socket.getRemoteDevice().getAddress());
 		mIOThread.start();
 		if (mUseProcessingThread){
 			mPThread = new ProcessingThread();
+			mPThread.setName("P Thread " + socket.getRemoteDevice().getAddress());
 			mPThread.start();
 		}
 
@@ -618,7 +684,7 @@ public class Shimmer extends ShimmerBluetooth{
 	/**
 	 * Stop all threads
 	 */
-	public synchronized void stop() {
+	public void stop() {
 		if (mTimerReadStatus!=null) {
 			mTimerReadStatus.cancel();
 			mTimerReadStatus.purge();
@@ -651,15 +717,267 @@ public class Shimmer extends ShimmerBluetooth{
 			mConnectThread = null;
 		}
 		if (mConnectedThread != null) {
-			try {
-				wait(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			mConnectedThread.cancel(); 
+			mConnectedThread.cancel();
 			mConnectedThread = null;
 		}
 
+	}
+
+	@Override
+	protected void clearSingleDataPacketFromBuffers(byte[] bufferTemp, int packetSize) {
+		byte[] fullBuffer = mByteArrayOutputStream.toByteArray();
+		byte[] keepBuffer = new byte[fullBuffer.length-packetSize];
+		System.arraycopy(fullBuffer,packetSize,keepBuffer,0,keepBuffer.length);
+		this.mByteArrayOutputStream.reset();
+		try {
+			this.mByteArrayOutputStream.write(keepBuffer);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		if (this.mEnablePCTimeStamps) {
+			for(int i = 0; i < packetSize; ++i) {
+				try {
+					this.mListofPCTimeStamps.remove(0);
+				} catch (Exception var5) {
+					this.consolePrintException(var5.getMessage(), var5.getStackTrace());
+				}
+			}
+		}
+
+	}
+
+	@Override
+	protected void processPacket() {
+		setIamAlive(true);
+		byte[] allBytes = mByteArrayOutputStream.toByteArray();
+		byte[] bufferTemp = new byte[getPacketSizeWithCrc()+2];
+		System.arraycopy(allBytes,0,bufferTemp,0,bufferTemp.length);
+		//Data packet followed by another data packet
+		if(bufferTemp[0]==DATA_PACKET
+				&& bufferTemp[getPacketSizeWithCrc()+1]==DATA_PACKET){
+
+			if (mBtCommsCrcModeCurrent != BT_CRC_MODE.OFF && !checkCrc(bufferTemp, getPacketSize() + 1)) {
+				discardFirstBufferByte();
+				return;
+			}
+
+			//Handle the data packet
+			processDataPacket(bufferTemp);
+			clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+1);
+		}
+
+		//Data packet followed by an ACK (suggesting an ACK in response to a SET BT command or else a BT response command)
+		else if(bufferTemp[0]==DATA_PACKET
+				&& bufferTemp[getPacketSizeWithCrc()+1]==ACK_COMMAND_PROCESSED){
+
+			if(mByteArrayOutputStream.size()>getPacketSizeWithCrc()+2){
+				allBytes = mByteArrayOutputStream.toByteArray();
+				bufferTemp = new byte[getPacketSizeWithCrc()+3]; //check if the next byte is data packet
+				System.arraycopy(allBytes,0,bufferTemp,0,bufferTemp.length);
+				if(bufferTemp[getPacketSizeWithCrc()+2]==DATA_PACKET){
+					//Firstly handle the data packet
+					processDataPacket(bufferTemp);
+					clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+2); //clear an extra byte which is the ack
+
+					//Then handle the ACK from the last SET command
+					if(isKnownSetCommand(mCurrentCommand)){
+						stopTimerCheckForAckOrResp(); //cancel the ack timer
+						mWaitForAck=false;
+
+						processAckFromSetCommand(mCurrentCommand);
+
+						mTransactionCompleted = true;
+						setInstructionStackLock(false);
+					}
+					printLogDataForDebugging("Ack Received for Command: \t\t\t" + btCommandToString(mCurrentCommand));
+				}
+
+				//this is for LogAndStream support, command is transmitted and ack received
+				else if(isSupportedInStreamCmds() && bufferTemp[getPacketSizeWithCrc()+2]==INSTREAM_CMD_RESPONSE){
+					printLogDataForDebugging("COMMAND TXed and ACK RECEIVED IN STREAM");
+					printLogDataForDebugging("INS CMD RESP");
+
+					//Firstly handle the in-stream response
+					stopTimerCheckForAckOrResp(); //cancel the ack timer
+					mWaitForResponse=false;
+					mWaitForAck=false;
+
+					processInstreamResponse();
+
+					// Need to remove here because it is an
+					// in-stream response while streaming so not
+					// handled elsewhere
+					if(getListofInstructions().size()>0){
+						removeInstruction(0);
+					}
+
+					mTransactionCompleted=true;
+					setInstructionStackLock(false);
+
+					//Then process the Data packet
+					//processDataPacket(bufferTemp);
+					//clearBuffers();
+				}
+				else {
+					printLogDataForDebugging("Unknown parsing error while streaming");
+					discardFirstBufferByte(); //throw the first byte away
+				}
+			}
+			/*
+			if(mByteArrayOutputStream.size()>getPacketSizeWithCrc()+2){
+				printLogDataForDebugging("Unknown packet error (check with JC):\tExpected: " + (getPacketSizeWithCrc()+2) + "bytes but buffer contains " + mByteArrayOutputStream.size() + "bytes");
+				discardFirstBufferByte(); //throw the first byte away
+			}
+			 */
+
+		}
+		//TODO: ACK in bufferTemp[0] not handled
+		//else if
+		else {
+			printLogDataForDebugging("Packet syncing problem:\tExpected: " + (getPacketSizeWithCrc()+2) + "bytes. Buffer contains " + mByteArrayOutputStream.size() + "bytes"
+					+ "\nBuffer = " + UtilShimmer.bytesToHexStringWithSpacesFormatted(mByteArrayOutputStream.toByteArray()));
+			discardFirstBufferByte(); //throw the first byte away
+		}
+	}
+
+	protected byte[] getDataFromArrayOutputStream(int extraBytesLength){
+		if (mByteArrayOutputStream.size() >= getPacketSizeWithCrc() + extraBytesLength) {
+			byte[] allBytes = mByteArrayOutputStream.toByteArray();
+			byte[] bufferTemp = new byte[getPacketSizeWithCrc() + extraBytesLength]; //check if the next byte is data packet
+			System.arraycopy(allBytes, 0, bufferTemp, 0, bufferTemp.length);
+			return bufferTemp;
+		}
+		return null;
+	}
+
+	/** process responses to in-stream response */
+	@Override
+	protected void processInstreamResponse() {
+
+		if (mBluetoothRadioState.equals(BT_STATE.CONNECTED)){
+			super.processInstreamResponse();
+		} else if (mBluetoothRadioState.equals(BT_STATE.STREAMING)){
+			//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
+			byte[] bufferTemp = getDataFromArrayOutputStream(4);
+			if (bufferTemp != null) {
+				byte inStreamResponseCommand = bufferTemp[bufferTemp.length - 1];
+				consolePrintLn("In-stream received = " + btCommandToString(inStreamResponseCommand));
+
+				if (inStreamResponseCommand == DIR_RESPONSE) {
+					//byte[] responseData = readBytes(1, inStreamResponseCommand);
+					bufferTemp = getDataFromArrayOutputStream(5);
+					if (bufferTemp != null) {
+						int directoryNameLength = bufferTemp[bufferTemp.length - 1];
+						byte[] bufferDirectoryName = new byte[directoryNameLength];
+						bufferTemp = getDataFromArrayOutputStream(5 + directoryNameLength);
+						System.arraycopy(bufferTemp, bufferTemp.length - bufferDirectoryName.length, bufferDirectoryName, 0, bufferDirectoryName.length);
+						if (bufferDirectoryName != null) {
+							String tempDirectory = new String(bufferDirectoryName);
+							mDirectoryName = tempDirectory;
+							printLogDataForDebugging("Directory Name = " + mDirectoryName);
+						}
+						processDataPacket(bufferTemp);
+						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
+					}
+				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
+					bufferTemp = getDataFromArrayOutputStream(5);
+					if (bufferTemp != null) {
+						byte[] responseData = new byte[1];
+						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
+						if (responseData != null) {
+							parseStatusByte(responseData[0]);
+
+							if (!isSupportedRtcStateInStatus()) {
+								if (!mIsSensing && !isInitialised()) {
+									writeRealTimeClock();
+								}
+							} else {
+								//New case to make sure RTC is set if it hasn't been already
+								if (!isSDLogging() && (!isInitialised() || !mIsRtcSet)) {
+									writeRealTimeClock();
+								}
+							}
+							eventLogAndStreamStatusChanged(mCurrentCommand);
+							processDataPacket(bufferTemp);
+							clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
+						}
+					}
+				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
+					bufferTemp = getDataFromArrayOutputStream(7);
+					if (bufferTemp != null) {
+						byte[] responseData = new byte[3];
+						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
+						if (responseData != null) {
+							ShimmerBattStatusDetails battStatusDetails = new ShimmerBattStatusDetails(((responseData[1] & 0xFF) << 8) + (responseData[0] & 0xFF), responseData[2]);
+							setBattStatusDetails(battStatusDetails);
+							printLogDataForDebugging("Battery Status:"
+									+ "\tVoltage=" + battStatusDetails.getBattVoltageParsed()
+									+ "\tCharging status=" + battStatusDetails.getChargingStatusParsed()
+									+ "\tBatt %=" + battStatusDetails.getEstimatedChargePercentageParsed());
+						}
+						processDataPacket(bufferTemp);
+						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
+					}
+
+				} else {
+					discardFirstBufferByte();
+				}
+			}
+		}
+	}
+
+
+	@Override
+	protected void processWhileStreaming() {
+		byte[] byteBuffer = readBytes(availableBytes());
+		if(byteBuffer!=null){
+			try {
+				mByteArrayOutputStream.write(byteBuffer);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			//Everytime a byte is received the timestamp is taken
+			if(mEnablePCTimeStamps) {
+				for (int index:byteBuffer) {
+					mListofPCTimeStamps.add(System.currentTimeMillis());
+				}
+			}
+		}
+		else {
+			printLogDataForDebugging("readbyte null");
+		}
+
+		//If there is a full packet and the subsequent sequence number of following packet
+		if(mByteArrayOutputStream.size()>=getPacketSizeWithCrc()+2){ // +2 because there are two acks
+			processPacket();
+		}
+	}
+
+	/**this is to clear the buffer
+	 *
+	 */
+	@Override
+	protected void clearSerialBuffer() {
+		startTimerCheckForSerialPortClear();
+		byte[] buffer = new byte[0];
+		while (availableBytes() != 0) {
+//			int available = availableBytes();
+			if (bytesAvailableToBeRead()) {
+				//AA-283 : the clearing of the serial bytes , is too slow when streaming 1024Hz (e.g. exg test)
+				buffer = readBytes(availableBytes());
+
+				if (mSerialPortReadTimeout) {
+					break;
+				}
+			}
+		}
+
+		if (buffer.length > 0) {
+			String msg = "Clearing Buffer:\t\t" + UtilShimmer.bytesToHexStringWithSpacesFormatted(buffer);
+			printLogDataForDebugging(msg);
+		}
+
+		stopTimerCheckForSerialPortClear();
 	}
 
 	/**
@@ -668,6 +986,7 @@ public class Shimmer extends ShimmerBluetooth{
 	 * @see ConnectedThread write(byte[])
 	 */
 	public void write(byte[] out) {
+		/*
 		// Create temporary object
 		ConnectedThread r;
 		// Synchronize a copy of the ConnectedThread
@@ -678,6 +997,8 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		// Perform the write unsynchronized
 		r.write(out);
+		*/
+		mConnectedThread.write(out);
 	}
 
 	/**
@@ -746,6 +1067,7 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		public void run() {
+			System.out.println("initialize process 1) start connecting thread");
 			setName("ConnectThread");
 
 			// Always cancel discovery because it will slow down a connection
@@ -989,7 +1311,7 @@ public class Shimmer extends ShimmerBluetooth{
 
 
 
-
+	@Override
 	protected void inquiryDone() {
 		//TODO: Delete this...
 //		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
@@ -1001,6 +1323,7 @@ public class Shimmer extends ShimmerBluetooth{
 		isReadyForStreaming();
 	}   
 
+	@Override
 	protected void isReadyForStreaming(){
 		//TODO: Delete this...
 //		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
@@ -1030,7 +1353,12 @@ public class Shimmer extends ShimmerBluetooth{
 		//mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1, new ObjectCluster(mShimmerUserAssignedName,getBluetoothAddress(),mBluetoothRadioState)).sendToTarget();
 		Log.d(mClassName,"Shimmer " + mMyBluetoothAddress +" Initialization completed and is ready for Streaming");
 		if(mAutoStartStreaming){
-			startStreaming();
+			try {
+				startStreaming();
+			} catch (ShimmerException e) {
+				connectionLost();
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -1345,6 +1673,7 @@ public class Shimmer extends ShimmerBluetooth{
 			mIsConnected = false;
 			mIsStreaming = false;
 			mIsInitialised = false;
+			unregisterDisconnectListener();
 		}
 		
 		// Give the new state to the Handler so the UI Activity can update
@@ -1478,16 +1807,14 @@ public class Shimmer extends ShimmerBluetooth{
 //		}
 //	}
 	public void setRadio(BluetoothSocket socket){
-
+		System.out.println("initialize process set radio");
+		registerDisconnectListener();
 		if (socket.isConnected()){
 			setBluetoothRadioState(BT_STATE.CONNECTING);
 			mMyBluetoothAddress = socket.getRemoteDevice().getAddress();
 			connected(socket);
 		}
-
-
-
-}
+	}
 
 	private void sendMsgToHandlerList(int obtainMessage) {
 		for(Handler handler : mHandlerList) {

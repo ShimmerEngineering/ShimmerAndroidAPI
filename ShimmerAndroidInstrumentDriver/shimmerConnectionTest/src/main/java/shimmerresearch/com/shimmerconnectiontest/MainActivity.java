@@ -1,7 +1,9 @@
 package shimmerresearch.com.shimmerconnectiontest;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +31,9 @@ import java.util.TimerTask;
 import android.widget.EditText;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends Activity {
 
@@ -84,6 +89,34 @@ public class MainActivity extends Activity {
         editTextRetryCountLimit.setText(Integer.toString(retryCountLimit));
         editTextTotalIteration.setText(Integer.toString(totalIterationLimit));
         editTextInterval.setText(Integer.toString(durationBetweenTest));
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        boolean permissionGranted = true;
+        {
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        }
+        if (!permissionGranted) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 110);
+
+        } else {
+            //startServiceandBTManager();
+        }
+
     }
 
     public void startTest(View v){
@@ -218,7 +251,7 @@ public class MainActivity extends Activity {
                                     //shimmer.connect(macAdd, "default");
                                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
                                     btManager.removeShimmerDeviceBtConnected(macAdd);
-                                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler));
+                                    btManager.putShimmerGlobalMap(macAdd,new Shimmer(mHandler,MainActivity.this));
                                     btManager.connectShimmerThroughBTAddress(macAdd);
                                     try {
                                         Thread.sleep(500);
@@ -324,7 +357,7 @@ public class MainActivity extends Activity {
                     //shimmer = new Shimmer(mHandler);
                     //shimmer.connect(macAdd, "default");
                     Log.i(LOG_TAG, "Connect Called, retry count: " + Integer.toString(retryCount) + "; Total number of retries:" + totalRetries);
-                    Shimmer shimmer = new Shimmer(mHandler);
+                    Shimmer shimmer = new Shimmer(mHandler, MainActivity.this);
                     shimmer.setMacIdFromUart(macAdd);
                     btManager.removeShimmerDeviceBtConnected(macAdd);
                     btManager.putShimmerGlobalMap(macAdd, shimmer);

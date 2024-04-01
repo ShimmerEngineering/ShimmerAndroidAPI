@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="46dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="138dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sensor 1" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="connectDevice1"
+                android:text="Connect" />
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="disconnectDevice1"
+                android:text="Disconnect" />
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startStreaming1"
+                android:text="Start Streaming" />
+
+            <Button
+                android:id="@+id/button6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="stopStreaming1"
+                android:text="Stop Streaming" />
+
+            <Button
+                android:id="@+id/button7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="readProdConfig1"
+                android:text="Read Prod Config" />
+
+            <Button
+                android:id="@+id/button8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="readOpConfig1"
+                android:text="Read Op Config" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="136dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sensor 2" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="connectDevice2"
+                android:text="Connect" />
+
+            <Button
+                android:id="@+id/button11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="disconnectDevice2"
+                android:text="Disconnect" />
+
+            <Button
+                android:id="@+id/button12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startStreaming2"
+                android:text="Start Streaming" />
+
+            <Button
+                android:id="@+id/button13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="stopStreaming2"
+                android:text="Stop Streaming" />
+
+            <Button
+                android:id="@+id/button14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="readProdConfig2"
+                android:text="Read Prod Config" />
+
+            <Button
+                android:id="@+id/button15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="readOpConfig2"
+                android:text="Read Op Config" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sensor 3" />
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="connectDevice3"
+                android:text="Connect" />
+
+            <Button
+                android:id="@+id/button18"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="disconnectDevice3"
+                android:text="Disconnect" />
+
+            <Button
+                android:id="@+id/button19"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startStreaming3"
+                android:text="Start Streaming" />
+
+            <Button
+                android:id="@+id/button20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="stopStreaming3"
+                android:text="Stop Streaming" />
+
+            <Button
+                android:id="@+id/button21"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="readProdConfig3"
+                android:text="Read Prod Config" />
+
+            <Button
+                android:id="@+id/button22"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="readOpConfig3"
+                android:text="Read Op Config" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="415dp"
+        android:layout_height="235dp"
+        android:layout_marginBottom="2dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <LinearLayout
+            android:layout_width="215dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnStartSpeedTest1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startSpeedTest1"
+                android:text="Start Speed Test Sensor 1" />
+
+            <Button
+                android:id="@+id/btnStartSpeedTest2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startSpeedTest1And2"
+                android:text="Start Speed Test Sensor 1and2" />
+
+            <Button
+                android:id="@+id/btnStartSpeedTestAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startAllSpeedTest"
+                android:text="Start Speed Test All Sensor " />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnStopSpeedTest1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="stopSpeedTest1"
+                android:text="Stop Speed Test Sensor 1" />
+
+            <Button
+                android:id="@+id/btnStopSpeedTest2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="stopSpeedTest1And2"
+                android:text="Stop Speed Test Sensor 1and2" />
+
+            <Button
+                android:id="@+id/btnStopSpeedTestAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="stopAllSpeedTest"
+                android:text="Stop Speed Test All Sensor" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

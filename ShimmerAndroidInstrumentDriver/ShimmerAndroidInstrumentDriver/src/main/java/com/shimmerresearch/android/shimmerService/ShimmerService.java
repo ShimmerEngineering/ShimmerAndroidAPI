@@ -41,9 +41,11 @@ package com.shimmerresearch.android.shimmerService;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -63,10 +65,14 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
+import com.shimmerresearch.driverUtilities.BluetoothDeviceDetails;
 import com.shimmerresearch.driverUtilities.ChannelDetails.CHANNEL_TYPE;
+import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.tools.Logging;
 import com.shimmerresearch.tools.PlotManagerAndroid;
+import com.shimmerresearch.verisense.VerisenseDevice;
 
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,6 +96,10 @@ public class ShimmerService extends Service {
 	protected Handler mHandlerGraph=null;
 	private boolean mGraphing=false;
 	public String mLogFileName="Default";
+
+	public Uri mFileURI= null;
+	public ContentResolver mResolver = null;
+	public Context mContext = null;
 	Filter mFilter;
 	Filter mLPFilterECG;
 	Filter mHPFilterECG;
@@ -245,7 +255,29 @@ public class ShimmerService extends Service {
 	}
 
 	public void connectShimmer(final String bluetoothAddress,Context context){
-		btManager.connectShimmerThroughBTAddress(bluetoothAddress,context);
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,"",context);
+	}
+
+	public void connectShimmer(final String bluetoothAddress,final String deviceName, Context context){
+		btManager.connectShimmerThroughBTAddress(bluetoothAddress,deviceName,context);
+	}
+
+	public void connectShimmer(final String bluetoothAddress,final String deviceName, ShimmerBluetoothManagerAndroid.BT_TYPE preferredBtType, Context context){
+		boolean isVerisense = false;
+		if (deviceName!=null){
+			if (deviceName.contains(VerisenseDevice.VERISENSE_PREFIX)) {
+				isVerisense = true;
+			}
+		}
+
+		if (isVerisense){
+			btManager.connectVerisenseDevice(new BluetoothDeviceDetails("",bluetoothAddress,deviceName));
+		} else {
+			btManager.connectShimmerThroughBTAddress(bluetoothAddress, preferredBtType);   //Connect to the selected device
+		}
+
+
+
 	}
 
 	public void connectShimmer(final String bluetoothAddress){
@@ -427,9 +459,17 @@ public class ShimmerService extends Service {
 					char[] bA=objectCluster.getMacAddress().toCharArray();
 					Logging shimmerLog;
 					if (mLogFileName.equals("Default")){
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16],"\t", mLogFolderName, mLoggingFileType);
+						if(mFileURI==null) {
+							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+						} else {
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+						}
 					} else {
-						shimmerLog=new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName,"\t", mLogFolderName, mLoggingFileType);
+						if(mFileURI==null) {
+							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
+						}else {
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
+						}
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
 					if (mLogShimmer.get(objectCluster.getMacAddress())==null){
@@ -513,6 +553,7 @@ public class ShimmerService extends Service {
 					sendBroadcast(intent);
 					break;
 				case DISCONNECTED:
+					btManager.removeShimmerDeviceBtConnected(macAddress);
 					intent.putExtra("ShimmerBluetoothAddress", macAddress );
 					intent.putExtra("ShimmerDeviceName", shimmerName );
 					intent.putExtra("ShimmerState",BT_STATE.DISCONNECTED);
@@ -915,8 +956,8 @@ public class ShimmerService extends Service {
 	}
 */
 
-	public void startStreaming(String bluetoothAddress) {
-		btManager.startStreaming(bluetoothAddress);
+	public void startStreaming(String bluetoothAddress) throws Exception{
+			btManager.startStreaming(bluetoothAddress);
 	}
 
 	/**
@@ -1008,8 +1049,8 @@ public class ShimmerService extends Service {
 	}
 */
 
-	public void stopStreaming(String bluetoothAddress) {
-		btManager.stopStreaming(bluetoothAddress);
+	public void stopStreaming(String bluetoothAddress) throws Exception{
+			btManager.stopStreaming(bluetoothAddress);
 	}
 
 	/**
@@ -1130,7 +1171,12 @@ public class ShimmerService extends Service {
 	public void closeAndRemoveFile(String bluetoothAddress){
 		if (mLogShimmer.get(bluetoothAddress)!=null){
 			mLogShimmer.get(bluetoothAddress).closeFile();
-			MediaScannerConnection.scanFile(this, new String[] { mLogShimmer.get(bluetoothAddress).getAbsoluteName() }, null, null);
+
+			try {
+				MediaScannerConnection.scanFile(this, new String[] { mLogShimmer.get(bluetoothAddress).getAbsoluteName() }, null, null);
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 			mLogShimmer.remove(bluetoothAddress);
 
 		}

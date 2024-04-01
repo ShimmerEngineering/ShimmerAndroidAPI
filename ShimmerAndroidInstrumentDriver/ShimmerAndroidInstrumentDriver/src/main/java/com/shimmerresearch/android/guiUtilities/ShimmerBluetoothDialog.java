@@ -16,6 +16,7 @@ package com.shimmerresearch.android.guiUtilities;
  */
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -23,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +40,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import androidx.core.app.ActivityCompat;
+
 import com.shimmerresearch.androidinstrumentdriver.R;
 
 import java.util.Set;
@@ -47,7 +51,7 @@ import java.util.Set;
  * devices detected in the area after discovery. When a device is chosen
  * by the user, the MAC address of the device is sent back to the parent
  * Activity in the result Intent.
- * 
+ *
  */
 public class ShimmerBluetoothDialog extends Activity {
     // Debugging
@@ -57,6 +61,7 @@ public class ShimmerBluetoothDialog extends Activity {
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
+    public static String EXTRA_DEVICE_NAME = "device_name";
 
 
     // Member fields
@@ -65,10 +70,11 @@ public class ShimmerBluetoothDialog extends Activity {
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
     //private String[] deviceAddresses={"","","","","","",""};
     private Button scanButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Set Material Design if the device's OS is Android Lollipop or higher
-        if(Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             setTheme(android.R.style.Theme_Material_Light_Dialog);
         } else {
             setTheme(android.R.style.Theme_Holo_Light_Dialog);
@@ -84,7 +90,7 @@ public class ShimmerBluetoothDialog extends Activity {
 
         // Initialize the button to perform device discovery
         scanButton = (Button) findViewById(R.id.button_scan);
-          
+
         scanButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 doDiscovery();
@@ -111,7 +117,8 @@ public class ShimmerBluetoothDialog extends Activity {
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         this.registerReceiver(mReceiver, filter);
-
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        this.registerReceiver(mReceiver, filter);
         // Register for broadcasts when discovery has finished
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
@@ -164,6 +171,19 @@ public class ShimmerBluetoothDialog extends Activity {
         findViewById(R.id.layoutNewDevices).setVisibility(View.VISIBLE);
 
         // If we're already discovering, stop it
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+        }
+
         if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
@@ -181,10 +201,11 @@ public class ShimmerBluetoothDialog extends Activity {
             // Get the device MAC address, which is the last 17 chars in the View
             String info = ((TextView) v).getText().toString();
             String address = info.substring(info.length() - 17);
-
+            String devicename = info.split("\n")[0];
             // Create the result Intent and include the MAC address
             Intent intent = new Intent();
             intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+            intent.putExtra(EXTRA_DEVICE_NAME, devicename);
 
             Toast.makeText(getApplicationContext(),"Device Selected " +  "-> "+ address, Toast.LENGTH_SHORT).show();
             setResult(Activity.RESULT_OK, intent);              // Set result and finish this Activity
