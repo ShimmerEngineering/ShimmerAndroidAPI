@@ -50,7 +50,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-v4:+'
     androidTestImplementation 'com.android.support:support-annotations:25.3.1'
-    compile(group: 'com.shimmerresearch', name: 'shimmerandroidinstrumentdriver', version: '3.0.83_beta', ext: 'aar')
+    compile(group: 'com.shimmerresearch', name: 'shimmerandroidinstrumentdriver', version: '3.0.84_beta', ext: 'aar')
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
