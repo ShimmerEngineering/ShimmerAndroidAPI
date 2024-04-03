@@ -1,23 +1,15 @@
 # Introduction
 This API can be used to communicate with a Shimmer3 device via Bluetooth. A good starting point will be the [quick start guide](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Quick-Start-Guide) and the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki)
 
-# Known Issues
-While this does have a dependency on the environment you are in (e.g. whether there is significant radio noise in the Bluetooth spectrum) in general we've found that the rate of connecting to a Shimmer3 device on the first try varies across Android devices. The following gives an example of the results we've seen, where percentage of success is the number of times the Android Phone Model is able to connect successfully to a Shimmer device the first time of trying:-
 
-| Android Phone Model  | Percentage of Success |
-| ------------- | ------------- |
-| Nokia 2.3  | 96%  |
-| Pocophone F1  | 60%  |
-| Redmi Note4 | 97%  |
-| Redmi 9AT  | 99%  |
-| Samsung j3 | 97%  |
-| Samsung Galaxy A5 | 99% |
-| Samsung Galaxy A10 | 99% |
-| Xiaomi Redmi 9A | 99% |
-| Pixel 3A | 77% |
-| OnePlus 5 | 60% |
+# ShimmerAndroidAPI 
 
-From a users perspective to improve the success rate of connecting the first time seamlessly, we recommend using logic in the background which will automatically try to connect to the Shimmer device should the first time fail. An example implementation of this logic can be found in the project/app shimmerConnectionTest. Please refer to the readme of said project for further details. Using said logic we have found significant improvements on the poor performing phones like the Pocophone F1 and the OnePlus 5.
+The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
+
+The latest version is [3.0.84Beta](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/releases/tag/AndroidAPI_v3.0.84beta).
+
+We recommend first time users go through the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). 
+
 
 # Important ~ Migration to Github Packages
 With JFrog removing services we have migrated to using Github Packages. This would be a good [starting point](https://docs.github.com/en/packages/learn-github-packages/installing-a-package).
@@ -76,18 +68,6 @@ dependencies:-
 compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Beta_AA-245_AA-246'
 ```
 
-
-# ShimmerAndroidAPI 3.0Beta
-
-The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
-
-The latest version is 3.0.73Beta.
-
-The most significant recent change in the API was the release of the updated arrays data structure as an alternative to the default multimap data structure in ObjectCluster. 
-Using the new arrays data structure can improve packet reception rate significantly on Android, as it consumes significantly less CPU resources. 
-An example of how to use this arrays data structure can be found in Efficient Data Array Example.
-We recommend first time users go through the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). 
-
 # Frequently Asked Questions
 
 ### Getting Started with the Shimmer Android API
@@ -122,45 +102,6 @@ Most recent uploaded library can be found here:-
 https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver and should be added as one of the dependencies
 
 *Note: do not download any versions of the library marked as "test". These are internal releases, and may not be fully functional.*
-
-
-### Difference between methods
-
-In the Android API, you may notice methods with different names, but which appear to perform the same function.
-
-For example, Shimmer.setSamplingRateShimmer(rate) vs Shimmer.writeShimmerAndSensorsSamplingRate(rate)
-
-The differences between these methods are as follows:
-
-**Set** - Modifies the setting on the Shimmer object in code only. 
-These settings still have to be written to the physical device using a command e.g. shimmer.writeConfigBytes()
-
-**Write** - Modifies the setting on the Shimmer object in code AND writes the setting to the physical Shimmer device
-
-
-
-### Timestamps (Shimmer3)
-
-Each ObjectCluster (message) received from the Shimmer devices contains a record of the time when the message or the sample was recorded. These records are known as timestamps.
-
-Each message can contain multiple types of timestamps, and the differences between each are listed below.
-Note that these names are found in Configuration.Shimmer3.ObjectClusterSensorName
-
-TIMESTAMP - This is the Shimmer internal device clock timestamp, and is taken a sample is recorded on the device.
-This is the most accurate timestamp for identifying the exact time when a sample was recorded.
-
-SYSTEM_TIMESTAMP - This is the timestamp which is taken when a packet has been received on an Android device. This is less accurate than the Shimmer's internal clock, as there will be variable latency introduced between the sample being recorded on the Shimmer, and the packet being received on the Android device. This is due to the nature of the Bluetooth connection.
-
-This latency cannot be avoided, but it can be mitigated in part by methods such as a linear fit, which can be found in Section 7.2 of the Multi Shimmer Sync for Android user manual.
-
-SYSTEM_TIMESTAMP_PLOT - This is the current TIMESTAMP added to an offset. 
-
-This offset is calculated once, when the first packet is received, using the equation: 
-OFFSET = SYSTEM_TIMESTAMP - TIMESTAMP.
-This ensures that the latency between a Shimmer recording a packet and transmitting it to the Android device is constant and equal to the latency of the first packet received. 
-
-TIMESTAMP_OFFSET - It is not recommended to use this, as this is used for SD parsing.
-
 
 ### Common Errors
 - **DexArchiveMergerException** *e.g. ':app:transformDexArchiveWithExternalLibsDexMergerForDebug'.>
