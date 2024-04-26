@@ -731,7 +731,6 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		*/
 		keepBytes = removeLengthofBytes(bufferTemp,packetSize);
-
 		if (this.mEnablePCTimeStamps) {
 			for(int i = 0; i < packetSize; ++i) {
 				try {
@@ -762,11 +761,12 @@ public class Shimmer extends ShimmerBluetooth{
 
 		return result;
 	}
-
+	byte[] bufferTemp;
 	@Override
 	protected void processPacket() {
 		setIamAlive(true);
-		byte[] bufferTemp = removeBytes(getPacketSizeWithCrc()+2);
+		bufferTemp = removeBytes(getPacketSizeWithCrc()+2 - keepBytes.length);
+		//consolePrintLn("Keep Bytes size: " + keepBytes.length);
 		bufferTemp = joinByteArrays(keepBytes,bufferTemp);
 		/*
 		byte[] allBytes = mByteArrayOutputStream.toByteArray();
@@ -866,6 +866,7 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	protected byte[] getDataFromArrayOutputStream(int extraBytesLength){
+		/*
 		if (mByteArrayOutputStream.size() >= getPacketSizeWithCrc() + extraBytesLength) {
 			byte[] allBytes = mByteArrayOutputStream.toByteArray();
 			byte[] bufferTemp = new byte[getPacketSizeWithCrc() + extraBytesLength]; //check if the next byte is data packet
@@ -873,6 +874,8 @@ public class Shimmer extends ShimmerBluetooth{
 			return bufferTemp;
 		}
 		return null;
+		*/
+		return joinByteArrays(bufferTemp,removeBytes(extraBytesLength));
 	}
 
 	/** process responses to in-stream response */
@@ -883,7 +886,9 @@ public class Shimmer extends ShimmerBluetooth{
 			super.processInstreamResponse();
 		} else if (mBluetoothRadioState.equals(BT_STATE.STREAMING)){
 			//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
-			byte[] bufferTemp = getDataFromArrayOutputStream(4);
+			byte[] bufferTemp = getDataFromArrayOutputStream(1);
+
+
 			if (bufferTemp != null) {
 				byte inStreamResponseCommand = bufferTemp[bufferTemp.length - 1];
 				consolePrintLn("In-stream received = " + btCommandToString(inStreamResponseCommand));
@@ -905,7 +910,7 @@ public class Shimmer extends ShimmerBluetooth{
 						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
-					bufferTemp = getDataFromArrayOutputStream(5);
+					bufferTemp = getDataFromArrayOutputStream(1);
 					if (bufferTemp != null) {
 						byte[] responseData = new byte[1];
 						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
@@ -924,11 +929,12 @@ public class Shimmer extends ShimmerBluetooth{
 							}
 							eventLogAndStreamStatusChanged(mCurrentCommand);
 							processDataPacket(bufferTemp);
-							clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
+							keepBytes = new byte[0];
+							//clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 						}
 					}
 				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
-					bufferTemp = getDataFromArrayOutputStream(7);
+					bufferTemp = getDataFromArrayOutputStream(3);
 					if (bufferTemp != null) {
 						byte[] responseData = new byte[3];
 						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
@@ -941,7 +947,8 @@ public class Shimmer extends ShimmerBluetooth{
 									+ "\tBatt %=" + battStatusDetails.getEstimatedChargePercentageParsed());
 						}
 						processDataPacket(bufferTemp);
-						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
+						keepBytes=new byte[0];
+						//clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 
 				} else {
@@ -965,12 +972,13 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 		return bytes;
 	}
-
+    int count=0;
 	@Override
 	protected void processWhileStreaming() {
 		byte[] byteBuffer = readBytes(availableBytes());
-		if(byteBuffer!=null){
-			addBytesToQueue(byteBuffer);
+		if(byteBuffer!=null) {
+			if (byteBuffer.length > 0) {
+				addBytesToQueue(byteBuffer);
 			/*
 			try {
 				mByteArrayOutputStream.write(byteBuffer);
@@ -978,12 +986,14 @@ public class Shimmer extends ShimmerBluetooth{
 				throw new RuntimeException(e);
 			}
 			*/
-			//Everytime a byte is received the timestamp is taken
-			mEnablePCTimeStamps = false;
-			if(mEnablePCTimeStamps) {
-				for (int index:byteBuffer) {
-					mListofPCTimeStamps.add(System.currentTimeMillis());
+				//Everytime a byte is received the timestamp is taken
+				mEnablePCTimeStamps = false;
+				if (mEnablePCTimeStamps) {
+					for (int index : byteBuffer) {
+						mListofPCTimeStamps.add(System.currentTimeMillis());
+					}
 				}
+				consolePrintLn("List of timestamps: " + mListofPCTimeStamps.size());
 			}
 		}
 		else {
@@ -1508,7 +1518,9 @@ public class Shimmer extends ShimmerBluetooth{
 
 	@Override
 	protected void writeBytes(byte[] data) {
-		
+		if (data[0]==0x07){
+			keepBytes = new byte[0];
+		}
 		write(data);
 	}
 
