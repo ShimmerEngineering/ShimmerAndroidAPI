@@ -895,11 +895,11 @@ public class Shimmer extends ShimmerBluetooth{
 
 				if (inStreamResponseCommand == DIR_RESPONSE) {
 					//byte[] responseData = readBytes(1, inStreamResponseCommand);
-					bufferTemp = getDataFromArrayOutputStream(5);
+					bufferTemp = getDataFromArrayOutputStream(1);
 					if (bufferTemp != null) {
 						int directoryNameLength = bufferTemp[bufferTemp.length - 1];
 						byte[] bufferDirectoryName = new byte[directoryNameLength];
-						bufferTemp = getDataFromArrayOutputStream(5 + directoryNameLength);
+						bufferTemp = getDataFromArrayOutputStream(directoryNameLength);
 						System.arraycopy(bufferTemp, bufferTemp.length - bufferDirectoryName.length, bufferDirectoryName, 0, bufferDirectoryName.length);
 						if (bufferDirectoryName != null) {
 							String tempDirectory = new String(bufferDirectoryName);
@@ -907,7 +907,8 @@ public class Shimmer extends ShimmerBluetooth{
 							printLogDataForDebugging("Directory Name = " + mDirectoryName);
 						}
 						processDataPacket(bufferTemp);
-						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
+						keepBytes = new byte[0];
+						//clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
 					bufferTemp = getDataFromArrayOutputStream(1);
