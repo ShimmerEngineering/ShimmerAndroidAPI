@@ -238,6 +238,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if(selectedDeviceAddress != null) {
 
                     ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
+                    //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
+                    ((ShimmerBluetooth)mDevice).enablePCTimeStamps(false);
                     try {
                         mDevice.startStreaming();
                         mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
