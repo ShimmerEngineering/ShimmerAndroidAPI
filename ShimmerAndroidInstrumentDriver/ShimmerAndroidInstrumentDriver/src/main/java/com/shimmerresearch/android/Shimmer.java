@@ -994,7 +994,6 @@ public class Shimmer extends ShimmerBluetooth{
 						mListofPCTimeStamps.add(System.currentTimeMillis());
 					}
 				}
-				consolePrintLn("List of timestamps: " + mListofPCTimeStamps.size());
 			}
 		}
 		else {
