@@ -745,11 +745,17 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 	}
-
 	@Override
 	protected void processPacket() {
 		setIamAlive(true);
 		byte[] allBytes = mByteArrayOutputStream.toByteArray();
+		//consolePrintLn("Byte Array Size: " + allBytes.length);
+		if (mByteArrayOutputStream.size()>10000){
+			mByteArrayOutputStream.reset();
+			mListofPCTimeStamps.clear();
+			consolePrintLn("Byte Array Size (reset): " + mByteArrayOutputStream.size());
+			return;
+		}
 		byte[] bufferTemp = new byte[getPacketSizeWithCrc()+2];
 		System.arraycopy(allBytes,0,bufferTemp,0,bufferTemp.length);
 		//Data packet followed by another data packet
@@ -864,6 +870,7 @@ public class Shimmer extends ShimmerBluetooth{
 				consolePrintLn("In-stream received = " + btCommandToString(inStreamResponseCommand));
 
 				if (inStreamResponseCommand == DIR_RESPONSE) {
+					printLogDataForDebugging("IN STREAM: DIR_RESPONSE");
 					//byte[] responseData = readBytes(1, inStreamResponseCommand);
 					bufferTemp = getDataFromArrayOutputStream(5);
 					if (bufferTemp != null) {
@@ -880,6 +887,7 @@ public class Shimmer extends ShimmerBluetooth{
 						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
+					printLogDataForDebugging("IN STREAM: STATUS_RESPONSE");
 					bufferTemp = getDataFromArrayOutputStream(5);
 					if (bufferTemp != null) {
 						byte[] responseData = new byte[1];
@@ -903,6 +911,7 @@ public class Shimmer extends ShimmerBluetooth{
 						}
 					}
 				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
+					printLogDataForDebugging("IN STREAM: VBATT_RESPONSE");
 					bufferTemp = getDataFromArrayOutputStream(7);
 					if (bufferTemp != null) {
 						byte[] responseData = new byte[3];
@@ -922,6 +931,8 @@ public class Shimmer extends ShimmerBluetooth{
 				} else {
 					discardFirstBufferByte();
 				}
+			} else {
+				printLogDataForDebugging("IN STREAM: buffer temp is null, byte array output stream size is " + mByteArrayOutputStream.size());
 			}
 		}
 	}
@@ -932,7 +943,10 @@ public class Shimmer extends ShimmerBluetooth{
 		byte[] byteBuffer = readBytes(availableBytes());
 		if(byteBuffer!=null){
 			try {
-				mByteArrayOutputStream.write(byteBuffer);
+				if (byteBuffer.length>0) {
+					//consolePrintLn("Byte Array Size put in : " + byteBuffer.length);
+					mByteArrayOutputStream.write(byteBuffer);
+				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -948,10 +962,17 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		//If there is a full packet and the subsequent sequence number of following packet
-		if(mByteArrayOutputStream.size()>=getPacketSizeWithCrc()+2){ // +2 because there are two acks
+		int size = mByteArrayOutputStream.size();
+		while(mByteArrayOutputStream.size()>=getPacketSizeWithCrc()+2){ // +2 because there are two acks
 			processPacket();
+			int newSize = mByteArrayOutputStream.size();
+			if (size == newSize){
+				consolePrintLn("processWhileStreaming: Leaving while loop");
+				break;
+			}
 		}
 	}
+
 
 	/**this is to clear the buffer
 	 *
