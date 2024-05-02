@@ -870,6 +870,7 @@ public class Shimmer extends ShimmerBluetooth{
 				consolePrintLn("In-stream received = " + btCommandToString(inStreamResponseCommand));
 
 				if (inStreamResponseCommand == DIR_RESPONSE) {
+					printLogDataForDebugging("IN STREAM: DIR_RESPONSE");
 					//byte[] responseData = readBytes(1, inStreamResponseCommand);
 					bufferTemp = getDataFromArrayOutputStream(5);
 					if (bufferTemp != null) {
@@ -886,6 +887,7 @@ public class Shimmer extends ShimmerBluetooth{
 						clearSingleDataPacketFromBuffers(bufferTemp, bufferTemp.length + mBtCommsCrcModeCurrent.getNumCrcBytes());
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
+					printLogDataForDebugging("IN STREAM: STATUS_RESPONSE");
 					bufferTemp = getDataFromArrayOutputStream(5);
 					if (bufferTemp != null) {
 						byte[] responseData = new byte[1];
@@ -909,6 +911,7 @@ public class Shimmer extends ShimmerBluetooth{
 						}
 					}
 				} else if (inStreamResponseCommand == VBATT_RESPONSE) {
+					printLogDataForDebugging("IN STREAM: VBATT_RESPONSE");
 					bufferTemp = getDataFromArrayOutputStream(7);
 					if (bufferTemp != null) {
 						byte[] responseData = new byte[3];
@@ -928,6 +931,8 @@ public class Shimmer extends ShimmerBluetooth{
 				} else {
 					discardFirstBufferByte();
 				}
+			} else {
+				printLogDataForDebugging("IN STREAM: buffer temp is null, byte array output stream size is " + mByteArrayOutputStream.size());
 			}
 		}
 	}
