@@ -141,6 +141,8 @@ public class MainActivity extends Activity {
             setupCSV();
             //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
             shimmer.enablePCTimeStamps(false);
+            //Disable timers for better performance.
+            shimmer.stopAllTimers();
             //Enable the arrays data structure. Note that enabling this will disable the Multimap/FormatCluster data structure
             shimmer.enableArraysDataStructure(true);
             try {
