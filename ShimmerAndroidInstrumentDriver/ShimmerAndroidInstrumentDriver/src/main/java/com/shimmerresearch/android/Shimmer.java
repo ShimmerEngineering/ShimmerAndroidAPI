@@ -1801,7 +1801,7 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void readBattery() {
 		if (isStreaming()) {
-			writeBytes(new byte[]{-107});
+			writeBytes(new byte[]{GET_VBATT_COMMAND});
 		} else {
 			super.readBattery();
 		}
@@ -1811,7 +1811,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public void readStatusLogAndStream() {
 		if (this.isSupportedInStreamCmds()) {
 			if (isStreaming()) {
-				writeBytes(new byte[]{-107});
+				writeBytes(new byte[]{GET_STATUS_COMMAND});
 			} else {
 				super.readStatusLogAndStream();
 			}
