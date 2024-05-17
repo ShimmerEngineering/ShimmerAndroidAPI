@@ -242,7 +242,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
                         ((ShimmerBluetooth) mDevice).enablePCTimeStamps(false);
                         //Disable timers for better performance.
-                        ((ShimmerBluetooth) mDevice).stopAllTimers();
+                        //((ShimmerBluetooth) mDevice).stopAllTimers();
+                        ((Shimmer) mDevice).startTimerReadBattStatusTest();
                     }
                     try {
                         mDevice.startStreaming();

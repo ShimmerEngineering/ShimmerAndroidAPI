@@ -1807,6 +1807,18 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 	}
 
+	@Override
+	public void readStatusLogAndStream() {
+		if (this.isSupportedInStreamCmds()) {
+			if (isStreaming()) {
+				writeBytes(new byte[]{-107});
+			} else {
+				super.readStatusLogAndStream();
+			}
+		}
+
+	}
+
 //	@Override
 //	protected void checkBatteryShimmer2r() {
 //		if (!mWaitForAck) {	
