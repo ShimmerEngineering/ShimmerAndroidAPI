@@ -726,6 +726,9 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	protected void clearSingleDataPacketFromBuffers(byte[] bufferTemp, int packetSize) {
 		byte[] fullBuffer = mByteArrayOutputStream.toByteArray();
+		if ((fullBuffer.length-packetSize)<0){
+			return;
+		}
 		byte[] keepBuffer = new byte[fullBuffer.length-packetSize];
 		System.arraycopy(fullBuffer,packetSize,keepBuffer,0,keepBuffer.length);
 		this.mByteArrayOutputStream.reset();
@@ -962,17 +965,17 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		//If there is a full packet and the subsequent sequence number of following packet
-		int size = mByteArrayOutputStream.size();
 		while(mByteArrayOutputStream.size()>=getPacketSizeWithCrc()+2){ // +2 because there are two acks
+			int size = mByteArrayOutputStream.size();
 			processPacket();
 			int newSize = mByteArrayOutputStream.size();
 			if (size == newSize){
 				consolePrintLn("processWhileStreaming: Leaving while loop");
 				break;
 			}
+			size = newSize;
 		}
 	}
-
 
 	/**this is to clear the buffer
 	 *
@@ -1795,6 +1798,26 @@ public class Shimmer extends ShimmerBluetooth{
 		return super.getSensorIdsSet();
 	}
 
+	@Override
+	public void readBattery() {
+		if (isStreaming()) {
+			writeBytes(new byte[]{GET_VBATT_COMMAND});
+		} else {
+			super.readBattery();
+		}
+	}
+
+	@Override
+	public void readStatusLogAndStream() {
+		if (this.isSupportedInStreamCmds()) {
+			if (isStreaming()) {
+				writeBytes(new byte[]{GET_STATUS_COMMAND});
+			} else {
+				super.readStatusLogAndStream();
+			}
+		}
+
+	}
 
 //	@Override
 //	protected void checkBatteryShimmer2r() {
