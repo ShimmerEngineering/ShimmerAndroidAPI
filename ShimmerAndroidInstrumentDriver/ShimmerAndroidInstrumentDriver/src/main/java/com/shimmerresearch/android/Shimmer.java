@@ -1772,7 +1772,11 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void createConfigBytesLayout() {
 		//TODO check this is ok
-		mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
+		if (mShimmerVerObject.mHardwareVersion == ShimmerVerDetails.HW_ID.UNKNOWN) {
+			mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal(), ShimmerVerDetails.HW_ID.SHIMMER_3);
+		} else {
+			mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal(), mShimmerVerObject.mHardwareVersion);
+		}
 	}
 
 	protected void finishOperation(BT_STATE currentOperation) {

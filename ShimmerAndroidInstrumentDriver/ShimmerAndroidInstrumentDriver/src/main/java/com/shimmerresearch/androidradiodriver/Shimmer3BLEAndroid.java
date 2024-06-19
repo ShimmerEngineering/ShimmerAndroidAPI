@@ -33,6 +33,7 @@ import com.shimmerresearch.driver.ThreadSafeByteFifoBuffer;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.driverUtilities.UtilShimmer;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.sensors.kionix.SensorKionixAccel;
@@ -457,7 +458,12 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
     @Override
     public void createConfigBytesLayout() {
-        mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
+        //TODO check this is ok
+        if (mShimmerVerObject.mHardwareVersion == ShimmerVerDetails.HW_ID.UNKNOWN) {
+            mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal(), ShimmerVerDetails.HW_ID.SHIMMER_3);
+        } else {
+            mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal(), mShimmerVerObject.mHardwareVersion);
+        }
     }
 
     @Override

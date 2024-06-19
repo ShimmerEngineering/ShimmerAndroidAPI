@@ -396,7 +396,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         mMapOfBtConnectedShimmers.put(bluetoothAddress, shimmer);
         try {
             ShimmerVerObject sVO = shimmerRadioInitializer.readShimmerVerObject();
-            if (sVO.isShimmerGen3()) {
+            if (sVO.isShimmerGen3() || sVO.isShimmerGen3R()) {
                 return initializeShimmer3(serialPort, shimmer);
             } else if (sVO.isShimmerGen2()) {
                 return initializeShimmer2r(serialPort, shimmer);
