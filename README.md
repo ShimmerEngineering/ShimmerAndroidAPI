@@ -1,5 +1,5 @@
 # Introduction
-This API can be used to communicate with a Shimmer3 device via Bluetooth. A good starting point will be the [quick start guide](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Quick-Start-Guide) and the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). Also other important resource will be the [start guide for Guide for Android Studio 2024.2.1 Patch 2](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Guide-for-Android-Studio-2024.2.1-Patch-2).
+This API can be used to communicate with a Shimmer3 device via Bluetooth. A good starting point will be the [quick start guide](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Quick-Start-Guide) and the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). Also other important resource will be the [start guide for Android Studio 2024.2.1 Patch 2](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Guide-for-Android-Studio-2024.2.1-Patch-2).
 
 
 # ShimmerAndroidAPI 
