@@ -6,7 +6,7 @@ This API can be used to communicate with a Shimmer3 device via Bluetooth. A good
 
 The Shimmer Android API is currently in a BETA development state, users are free to use and provide feedback. 
 
-The latest version is [3.0.84Beta](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/releases/tag/AndroidAPI_v3.0.84beta).
+The latest version can be found [here](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/releases).
 
 We recommend first time users go through the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). 
 
