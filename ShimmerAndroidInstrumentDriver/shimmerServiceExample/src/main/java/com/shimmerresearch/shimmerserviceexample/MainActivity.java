@@ -684,6 +684,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             else if(msg.what == Shimmer.MSG_IDENTIFIER_NOTIFICATION_MESSAGE){
                 if(((CallbackObject)msg.obj).mIndicator == Shimmer.NOTIFICATION_SHIMMER_FULLY_INITIALIZED){
                     Toast.makeText(getApplicationContext(), "Device fully initialized: ", Toast.LENGTH_SHORT).show();
+                    String macAddress = ((CallbackObject)msg.obj).mBluetoothAddress;
+                    ShimmerDevice device = mService.getShimmer(macAddress);
+                    deviceConfigFragment.buildDeviceConfigList(device, MainActivity.this, mService.getBluetoothManager());
                 }
             }
 
