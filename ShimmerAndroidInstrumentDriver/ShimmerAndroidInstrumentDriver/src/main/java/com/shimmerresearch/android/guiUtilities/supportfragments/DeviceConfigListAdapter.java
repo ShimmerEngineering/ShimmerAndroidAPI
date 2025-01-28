@@ -153,13 +153,16 @@ public class DeviceConfigListAdapter extends BaseExpandableListAdapter {
             String currentConfigValue = Integer.toString(currentConfigInt);
 
             String valuelabel = getConfigValueLabelFromConfigLabel(configValueLabel);
-
+            if(configValueLabel.contains("Rate")){
+                expandedListTextView.setEnabled(false);
+            }else{
+                expandedListTextView.setEnabled(true);
+            }
             if(valuelabel.equals(expandedListText)) {
                 expandedListTextView.setChecked(true);
             } else {
                 expandedListTextView.setChecked(false);
             }
-
         }
 
         return convertView;

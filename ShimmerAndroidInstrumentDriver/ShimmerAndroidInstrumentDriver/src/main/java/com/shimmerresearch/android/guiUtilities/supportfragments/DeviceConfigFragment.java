@@ -80,30 +80,30 @@ public class DeviceConfigFragment extends Fragment {
         expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmerDevice, shimmerDeviceClone);
         expandListView = (ExpandableListView) getView().findViewById(R.id.expandable_listview);
         expandListView.setAdapter(expandListAdapter);
-
         expandListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 final int editTextGroupPosition = groupPosition;
                 if(v.findViewById(R.id.expandedListItem) != null) { //The item that was clicked is a checkbox
                     CheckedTextView checkedTextView = (CheckedTextView) v.findViewById(R.id.expandedListItem);
-                    if(checkedTextView.isChecked()) {
-                        checkedTextView.setChecked(false);
-                    } else {
-                        checkedTextView.setChecked(true);
+                    if(checkedTextView.isEnabled()){
+                        if(checkedTextView.isChecked()) {
+                            checkedTextView.setChecked(false);
+                        } else {
+                            checkedTextView.setChecked(true);
+                        }
+
+                        String newSetting = (String) expandListAdapter.getChild(groupPosition, childPosition);
+                        String keySetting = (String) expandListAdapter.getGroup(groupPosition);
+
+                        //Write the setting to the Shimmer Clone
+                        final ConfigOptionDetailsSensor cods = configOptionsMap.get(keySetting);
+
+                        shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, cods.mConfigValues[childPosition]);
+
+                        expandListAdapter.replaceCurrentSetting(keySetting, newSetting);
+                        expandListAdapter.notifyDataSetChanged();   //Tells the list to redraw itself with the new information
                     }
-
-                    String newSetting = (String) expandListAdapter.getChild(groupPosition, childPosition);
-                    String keySetting = (String) expandListAdapter.getGroup(groupPosition);
-
-                    //Write the setting to the Shimmer Clone
-                    final ConfigOptionDetailsSensor cods = configOptionsMap.get(keySetting);
-
-                    shimmerDeviceClone.setConfigValueUsingConfigLabel(keySetting, cods.mConfigValues[childPosition]);
-
-                    expandListAdapter.replaceCurrentSetting(keySetting, newSetting);
-                    expandListAdapter.notifyDataSetChanged();   //Tells the list to redraw itself with the new information
-
                 }
                 return false;
             }
