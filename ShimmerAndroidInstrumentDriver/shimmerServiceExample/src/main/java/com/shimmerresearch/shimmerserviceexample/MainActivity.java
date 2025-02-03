@@ -44,6 +44,7 @@ import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.supportfragments.ConnectedShimmersListFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.DeviceConfigFragment;
+import com.shimmerresearch.android.guiUtilities.supportfragments.LowPowerModeFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.PlotFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.SensorsEnabledFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.DataSyncFragment;
@@ -73,7 +74,7 @@ import java.util.concurrent.TimeUnit;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 
-public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener {
+public class MainActivity extends AppCompatActivity implements ConnectedShimmersListFragment.OnShimmerDeviceSelectedListener, SensorsEnabledFragment.OnSensorsSelectedListener, LowPowerModeFragment.OnSensorsSelectedListener {
 
     private static final int PERMISSION_FILE_REQUEST_SHIMMER = 99;
     private static final int PERMISSION_FILE_REQUEST_VERISENSE = 100;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     BluetoothAdapter btAdapter;
     ShimmerService mService;
     SensorsEnabledFragment sensorsEnabledFragment;
+    LowPowerModeFragment lowPowerModeFragment;
     ConnectedShimmersListFragment connectedShimmersListFragment;
     DeviceConfigFragment deviceConfigFragment;
     PlotFragment plotFragment;
@@ -515,15 +517,18 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
             sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
             deviceConfigFragment = DeviceConfigFragment.newInstance();
+            lowPowerModeFragment = LowPowerModeFragment.newInstance(null, null);
             plotFragment = PlotFragment.newInstance();
             signalsToPlotFragment = SignalsToPlotFragment.newInstance();
 
             add(connectedShimmersListFragment, "Connected Devices");
             add(sensorsEnabledFragment, "Enable Sensors");
             add(deviceConfigFragment, "Device Configuration");
+            add(lowPowerModeFragment, "Low Power Mode");
             add(plotFragment, "Plot");
             add(signalsToPlotFragment, "Signals to Plot");
             add(dataSyncFragment, "Verisense Sync");
+            //add(lowPowerModeFragment, "Low Power Mode");
         }
 
         @Override
@@ -734,6 +739,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             sensorsEnabledFragment.buildSensorsList(device, this, mService.getBluetoothManager());
 
             deviceConfigFragment.buildDeviceConfigList(device, this, mService.getBluetoothManager());
+
+            lowPowerModeFragment.setShimmerService(mService);
+            lowPowerModeFragment.buildLowPowerModeList(device, this, mService.getBluetoothManager());
 
             plotFragment.setShimmerService(mService);
             plotFragment.clearPlot();
