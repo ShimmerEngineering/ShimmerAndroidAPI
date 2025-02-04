@@ -457,7 +457,7 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
     @Override
     public void createConfigBytesLayout() {
-        mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal());
+        mConfigByteLayout = new ConfigByteLayoutShimmer3(getFirmwareIdentifier(), getFirmwareVersionMajor(), getFirmwareVersionMinor(), getFirmwareVersionInternal(), getHardwareVersion());
     }
 
     @Override

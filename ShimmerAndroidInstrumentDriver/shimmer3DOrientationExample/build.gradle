@@ -35,10 +35,10 @@ android {
 }
 
 dependencies {
-    compile project(':ShimmerAndroidInstrumentDriver')
-    compile 'org.apache.commons:commons-math:2.2'
-    compile 'org.apache.commons:commons-lang3:3.4'
-    provided files('../ShimmerAndroidInstrumentDriver/libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
-    provided files('../ShimmerAndroidInstrumentDriver/libs/androidplot-core-0.5.0-release.jar')
-    provided 'com.google.guava:guava:19.0'
+    implementation project(':ShimmerAndroidInstrumentDriver')
+    implementation 'org.apache.commons:commons-math:2.2'
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation files('../ShimmerAndroidInstrumentDriver/libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
+    implementation files('../ShimmerAndroidInstrumentDriver/libs/androidplot-core-0.5.0-release.jar')
+    implementation 'com.google.guava:guava:19.0'
 }
