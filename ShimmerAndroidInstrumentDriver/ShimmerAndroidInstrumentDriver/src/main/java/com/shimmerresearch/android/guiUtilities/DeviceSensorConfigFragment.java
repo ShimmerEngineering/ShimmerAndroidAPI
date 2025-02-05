@@ -96,6 +96,12 @@ public class DeviceSensorConfigFragment extends Fragment {
             filterList.add("Wide Range Accel Rate");
             setSensorKeysFilter(filterList, true);
 
+            //Filter out config options that tobe shown but disable
+            List<String> displayButDisableFilterList = new ArrayList<String>();
+            displayButDisableFilterList.add("Wide Range Accel Rate");
+            displayButDisableFilterList.add("Mag Rate");
+            displayButDisableFilterList.add("Gyro Sampling Rate");
+            setSensorDisplayButDisableKeysFilter(displayButDisableFilterList, true);
             initialize();
             showFrame();
         }
@@ -105,12 +111,12 @@ public class DeviceSensorConfigFragment extends Fragment {
         }
 
         @Override
-        public void createComboBox(int numOfOptions, String key, ConfigOptionDetailsSensor cods, Object[] checkBox) {
+        public void createComboBox(int numOfOptions, String key, ConfigOptionDetailsSensor cods, Object[] checkBox, boolean isEnabled) {
 
         }
 
         @Override
-        public void createEditText(String key) {
+        public void createEditText(String key, boolean isEnabled) {
 
         }
 

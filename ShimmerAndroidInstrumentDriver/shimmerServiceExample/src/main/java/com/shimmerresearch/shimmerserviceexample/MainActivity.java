@@ -37,11 +37,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.androidplot.xy.XYPlot;
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
+import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.guiUtilities.supportfragments.ConnectedShimmersListFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.DeviceConfigFragment;
 import com.shimmerresearch.android.guiUtilities.supportfragments.PlotFragment;
@@ -56,18 +59,24 @@ import com.shimmerresearch.android.shimmerService.ShimmerService;
 import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
+import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
 
 import com.shimmerresearch.driver.Configuration.COMMUNICATION_TYPE;
+import com.shimmerresearch.sensors.lis2dw12.SensorLIS2DW12;
+import com.shimmerresearch.sensors.lisxmdl.SensorLIS3MDL;
+import com.shimmerresearch.sensors.lsm6dsv.SensorLSM6DSV;
 import com.shimmerresearch.tools.FileUtils;
 import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
@@ -198,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuItem item4 = menu.findItem(R.id.set_sampling_rate);
         MenuItem item5 = menu.findItem(R.id.enable_write_to_csv);
         MenuItem item6 = menu.findItem(R.id.disable_write_to_csv);
+        MenuItem item7 = menu.findItem(R.id.low_power_mode);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
             if(device instanceof VerisenseDevice) {
@@ -207,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item4.setVisible(false);
                 item5.setVisible(false);
                 item6.setVisible(false);
+                item7.setVisible(false);
                 if (((VerisenseDevice)device).isRecordingEnabled()){
                     item2.setTitle("Disable Logging");
                     return true;
@@ -217,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item4.setVisible(true);
                 item5.setVisible(true);
                 item6.setVisible(true);
+                item7.setVisible(true);
             }
         }
         item1.setVisible(false);
@@ -377,6 +389,83 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
 
                 builder.show();
+                return true;
+            case R.id.low_power_mode:
+                if (selectedDeviceAddress.isEmpty()){
+                    return true;
+                }
+                ShimmerDevice shimmerDevice = mService.getShimmer(selectedDeviceAddress);
+                ShimmerDevice clone = shimmerDevice.deepClone();
+
+                View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+                CheckBox cbMagLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbMagLPMode);
+                cbMagLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_MAG_LP, isChecked);
+                    }
+                });
+                cbMagLPMode.setText("Enable Mag LP Mode");
+                boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_MAG_LP));
+                cbMagLPMode.setChecked(isLowPowerMagEnabled);
+
+                CheckBox cbWRAccelLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbWRAccelLPMode);
+                cbWRAccelLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS2DW12_ACCEL_WR, SensorLIS2DW12.GuiLabelConfig.LIS2DW12_ACCEL_LPM, isChecked);
+                    }
+                });
+                cbWRAccelLPMode.setText("Enable WR Accel LP Mode");
+                boolean isLowPowerWRAccelEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS2DW12_ACCEL_WR, SensorLIS2DW12.GuiLabelConfig.LIS2DW12_ACCEL_LPM));
+                cbWRAccelLPMode.setChecked(isLowPowerWRAccelEnabled);
+
+
+                CheckBox cbGyroLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbGyroLPMode);
+                cbGyroLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_GYRO, SensorLSM6DSV.GuiLabelConfig.LSM6DSV_GYRO_LPM, isChecked);
+                    }
+                });
+                cbGyroLPMode.setText("Enable LN Accel and Gyro LP Mode");
+                if(clone.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3R){
+                    cbGyroLPMode.setText("Enable LN Accel and Gyro LP Mode");
+                }else{
+                    cbGyroLPMode.setText("Enable Gyro LP Mode");
+                }
+                boolean isLowPowerGyroEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_GYRO, SensorLSM6DSV.GuiLabelConfig.LSM6DSV_GYRO_LPM));
+                cbGyroLPMode.setChecked(isLowPowerGyroEnabled);
+
+                AlertDialog.Builder builderLPMode = new AlertDialog.Builder(this);
+                builderLPMode.setTitle("Low Power Mode");
+                builderLPMode.setView(checkBoxView)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (clone != null) {
+
+                                    List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                                    cloneList.add(0, clone);
+                                    //TODO: Change this when AssembleShimmerConfig has been updated:
+                                    AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+
+                                    if (shimmerDevice instanceof Shimmer || shimmerDevice instanceof VerisenseDevice || shimmerDevice instanceof Shimmer3BLEAndroid) {
+                                        mService.getBluetoothManager().configureShimmer(clone);
+                                    } else if (shimmerDevice instanceof Shimmer4Android) {
+
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        }).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

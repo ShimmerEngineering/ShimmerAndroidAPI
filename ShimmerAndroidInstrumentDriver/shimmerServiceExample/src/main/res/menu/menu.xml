@@ -36,5 +36,7 @@
         android:id="@+id/enable_write_to_csv"></item>
     <item   android:title="Disable Write To CSV"
         android:id="@+id/disable_write_to_csv"></item>
+    <item   android:title="Low Power Mode"
+        android:id="@+id/low_power_mode"></item>
 
 </menu>
