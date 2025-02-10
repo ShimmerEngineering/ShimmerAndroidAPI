@@ -93,8 +93,8 @@ publishing {
             url = uri("https://maven.pkg.github.com/ShimmerEngineering/ShimmerAndroidAPI")
             credentials {
                 //Create github.properties in root project folder file with gpra.usr=GITHUB_USER_ID  & gpra.key=PERSONAL_ACCESS_TOKEN
-                username = project.findProperty('gpra.usr')
-                password = project.findProperty('gpra.key')
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
             }
         }
     }
