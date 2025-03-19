@@ -496,24 +496,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     return true;
                 }
                 ShimmerDevice shimmerTemp = mService.getShimmer(selectedDeviceAddress);
-                String shimmerVersion="";
-                switch(shimmerTemp.getShimmerVerObject().getHardwareVersion()){
-                    case ShimmerVerDetails.HW_ID.SHIMMER_2:
-                        shimmerVersion = "Shimmer 2";
-                        break;
-                    case ShimmerVerDetails.HW_ID.SHIMMER_2R:
-                        shimmerVersion = "Shimmer 2R";
-                        break;
-                    case ShimmerVerDetails.HW_ID.SHIMMER_3:
-                        shimmerVersion = "Shimmer 3";
-                        break;
-                    case ShimmerVerDetails.HW_ID.SHIMMER_3R:
-                        shimmerVersion = "Shimmer 3R";
-                        break;
-                    case ShimmerVerDetails.HW_ID.SHIMMER_SR30:
-                        shimmerVersion = "Shimmer SR30";
-                        break;
-                };
+                String shimmerVersion= shimmerTemp.getHardwareVersionParsed();
                 String FWName = shimmerTemp.getFirmwareVersionParsed();
                 if(FWName.equals(""))
                     FWName = "Unknown";
