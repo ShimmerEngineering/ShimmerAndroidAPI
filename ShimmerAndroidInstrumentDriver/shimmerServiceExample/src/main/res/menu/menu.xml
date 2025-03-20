@@ -38,5 +38,10 @@
         android:id="@+id/disable_write_to_csv"></item>
     <item   android:title="Low Power Mode"
         android:id="@+id/low_power_mode"></item>
-
+    <item   android:title="Start Logging Shimmer SD"
+        android:id="@+id/start_sd_logging"></item>
+    <item   android:title="Stop Logging Shimmer SD"
+        android:id="@+id/stop_sd_logging"></item>
+    <item   android:title="Device Info"
+        android:id="@+id/device_info"></item>
 </menu>

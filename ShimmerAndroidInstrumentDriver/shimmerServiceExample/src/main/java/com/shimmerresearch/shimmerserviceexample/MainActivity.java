@@ -201,6 +201,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        if(mService != null){
+            menu.findItem(R.id.connect_device).setEnabled(mService.getListOfConnectedDevices().isEmpty());
+        }
         MenuItem item1 = menu.findItem(R.id.data_sync);
         MenuItem item2 = menu.findItem(R.id.disable_logging);
         MenuItem item3 = menu.findItem(R.id.erase_data);
@@ -208,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuItem item5 = menu.findItem(R.id.enable_write_to_csv);
         MenuItem item6 = menu.findItem(R.id.disable_write_to_csv);
         MenuItem item7 = menu.findItem(R.id.low_power_mode);
+        MenuItem item8 = menu.findItem(R.id.start_sd_logging);
+        MenuItem item9 = menu.findItem(R.id.stop_sd_logging);
+        MenuItem item10 = menu.findItem(R.id.device_info);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
             if(device instanceof VerisenseDevice) {
@@ -218,6 +224,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item5.setVisible(false);
                 item6.setVisible(false);
                 item7.setVisible(false);
+                item8.setVisible(false);
+                item9.setVisible(false);
+                item10.setVisible(false);
                 if (((VerisenseDevice)device).isRecordingEnabled()){
                     item2.setTitle("Disable Logging");
                     return true;
@@ -229,6 +238,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item5.setVisible(true);
                 item6.setVisible(true);
                 item7.setVisible(true);
+                item8.setVisible(true);
+                item9.setVisible(true);
+                item10.setVisible(true);
             }
         }
         item1.setVisible(false);
@@ -355,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                 // Inflate the dialog layout
                 final EditText editTextSamplingRate = new EditText(this);
-                if (selectedDeviceAddress.isEmpty()){
+                if (selectedDeviceAddress==null){
                     return true;
                 }
                 ShimmerBluetooth device = (ShimmerBluetooth) mService.getShimmer(selectedDeviceAddress);
@@ -391,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 builder.show();
                 return true;
             case R.id.low_power_mode:
-                if (selectedDeviceAddress.isEmpty()){
+                if (selectedDeviceAddress==null){
                     return true;
                 }
                 ShimmerDevice shimmerDevice = mService.getShimmer(selectedDeviceAddress);
@@ -466,6 +478,34 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                                 dialog.dismiss();
                             }
                         }).show();
+                return true;
+            case R.id.start_sd_logging:
+                if (selectedDeviceAddress==null){
+                    return true;
+                }
+                mService.startLogging(selectedDeviceAddress);
+                return true;
+            case R.id.stop_sd_logging:
+                if (selectedDeviceAddress==null){
+                    return true;
+                }
+                mService.stopLogging(selectedDeviceAddress);
+                return true;
+            case R.id.device_info:
+                if (selectedDeviceAddress==null){
+                    return true;
+                }
+                ShimmerDevice shimmerTemp = mService.getShimmer(selectedDeviceAddress);
+                String shimmerVersion= shimmerTemp.getHardwareVersionParsed();
+                String FWName = shimmerTemp.getFirmwareVersionParsed();
+                if(FWName.equals(""))
+                    FWName = "Unknown";
+
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Device Info");
+                alertDialog.setMessage("Shimmer Version: "+shimmerVersion + "\n\nFirmware Version: "+FWName);
+                alertDialog.show();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
