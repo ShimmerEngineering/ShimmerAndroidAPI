@@ -1,4 +1,4 @@
-package com.shimmerresearch.shimmerserviceexample;
+package com.shimmerresearch.shimmercapture;
 
 import android.Manifest;
 

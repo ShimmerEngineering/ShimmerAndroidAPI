@@ -4,7 +4,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId "com.shimmerresearch.shimmerserviceexample"
+        applicationId "com.shimmerresearch.shimmerconnect"
         minSdkVersion 14
         targetSdkVersion 33
         versionCode 1
