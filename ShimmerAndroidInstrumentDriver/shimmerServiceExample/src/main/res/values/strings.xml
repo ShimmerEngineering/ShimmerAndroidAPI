@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Shimmer Service Example</string>
+    <string name="app_name">Shimmer Capture</string>
     <string name="connect">Connect a Shimmer</string>
     <string name="disconnect">Disconnect Shimmer</string>
     <string name="startstream">Start streaming</string>
