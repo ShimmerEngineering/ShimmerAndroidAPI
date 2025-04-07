@@ -114,44 +114,17 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
-        boolean permissionGranted = true;
-        {
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                permissionGranted = false;
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        //alertDialog.setTitle("Device Info");
+        alertDialog.setMessage("Shimmer Capture requires Location permission to allow Bluetooth devices scanning on Android versions 11 and lower.");
+        alertDialog.setCancelable(false);
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                requestPermissions();
             }
-            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                permissionGranted = false;
-            }
-            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                permissionGranted = false;
-            }
-            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                permissionGranted = false;
-            }
-        }
-        if (!permissionGranted) {
-            // Should we show an explanation?
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 110);
-
-        } else {
-            startServiceandBTManager();
-        }
-
-        setContentView(R.layout.activity_main);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter1);
-        mViewPager.setOffscreenPageLimit(5);    //Ensure none of the fragments has their view destroyed when off-screen
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        dialog = new ShimmerDialogConfigurations();
+        });
+        alertDialog.show();
 
         //Check if Bluetooth is enabled
         /*if (!btAdapter.isEnabled()) {
@@ -171,6 +144,48 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         }*/
     }
 
+    public void requestPermissions(){
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        boolean permissionGranted = true;
+        {
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = false;
+            }
+        }
+        if (!permissionGranted) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, 110);
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT,Manifest.permission.BLUETOOTH_SCAN}, 110);
+
+        } else {
+            startServiceandBTManager();
+        }
+
+        setContentView(R.layout.activity_main);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter1);
+        mViewPager.setOffscreenPageLimit(5);    //Ensure none of the fragments has their view destroyed when off-screen
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        dialog = new ShimmerDialogConfigurations();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -214,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuItem item8 = menu.findItem(R.id.start_sd_logging);
         MenuItem item9 = menu.findItem(R.id.stop_sd_logging);
         MenuItem item10 = menu.findItem(R.id.device_info);
+        MenuItem item11 = menu.findItem(R.id.privacy_policy);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
             if(device instanceof VerisenseDevice) {
@@ -227,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item8.setVisible(false);
                 item9.setVisible(false);
                 item10.setVisible(false);
+                item11.setVisible(false);
                 if (((VerisenseDevice)device).isRecordingEnabled()){
                     item2.setTitle("Disable Logging");
                     return true;
@@ -241,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item8.setVisible(true);
                 item9.setVisible(true);
                 item10.setVisible(true);
+                item11.setVisible(true);
             }
         }
         item1.setVisible(false);
@@ -507,6 +525,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 alertDialog.show();
 
                 return true;
+            case R.id.privacy_policy:
+                startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.shimmersensing.com/privacy/")));
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -652,7 +674,8 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             add(deviceConfigFragment, "Device Configuration");
             add(plotFragment, "Plot");
             add(signalsToPlotFragment, "Signals to Plot");
-            add(dataSyncFragment, "Verisense Sync");
+            // Hide fragment for DEV-159
+            //add(dataSyncFragment, "Verisense Sync");
         }
 
         @Override

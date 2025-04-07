@@ -44,4 +44,6 @@
         android:id="@+id/stop_sd_logging"></item>
     <item   android:title="Device Info"
         android:id="@+id/device_info"></item>
+    <item   android:title="Privacy Policy"
+        android:id="@+id/privacy_policy"></item>
 </menu>
