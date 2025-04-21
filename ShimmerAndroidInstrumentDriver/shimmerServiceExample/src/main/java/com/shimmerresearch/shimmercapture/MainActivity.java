@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
-    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.INTERNAL;
+    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.PUBLIC;
     public enum APP_RELEASE_TYPE{
         INTERNAL,
         PUBLIC,
