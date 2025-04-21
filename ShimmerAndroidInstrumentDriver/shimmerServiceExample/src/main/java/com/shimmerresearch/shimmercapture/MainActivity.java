@@ -90,6 +90,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
+    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.INTERNAL;
+    public enum APP_RELEASE_TYPE{
+        INTERNAL,
+        PUBLIC,
+        TESTING
+    }
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
@@ -215,8 +221,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(mService != null){
-            menu.findItem(R.id.connect_device).setEnabled(mService.getListOfConnectedDevices().isEmpty());
+
+        if(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC)){
+            if(mService != null){
+                menu.findItem(R.id.connect_device).setEnabled(mService.getListOfConnectedDevices().isEmpty());
+            }
         }
         MenuItem item1 = menu.findItem(R.id.data_sync);
         MenuItem item2 = menu.findItem(R.id.disable_logging);
@@ -642,8 +651,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if (deviceName.contains(VerisenseDevice.VERISENSE_PREFIX)){
 
                 } else {
-                    showBtTypeConnectionOption();
-
+                    if(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC)){
+                        preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                    }else{
+                        showBtTypeConnectionOption();
+                    }
                 }
                 mService.connectShimmer(macAdd,deviceName,preferredBtType,this);    //Connect to the selected device, and set context to show progress dialog when pairing
                 //mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
@@ -662,7 +674,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
-            //dataSyncFragment = DataSyncFragment.newInstance();
             connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
             sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
             deviceConfigFragment = DeviceConfigFragment.newInstance();
@@ -674,8 +685,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             add(deviceConfigFragment, "Device Configuration");
             add(plotFragment, "Plot");
             add(signalsToPlotFragment, "Signals to Plot");
-            // Hide fragment for DEV-159
-            //add(dataSyncFragment, "Verisense Sync");
+            if(!(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC))){
+                dataSyncFragment = DataSyncFragment.newInstance();
+                add(dataSyncFragment, "Verisense Sync");
+            }
         }
 
         @Override
