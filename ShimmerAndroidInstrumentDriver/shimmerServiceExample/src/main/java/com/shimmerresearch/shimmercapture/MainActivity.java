@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         super.onCreate(savedInstanceState);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         //alertDialog.setTitle("Device Info");
-        alertDialog.setMessage("Shimmer Capture requires Location permission to allow Bluetooth devices scanning on Android versions 11 and lower.");
+        alertDialog.setMessage("Shimmer Capture App collect Location data to enable Bluetooth devices scanning on Android versions 11 and lower even when the app is closed or not in use.");
         alertDialog.setCancelable(false);
         alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -553,8 +553,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
 
             //if there is a device connected display it on the fragment
-            connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-
+            if(connectedShimmersListFragment!=null) {
+                connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -662,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
-            dataSyncFragment = DataSyncFragment.newInstance();
+            //dataSyncFragment = DataSyncFragment.newInstance();
             connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
             sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
             deviceConfigFragment = DeviceConfigFragment.newInstance();
