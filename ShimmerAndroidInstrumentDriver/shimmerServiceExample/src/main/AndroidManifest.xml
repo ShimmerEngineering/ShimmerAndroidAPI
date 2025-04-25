@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.shimmerresearch.shimmerserviceexample">
+    package="com.shimmerresearch.shimmercapture">
     <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
@@ -23,7 +23,7 @@
         tools:remove="android:appComponentFactory"
         tools:targetApi="p">
         <service android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
-        <activity android:name=".MainActivity"
+        <activity android:name="com.shimmerresearch.shimmercapture.MainActivity"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.shimmerresearch.shimmerserviceexample;
+package com.shimmerresearch.shimmercapture;
 
 import android.Manifest;
 
@@ -90,6 +90,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
+    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.PUBLIC;
+    public enum APP_RELEASE_TYPE{
+        INTERNAL,
+        PUBLIC,
+        TESTING
+    }
 
     ShimmerDialogConfigurations dialog;
     BluetoothAdapter btAdapter;
@@ -114,6 +120,37 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        //alertDialog.setTitle("Device Info");
+        alertDialog.setMessage("Shimmer Capture App collect Location data to enable Bluetooth devices scanning on Android versions 11 and lower even when the app is closed or not in use.");
+        alertDialog.setCancelable(false);
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                requestPermissions();
+            }
+        });
+        alertDialog.show();
+
+        //Check if Bluetooth is enabled
+        /*if (!btAdapter.isEnabled()) {
+            int REQUEST_ENABLE_BT = 1;
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+        else {*/
+
+        //}
+
+
+/*
+        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE )!= PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_WRITE_STORAGE);
+        }*/
+    }
+
+    public void requestPermissions(){
 
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
         boolean permissionGranted = true;
@@ -125,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = false;
             }
+
             permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = false;
@@ -152,25 +190,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         mViewPager.setOffscreenPageLimit(5);    //Ensure none of the fragments has their view destroyed when off-screen
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();
-
-        //Check if Bluetooth is enabled
-        /*if (!btAdapter.isEnabled()) {
-            int REQUEST_ENABLE_BT = 1;
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-        else {*/
-
-        //}
-
-
-/*
-        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE )!= PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSIONS_REQUEST_WRITE_STORAGE);
-        }*/
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -201,8 +221,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(mService != null){
-            menu.findItem(R.id.connect_device).setEnabled(mService.getListOfConnectedDevices().isEmpty());
+
+        if(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC)){
+            if(mService != null){
+                menu.findItem(R.id.connect_device).setEnabled(mService.getListOfConnectedDevices().isEmpty());
+            }
         }
         MenuItem item1 = menu.findItem(R.id.data_sync);
         MenuItem item2 = menu.findItem(R.id.disable_logging);
@@ -214,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         MenuItem item8 = menu.findItem(R.id.start_sd_logging);
         MenuItem item9 = menu.findItem(R.id.stop_sd_logging);
         MenuItem item10 = menu.findItem(R.id.device_info);
+        MenuItem item11 = menu.findItem(R.id.privacy_policy);
         if(selectedDeviceAddress != null){
             ShimmerDevice device = mService.getShimmer(selectedDeviceAddress);
             if(device instanceof VerisenseDevice) {
@@ -227,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item8.setVisible(false);
                 item9.setVisible(false);
                 item10.setVisible(false);
+                item11.setVisible(false);
                 if (((VerisenseDevice)device).isRecordingEnabled()){
                     item2.setTitle("Disable Logging");
                     return true;
@@ -241,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 item8.setVisible(true);
                 item9.setVisible(true);
                 item10.setVisible(true);
+                item11.setVisible(true);
             }
         }
         item1.setVisible(false);
@@ -507,6 +533,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 alertDialog.show();
 
                 return true;
+            case R.id.privacy_policy:
+                startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.shimmersensing.com/privacy/")));
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -531,8 +561,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             Log.d(SERVICE_TAG, "Shimmer Service Bound");
 
             //if there is a device connected display it on the fragment
-            connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
-
+            if(connectedShimmersListFragment!=null) {
+                connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -620,8 +651,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if (deviceName.contains(VerisenseDevice.VERISENSE_PREFIX)){
 
                 } else {
-                    showBtTypeConnectionOption();
-
+                    if(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC)){
+                        preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                    }else{
+                        showBtTypeConnectionOption();
+                    }
                 }
                 mService.connectShimmer(macAdd,deviceName,preferredBtType,this);    //Connect to the selected device, and set context to show progress dialog when pairing
                 //mService.connectShimmer(macAdd,this);    //Connect to the selected device, and set context to show progress dialog when pairing
@@ -640,7 +674,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         public SectionsPagerAdapter1(FragmentManager fm) {
             super(fm);
-            dataSyncFragment = DataSyncFragment.newInstance();
             connectedShimmersListFragment = ConnectedShimmersListFragment.newInstance();
             sensorsEnabledFragment = SensorsEnabledFragment.newInstance(null, null);
             deviceConfigFragment = DeviceConfigFragment.newInstance();
@@ -652,7 +685,10 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             add(deviceConfigFragment, "Device Configuration");
             add(plotFragment, "Plot");
             add(signalsToPlotFragment, "Signals to Plot");
-            add(dataSyncFragment, "Verisense Sync");
+            if(!(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC))){
+                dataSyncFragment = DataSyncFragment.newInstance();
+                add(dataSyncFragment, "Verisense Sync");
+            }
         }
 
         @Override

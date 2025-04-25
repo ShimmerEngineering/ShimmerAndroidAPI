@@ -1,4 +1,4 @@
-package com.shimmerresearch.shimmerserviceexample;
+package com.shimmerresearch.shimmercapture;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
