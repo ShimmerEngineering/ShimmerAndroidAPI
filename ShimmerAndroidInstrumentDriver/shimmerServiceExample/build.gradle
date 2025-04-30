@@ -7,8 +7,8 @@ android {
         applicationId "com.shimmersensing.shimmerconnect"
         minSdkVersion 14
         targetSdkVersion 34
-        versionCode 27
-        versionName "27.0"
+        versionCode 28
+        versionName "1.0"
         multiDexEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
