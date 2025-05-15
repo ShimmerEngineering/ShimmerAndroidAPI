@@ -82,7 +82,8 @@ public class ShimmerSerialPortAndroid extends AbstractSerialPortHal {
     private void createBluetoothSocket() {
         try {
             device = mBluetoothAdapter.getRemoteDevice(mBluetoothAddress);
-            mBluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
+            //mBluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID);
+            mBluetoothSocket = device.createRfcommSocketToServiceRecord(mSPP_UUID);// If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
         } catch (IOException e) {
             catchException(e, ErrorCodesSerialPort.SHIMMERUART_COMM_ERR_PORT_EXCEPTON_OPENING);
         }
