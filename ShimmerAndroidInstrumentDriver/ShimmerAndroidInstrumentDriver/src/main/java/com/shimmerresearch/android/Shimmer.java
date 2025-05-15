@@ -1082,7 +1082,8 @@ public class Shimmer extends ShimmerBluetooth{
 			// Get a BluetoothSocket for a connection with the
 			// given BluetoothDevice
 			try {
-				tmp = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
+				//tmp = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID);
+				tmp = device.createRfcommSocketToServiceRecord (mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
 			} catch (IOException e) {
 				connectionLost();
 				
