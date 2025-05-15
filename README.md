@@ -10,6 +10,9 @@ The latest version can be found [here](https://github.com/ShimmerEngineering/Shi
 
 We recommend first time users go through the [wiki](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki). 
 
+# Shimmer3R
+
+Integration [notes](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Shimmer3R-Integration-Notes)
 
 # Important ~ Migration to Github Packages
 With JFrog removing services we have migrated to using Github Packages. This would be a good [starting point](https://docs.github.com/en/packages/learn-github-packages/installing-a-package).
