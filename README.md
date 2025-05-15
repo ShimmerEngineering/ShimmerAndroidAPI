@@ -68,70 +68,8 @@ dependencies:-
 compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Beta_AA-245_AA-246'
 ```
 
-# Frequently Asked Questions
 
-### Getting Started with the Shimmer Android API
-**1) Clone the repository from GitHub**
 
-You can clone the Android API repository by navigating over to the repository's GitHub main page, and clicking the green "Clone or Download" button on the right.
-
-You then have the option of:
-
-**A) Downloading the repository as a zip file.** 
-
-You would then need to unzip it and import the contents of the unzipped folder into Android Studio as a project.
-
-**B) Copying the link provided.**
-
-You would then need to choose the option "Check out project from Version Control" on the Android Studio start screen. After that, click on "GitHub" and copy the link into the popup dialog.
-
-**2) Importing via Gradle**
-
-The api can also be imported using gradle. Please include the following repository in your build.gradle file 
-```
-allprojects {
-    repositories {
-        jcenter()
-        maven {
-            url  "http://dl.bintray.com/shimmerengineering/Shimmer"
-        }
-    }
-}
-```
-Most recent uploaded library can be found here:-
-https://bintray.com/shimmerengineering/Shimmer/shimmerandroiddriver and should be added as one of the dependencies
-
-*Note: do not download any versions of the library marked as "test". These are internal releases, and may not be fully functional.*
-
-### Common Errors
-- **DexArchiveMergerException** *e.g. ':app:transformDexArchiveWithExternalLibsDexMergerForDebug'.>
-java.lang.RuntimeException: java.lang.RuntimeException:
-com.android.builder.dexing.DexArchiveMergerException: Unable to merge dex*
-
-To resolve this, enable Multidex in your project's build.gradle file:
-```
-android {
-    defaultConfig {
-        ...
-        multiDexEnabled true
-        ...
-    }
-```
-
-- **Errors with buildToolsVersion and/or MultiDex Incremental**
-These options were removed from the build.gradle files as they are unnecessary in the latest version of Android Studio and Gradle Plugin 3.0 and above. Should you encounter issues with these settings, simply add them back in:
-```
-android {
-    ...
-    buildToolsVersion x.x.x
-    
-    dexOptions {
-        incremental true
-    }
-    ...
-
-}
-```
 
 
 
