@@ -441,11 +441,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_MAG_LP, isChecked);
+                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP, isChecked);
                     }
                 });
                 cbMagLPMode.setText("Enable Mag LP Mode");
-                boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_MAG_LP));
+                boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP));
                 cbMagLPMode.setChecked(isLowPowerMagEnabled);
 
                 CheckBox cbWRAccelLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbWRAccelLPMode);
