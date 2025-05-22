@@ -82,7 +82,7 @@ publishing {
         bar(MavenPublication) {
             groupId = 'com.shimmerresearch' // Replace with your package's group/organization name
             artifactId = 'shimmerandroidinstrumentdriver' // Replace with the name of your package
-            version = '3.2.1_beta' // Replace with your package version
+            version = '3.2.2_beta' // Replace with your package version
             artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
         }
     }
