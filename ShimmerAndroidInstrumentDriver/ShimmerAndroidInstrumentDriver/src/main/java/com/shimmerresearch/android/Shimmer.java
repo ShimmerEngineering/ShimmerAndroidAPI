@@ -890,12 +890,20 @@ public class Shimmer extends ShimmerBluetooth{
 					}
 				} else if (inStreamResponseCommand == STATUS_RESPONSE) {
 					printLogDataForDebugging("IN STREAM: STATUS_RESPONSE");
-					bufferTemp = getDataFromArrayOutputStream(5);
+					int length = 5;
+					int statusBytesToRead = 0;
+					if(isSupportedUSBPluggedInStatus()) {
+						length+=1;
+						statusBytesToRead = 2;
+					} else {
+						statusBytesToRead = 1;
+					}
+					bufferTemp = getDataFromArrayOutputStream(length);
 					if (bufferTemp != null) {
-						byte[] responseData = new byte[1];
+						byte[] responseData = new byte[statusBytesToRead];
 						System.arraycopy(bufferTemp, bufferTemp.length - responseData.length, responseData, 0, responseData.length);
 						if (responseData != null) {
-							parseStatusByte(responseData[0]);
+							parseStatusByte(responseData);
 
 							if (!isSupportedRtcStateInStatus()) {
 								if (!mIsSensing && !isInitialised()) {
