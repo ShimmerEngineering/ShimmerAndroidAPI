@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
-    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.PUBLIC;
+    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.INTERNAL;
     public enum APP_RELEASE_TYPE{
         INTERNAL,
         PUBLIC,
@@ -441,11 +441,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_MAG_LP, isChecked);
+                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP, isChecked);
                     }
                 });
                 cbMagLPMode.setText("Enable Mag LP Mode");
-                boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_MAG_LP));
+                boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP));
                 cbMagLPMode.setChecked(isLowPowerMagEnabled);
 
                 CheckBox cbWRAccelLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbWRAccelLPMode);

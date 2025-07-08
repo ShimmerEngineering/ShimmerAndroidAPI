@@ -147,7 +147,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.bluetooth.BluetoothProgressReportPerCmd;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
@@ -811,7 +810,7 @@ public class Shimmer extends ShimmerBluetooth{
 					mWaitForResponse=false;
 					mWaitForAck=false;
 
-					processInstreamResponse();
+					processInstreamResponse(true);
 
 					// Need to remove here because it is an
 					// in-stream response while streaming so not
@@ -861,10 +860,10 @@ public class Shimmer extends ShimmerBluetooth{
 
 	/** process responses to in-stream response */
 	@Override
-	protected void processInstreamResponse() {
+	protected void processInstreamResponse(boolean shouldClearCrcFromBuffer) {
 
 		if (mBluetoothRadioState.equals(BT_STATE.CONNECTED)){
-			super.processInstreamResponse();
+			super.processInstreamResponse(shouldClearCrcFromBuffer);
 		} else if (mBluetoothRadioState.equals(BT_STATE.STREAMING)){
 			//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
 			byte[] bufferTemp = getDataFromArrayOutputStream(4);
@@ -1082,7 +1081,8 @@ public class Shimmer extends ShimmerBluetooth{
 			// Get a BluetoothSocket for a connection with the
 			// given BluetoothDevice
 			try {
-				tmp = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
+				//tmp = device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID);
+				tmp = device.createRfcommSocketToServiceRecord (mSPP_UUID); // If your device fails to pair try: device.createInsecureRfcommSocketToServiceRecord(mSPP_UUID)
 			} catch (IOException e) {
 				connectionLost();
 				
