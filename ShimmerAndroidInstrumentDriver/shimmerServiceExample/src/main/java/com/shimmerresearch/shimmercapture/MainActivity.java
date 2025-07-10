@@ -63,6 +63,7 @@ import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerDevice;
 import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
+import com.shimmerresearch.driverUtilities.HwDriverShimmerDeviceDetails;
 import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
 
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     final static String LOG_TAG = "Shimmer";
     final static String SERVICE_TAG = "ShimmerService";
     final static int REQUEST_CONNECT_SHIMMER = 2;
-    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.INTERNAL;
+    public static APP_RELEASE_TYPE appReleaseType = APP_RELEASE_TYPE.PUBLIC;
     public enum APP_RELEASE_TYPE{
         INTERNAL,
         PUBLIC,
@@ -651,8 +652,12 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 if (deviceName.contains(VerisenseDevice.VERISENSE_PREFIX)){
 
                 } else {
-                    if(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC)){
-                        preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                    if(appReleaseType.equals(APP_RELEASE_TYPE.PUBLIC)){ //only Shimmer 3R has BT connection type popup
+                        if (deviceName.contains(HwDriverShimmerDeviceDetails.DEVICE_TYPE.SHIMMER3R.toString())){
+                            showBtTypeConnectionOption();
+                        }else{
+                            preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                        }
                     }else{
                         showBtTypeConnectionOption();
                     }
