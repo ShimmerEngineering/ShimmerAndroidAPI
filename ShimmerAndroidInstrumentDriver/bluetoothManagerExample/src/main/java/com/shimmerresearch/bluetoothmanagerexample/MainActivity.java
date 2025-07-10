@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 
 /**
  * This example demonstrates the use of the {@link ShimmerBluetoothManagerAndroid} to:
@@ -370,7 +371,8 @@ public class MainActivity extends AppCompatActivity {
                 showBtTypeConnectionOption();
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                btManager.connectShimmerThroughBTAddress(macAdd, preferredBtType);   //Connect to the selected device
+                String deviceName = data.getStringExtra(EXTRA_DEVICE_NAME);
+                btManager.connectShimmerThroughBTAddress(macAdd, deviceName, preferredBtType);   //Connect to the selected device
                 shimmerBtAdd = macAdd;
             }
 
