@@ -273,7 +273,7 @@ public class ShimmerService extends Service {
 		if (isVerisense){
 			btManager.connectVerisenseDevice(new BluetoothDeviceDetails("",bluetoothAddress,deviceName));
 		} else {
-			btManager.connectShimmerThroughBTAddress(bluetoothAddress, preferredBtType);   //Connect to the selected device
+			btManager.connectShimmerThroughBTAddress(bluetoothAddress, deviceName, preferredBtType);   //Connect to the selected device
 		}
 
 

@@ -33,6 +33,7 @@ import com.shimmerresearch.driver.ThreadSafeByteFifoBuffer;
 import com.shimmerresearch.driver.shimmer2r3.ConfigByteLayoutShimmer3;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
 import com.shimmerresearch.driverUtilities.SensorDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.driverUtilities.UtilShimmer;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.sensors.kionix.SensorKionixAccel;
@@ -52,12 +53,18 @@ import bolts.TaskCompletionSource;
 
 public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable {
     transient BleDevice mBleDevice;
-    String TxID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-    String RxID = "49535343-1e4d-4bd9-ba61-23c647249616";
-    String ServiceID = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
-    UUID sid = UUID.fromString(ServiceID);
-    UUID txid = UUID.fromString(TxID);
-    UUID rxid = UUID.fromString(RxID);
+    final String TxID_Shimmer3 = "49535343-8841-43f4-a8d4-ecbe34729bb3";
+    final String RxID_Shimmer3 = "49535343-1e4d-4bd9-ba61-23c647249616";
+    final String ServiceID_Shimmer3 = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
+    final String TxID_Shimmer3R = "65333333-A115-11E2-9E9A-0800200CA101";
+    final String RxID_Shimmer3R = "65333333-A115-11E2-9E9A-0800200CA102";
+    final String ServiceID_Shimmer3R = "65333333-A115-11E2-9E9A-0800200CA100";
+    String TxID = "";
+    String RxID = "";
+    String ServiceID = "";
+    UUID sid = null;
+    UUID txid = null;
+    UUID rxid = null;
     String mMac;
     String uuid;
     transient ThreadSafeByteFifoBuffer mBuffer;
@@ -78,7 +85,22 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
         mHandler = null;
     }
 
-    public Shimmer3BLEAndroid(String mac, Handler handler){
+    /** Only support Shimmer3 and Shimmer3R
+     *
+     * @param hardwareID e.g. ShimmerVerDetails.HW_ID.SHIMMER_3R or ShimmerVerDetails.HW_ID.SHIMMER_3
+     * @param mac
+     * @param handler
+     */
+    public Shimmer3BLEAndroid(int hardwareID, String mac, Handler handler){
+        if (hardwareID== ShimmerVerDetails.HW_ID.SHIMMER_3R){
+            sid = UUID.fromString(ServiceID_Shimmer3R);
+            txid = UUID.fromString(TxID_Shimmer3R);
+            rxid = UUID.fromString(RxID_Shimmer3R);
+        } else if (hardwareID== ShimmerVerDetails.HW_ID.SHIMMER_3) {
+            sid = UUID.fromString(ServiceID_Shimmer3);
+            txid = UUID.fromString(TxID_Shimmer3);
+            rxid = UUID.fromString(RxID_Shimmer3);
+        }
         mMac = mac;
         mHandler = handler;
     }

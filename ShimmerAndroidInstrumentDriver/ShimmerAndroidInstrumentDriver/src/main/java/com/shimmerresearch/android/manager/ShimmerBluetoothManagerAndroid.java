@@ -206,11 +206,11 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         thread.start();
     }
 
-    public void connectShimmerThroughBTAddress(final String bluetoothAddress, BT_TYPE btType) {
+    public void connectShimmerThroughBTAddress(final String bluetoothAddress, final String deviceName, BT_TYPE btType) {
         if(btType.equals(BT_TYPE.BT_CLASSIC)){
             connectShimmerThroughBTAddress(bluetoothAddress);
         }else{
-            connectShimmer3BLEThroughBTAddress(bluetoothAddress,"",null);
+            connectShimmer3BLEThroughBTAddress(bluetoothAddress,deviceName,null);
         }
     }
     @Override
@@ -218,11 +218,18 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
 
         //scanLeDevice(bluetoothAddress);
         //doDiscovery();
-        connectShimmerThroughBTAddress(bluetoothAddress,"",null);
+        connectShimmerThroughBTAddress(bluetoothAddress,"", (Context) null);
     }
 
     public void connectShimmer3BLEThroughBTAddress(final String bluetoothAddress, final String deviceName, Context context){
-        final Shimmer3BLEAndroid shimmer3BLE = new Shimmer3BLEAndroid(bluetoothAddress, mHandler);
+        Shimmer3BLEAndroid shimmer3BLE;
+        if (deviceName.contains(HwDriverShimmerDeviceDetails.DEVICE_TYPE.SHIMMER3R.toString())){
+            shimmer3BLE = new Shimmer3BLEAndroid(ShimmerVerDetails.HW_ID.SHIMMER_3R,bluetoothAddress, mHandler);
+
+        } else {
+            shimmer3BLE = new Shimmer3BLEAndroid(ShimmerVerDetails.HW_ID.SHIMMER_3, bluetoothAddress, mHandler);
+
+        }
         shimmer3BLE.setMacIdFromUart(bluetoothAddress);
         initializeNewShimmerCommon(shimmer3BLE);
         Thread thread = new Thread(){

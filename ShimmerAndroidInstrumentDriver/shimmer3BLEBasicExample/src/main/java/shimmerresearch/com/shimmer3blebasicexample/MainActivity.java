@@ -1,6 +1,7 @@
 package shimmerresearch.com.shimmer3blebasicexample;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,6 +30,8 @@ import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driver.ShimmerMsg;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
+import com.shimmerresearch.driverUtilities.HwDriverShimmerDeviceDetails;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.sensors.kionix.SensorKionixAccel;
 
@@ -239,7 +242,13 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer1 = new Shimmer3BLEAndroid(macAdd, this.mHandler);
+                String name = data.getStringExtra(EXTRA_DEVICE_NAME);
+                if (name!=null && name.contains(HwDriverShimmerDeviceDetails.DEVICE_TYPE.SHIMMER3R.toString())){
+                    shimmer1 = new Shimmer3BLEAndroid(ShimmerVerDetails.HW_ID.SHIMMER_3R, macAdd, this.mHandler);
+                } else {
+                    shimmer1 = new Shimmer3BLEAndroid(ShimmerVerDetails.HW_ID.SHIMMER_3, macAdd, this.mHandler);
+                }
+
                 SensorDataReceived sdr = this.new SensorDataReceived();
                 sdr.setWaitForData(shimmer1);
 
