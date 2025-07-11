@@ -57,6 +57,13 @@
             android:text="Connect" />
 
     <Button
+        android:id="@+id/buttonDisconnect"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="disconnectDevice"
+        android:text="Disconnect" />
+
+    <Button
         android:id="@+id/button"
         android:layout_width="200dp"
         android:layout_height="wrap_content"

@@ -2,17 +2,22 @@ package com.shimmerresearch.efficientdataarrayexample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.FileListActivity;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
@@ -22,6 +27,7 @@ import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ObjectCluster;
 import com.shimmerresearch.driverUtilities.ChannelDetails;
+import com.shimmerresearch.driverUtilities.HwDriverShimmerDeviceDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
 import com.shimmerresearch.tools.FileUtils;
 import com.shimmerresearch.verisense.VerisenseDevice;
@@ -39,6 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
+import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_NAME;
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.REQUEST_CONNECT_SHIMMER;
 
 import androidx.core.app.ActivityCompat;
@@ -73,6 +80,10 @@ public class MainActivity extends Activity {
     private File file;
     boolean firstTimeWrite = true;
     Uri mTreeUri;
+
+    ShimmerBluetoothManagerAndroid.BT_TYPE preferredBtType;
+    Looper looper = Looper.myLooper();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +131,7 @@ public class MainActivity extends Activity {
 
 
             try {
+                BleManager.getInstance().init(getApplication());
                 btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
 
 
@@ -135,8 +147,12 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, REQUEST_CONNECT_SHIMMER);
     }
 
+    public void disconnectDevice(View v){
+        btManager.disconnectAllDevices();
+    }
+
     public void startStreaming(View v) {
-        Shimmer shimmer = (Shimmer) btManager.getShimmer(bluetoothAdd);
+        ShimmerBluetooth shimmer = (ShimmerBluetooth) btManager.getShimmer(bluetoothAdd);
         if(shimmer != null) {   //this is null if Shimmer device is not connected
             setupCSV();
             //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
@@ -158,7 +174,7 @@ public class MainActivity extends Activity {
     public void stopStreaming(View v) {
         if(btManager.getShimmer(bluetoothAdd) != null) {
             try {
-                Shimmer shimmer = (Shimmer) btManager.getShimmer(bluetoothAdd);
+                ShimmerBluetooth shimmer = (ShimmerBluetooth) btManager.getShimmer(bluetoothAdd);
                 btManager.stopStreaming(bluetoothAdd);
             } catch (ShimmerException e) {
                 e.printStackTrace();
@@ -182,7 +198,12 @@ public class MainActivity extends Activity {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 bluetoothAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                btManager.connectShimmerThroughBTAddress(bluetoothAdd); //Connect to the selected device
+                String deviceName = data.getStringExtra(EXTRA_DEVICE_NAME);
+                preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                if (deviceName.contains(HwDriverShimmerDeviceDetails.DEVICE_TYPE.SHIMMER3R.toString())){
+                    showBtTypeConnectionOption();
+                }
+                btManager.connectShimmerThroughBTAddress(bluetoothAdd,deviceName,preferredBtType); //Connect to the selected device
             }
 
         }
@@ -198,6 +219,26 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public void showBtTypeConnectionOption(){
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setMessage("Choose preferred Bluetooth type");
+        alertDialog.setButton( Dialog.BUTTON_POSITIVE, "BT CLASSIC", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC;
+                looper.quit();
+            };
+        });
+        alertDialog.setButton( Dialog.BUTTON_NEGATIVE, "BLE", new DialogInterface.OnClickListener()    {
+            public void onClick(DialogInterface dialog, int which) {
+                preferredBtType = ShimmerBluetoothManagerAndroid.BT_TYPE.BLE;
+                looper.quit();
+            };
+        });
+        alertDialog.show();
+        try{ looper.loop(); }
+        catch(RuntimeException e){}
+    }
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private int countNonNulls(String[] dataArray){
