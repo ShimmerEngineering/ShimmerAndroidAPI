@@ -288,29 +288,24 @@ public class Shimmer3DOrientationExample extends Activity {
 		@Override
 		public boolean onOptionsItemSelected(MenuItem item) {
 			Intent serverIntent;
-			switch (item.getItemId()) {
-			
-			case R.id.itemConnect:
+			int id = item.getItemId();
+			if(id == R.id.itemConnect){
 				serverIntent = new Intent(this, DeviceListActivity.class);
-				startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);	
-				
+				startActivityForResult(serverIntent, REQUEST_CONNECT_SHIMMER);
 				return true;
-				
-			case R.id.itemDisconnect:
+			}else if(id == R.id.itemDisconnect){
 				mShimmerDevice1.stop();
 				return true;
-			case R.id.itemConfigure:
+			}else if(id == R.id.itemConfigure){
 				serverIntent = new Intent(this, ConfigureActivity.class);
 				serverIntent.putExtra("LowPowerMag",mShimmerDevice1.isLowPowerMagEnabled());
 				serverIntent.putExtra("GyroOnTheFlyCal",mShimmerDevice1.isGyroOnTheFlyCalEnabled());
 				startActivityForResult(serverIntent, REQUEST_CONFIGURE_SHIMMER);
 				return true;
-			default:
+			}else{
 				return super.onOptionsItemSelected(item);
 			}
 		}
-		
-		
 		
 		public void onActivityResult(int requestCode, int resultCode, Intent data) {
 			
