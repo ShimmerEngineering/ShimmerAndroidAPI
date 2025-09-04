@@ -523,6 +523,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     return true;
                 }
                 ShimmerDevice shimmerTemp = mService.getShimmer(selectedDeviceAddress);
+                double chargePercentage = shimmerTemp.getEstimatedChargePercentage();
                 String shimmerVersion= shimmerTemp.getHardwareVersionParsed();
                 String FWName = shimmerTemp.getFirmwareVersionParsed();
                 if(FWName.equals(""))
@@ -530,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("Device Info");
-                alertDialog.setMessage("Shimmer Version: "+shimmerVersion + "\n\nFirmware Version: "+FWName);
+                alertDialog.setMessage("Shimmer Version: "+shimmerVersion + "\n\nFirmware Version: "+FWName + "\n\nCharge Percentage: "+ (int)chargePercentage +"%");
                 alertDialog.show();
 
                 return true;
