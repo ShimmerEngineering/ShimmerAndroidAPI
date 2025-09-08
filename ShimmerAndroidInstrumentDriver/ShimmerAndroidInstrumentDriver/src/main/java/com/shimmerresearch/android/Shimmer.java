@@ -862,9 +862,9 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	protected void processInstreamResponse(boolean shouldClearCrcFromBuffer) {
 
-		if (mBluetoothRadioState.equals(BT_STATE.CONNECTED)){
+		if (!mBluetoothRadioState.equals(BT_STATE.STREAMING)){ //every other start besides streaming
 			super.processInstreamResponse(shouldClearCrcFromBuffer);
-		} else if (mBluetoothRadioState.equals(BT_STATE.STREAMING)){
+		} else { //streaming state
 			//byte[] inStreamResponseCommandBuffer = readBytes(1, INSTREAM_CMD_RESPONSE);
 			byte[] bufferTemp = getDataFromArrayOutputStream(4);
 			if (bufferTemp != null) {
