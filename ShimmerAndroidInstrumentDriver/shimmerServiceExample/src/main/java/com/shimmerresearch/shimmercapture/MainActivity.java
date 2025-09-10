@@ -525,8 +525,9 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             mService.stopLogging(selectedDeviceAddress);
             return true;
         }else if(id == R.id.device_info){
-            if (selectedDeviceAddress==null){
+            if (selectedDeviceAddress==null) {
                 return true;
+            }
               
                 ShimmerDevice shimmerTemp = mService.getShimmer(selectedDeviceAddress);
                 double chargePercentage = shimmerTemp.getEstimatedChargePercentage();
