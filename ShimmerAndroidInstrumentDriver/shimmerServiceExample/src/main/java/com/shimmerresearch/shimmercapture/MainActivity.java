@@ -280,248 +280,255 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         final Toast otherTaskOngoingToast = Toast.makeText(this, "Please wait until current task is finished", Toast.LENGTH_LONG);
-        switch (item.getItemId()) {
-            case R.id.connect_device:
-                Intent pairedDevicesIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
-                startActivityForResult(pairedDevicesIntent, REQUEST_CONNECT_SHIMMER);
-                return true;
-            case R.id.start_streaming:
-                if(selectedDeviceAddress != null) {
+        int id = item.getItemId();
+        if(id == R.id.connect_device){
+            Intent pairedDevicesIntent = new Intent(getApplicationContext(), ShimmerBluetoothDialog.class);
+            startActivityForResult(pairedDevicesIntent, REQUEST_CONNECT_SHIMMER);
+            return true;
+        }else if(id == R.id.start_streaming){
+            if(selectedDeviceAddress != null) {
 
-                    ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
-                    if (mDevice instanceof  ShimmerBluetooth) {
-                        //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
-                        ((ShimmerBluetooth) mDevice).enablePCTimeStamps(false);
-                        //Disable timers for better performance.
-                        ((ShimmerBluetooth) mDevice).stopAllTimers();
+                ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
+                if (mDevice instanceof  ShimmerBluetooth) {
+                    //Disable PC timestamps for better performance. Disabling this takes the timestamps on every full packet received instead of on every byte received.
+                    ((ShimmerBluetooth) mDevice).enablePCTimeStamps(false);
+                    //Disable timers for better performance.
+                    ((ShimmerBluetooth) mDevice).stopAllTimers();
+                }
+                try {
+                    mDevice.startStreaming();
+                    mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
+                } catch (ShimmerException e) {
+                    if(e.getMessage() == "A task is still ongoing"){
+                        otherTaskOngoingToast.show();
                     }
-                    try {
-                        mDevice.startStreaming();
-                        mViewPager.setCurrentItem(mDevice instanceof VerisenseDevice ? 5 : 4);
-                    } catch (ShimmerException e) {
-                        if(e.getMessage() == "A task is still ongoing"){
-                            otherTaskOngoingToast.show();
-                        }
 
-                        e.printStackTrace();
+                    e.printStackTrace();
+                }
+                signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
+            }
+            return true;
+
+        } else if(id == R.id.stop_streaming){
+            if(selectedDeviceAddress != null) {
+                ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
+                try {
+                    mDevice.stopStreaming();
+                } catch (ShimmerException e) {
+                    if(e.getMessage() == "A task is still ongoing"){
+                        otherTaskOngoingToast.show();
                     }
-                    signalsToPlotFragment.buildSignalsToPlotList(this, mService, selectedDeviceAddress, dynamicPlot);
+                    e.printStackTrace();
                 }
-                return true;
-            case R.id.stop_streaming:
-                if(selectedDeviceAddress != null) {
-                    ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
-                    try {
-                        mDevice.stopStreaming();
-                    } catch (ShimmerException e) {
-                        if(e.getMessage() == "A task is still ongoing"){
-                            otherTaskOngoingToast.show();
-                        }
-                        e.printStackTrace();
+            }
+            return true;
+
+        }else if(id == R.id.data_sync){
+            if(selectedDeviceAddress != null) {
+                mViewPager.setCurrentItem(5);
+            }
+            return true;
+
+        }else if(id == R.id.disable_logging){
+            if(selectedDeviceAddress != null) {
+                VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                VerisenseDevice mDeviceClone = mDevice.deepClone();
+                boolean logging = !mDevice.isRecordingEnabled();
+                mDeviceClone.setRecordingEnabled(logging);
+                byte[] opConfig = mDeviceClone.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
+                try {
+                    mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeAndReadOperationalConfig(opConfig);
+                    Toast.makeText(this, logging?"Logging Enabled":"Logging Disabled", Toast.LENGTH_SHORT).show();
+                } catch (ShimmerException e) {
+                    if(e.getMessage() == "A task is still ongoing"){
+                        otherTaskOngoingToast.show();
                     }
+                    e.printStackTrace();
                 }
-                return true;
-            case R.id.data_sync:
-                if(selectedDeviceAddress != null) {
-                    mViewPager.setCurrentItem(5);
-                }
-                return true;
-            case R.id.disable_logging:
-                if(selectedDeviceAddress != null) {
-                    VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
-                    VerisenseDevice mDeviceClone = mDevice.deepClone();
-                    boolean logging = !mDevice.isRecordingEnabled();
-                    mDeviceClone.setRecordingEnabled(logging);
-                    byte[] opConfig = mDeviceClone.configBytesGenerate(true, COMMUNICATION_TYPE.BLUETOOTH);
-                    try {
-                        mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).writeAndReadOperationalConfig(opConfig);
-                        Toast.makeText(this, logging?"Logging Enabled":"Logging Disabled", Toast.LENGTH_SHORT).show();
-                    } catch (ShimmerException e) {
-                        if(e.getMessage() == "A task is still ongoing"){
-                            otherTaskOngoingToast.show();
-                        }
-                        e.printStackTrace();
-                    }
-                }
-                return true;
-            case R.id.erase_data:
-                if(selectedDeviceAddress != null) {
-                    final VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
-                    final ProgressDialog progress = new ProgressDialog(this);
-                    progress.setTitle("Erasing data");
-                    progress.setMessage("Please wait for the operation to complete...");
-                    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-                    progress.show();
-                    new Thread(){
-                        public void run(){
-                            try {
-                                mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).eraseDataTask().waitForCompletion(60, TimeUnit.SECONDS);
-                                progress.dismiss();
-                            } catch (ShimmerException | InterruptedException e) {
-                                progress.dismiss();
-                                if(e.getMessage() == "A task is still ongoing"){
-                                    otherTaskOngoingToast.show();
-                                }
-                                e.printStackTrace();
+            }
+            return true;
+
+        }else if(id == R.id.erase_data){
+            if(selectedDeviceAddress != null) {
+                final VerisenseDevice mDevice = (VerisenseDevice)mService.getShimmer(selectedDeviceAddress);
+                final ProgressDialog progress = new ProgressDialog(this);
+                progress.setTitle("Erasing data");
+                progress.setMessage("Please wait for the operation to complete...");
+                progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+                progress.show();
+                new Thread(){
+                    public void run(){
+                        try {
+                            mDevice.getMapOfVerisenseProtocolByteCommunication().get(COMMUNICATION_TYPE.BLUETOOTH).eraseDataTask().waitForCompletion(60, TimeUnit.SECONDS);
+                            progress.dismiss();
+                        } catch (ShimmerException | InterruptedException e) {
+                            progress.dismiss();
+                            if(e.getMessage() == "A task is still ongoing"){
+                                otherTaskOngoingToast.show();
                             }
+                            e.printStackTrace();
                         }
-                    }.start();
+                    }
+                }.start();
+            }
+            return true;
+
+        }else if(id == R.id.disconnect_all_devices){
+            mService.disconnectAllDevices();
+            connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+            mViewPager.setCurrentItem(0);
+            selectedDeviceAddress = null;
+            selectedDeviceName = null;
+            connectedShimmersListFragment.removeSelectedDevice();
+            return true;
+        }else if(id == R.id.enable_write_to_csv){
+            Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+            startActivityForResult(intent, PERMISSION_FILE_REQUEST_SHIMMER);
+
+            mService.setEnableLogging(true);
+            return true;
+
+        }else if(id == R.id.disable_write_to_csv){
+            mService.setEnableLogging(false);
+            return true;
+        }else if(id == R.id.set_sampling_rate){
+            // Create an AlertDialog Builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Enter Sampling Rate");
+
+            // Inflate the dialog layout
+            final EditText editTextSamplingRate = new EditText(this);
+            if (selectedDeviceAddress==null){
+                return true;
+            }
+            ShimmerBluetooth device = (ShimmerBluetooth) mService.getShimmer(selectedDeviceAddress);
+            editTextSamplingRate.setText(Double.toString(device.getSamplingRateShimmer()));
+            builder.setView(editTextSamplingRate);
+            // Add OK button
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String samplingRateStr = editTextSamplingRate.getText().toString();
+                    // Convert the input to integer
+                    double samplingRate = Double.parseDouble(samplingRateStr);
+
+                    // Call a method to write sampling rate or do whatever you need
+                    ShimmerDevice clone = device.deepClone();
+                    clone.setSamplingRateShimmer(samplingRate);
+                    AssembleShimmerConfig.generateSingleShimmerConfig(clone, COMMUNICATION_TYPE.BLUETOOTH);
+                    mService.configureShimmer(clone);
+                    //device.writeShimmerAndSensorsSamplingRate(samplingRate);
+
                 }
-                return true;
-            case R.id.disconnect_all_devices:
-                mService.disconnectAllDevices();
-                connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
-                mViewPager.setCurrentItem(0);
-                selectedDeviceAddress = null;
-                selectedDeviceName = null;
-                connectedShimmersListFragment.removeSelectedDevice();
-                return true;
-            case R.id.enable_write_to_csv:
-                Intent intent =new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            });
 
-                startActivityForResult(intent, PERMISSION_FILE_REQUEST_SHIMMER);
-
-                mService.setEnableLogging(true);
-                return true;
-            case R.id.disable_write_to_csv:
-                mService.setEnableLogging(false);
-                return true;
-            case R.id.set_sampling_rate:
-
-                // Create an AlertDialog Builder
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Enter Sampling Rate");
-
-                // Inflate the dialog layout
-                final EditText editTextSamplingRate = new EditText(this);
-                if (selectedDeviceAddress==null){
-                    return true;
+            // Add Cancel button
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                 }
-                ShimmerBluetooth device = (ShimmerBluetooth) mService.getShimmer(selectedDeviceAddress);
-                editTextSamplingRate.setText(Double.toString(device.getSamplingRateShimmer()));
-                builder.setView(editTextSamplingRate);
-                // Add OK button
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String samplingRateStr = editTextSamplingRate.getText().toString();
-                        // Convert the input to integer
-                        double samplingRate = Double.parseDouble(samplingRateStr);
-
-                        // Call a method to write sampling rate or do whatever you need
-                        ShimmerDevice clone = device.deepClone();
-                        clone.setSamplingRateShimmer(samplingRate);
-                        AssembleShimmerConfig.generateSingleShimmerConfig(clone, COMMUNICATION_TYPE.BLUETOOTH);
-                        mService.configureShimmer(clone);
-                        //device.writeShimmerAndSensorsSamplingRate(samplingRate);
-
-                    }
-                });
-
-                // Add Cancel button
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+            });
 
 
-                builder.show();
+            builder.show();
+            return true;
+        }else if(id == R.id.low_power_mode){
+            if (selectedDeviceAddress==null){
                 return true;
-            case R.id.low_power_mode:
-                if (selectedDeviceAddress==null){
-                    return true;
+            }
+            ShimmerDevice shimmerDevice = mService.getShimmer(selectedDeviceAddress);
+            ShimmerDevice clone = shimmerDevice.deepClone();
+
+            View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+            CheckBox cbMagLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbMagLPMode);
+            cbMagLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP, isChecked);
                 }
-                ShimmerDevice shimmerDevice = mService.getShimmer(selectedDeviceAddress);
-                ShimmerDevice clone = shimmerDevice.deepClone();
+            });
+            cbMagLPMode.setText("Enable Mag LP Mode");
+            boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP));
+            cbMagLPMode.setChecked(isLowPowerMagEnabled);
 
-                View checkBoxView = View.inflate(this, R.layout.checkbox, null);
-                CheckBox cbMagLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbMagLPMode);
-                cbMagLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            CheckBox cbWRAccelLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbWRAccelLPMode);
+            cbWRAccelLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP, isChecked);
-                    }
-                });
-                cbMagLPMode.setText("Enable Mag LP Mode");
-                boolean isLowPowerMagEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS3MDL_MAG_ALT, SensorLIS3MDL.GuiLabelConfig.LIS3MDL_ALT_MAG_LP));
-                cbMagLPMode.setChecked(isLowPowerMagEnabled);
-
-                CheckBox cbWRAccelLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbWRAccelLPMode);
-                cbWRAccelLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS2DW12_ACCEL_WR, SensorLIS2DW12.GuiLabelConfig.LIS2DW12_ACCEL_LPM, isChecked);
-                    }
-                });
-                cbWRAccelLPMode.setText("Enable WR Accel LP Mode");
-                boolean isLowPowerWRAccelEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS2DW12_ACCEL_WR, SensorLIS2DW12.GuiLabelConfig.LIS2DW12_ACCEL_LPM));
-                cbWRAccelLPMode.setChecked(isLowPowerWRAccelEnabled);
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS2DW12_ACCEL_WR, SensorLIS2DW12.GuiLabelConfig.LIS2DW12_ACCEL_LPM, isChecked);
+                }
+            });
+            cbWRAccelLPMode.setText("Enable WR Accel LP Mode");
+            boolean isLowPowerWRAccelEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LIS2DW12_ACCEL_WR, SensorLIS2DW12.GuiLabelConfig.LIS2DW12_ACCEL_LPM));
+            cbWRAccelLPMode.setChecked(isLowPowerWRAccelEnabled);
 
 
-                CheckBox cbGyroLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbGyroLPMode);
-                cbGyroLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            CheckBox cbGyroLPMode = (CheckBox) checkBoxView.findViewById(R.id.cbGyroLPMode);
+            cbGyroLPMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_GYRO, SensorLSM6DSV.GuiLabelConfig.LSM6DSV_GYRO_LPM, isChecked);
-                    }
-                });
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    clone.setConfigValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_GYRO, SensorLSM6DSV.GuiLabelConfig.LSM6DSV_GYRO_LPM, isChecked);
+                }
+            });
+            cbGyroLPMode.setText("Enable LN Accel and Gyro LP Mode");
+            if(clone.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3R){
                 cbGyroLPMode.setText("Enable LN Accel and Gyro LP Mode");
-                if(clone.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3R){
-                    cbGyroLPMode.setText("Enable LN Accel and Gyro LP Mode");
-                }else{
-                    cbGyroLPMode.setText("Enable Gyro LP Mode");
-                }
-                boolean isLowPowerGyroEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_GYRO, SensorLSM6DSV.GuiLabelConfig.LSM6DSV_GYRO_LPM));
-                cbGyroLPMode.setChecked(isLowPowerGyroEnabled);
+            }else{
+                cbGyroLPMode.setText("Enable Gyro LP Mode");
+            }
+            boolean isLowPowerGyroEnabled = Boolean.valueOf(clone.getConfigGuiValueUsingConfigLabel(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_GYRO, SensorLSM6DSV.GuiLabelConfig.LSM6DSV_GYRO_LPM));
+            cbGyroLPMode.setChecked(isLowPowerGyroEnabled);
 
-                AlertDialog.Builder builderLPMode = new AlertDialog.Builder(this);
-                builderLPMode.setTitle("Low Power Mode");
-                builderLPMode.setView(checkBoxView)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                if (clone != null) {
+            AlertDialog.Builder builderLPMode = new AlertDialog.Builder(this);
+            builderLPMode.setTitle("Low Power Mode");
+            builderLPMode.setView(checkBoxView)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            if (clone != null) {
 
-                                    List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
-                                    cloneList.add(0, clone);
-                                    //TODO: Change this when AssembleShimmerConfig has been updated:
-                                    AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+                                List<ShimmerDevice> cloneList = new ArrayList<ShimmerDevice>();
+                                cloneList.add(0, clone);
+                                //TODO: Change this when AssembleShimmerConfig has been updated:
+                                AssembleShimmerConfig.generateMultipleShimmerConfig(cloneList, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
 
-                                    if (shimmerDevice instanceof Shimmer || shimmerDevice instanceof VerisenseDevice || shimmerDevice instanceof Shimmer3BLEAndroid) {
-                                        mService.getBluetoothManager().configureShimmer(clone);
-                                    } else if (shimmerDevice instanceof Shimmer4Android) {
+                                if (shimmerDevice instanceof Shimmer || shimmerDevice instanceof VerisenseDevice || shimmerDevice instanceof Shimmer3BLEAndroid) {
+                                    mService.getBluetoothManager().configureShimmer(clone);
+                                } else if (shimmerDevice instanceof Shimmer4Android) {
 
-                                    }
                                 }
                             }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        }).show();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+            return true;
+
+        }else if(id == R.id.start_sd_logging){
+            if (selectedDeviceAddress==null){
                 return true;
-            case R.id.start_sd_logging:
-                if (selectedDeviceAddress==null){
-                    return true;
-                }
-                mService.startLogging(selectedDeviceAddress);
+            }
+            mService.startLogging(selectedDeviceAddress);
+            return true;
+        }else if(id == R.id.stop_sd_logging){
+            if (selectedDeviceAddress==null){
                 return true;
-            case R.id.stop_sd_logging:
-                if (selectedDeviceAddress==null){
-                    return true;
-                }
-                mService.stopLogging(selectedDeviceAddress);
+            }
+            mService.stopLogging(selectedDeviceAddress);
+            return true;
+        }else if(id == R.id.device_info){
+            if (selectedDeviceAddress==null) {
                 return true;
-            case R.id.device_info:
-                if (selectedDeviceAddress==null){
-                    return true;
-                }
+            }
+              
                 ShimmerDevice shimmerTemp = mService.getShimmer(selectedDeviceAddress);
                 double chargePercentage = shimmerTemp.getEstimatedChargePercentage();
                 String shimmerVersion= shimmerTemp.getHardwareVersionParsed();
@@ -534,14 +541,16 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 alertDialog.setMessage("Shimmer Version: "+shimmerVersion + "\n\nFirmware Version: "+FWName + "\n\nCharge Percentage: "+ (int)chargePercentage +"%");
                 alertDialog.show();
 
-                return true;
-            case R.id.privacy_policy:
-                startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.shimmersensing.com/privacy/")));
+            return true;
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        }else if(id == R.id.privacy_policy){
+            startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.shimmersensing.com/privacy/")));
+            return true;
+
+        }else{
+            return super.onOptionsItemSelected(item);
         }
+
     }
 
     @Override

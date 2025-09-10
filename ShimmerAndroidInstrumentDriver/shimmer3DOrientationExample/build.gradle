@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.shimmerresearch.shimmer3dexample'
 //    compileSdkVersion 23
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.shimmerresearch.shimmer3dexample"
-        minSdkVersion 14
-        targetSdkVersion 33
+        minSdkVersion 21
+        targetSdkVersion 34
         multiDexEnabled true
     }
 
@@ -41,4 +42,6 @@ dependencies {
     implementation files('../ShimmerAndroidInstrumentDriver/libs/ShimmerBiophysicalProcessingLibrary_Rev_0_11.jar')
     implementation files('../ShimmerAndroidInstrumentDriver/libs/androidplot-core-0.5.0-release.jar')
     implementation 'com.google.guava:guava:19.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
