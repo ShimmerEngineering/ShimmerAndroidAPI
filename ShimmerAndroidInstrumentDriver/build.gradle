@@ -78,7 +78,7 @@ allprojects {
                 implementation 'java3d:vecmath:1.3.1'
                 implementation 'com.android.support:appcompat-v7:26.1.0'
                 implementation 'com.github.Jasonchenlijian:FastBle:2.4.0'
-                implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.11.4_beta'){
+                implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.11.5_beta'){
 
                     // excluding org.json which is provided by Android
                     exclude group: 'io.netty'
@@ -86,7 +86,7 @@ allprojects {
                     exclude group: 'org.apache.commons.math'
                 }
 
-                implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.11.4_beta'){
+                implementation (group: 'com.shimmerresearch', name: 'shimmerdriver', version:'0.11.5_beta'){
 
                     // excluding org.json which is provided by Android
                     exclude group: 'io.netty'
