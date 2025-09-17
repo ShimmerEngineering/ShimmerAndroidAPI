@@ -142,7 +142,7 @@ public class ShimmerService extends Service {
 		}
 	}
 
-	public FILE_TYPE mLoggingFileType = FILE_TYPE.DAT;
+	public FILE_TYPE mLoggingFileType = FILE_TYPE.CSV;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -446,7 +446,7 @@ public class ShimmerService extends Service {
 
 
 			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.BATT_PERCENTAGE);
-			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.SYSTEM_TIMESTAMP_PLOT);
+			//objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.SYSTEM_TIMESTAMP_PLOT);
 			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_OVERALL);
 			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.PACKET_RECEPTION_RATE_CURRENT);
 			objectCluster.removeAll(Configuration.Shimmer3.ObjectClusterSensorName.SYSTEM_TIMESTAMP);
@@ -460,15 +460,15 @@ public class ShimmerService extends Service {
 					Logging shimmerLog;
 					if (mLogFileName.equals("Default")){
 						if(mFileURI==null) {
-							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], ",", mLogFolderName, mLoggingFileType);
 						} else {
-							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], "\t", mLogFolderName, mLoggingFileType);
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + " Device" + bA[12] + bA[13] + bA[15] + bA[16], ",", mLogFolderName, mLoggingFileType);
 						}
 					} else {
 						if(mFileURI==null) {
-							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
+							shimmerLog = new Logging(fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, ",", mLogFolderName, mLoggingFileType);
 						}else {
-							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, "\t", mLogFolderName, mLoggingFileType);
+							shimmerLog = new Logging(mFileURI,mContext,fromMilisecToDate(System.currentTimeMillis()) + mLogFileName, ",", mLogFolderName, mLoggingFileType);
 						}
 					}
 					mLogShimmer.remove(objectCluster.getMacAddress());
