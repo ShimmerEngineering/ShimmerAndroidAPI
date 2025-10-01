@@ -50,7 +50,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation(group: 'com.shimmerresearch', name: 'shimmerandroidinstrumentdriver', version: '3.2.2_beta', ext: 'aar')
+    implementation(group: 'com.shimmerresearch', name: 'shimmerandroidinstrumentdriver', version: '3.2.5_beta', ext: 'aar')
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
     androidTestImplementation 'androidx.annotation:annotation:1.7.1'
     testImplementation 'junit:junit:4.12'
