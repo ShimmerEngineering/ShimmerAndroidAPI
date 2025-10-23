@@ -1922,4 +1922,60 @@ public class Shimmer extends ShimmerBluetooth{
 		//sendMsgToHandlerListTarget(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, obj);
 	}
 
+	private static final byte PING_BYTE = (byte) 0xB5;
+	private java.util.concurrent.ScheduledExecutorService pingExec;
+	private java.util.concurrent.ScheduledFuture<?> pingTask;
+
+	public void startPingTask() {
+		if (pingExec != null && !pingExec.isShutdown()) return;
+
+		pingExec = java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
+			Thread t = new Thread(r, "ShimmerPing");
+			t.setDaemon(true);
+			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+			return t;
+		});
+
+		// schedule every 2 seconds
+		pingTask = pingExec.scheduleWithFixedDelay(() -> {
+			try {
+				if (mIsStreaming)
+				{
+					write(new byte[]{PING_BYTE});
+				} else {
+					stopPingTask();
+				}
+			} catch (Throwable e) {
+				// If device disconnects, stop pings
+				stopPingTask();
+			}
+		}, 2, 2, java.util.concurrent.TimeUnit.SECONDS);
+	}
+
+	public void stopPingTask() {
+		if (pingTask != null) pingTask.cancel(true);
+		if (pingExec != null) {
+			pingExec.shutdownNow();
+			pingExec = null;
+		}
+	}
+
+
+	@Override
+	public void startStreaming() throws ShimmerException {
+		super.startStreaming();
+		if (getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3R
+				&& isThisVerCompatibleWith(ShimmerVerDetails.FW_ID.LOGANDSTREAM, 1, 0, 46)) {
+			startPingTask();
+		}
+	}
+
+	@Override
+	public void stopStreaming(){
+		super.stopStreaming();
+		if (getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3R
+		&& isThisVerCompatibleWith(ShimmerVerDetails.FW_ID.LOGANDSTREAM, 1, 0, 46)) {
+			stopPingTask();
+		}
+	}
 }
