@@ -1964,7 +1964,8 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void startStreaming() throws ShimmerException {
 		super.startStreaming();
-	 	if (getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3R){
+		if (getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3R
+				&& isThisVerCompatibleWith(ShimmerVerDetails.FW_ID.LOGANDSTREAM, 1, 0, 46)) {
 			startPingTask();
 		}
 	}
@@ -1972,7 +1973,8 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void stopStreaming(){
 		super.stopStreaming();
-		if (getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3R) {
+		if (getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3R
+		&& isThisVerCompatibleWith(ShimmerVerDetails.FW_ID.LOGANDSTREAM, 1, 0, 46)) {
 			stopPingTask();
 		}
 	}
