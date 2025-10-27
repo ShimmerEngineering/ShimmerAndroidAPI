@@ -12,6 +12,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <!-- Shared header included here -->
+        <include layout="@layout/list_header_default" />
+
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"

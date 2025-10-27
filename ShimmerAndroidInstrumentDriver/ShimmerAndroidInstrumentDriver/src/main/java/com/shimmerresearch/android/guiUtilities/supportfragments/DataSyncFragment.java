@@ -38,8 +38,15 @@ public class DataSyncFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         context = getActivity();
+        // Inflate a simple layout with a ListView
+        View root = inflater.inflate(R.layout.data_sync, container, false);
+
+        TextView headerTitle = root.findViewById(R.id.header_title);
+        headerTitle.setText("Data Sync");
+
+        return root;
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.data_sync, container, false);
+        //return inflater.inflate(R.layout.data_sync, container, false);
     }
 
     @Override

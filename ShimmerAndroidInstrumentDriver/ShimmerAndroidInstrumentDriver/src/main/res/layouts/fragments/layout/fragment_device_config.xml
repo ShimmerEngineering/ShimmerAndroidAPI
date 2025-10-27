@@ -4,6 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Shared header included here -->
+    <include layout="@layout/list_header_default" />
+
     <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

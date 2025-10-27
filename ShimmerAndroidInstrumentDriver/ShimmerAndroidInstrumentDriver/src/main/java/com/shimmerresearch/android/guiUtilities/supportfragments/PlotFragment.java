@@ -87,8 +87,16 @@ public class PlotFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         context = getActivity();
+
+        // Inflate a simple layout with a ListView
+        View root = inflater.inflate(R.layout.fragment_plot, container, false);
+
+        TextView headerTitle = root.findViewById(R.id.header_title);
+        headerTitle.setText("Plot");
+
+        return root;
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_plot, container, false);
+        //return inflater.inflate(R.layout.fragment_plot, container, false);
     }
 
     @Override

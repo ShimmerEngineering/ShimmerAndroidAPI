@@ -3,8 +3,15 @@ package com.shimmerresearch.android.guiUtilities.supportfragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -12,12 +19,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.android.shimmerService.ShimmerService;
+import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.androidradiodriver.Shimmer3BLEAndroid;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.ShimmerDevice;
@@ -45,6 +54,30 @@ public class SensorsEnabledFragment extends ListFragment {
 
     public SensorsEnabledFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ListView listView = getListView();
+
+        // Inflate the same shared header layout
+        View header = LayoutInflater.from(getContext())
+                .inflate(R.layout.list_header_default, listView, false);
+
+        // Set the header title dynamically
+        TextView headerTitle = header.findViewById(R.id.header_title);
+        headerTitle.setText("Enable Sensors"); // Custom method below
+
+        listView.addHeaderView(header, null, false);
+
+        // Apply edge-to-edge padding
+        ViewCompat.setOnApplyWindowInsetsListener(listView, (v, insets) -> {
+            Insets sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, sysBars.top, 0, sysBars.bottom);
+            return insets;
+        });
     }
 
     public static SensorsEnabledFragment newInstance(String param1, String param2) {

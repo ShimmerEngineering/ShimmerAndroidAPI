@@ -4,6 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Shared header included here -->
+    <include layout="@layout/list_header_default" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
@@ -16,6 +19,7 @@
         android:padding="16dp"
         android:gravity="center"
         android:orientation="horizontal">
+
         <Button
             android:id="@+id/dataSyncButton"
             android:layout_width="150dp"

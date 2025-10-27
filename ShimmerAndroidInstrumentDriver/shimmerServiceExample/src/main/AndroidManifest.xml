@@ -24,6 +24,7 @@
         tools:targetApi="p">
         <service android:name="com.shimmerresearch.android.shimmerService.ShimmerService" />
         <activity android:name="com.shimmerresearch.shimmercapture.MainActivity"
+            android:theme="@style/AppTheme"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -213,6 +214,12 @@ public class DeviceConfigFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_device_config, null);
+        // Inflate a simple layout with a ListView
+        View root = inflater.inflate(R.layout.fragment_device_config, container, false);
+
+        TextView headerTitle = root.findViewById(R.id.header_title);
+        headerTitle.setText("Device Configuration");
+
+        return root;
     }
 }

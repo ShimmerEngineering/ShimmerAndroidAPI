@@ -4,15 +4,21 @@ package com.shimmerresearch.android.guiUtilities.supportfragments;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.androidplot.xy.XYPlot;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
@@ -46,6 +52,31 @@ public class SignalsToPlotFragment extends ListFragment {
     public SignalsToPlotFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ListView listView = getListView();
+
+        // Inflate the same shared header layout
+        View header = LayoutInflater.from(getContext())
+                .inflate(R.layout.list_header_default, listView, false);
+
+        // Set the header title dynamically
+        TextView headerTitle = header.findViewById(R.id.header_title);
+        headerTitle.setText("Signals to Plot"); // Custom method below
+
+        listView.addHeaderView(header, null, false);
+
+        // Apply edge-to-edge padding
+        ViewCompat.setOnApplyWindowInsetsListener(listView, (v, insets) -> {
+            Insets sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, sysBars.top, 0, sysBars.bottom);
+            return insets;
+        });
+    }
+
 
     /**
      * Display a default message when the fragment is first created
