@@ -13,8 +13,14 @@ import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 
 
@@ -33,6 +39,7 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,9 +47,11 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.androidplot.xy.XYPlot;
 import com.clj.fastble.BleManager;
+import com.google.android.material.tabs.TabLayout;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.Shimmer4Android;
 import com.shimmerresearch.android.guiUtilities.supportfragments.ConnectedShimmersListFragment;
@@ -76,6 +85,7 @@ import com.shimmerresearch.verisense.VerisenseDevice;
 import com.shimmerresearch.verisense.communication.SyncProgressDetails;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -181,13 +191,72 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             startServiceandBTManager();
         }
 
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        SectionsPagerAdapter1 sectionsPagerAdapter = new SectionsPagerAdapter1(getSupportFragmentManager());
+        ViewPager viewPager = findViewById(R.id.container);
+        viewPager.setAdapter(sectionsPagerAdapter);
+
+        TabLayout tabs = findViewById(R.id.tabs);
+        tabs.setupWithViewPager(viewPager);
+
+        // Insets listener — apply a fraction of status bar top as toolbar top padding
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            toolbar.post(() -> {
+                int targetPaddingTop = (int) (bars.top * 0.35f);
+                toolbar.setPadding(toolbar.getPaddingLeft(), targetPaddingTop, toolbar.getPaddingRight(), toolbar.getPaddingBottom());
+            });
+            return insets;
+        });
+
+        // ✅ Align title and overflow icons consistently
+        toolbar.post(() -> {
+            try {
+                // Center title vertically and slightly lower it
+                Field f = toolbar.getClass().getDeclaredField("mTitleTextView");
+                f.setAccessible(true);
+                TextView titleTextView = (TextView) f.get(toolbar);
+                if (titleTextView != null) {
+                    Toolbar.LayoutParams lp = (Toolbar.LayoutParams) titleTextView.getLayoutParams();
+                    lp.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+                    titleTextView.setLayoutParams(lp);
+                    // Slight downward offset (adjust 16–22 if needed)
+                    titleTextView.setPadding(
+                            titleTextView.getPaddingLeft(),
+                            40,
+                            titleTextView.getPaddingRight(),
+                            0
+                    );
+                }
+            } catch (Exception ignore) { /* Safe fallback if reflection fails */ }
+
+            // Move the overflow (⋮) menu slightly DOWN for perfect alignment
+            for (int i = 0; i < toolbar.getChildCount(); i++) {
+                View child = toolbar.getChildAt(i);
+                if (child.getClass().getSimpleName().equals("ActionMenuView")) {
+                    child.setTranslationY(30f);
+                }
+            }
+        });
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter1 = new SectionsPagerAdapter1(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter1);
+
+        // Apply bottom inset padding
+        ViewCompat.setOnApplyWindowInsetsListener(viewPager, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), bars.bottom);
+            return insets;
+        });
         mViewPager.setOffscreenPageLimit(5);    //Ensure none of the fragments has their view destroyed when off-screen
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         dialog = new ShimmerDialogConfigurations();

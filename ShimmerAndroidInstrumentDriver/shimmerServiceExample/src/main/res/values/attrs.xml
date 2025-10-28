@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom attribute used to fine-tune toolbar inset for Android 15+ -->
+    <attr name="actionBarInsetTop" format="dimension" />
+</resources>
