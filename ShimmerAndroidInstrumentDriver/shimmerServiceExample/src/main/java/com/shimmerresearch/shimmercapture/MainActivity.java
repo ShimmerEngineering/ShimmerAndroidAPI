@@ -203,65 +203,6 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-/*
-// ✅ Important: use dispatch listener, not consume listener
-        ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-
-            toolbar.postDelayed(() -> {
-                int topInset = bars.top;
-
-                // Toolbar height should be roughly ?attr/actionBarSize + topInset
-                int toolbarHeight = toolbar.getHeight();
-
-                // 🔹 Lower the title slightly, but keep toolbar nicely below the status bar
-                int targetPaddingTop = (int) (topInset * 0.6f);
-                int targetPaddingBottom = (int) (toolbarHeight * 0.10f); // add gentle bottom padding
-
-                Log.d("ToolbarAdjust", "Top inset=" + topInset +
-                        ", toolbarHeight=" + toolbarHeight +
-                        ", paddingTop=" + targetPaddingTop +
-                        ", paddingBottom=" + targetPaddingBottom);
-
-                toolbar.setPadding(
-                        toolbar.getPaddingLeft(),
-                        targetPaddingTop,
-                        toolbar.getPaddingRight(),
-                        targetPaddingBottom
-                );
-            }, 100);
-
-            return insets;
-        });
-
-        toolbar.post(() -> {
-            try {
-                // Access the private TextView that AppCompatToolbar uses for the title
-                Field f = toolbar.getClass().getDeclaredField("mTitleTextView");
-                f.setAccessible(true);
-                TextView titleTextView = (TextView) f.get(toolbar);
-
-                if (titleTextView != null) {
-                    // Center the title vertically within the toolbar
-                    Toolbar.LayoutParams lp = (Toolbar.LayoutParams) titleTextView.getLayoutParams();
-                    lp.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
-                    titleTextView.setLayoutParams(lp);
-
-                    // Move it slightly lower for better visual centering
-                    titleTextView.setPadding(
-                            titleTextView.getPaddingLeft(),
-                            20,   // increase this (e.g. 12) if still looks too high
-                            titleTextView.getPaddingRight(),
-                            0
-                    );
-
-                    Log.d("ToolbarTitleFix", "Adjusted title via reflection");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        */
 
         // Insets listener — apply a fraction of status bar top as toolbar top padding
         ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
@@ -298,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             for (int i = 0; i < toolbar.getChildCount(); i++) {
                 View child = toolbar.getChildAt(i);
                 if (child.getClass().getSimpleName().equals("ActionMenuView")) {
-                    child.setTranslationY(30f);  // try 4f–6f for best result
+                    child.setTranslationY(30f);
                 }
             }
         });
@@ -309,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter1);
+
         // Apply bottom inset padding
         ViewCompat.setOnApplyWindowInsetsListener(viewPager, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
