@@ -138,7 +138,7 @@ public class SignalsToPlotFragment extends ListFragment {
             //final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
             final String[] sensorNames = sensorList.toArray(new String[sensorList.size()]);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.simple_list_item_multiple_choice_force_black_text, android.R.id.text1, sensorNames);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, sensorNames);
             setListAdapter(adapter);
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
             updateCheckboxes();

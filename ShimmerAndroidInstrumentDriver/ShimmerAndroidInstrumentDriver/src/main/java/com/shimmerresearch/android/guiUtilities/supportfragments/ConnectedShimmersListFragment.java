@@ -18,6 +18,7 @@ import com.shimmerresearch.androidinstrumentdriver.R;
 import com.shimmerresearch.driver.ShimmerDevice;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -83,7 +84,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
                     displayList[i] = nameList[i] + "\n" + macList[i];
                 }
 
-                ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, R.layout.simple_list_item_multiple_choice_force_black_text, displayList);
+                ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_multiple_choice, displayList);
 
                 //Set the list of devices to be displayed in the Fragment
                 setListAdapter(listAdapter);
@@ -93,7 +94,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if(selectedDeviceAddress != null && selectedDeviceAddress == macList[position]){
+                        if(selectedDeviceAddress != null && selectedDeviceAddress.equals(macList[position])){
                             selectedDeviceAddress = null;
                             selectedDevicePos = -1;
                         }
@@ -137,7 +138,7 @@ public class ConnectedShimmersListFragment extends ListFragment {
         if(savedListView != null && savedListAdapter != null) {
             buildShimmersConnectedListView(shimmerDeviceList, context);
         } else {
-            buildShimmersConnectedListView(null, getActivity().getApplicationContext());
+            buildShimmersConnectedListView(null, requireActivity());
         }
         super.onResume();
     }

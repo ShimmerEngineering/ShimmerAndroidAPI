@@ -77,7 +77,7 @@ public class DeviceConfigFragment extends Fragment {
 
         //        final CharSequence[] cs = listOfKeys.toArray(new CharSequence[listOfKeys.size()]);
 
-        expandListAdapter = new DeviceConfigListAdapter(context, listOfKeys, configOptionsMap, shimmerDevice, shimmerDeviceClone);
+        expandListAdapter = new DeviceConfigListAdapter(requireActivity(), listOfKeys, configOptionsMap, shimmerDevice, shimmerDeviceClone);
         expandListView = (ExpandableListView) getView().findViewById(R.id.expandable_listview);
         expandListView.setAdapter(expandListAdapter);
         expandListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
