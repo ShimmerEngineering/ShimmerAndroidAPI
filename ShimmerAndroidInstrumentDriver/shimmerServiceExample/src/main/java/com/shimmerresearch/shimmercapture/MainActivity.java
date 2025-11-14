@@ -444,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
         }else if(id == R.id.disconnect_all_devices){
             mService.disconnectAllDevices();
-            connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+            connectedShimmersListFragment.buildShimmersConnectedListView(null, MainActivity.this);
             mViewPager.setCurrentItem(0);
             selectedDeviceAddress = null;
             selectedDeviceName = null;
@@ -642,7 +642,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
 
             //if there is a device connected display it on the fragment
             if(connectedShimmersListFragment!=null) {
-                connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), MainActivity.this);
             }
         }
 
@@ -780,7 +780,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             // getItem is called to instantiate the fragment for the given page.
             if(position < fragmentArrayList.size()){
                 if(position == 0){
-                    connectedShimmersListFragment.buildShimmersConnectedListView(null, getApplicationContext());
+                    connectedShimmersListFragment.buildShimmersConnectedListView(null, MainActivity.this);
                 }
                 return fragmentArrayList.get(position);
             }
@@ -879,11 +879,11 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                 switch (state) {
                     case CONNECTED:
                         if(isNumberOfConnectedDevicesChanged()) {
-                            connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                            connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), MainActivity.this);
                             if (selectedDeviceAddress != null) {
                                 ShimmerDevice mDevice = mService.getShimmer(selectedDeviceAddress);
                                 if (mDevice!=null) {
-                                    deviceConfigFragment.buildDeviceConfigList(mDevice, getApplicationContext(), mService.getBluetoothManager());
+                                    deviceConfigFragment.buildDeviceConfigList(mDevice, MainActivity.this, mService.getBluetoothManager());
                                 }
                             }
                         }
@@ -910,7 +910,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                         }
                         break;
                     case SDLOGGING:
-                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext());
+                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), MainActivity.this);
                         break;
                     case STREAMING_LOGGED_DATA:
                         Toast.makeText(getApplicationContext(), "Data Sync: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
@@ -920,7 +920,7 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
                     case DISCONNECTED:
                         isNumberOfConnectedDevicesChanged();
                         Toast.makeText(getApplicationContext(), "Device disconnected: " + shimmerName + " " + macAddress, Toast.LENGTH_SHORT).show();
-                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), getApplicationContext()); //to be safe lets rebuild this
+                        connectedShimmersListFragment.buildShimmersConnectedListView(mService.getListOfConnectedDevices(), MainActivity.this); //to be safe lets rebuild this
                         break;
                 }
             }
