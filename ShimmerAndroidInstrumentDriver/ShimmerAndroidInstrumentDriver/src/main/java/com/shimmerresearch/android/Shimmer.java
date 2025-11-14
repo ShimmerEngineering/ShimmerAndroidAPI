@@ -1923,8 +1923,8 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	private static final byte PING_BYTE = (byte) 0xB5;
-	private java.util.concurrent.ScheduledExecutorService pingExec;
-	private java.util.concurrent.ScheduledFuture<?> pingTask;
+	private transient java.util.concurrent.ScheduledExecutorService pingExec;
+	private transient java.util.concurrent.ScheduledFuture<?> pingTask;
 
 	public void startPingTask() {
 		if (pingExec != null && !pingExec.isShutdown()) return;
