@@ -225,11 +225,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                         case CONNECTED:
 
                             if (!mConfigured){
-                                try {
-                                    Thread.sleep(2000);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
                                 Shimmer shimmer = (Shimmer)btManager.getShimmer(mMacAddress);
                                 Shimmer clone = (Shimmer) shimmer.deepClone();
                                 clone.disableAllSensors();
