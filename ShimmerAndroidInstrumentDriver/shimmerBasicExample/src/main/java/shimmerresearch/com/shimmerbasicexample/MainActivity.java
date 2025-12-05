@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -15,22 +17,23 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.Shimmer;
 import com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog;
+import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.driver.CallbackObject;
 import com.shimmerresearch.driver.Configuration;
 import com.shimmerresearch.driver.FormatCluster;
 import com.shimmerresearch.driver.ObjectCluster;
+import com.shimmerresearch.driverUtilities.AssembleShimmerConfig;
+import com.shimmerresearch.driverUtilities.ShimmerVerDetails;
 import com.shimmerresearch.exceptions.ShimmerException;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,9 +44,15 @@ import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EX
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     private final static String LOG_TAG = "ShimmerBasicExample";
-    Shimmer shimmer;
+    //Shimmer shimmer;
+    String mMacAddress;
+    boolean mConfigured=false;
     Spinner spinner;
-
+    Button buttonStreaming;
+    Button buttonStopStreaming;
+    Button buttonDisconnect;
+    Button buttonConnect;
+    ShimmerBluetoothManagerAndroid btManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,10 +93,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 110);
             }
         } else {
-
+            startBTManager();
         }
-        shimmer = new Shimmer(mHandler,MainActivity.this);
         spinner = (Spinner) findViewById(R.id.crcSpinner);
+        buttonStreaming = (Button) findViewById(R.id.button2);
+        buttonStopStreaming = (Button) findViewById(R.id.button3);
+        buttonDisconnect = (Button) findViewById(R.id.button6);
+        buttonConnect = (Button) findViewById(R.id.button5);
+        buttonStreaming.setEnabled(false);
+        buttonStopStreaming.setEnabled(false);
+        buttonDisconnect.setEnabled(false);
         spinner.setEnabled(false);
         // Spinner click listener
         spinner.setOnItemSelectedListener(this);
@@ -107,13 +122,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         if(spinner.isEnabled()){
             switch(position) {
                 case 0:
-                    shimmer.disableBtCommsCrc();
-                    break;
+                   ((ShimmerBluetooth)btManager.getShimmer(mMacAddress)).disableBtCommsCrc();
+                   break;
                 case 1:
-                    shimmer.enableBtCommsOneByteCrc();
+                    ((ShimmerBluetooth)btManager.getShimmer(mMacAddress)).enableBtCommsOneByteCrc();
                     break;
                 case 2:
-                    shimmer.enableBtCommsTwoByteCrc();
+                    ((ShimmerBluetooth)btManager.getShimmer(mMacAddress)).enableBtCommsTwoByteCrc();
                     break;
                 default:
             }
@@ -130,21 +145,28 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     }
 
     public void disconnectDevice(View v) {
-        if (shimmer!=null){
-            shimmer.disconnect();
+        try {
+            btManager.getShimmer(mMacAddress).disconnect();
+            mConfigured = false;
+        } catch (ShimmerException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void startStreaming(View v) throws InterruptedException, IOException{
         try {
-            shimmer.startStreaming();
+            btManager.getShimmer(mMacAddress).startStreaming();
         } catch (ShimmerException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     public void stopStreaming(View v) throws IOException{
-        shimmer.stopStreaming();
+        try {
+            btManager.getShimmer(mMacAddress).stopStreaming();
+        } catch (ShimmerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -201,28 +223,52 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
                     switch (state) {
                         case CONNECTED:
-                            if(shimmer.getFirmwareVersionCode() >= 8){
-                                if(!spinner.isEnabled()){
-                                    switch(shimmer.getCurrentBtCommsCrcMode()) {
-                                        case OFF:
-                                            spinner.setSelection(0);
-                                            break;
-                                        case ONE_BYTE_CRC:
-                                            spinner.setSelection(1);
-                                            break;
-                                        case TWO_BYTE_CRC:
-                                            spinner.setSelection(2);
-                                            break;
-                                        default:
-                                    }
+
+                            if (!mConfigured){
+                                Shimmer shimmer = (Shimmer)btManager.getShimmer(mMacAddress);
+                                Shimmer clone = (Shimmer) shimmer.deepClone();
+                                clone.disableAllSensors();
+                                if (clone.getHardwareVersion()== ShimmerVerDetails.HW_ID.SHIMMER_3) {
+                                    clone.setSensorEnabledState(Configuration.Shimmer3.SENSOR_ID.SHIMMER_ANALOG_ACCEL, true);
+                                } else {
+                                    clone.setSensorEnabledState(Configuration.Shimmer3.SENSOR_ID.SHIMMER_LSM6DSV_ACCEL_LN, true);
                                 }
-                                spinner.setEnabled(true);
+                                clone.setShimmerAndSensorsSamplingRate(51.2);
+                                AssembleShimmerConfig.generateSingleShimmerConfig(clone, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
+                                btManager.configureShimmer(clone);
+                                mConfigured = true;
+                            }
+                            else {
+                                if (btManager.getShimmer(mMacAddress)!=null && ((ShimmerBluetooth) btManager.getShimmer(mMacAddress)).getFirmwareVersionCode() >= 8) {
+                                    if (!spinner.isEnabled()) {
+                                        switch (((ShimmerBluetooth) btManager.getShimmer(mMacAddress)).getCurrentBtCommsCrcMode()) {
+                                            case OFF:
+                                                spinner.setSelection(0);
+                                                break;
+                                            case ONE_BYTE_CRC:
+                                                spinner.setSelection(1);
+                                                break;
+                                            case TWO_BYTE_CRC:
+                                                spinner.setSelection(2);
+                                                break;
+                                            default:
+                                        }
+                                    }
+                                    spinner.setEnabled(true);
+                                    buttonConnect.setEnabled(false);
+                                    buttonStreaming.setEnabled(true);
+                                    buttonStopStreaming.setEnabled(false);
+                                    buttonDisconnect.setEnabled(true);
+                                }
                             }
                             break;
                         case CONNECTING:
                             break;
                         case STREAMING:
                             spinner.setEnabled(false);
+                            buttonStreaming.setEnabled(false);
+                            buttonStopStreaming.setEnabled(true);
+                            buttonDisconnect.setEnabled(true);
                             break;
                         case STREAMING_AND_SDLOGGING:
                             break;
@@ -230,7 +276,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                             break;
                         case DISCONNECTED:
                             spinner.setEnabled(false);
+                            buttonStreaming.setEnabled(false);
                             spinner.setSelection(0);
+                            buttonStopStreaming.setEnabled(false);
+                            buttonDisconnect.setEnabled(false);
+                            buttonConnect.setEnabled(true);
                             break;
                     }
                     break;
@@ -250,14 +300,44 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         if(requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
-                String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                shimmer = new Shimmer(mHandler,MainActivity.this);
-                shimmer.connect(macAdd, "default");                  //Connect to the selected device
+                mMacAddress = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
+                btManager.connectShimmerThroughBTAddress(mMacAddress,"Shimmer", ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC);
             }
 
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 110) {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,
+                        "Bluetooth permissions are required to connect to Shimmer.",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                startBTManager();
+            }
+        }
+    }
 
-}
+    protected void startBTManager() {
+        BleManager.getInstance().init(getApplication());
+        if (btManager == null) {
+            try {
+                btManager = new ShimmerBluetoothManagerAndroid(this, mHandler);
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Couldn't create ShimmerBluetoothManagerAndroid. Error: " + e);
+            }
+        }
+    }
+ }
+
+
+
