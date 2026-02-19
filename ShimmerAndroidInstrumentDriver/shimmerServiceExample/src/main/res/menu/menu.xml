@@ -42,6 +42,10 @@
         android:id="@+id/start_sd_logging"></item>
     <item   android:title="Stop Logging Shimmer SD"
         android:id="@+id/stop_sd_logging"></item>
+    <item   android:title="Start Stream and Logging Shimmer"
+        android:id="@+id/start_bt_sd_logging"></item>
+    <item   android:title="Stop Stream and Logging Shimmer"
+        android:id="@+id/stop_bt_sd_logging"></item>
     <item   android:title="Device Info"
         android:id="@+id/device_info"></item>
     <item   android:title="Privacy Policy"

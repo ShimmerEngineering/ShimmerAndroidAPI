@@ -917,9 +917,21 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.startDataLogAndStreaming();
+            }
+        }
+    }
+    public void stopLoggingAndStreaming(String bluetoothAddress) {
+        HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
+
+        Collection<Object> colS=mMultiShimmer.values();
+        Iterator<Object> iterator = colS.iterator();
+        while (iterator.hasNext()) {
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
+            if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
+                stemp.stopStreamingAndLogging();
             }
         }
     }

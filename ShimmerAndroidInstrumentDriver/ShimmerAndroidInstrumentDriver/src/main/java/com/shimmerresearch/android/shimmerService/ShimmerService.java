@@ -978,13 +978,12 @@ public class ShimmerService extends Service {
 		btManager.stopLogging(bluetoothAddress);
 	}
 
-	/**
-	 * This method is kept for backwards compatibility with existing apps
-	 * @param bluetoothAddress
-	 */
-	@Deprecated
 	public void startLogAndStreaming(String bluetoothAddress) {
 		btManager.startLoggingAndStreaming(bluetoothAddress);
+	}
+
+	public void stopLogAndStreaming(String bluetoothAddress) {
+		btManager.stopLoggingAndStreaming(bluetoothAddress);
 	}
 
 	/**
