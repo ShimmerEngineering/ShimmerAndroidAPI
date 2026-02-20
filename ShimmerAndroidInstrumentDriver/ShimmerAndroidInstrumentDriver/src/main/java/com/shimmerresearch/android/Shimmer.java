@@ -848,6 +848,16 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 	}
 
+	protected void discardFirstBufferByte(){
+		byte[] bTemp = mByteArrayOutputStream.toByteArray();
+		mByteArrayOutputStream.reset();
+		mByteArrayOutputStream.write(bTemp, 1, bTemp.length-1); //this will throw the first byte away
+		if(mEnablePCTimeStamps) {
+			mListofPCTimeStamps.remove(0);
+		}
+		consolePrintLn("Throw Byte" + UtilShimmer.bytesToHexStringWithSpacesFormatted(bTemp));
+	}
+
 	protected byte[] getDataFromArrayOutputStream(int extraBytesLength){
 		if (mByteArrayOutputStream.size() >= getPacketSizeWithCrc() + extraBytesLength) {
 			byte[] allBytes = mByteArrayOutputStream.toByteArray();
