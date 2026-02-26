@@ -34,7 +34,7 @@ allprojects {
          // Update credentials here
         }
 ````
-
+Also, see [this page](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/wiki/Importing-Library-From-Github-Packages) for more details.
 
 
 # Important ~ Migration to JFrog
