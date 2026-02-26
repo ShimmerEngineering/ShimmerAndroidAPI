@@ -22,6 +22,21 @@ with the following above we have made available the last two versions which were
 the following is also relevant that the Shimmer Java Android API is not a public repository
 https://github.com/ShimmerEngineering?tab=packages&repo_name=Shimmer-Java-Android-API
 
+In order to build the ShimmerAndroidInstrumentDriver, you will need to open its [build.gradle](https://github.com/ShimmerEngineering/ShimmerAndroidAPI/blob/master/ShimmerAndroidInstrumentDriver/build.gradle) file, and update the below sections with your own GitHub user credentials (typically a username, and acccess token entered in the password field). Note that **both** maven {} blocks need to be updated.
+````
+allprojects {
+    repositories {
+        google()
+        maven {
+         // Update credentials here
+        }
+        maven {
+         // Update credentials here
+        }
+````
+
+
+
 # Important ~ Migration to JFrog
 With Bintray being sunset, we have migrated to the use of JFrog. Should you face any problems please do not hesitate to contact us. We apologize for any inconvenience caused.
 
