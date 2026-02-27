@@ -65,7 +65,6 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
     UUID sid = null;
     UUID txid = null;
     UUID rxid = null;
-    String mMac;
     String uuid;
     transient ThreadSafeByteFifoBuffer mBuffer;
     protected transient ShimmerDeviceCallbackAdapter mDeviceCallbackAdapter = new ShimmerDeviceCallbackAdapter(this);
@@ -81,7 +80,7 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
      * @param mac mac address of the Shimmer3 BLE device e.g. d0:2b:46:3d:a2:bb
      */
     public Shimmer3BLEAndroid(String mac) {
-        mMac = mac;
+        mMyBluetoothAddress = mac;
         mHandler = null;
     }
 
@@ -101,7 +100,7 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
             txid = UUID.fromString(TxID_Shimmer3);
             rxid = UUID.fromString(RxID_Shimmer3);
         }
-        mMac = mac;
+        mMyBluetoothAddress = mac;
         mHandler = handler;
     }
     transient TaskCompletionSource<String> mTaskConnect = new TaskCompletionSource<>();
@@ -119,7 +118,7 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
     @Override
     public void connect(String s, String s1) {
         mTaskConnect = new TaskCompletionSource<>();
-        BleManager.getInstance().connect(mMac, new BleGattCallback() {
+        BleManager.getInstance().connect(mMyBluetoothAddress, new BleGattCallback() {
             @Override
             public void onStartConnect() {
                 System.out.println("Connecting");
@@ -364,6 +363,24 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
     @Override
     public boolean setBluetoothRadioState(BT_STATE state) {
         boolean isChanged = super.setBluetoothRadioState(state);
+        if(mBluetoothRadioState==BT_STATE.CONNECTED){
+            mIsConnected = true;
+            mIsStreaming = false;
+        } else if(mBluetoothRadioState==BT_STATE.SDLOGGING){
+            mIsConnected = true;
+            mIsInitialised = true;
+            mIsStreaming = false;
+        }
+        else if(mBluetoothRadioState==BT_STATE.STREAMING){
+            mIsStreaming = true;
+        }
+        else if((mBluetoothRadioState==BT_STATE.DISCONNECTED)
+                ||(mBluetoothRadioState==BT_STATE.CONNECTION_LOST)
+                ||(mBluetoothRadioState==BT_STATE.CONNECTION_FAILED)){
+            mIsConnected = false;
+            mIsStreaming = false;
+            mIsInitialised = false;
+        }
         mDeviceCallbackAdapter.setBluetoothRadioState(state, isChanged);
         return isChanged;
     }

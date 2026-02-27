@@ -541,16 +541,21 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         return mMultiShimmer;
     }
 
-    public void addHandler(Handler handler) {
+    // Only supported by Shimmer class (e.g. Shimmer3 Bluetoth Classic)
+    public void addHandler(Handler handler) throws Exception {
         //Add the Handler to each connected Shimmer device
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
 
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()!= ShimmerBluetooth.BT_STATE.DISCONNECTED)){
-                stemp.addHandler(handler);
+                if (stemp instanceof Shimmer){
+                    ((Shimmer)stemp).addHandler(handler);
+                } else if (stemp instanceof Shimmer3BLEAndroid){
+                    throw new Exception("Unsupported");
+                }
             }
         }
     }
@@ -566,7 +571,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING){
                 stemp.toggleLed();
             }
@@ -580,7 +585,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.toggleLed();
             }
@@ -594,7 +599,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING)){
                 stemp.writeAccelRange(accelRange);
             }
@@ -607,7 +612,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING)){
                 stemp.writeGSRRange(gsrRange);
             }
@@ -620,7 +625,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING)){
                 stemp.writeEnabledSensors(enabledSensors);
             }
@@ -633,7 +638,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.writePMux(setBit);
             }
@@ -646,7 +651,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.writeFiveVoltReg(setBit);
             }
@@ -701,7 +706,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         long enabledSensors=0;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()!= ShimmerBluetooth.BT_STATE.DISCONNECTED)){
                 enabledSensors = stemp.getEnabledSensors();
             }
@@ -715,7 +720,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.writeAccelRange(accelRange);
             }
@@ -728,7 +733,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.writeGyroRange(range);
             }
@@ -741,7 +746,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 //currently not supported
                 stemp.writePressureResolution(resolution);
@@ -755,7 +760,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.writeMagRange(range);
             }
@@ -768,7 +773,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.writeGSRRange(gsrRange);
             }
@@ -800,7 +805,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         int aRange=-1;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 aRange = stemp.getAccelRange();
             }
@@ -815,7 +820,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         ShimmerBluetooth.BT_STATE status= ShimmerBluetooth.BT_STATE.DISCONNECTED;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 status = stemp.getBluetoothRadioState();
 
@@ -832,7 +837,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         int gRange=-1;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 gRange = stemp.getGSRRange();
             }
@@ -847,7 +852,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         int fiveVReg=-1;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 fiveVReg = stemp.get5VReg();
             }
@@ -862,7 +867,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         boolean enabled=false;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 enabled = stemp.isLowPowerMagEnabled();
             }
@@ -877,7 +882,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Iterator<Object> iterator = colS.iterator();
         int pmux=-1;
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 pmux = stemp.getPMux();
             }
@@ -891,7 +896,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.STREAMING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.startSDLogging();
             }
@@ -904,7 +909,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.STREAMING_AND_SDLOGGING || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.stopSDLogging();
             }
@@ -917,9 +922,21 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.startDataLogAndStreaming();
+            }
+        }
+    }
+    public void stopLoggingAndStreaming(String bluetoothAddress) {
+        HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
+
+        Collection<Object> colS=mMultiShimmer.values();
+        Iterator<Object> iterator = colS.iterator();
+        while (iterator.hasNext()) {
+            ShimmerBluetooth stemp=(ShimmerBluetooth) iterator.next();
+            if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
+                stemp.stopStreamingAndLogging();
             }
         }
     }
@@ -931,7 +948,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 newSensorBitmap = stemp.sensorConflictCheckandCorrection(enabledSensors,sensorToCheck);
             }
@@ -971,7 +988,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void setBlinkLEDCMD(String bluetoothAddress) {
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 if (stemp.getCurrentLEDStatus()==0){
@@ -987,7 +1004,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void enableLowPowerMag(String bluetoothAddress,boolean enable) {
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.enableLowPowerMag(enable);
@@ -998,7 +1015,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void setBattLimitWarning(String bluetoothAddress, double limit) {
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 stemp.setBattLimitWarning(limit);
@@ -1011,7 +1028,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
         double limit=-1;
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 limit=stemp.getBattLimitWarning();
@@ -1024,7 +1041,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
         double rate=-1;
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if (stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 rate=stemp.getPacketReceptionRate();
@@ -1137,7 +1154,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
         Collection<Object> colS=mMultiShimmer.values();
         Iterator<Object> iterator = colS.iterator();
         while (iterator.hasNext()) {
-            Shimmer stemp=(Shimmer) iterator.next();
+            ShimmerBluetooth stemp = (ShimmerBluetooth) iterator.next();
             if ((stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.CONNECTED || stemp.getBluetoothRadioState()== ShimmerBluetooth.BT_STATE.SDLOGGING) && stemp.getBluetoothAddress().equals(bluetoothAddress)){
                 if (setting==0){
                     stemp.enableDefaultECGConfiguration();
@@ -1170,7 +1187,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public void readStatusLogAndStream(String bluetoothAddress){
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if(stemp.getFirmwareIdentifier()==3)
                 stemp.readStatusLogAndStream();
@@ -1180,7 +1197,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public boolean isSensing(String bluetoothAddress){
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if(stemp.getFirmwareIdentifier()==3)
                 return stemp.isSensing();
@@ -1192,7 +1209,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
     public boolean isDocked(String bluetoothAddress){
         HashMap<String, Object> mMultiShimmer = getHashMapOfShimmersConnected();
 
-        Shimmer stemp=(Shimmer) mMultiShimmer.get(bluetoothAddress);
+        ShimmerBluetooth stemp = (ShimmerBluetooth) mMultiShimmer.get(bluetoothAddress);
         if (stemp!=null){
             if(stemp.getFirmwareIdentifier()==3)
                 return stemp.isDocked();

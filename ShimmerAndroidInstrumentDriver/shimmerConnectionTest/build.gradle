@@ -26,6 +26,9 @@ android {
     }
 
     packagingOptions {
+        resources {
+            excludes += ["META-INF/INDEX.LIST"]
+        }
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'

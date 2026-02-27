@@ -593,6 +593,18 @@ public class MainActivity extends AppCompatActivity implements ConnectedShimmers
             }
             mService.stopLogging(selectedDeviceAddress);
             return true;
+        }else if(id == R.id.start_bt_sd_logging){
+            if (selectedDeviceAddress==null){
+                return true;
+            }
+            mService.startLogAndStreaming(selectedDeviceAddress);
+            return true;
+        }else if(id == R.id.stop_bt_sd_logging){
+            if (selectedDeviceAddress==null){
+                return true;
+            }
+            mService.stopLogAndStreaming(selectedDeviceAddress);
+            return true;
         }else if(id == R.id.device_info){
             if (selectedDeviceAddress==null) {
                 return true;
