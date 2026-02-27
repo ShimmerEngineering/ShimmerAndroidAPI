@@ -363,6 +363,24 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
     @Override
     public boolean setBluetoothRadioState(BT_STATE state) {
         boolean isChanged = super.setBluetoothRadioState(state);
+        if(mBluetoothRadioState==BT_STATE.CONNECTED){
+            mIsConnected = true;
+            mIsStreaming = false;
+        } else if(mBluetoothRadioState==BT_STATE.SDLOGGING){
+            mIsConnected = true;
+            mIsInitialised = true;
+            mIsStreaming = false;
+        }
+        else if(mBluetoothRadioState==BT_STATE.STREAMING){
+            mIsStreaming = true;
+        }
+        else if((mBluetoothRadioState==BT_STATE.DISCONNECTED)
+                ||(mBluetoothRadioState==BT_STATE.CONNECTION_LOST)
+                ||(mBluetoothRadioState==BT_STATE.CONNECTION_FAILED)){
+            mIsConnected = false;
+            mIsStreaming = false;
+            mIsInitialised = false;
+        }
         mDeviceCallbackAdapter.setBluetoothRadioState(state, isChanged);
         return isChanged;
     }
