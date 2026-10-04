@@ -1,6 +1,7 @@
 # ShimmerAndroidAPI
 
-Android wrapper over the Java driver, plus eleven example apps. Public repo; BETA per its README.
+Android wrapper over the Java driver — all but its Bluetooth streaming parser — plus eleven example
+apps. Public repo; BETA per its README.
 
 ## It wraps the driver — except for the Bluetooth stream parser
 
@@ -9,16 +10,29 @@ Android wrapper over the Java driver, plus eleven example apps. Public repo; BET
 the parser below, what lives here is Android-specific: radio/transport drivers
 (`androidradiodriver/`), a foreground `ShimmerService`, GUI fragments and plotting.
 
-**`Shimmer.java` carries its own copy of the Bluetooth stream parser.** It overrides
-`processPacket()`, `processWhileStreaming()`, `processInstreamResponse()` and
-`clearSingleDataPacketFromBuffers()` from `ShimmerBluetooth`, and the copy has drifted: it resyncs a
-byte at a time where the driver skips to the next packet. So a streaming-parse fix in the driver
-never reaches `Shimmer`, even after a republish and pin bump (below). Check every driver parser fix
-against `Shimmer.java`, and expect to port it.
+**`Shimmer.java` carries its own copy of the Bluetooth stream parser.** It overrides these
+`ShimmerBluetooth` methods, and the copy has drifted from the driver's:
 
-Packet decoding, calibration and timestamps (`processDataPacket()` → `buildMsg()`) and `checkCrc()`
-are still the driver's: a fix there belongs upstream and needs no port. `Shimmer3BLEAndroid`
-overrides only BLE transport, state and callbacks, so it uses the driver's parser.
+- `processPacket()` — resyncs a byte at a time, where the driver skips to the next packet
+- `processWhileStreaming()` — reads everything available in one go, where the driver reads a byte
+  at a time
+- `processInstreamResponse()` and `clearSingleDataPacketFromBuffers()`
+- `checkCrc()`, since DEV-1148 — a stopgap that its javadoc says can go once the driver pin
+  includes DEV-1147
+
+`readBattery()` and `readStatusLogAndStream()` are overridden too: while streaming they write the
+command straight to the socket instead of queueing it.
+
+So a driver fix to parsing, CRC or ACK handling **never reaches `Shimmer`, even after a republish
+and pin bump** (below). Check every such fix against `Shimmer.java` and expect to port it by hand:
+DEV-1147's driver fix (ShimmerResearch/Shimmer-Java-Android-API#319) had to be ported as DEV-1148
+(#121).
+
+Decoding is still the driver's: `Shimmer.java` hands each packet to `processDataPacket()` →
+`buildMsg()`, so calibration and the device timestamp are upstream, and a fix there needs no port.
+Nothing else here overrides the parser — `Shimmer4Android` and `VerisenseDeviceAndroid` override
+only callbacks, and `Shimmer3BLEAndroid` only BLE transport, state and callbacks, so it uses the
+driver's parser.
 
 ## But upstream fixes do not arrive for free
 
@@ -33,8 +47,8 @@ allprojects { subprojects { afterEvaluate { dependencies {
 } } } }
 ```
 
-So an upstream fix reaches this repo only when it is **published and the pin is bumped**. As of
-2026-09-30 that has not kept up:
+So an upstream fix reaches this repo only when it is **published and the pin is bumped** — and a
+stream-parser fix not even then (above). As of 2026-09-30 that has not kept up:
 
 | | pinned here | source in Shimmer-Java-Android-API | published |
 |---|---|---|---|
@@ -54,7 +68,8 @@ and is the library module, not the build root.
 cd ShimmerAndroidInstrumentDriver && ./gradlew :ShimmerAndroidInstrumentDriver:assembleRelease
 ```
 
-AGP 8.2.2, Gradle 8.5, Java 11, `compileSdk`/`targetSdk` 33, `minSdk` 14.
+AGP 8.2.2, Gradle 8.5, `compileSdk`/`targetSdk` 33, `minSdk` 14. Java 11 is the source and target
+level only: AGP 8 needs Gradle itself to run on JDK 17 or later.
 
 Both wrapper directories carry a wrapper, at **different versions** — 8.5 at the build root and
 8.14.3 in the module. Gradle walks upward for `settings.gradle`, so invoking the inner one still
@@ -73,6 +88,34 @@ gpr.key=<personal-access-token>
 Without it the build fails at dependency resolution, which reads like a network or repository fault
 rather than a missing credential. Note the property is `gpr.usr` — a commented-out block in the
 module's `build.gradle` says `gpra.usr`, which is dead code.
+
+### `android.useAndroidX=true` is required, and the repo does not set it
+
+The build root's `gradle.properties` is gitignored, so a fresh clone has none. The library depends
+on AndroidX (`androidx.appcompat`, `androidx.documentfile`), and without the property AGP stops:
+"contains AndroidX dependencies, but the `android.useAndroidX` property is not enabled". Create
+`ShimmerAndroidInstrumentDriver/gradle.properties` containing
+
+```
+android.useAndroidX=true
+```
+
+or pass `-Pandroid.useAndroidX=true` on the command line. Leave `android.enableJetifier` off: it
+breaks the unit-test classpath on a transitive `jackson-core` 2.18.2 with "Unsupported class file
+major version 65".
+
+### Unit tests
+
+Since DEV-1148 the library module has JVM unit tests in its `src/test/` (JUnit 4). They run against
+the stub `android.jar`, with `unitTests.returnDefaultValues = true` so the stubs return defaults
+instead of throwing — `Shimmer`'s constructor and its logging call into them. From
+`ShimmerAndroidInstrumentDriver/`:
+
+```
+./gradlew -Pandroid.useAndroidX=true :ShimmerAndroidInstrumentDriver:test
+```
+
+That runs both the debug and release variants. With no CI (below), nothing else will run them.
 
 ## No CI
 
