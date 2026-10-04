@@ -2,17 +2,23 @@
 
 Android wrapper over the Java driver, plus eleven example apps. Public repo; BETA per its README.
 
-## It wraps the driver — it does not reimplement it
+## It wraps the driver — except for the Bluetooth stream parser
 
 `Shimmer` extends `ShimmerBluetooth`, `Shimmer4Android` extends `Shimmer4sdk`, and
-`VerisenseDeviceAndroid` extends `VerisenseDevice` — all from `Shimmer-Java-Android-API`. What lives
-here is Android-specific: radio/transport drivers (`androidradiodriver/`), a foreground
-`ShimmerService`, GUI fragments and plotting.
+`VerisenseDeviceAndroid` extends `VerisenseDevice` — all from `Shimmer-Java-Android-API`. Apart from
+the parser below, what lives here is Android-specific: radio/transport drivers
+(`androidradiodriver/`), a foreground `ShimmerService`, GUI fragments and plotting.
 
-There is **no wire-format, parsing, calibration or timestamp logic of its own**. A protocol fix
-belongs upstream in `Shimmer-Java-Android-API`, not here. (Apparent hits when grepping for
-`calibrat`/`timeStamp` are changelog comments in `Shimmer.java` and reads of already-calibrated
-`ObjectCluster` data.)
+**`Shimmer.java` carries its own copy of the Bluetooth stream parser.** It overrides
+`processPacket()`, `processWhileStreaming()`, `processInstreamResponse()` and
+`clearSingleDataPacketFromBuffers()` from `ShimmerBluetooth`, and the copy has drifted: it resyncs a
+byte at a time where the driver skips to the next packet. So a streaming-parse fix in the driver
+never reaches `Shimmer`, even after a republish and pin bump (below). Check every driver parser fix
+against `Shimmer.java`, and expect to port it.
+
+Packet decoding, calibration and timestamps (`processDataPacket()` → `buildMsg()`) and `checkCrc()`
+are still the driver's: a fix there belongs upstream and needs no port. `Shimmer3BLEAndroid`
+overrides only BLE transport, state and callbacks, so it uses the driver's parser.
 
 ## But upstream fixes do not arrive for free
 
