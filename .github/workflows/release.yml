@@ -89,6 +89,10 @@ jobs:
         legacy=${VERSION/_beta/Beta}
         for t in "$TAG" "AndroidAPI_v$legacy" "v$legacy"; do
           if git rev-parse -q --verify "refs/tags/$t" >/dev/null; then
+            if [ "$DRY_RUN" = true ]; then
+              echo "::warning::$VERSION is already released as $t, so a real release would stop here. Dry run continues."
+              break
+            fi
             echo "::error::$VERSION is already released as $t. Bump the version with an uprev PR first."
             exit 1
           fi
