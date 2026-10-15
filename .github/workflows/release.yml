@@ -9,8 +9,8 @@
 #   2. Actions -> "Release Android API" -> Run workflow (on master).
 #
 # One run does, in order, and creates nothing public until the library has built:
-#   build    reads the version from the library's publishing block; fails if AndroidAPI_v<version>
-#            is already tagged; warns if the driver pins are not the newest Java API release
+#   build    reads the version from the library's publishing block; fails if that version is
+#            already tagged (in this or the older v3.2.xBeta form); warns if the driver pins are not the newest Java API release
 #            (DEV-1115); builds the release .aar; publishes it to GitHub Packages
 #   release  tags AndroidAPI_v<version> on the commit it built and creates the GitHub Release, with
 #            notes from the previous Android API release and the .aar attached
@@ -84,10 +84,15 @@ jobs:
           exit 1
         fi
         TAG="AndroidAPI_v$VERSION"
-        if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-          echo "::error::$TAG already exists. Bump the version with an uprev PR first."
-          exit 1
-        fi
+        # Releases before this workflow were tagged v3.2.8Beta / AndroidAPI_v3.2.9Beta for version
+        # 3.2.x_beta, so check those spellings too, or an un-bumped version would be released twice.
+        legacy=${VERSION/_beta/Beta}
+        for t in "$TAG" "AndroidAPI_v$legacy" "v$legacy"; do
+          if git rev-parse -q --verify "refs/tags/$t" >/dev/null; then
+            echo "::error::$VERSION is already released as $t. Bump the version with an uprev PR first."
+            exit 1
+          fi
+        done
         # Earlier releases were tagged v3.2.xBeta, so match those too.
         PREVIOUS_TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 200 --json tagName,createdAt \
           --jq '[.[] | select(.tagName | test("^(AndroidAPI_)?v[0-9]"))] | sort_by(.createdAt) | last | .tagName // ""')
