@@ -77,15 +77,15 @@ publishing {
 def getArtificatId = { ->
     return "ShimmerAndroidInstrumentDriver" // Replace with library name ID
 }
-// Published by the "Release Android API" workflow (.github/workflows/release.yml), which also reads
-// the version below: bump it in the uprev PR, then run the workflow. Run assembleRelease before
-// publish, because the artifact is the built .aar file.
+// Published by the "Release Android API" workflow (.github/workflows/release.yml), which picks the
+// version and passes it as -PreleaseVersion; the AndroidAPI_v tags record what was released. Run
+// assembleRelease before publish, because the artifact is the built .aar file.
 publishing {
     publications {
         bar(MavenPublication) {
             groupId = 'com.shimmerresearch' // Replace with your package's group/organization name
             artifactId = 'shimmerandroidinstrumentdriver' // Replace with the name of your package
-            version = '3.2.9_beta' // Replace with your package version
+            version = project.findProperty('releaseVersion') ?: 'local' // set by the Release Android API workflow
             artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
         }
     }
