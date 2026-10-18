@@ -6,9 +6,10 @@
 # it: a module added to settings.gradle is built here without editing this file. --continue keeps
 # building after a failure so one run lists every broken module; the run still fails if any did.
 #
-# Reading the driver from Shimmer-Java-Android-API's GitHub Packages uses this repo's GITHUB_TOKEN.
-# If that is refused (401/403 resolving com.shimmerresearch:shimmerdriver), add a classic token
-# with read:packages as the PACKAGES_READ_TOKEN secret and it is used instead.
+# Reading the driver from Shimmer-Java-Android-API's GitHub Packages uses this repo's GITHUB_TOKEN
+# only, never a long-lived token: PR builds run the PR's own build scripts, which could read it.
+# If that is refused (401/403 resolving com.shimmerresearch:shimmerdriver), give this repo read
+# access in the package's "Manage Actions access" settings rather than adding a token here.
 
 name: CI
 
@@ -37,7 +38,7 @@ jobs:
     env:
       # Read by the repositories in the root build.gradle to resolve the driver.
       USERNAME: ${{ github.actor }}
-      TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+      TOKEN: ${{ github.token }}
     steps:
     - uses: actions/checkout@v4
 
