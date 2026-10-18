@@ -16,7 +16,9 @@
 # One run does, in order, and creates nothing public until the library has built:
 #   build    picks both versions; fails if this version is already tagged (in this or the older
 #            v3.2.xBeta form) or the driver version has no API_v release; builds the release .aar
-#            against that driver; publishes it to GitHub Packages
+#            against that driver. Read-only (it reads the driver package): it runs on PRs too.
+#   publish  real releases only, and the only job with packages:write. Builds the .aar the same way,
+#            publishes it to GitHub Packages, and keeps the .aar it published for the release
 #   release  tags AndroidAPI_v<version> on the commit it built and creates the GitHub Release, with
 #            the driver version, notes since the previous Android API release, and the .aar
 #
@@ -62,9 +64,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30 # a hung Gradle daemon otherwise holds the runner for 6 hours
+    # Read-only on purpose: this job also runs on PRs, and any code in a job can recover that
+    # job's token. packages:read is for resolving the driver; only the publish job, which runs
+    # on real releases alone, can write packages.
     permissions:
       contents: read
-      packages: write
+      packages: read
     env:
       DRY_RUN: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run }}
       # Read by the repositories in the root build.gradle to resolve the driver.
@@ -86,6 +91,9 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0 # tags, to refuse a version that is already released
+        # Keep the token out of .git/config, where the Gradle build (and any plugin or dependency
+        # it runs) could read it. Nothing here needs git credentials after checkout; gh uses GH_TOKEN.
+        persist-credentials: false
 
     - name: Choose the version and the driver
       id: version
@@ -178,19 +186,52 @@ jobs:
         ./gradlew :ShimmerAndroidInstrumentDriver:assembleRelease -Pandroid.useAndroidX=true \
           -PreleaseVersion="$VERSION" -PdriverVersion="$DRIVER"
 
+  publish:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && !inputs.dry_run
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # a hung Gradle daemon otherwise holds the runner for 6 hours
+    permissions:
+      contents: read
+      packages: write # also covers reading the driver package
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+      DRIVER: ${{ needs.build.outputs.driver }}
+      # Read by the repositories in the root build.gradle to resolve the driver.
+      USERNAME: ${{ github.actor }}
+      TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false # publish gets its token explicitly, below
+
+    # AGP 8 needs JDK 17.
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
+
+    # Run assembleRelease first: the publication's artifact is the built .aar file, and publish
+    # does not build it itself.
+    - name: Build the release .aar
+      run: |
+        ./gradlew :ShimmerAndroidInstrumentDriver:assembleRelease -Pandroid.useAndroidX=true \
+          -PreleaseVersion="$VERSION" -PdriverVersion="$DRIVER"
+
+    # The library's publishing block reads GITHUB_ACTOR and GITHUB_TOKEN.
     - name: Publish to GitHub Packages
-      if: env.DRY_RUN != 'true'
       env:
         GITHUB_TOKEN: ${{ github.token }}
-        VERSION: ${{ steps.version.outputs.version }}
-        DRIVER: ${{ steps.version.outputs.driver }}
       run: |
         ./gradlew :ShimmerAndroidInstrumentDriver:publish -Pandroid.useAndroidX=true \
           -PreleaseVersion="$VERSION" -PdriverVersion="$DRIVER"
 
-    - name: Collect the release .aar
-      env:
-        VERSION: ${{ steps.version.outputs.version }}
+    # The .aar just published, so the GitHub Release carries the same file as GitHub Packages.
+    - name: Collect the published .aar
       run: |
         mkdir -p ../release-assets
         cp ShimmerAndroidInstrumentDriver/build/outputs/aar/ShimmerAndroidInstrumentDriver-release.aar \
@@ -204,7 +245,7 @@ jobs:
         if-no-files-found: error
 
   release:
-    needs: build
+    needs: [build, publish]
     if: github.event_name == 'workflow_dispatch' && !inputs.dry_run
     runs-on: ubuntu-latest
     timeout-minutes: 10
