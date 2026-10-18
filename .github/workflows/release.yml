@@ -16,7 +16,8 @@
 # One run does, in order, and creates nothing public until the library has built:
 #   build    picks both versions; fails if this version is already tagged (in this or the older
 #            v3.2.xBeta form) or the driver version has no API_v release; builds the release .aar
-#            against that driver. Read-only (it reads the driver package): it runs on PRs too.
+#            and every example app against that driver. Read-only (it reads the driver package):
+#            it runs on PRs too.
 #   publish  real releases only, and the only job with packages:write. Builds the .aar the same way,
 #            publishes it to GitHub Packages, and keeps the .aar it published for the release
 #   release  tags AndroidAPI_v<version> on the commit it built and creates the GitHub Release, with
@@ -88,7 +89,7 @@ jobs:
         echo "::error::A release must run on master, not ${GITHUB_REF_NAME}. Tick dry_run to try another branch."
         exit 1
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       with:
         fetch-depth: 0 # tags, to refuse a version that is already released
         # Keep the token out of .git/config, where the Gradle build (and any plugin or dependency
@@ -168,7 +169,7 @@ jobs:
 
     # AGP 8 needs JDK 17.
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -177,14 +178,27 @@ jobs:
       uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
 
     # gradle.properties is gitignored here, so android.useAndroidX (needed for the androidx
-    # dependencies) is passed on the command line.
+    # dependencies) and the daemon heap are passed on the command line. The default 512 MB heap
+    # runs out dexing the examples (see ci.yml); both steps pass the same value so they share
+    # one daemon.
     - name: Build the release .aar
       env:
         VERSION: ${{ steps.version.outputs.version }}
         DRIVER: ${{ steps.version.outputs.driver }}
       run: |
         ./gradlew :ShimmerAndroidInstrumentDriver:assembleRelease -Pandroid.useAndroidX=true \
-          -PreleaseVersion="$VERSION" -PdriverVersion="$DRIVER"
+          -PreleaseVersion="$VERSION" -PdriverVersion="$DRIVER" \
+          -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g"
+
+    # ci.yml builds the examples against master's default driver. A release can pick another,
+    # so build every example against the one this release ships with, before anything is
+    # published. --continue reports every failing module, and the step still fails.
+    - name: Build every example against the chosen driver
+      env:
+        DRIVER: ${{ steps.version.outputs.driver }}
+      run: |
+        ./gradlew assembleDebug --continue -Pandroid.useAndroidX=true -PdriverVersion="$DRIVER" \
+          -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g"
 
   publish:
     needs: build
@@ -201,13 +215,13 @@ jobs:
       USERNAME: ${{ github.actor }}
       TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       with:
         persist-credentials: false # publish gets its token explicitly, below
 
     # AGP 8 needs JDK 17.
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -238,7 +252,7 @@ jobs:
            "../release-assets/shimmerandroidinstrumentdriver-$VERSION.aar"
         ls -l ../release-assets
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: release-assets
         path: release-assets/
@@ -258,7 +272,7 @@ jobs:
       PREVIOUS_TAG: ${{ needs.build.outputs.previous_tag }}
       DRIVER: ${{ needs.build.outputs.driver }}
     steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         name: release-assets
         path: release-assets

@@ -95,10 +95,11 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/ShimmerResearch/ShimmerAndroidAPI")
             credentials {
-                // Locally: gpr.user and gpr.key in GRADLE_USER_HOME/gradle.properties, with a token
-                // that has write:packages. In the workflow: GITHUB_ACTOR and GITHUB_TOKEN. These are
-                // kept apart from USERNAME/TOKEN in the root build.gradle, which only need to read.
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                // Locally: gpr.user (or gpr.usr, the name the root build.gradle reads) and gpr.key in
+                // GRADLE_USER_HOME/gradle.properties, with a token that has write:packages. In the
+                // workflow: GITHUB_ACTOR and GITHUB_TOKEN. These are kept apart from USERNAME/TOKEN in
+                // the root build.gradle, which only need to read.
+                username = project.findProperty("gpr.user") ?: project.findProperty("gpr.usr") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
             }
         }
