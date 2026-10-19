@@ -287,6 +287,9 @@ jobs:
         {
           echo "Built against \`com.shimmerresearch:shimmerdriver\` and \`com.shimmerresearch:shimmerbluetoothmanager\` **$DRIVER** ([API_v$DRIVER]($driver_url)). Add both, at that version, to your app's dependencies."
           echo
+          # The driver's JNA is desktop-only; its two jars clash on META-INF/AL2.0 in an Android app.
+          echo "Exclude \`net.java.dev.jna\` from both, or the app fails packaging with \"2 files found with path 'META-INF/AL2.0'\". The exclusions this library builds with are in [ShimmerAndroidInstrumentDriver/build.gradle]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$TAG/ShimmerAndroidInstrumentDriver/build.gradle)."
+          echo
           gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" "${args[@]}" --jq .body
         } > notes.md
         gh release create "$TAG" release-assets/* \

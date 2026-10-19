@@ -88,6 +88,9 @@ allprojects {
                     // excluding org.json which is provided by Android
                     exclude group: 'io.netty'
                     exclude group: 'com.google.protobuf'
+                    // JNA (in the driver since 0.11.8_beta) is for the desktop USB debug listeners only; on
+                    // Android its two jars clash on META-INF/AL2.0 and fail every app's packaging.
+                    exclude group: 'net.java.dev.jna'
                     exclude group: 'org.apache.commons.math'
                 }
 
@@ -96,6 +99,9 @@ allprojects {
                     // excluding org.json which is provided by Android
                     exclude group: 'io.netty'
                     exclude group: 'com.google.protobuf'
+                    // JNA (in the driver since 0.11.8_beta) is for the desktop USB debug listeners only; on
+                    // Android its two jars clash on META-INF/AL2.0 and fail every app's packaging.
+                    exclude group: 'net.java.dev.jna'
                 }
             }
         }
