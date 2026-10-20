@@ -319,7 +319,8 @@ $summary | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $outDir 'summary.jso
 
 Write-Host ''
 $results | Format-Table -AutoSize -Wrap | Out-String -Width 200 | Write-Host
-$failed = @($results | Where-Object { $_.Result -ne 'PASS' -and $_.Result -ne 'SKIP' })
+# A skipped scenario did not run, so it is not a pass: the exit code and the gate's status agree on that.
+$failed = @($results | Where-Object { $_.Result -ne 'PASS' })
 $passed = @($results | Where-Object { $_.Result -eq 'PASS' })
 
 if ($Report) {
@@ -348,7 +349,7 @@ if ($Report) {
 }
 
 if ($failed.Count -gt 0) {
-    Write-Host "$($failed.Count) of $($results.Count) failed. Reports, logcat and instrument output: $outDir" -ForegroundColor Red
+    Write-Host "$($failed.Count) of $($results.Count) did not pass. Reports, logcat and instrument output: $outDir" -ForegroundColor Red
     exit 1
 }
 Write-Host "All $($results.Count) passed. Reports: $outDir" -ForegroundColor Green

@@ -19,7 +19,7 @@ driver has had its fix, DEV-1147, since 0.11.9_beta.
 .\tools\hil\run-android-hil.ps1
 ```
 
-It exits 0 when everything passed, 1 when something failed, and 2 when the bench isn't set up.
+It exits 0 when everything passed, 1 when anything failed, errored, timed out or was skipped, and 2 when the bench isn't set up.
 
 ## Before every Android release (the gate)
 
