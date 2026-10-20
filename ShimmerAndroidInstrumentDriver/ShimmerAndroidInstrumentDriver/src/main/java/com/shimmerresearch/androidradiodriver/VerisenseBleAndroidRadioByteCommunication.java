@@ -141,6 +141,10 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
      * Each step carries its connect attempt's task, so results from an attempt that is no longer current are ignored.
      */
     private void onMtuSet(TaskCompletionSource<String> taskConnect, BleDevice bleDevice, BluetoothGatt gatt) {
+        if (taskConnect != mTaskConnect || taskConnect.getTask().isCompleted()) {
+            // The attempt failed or a newer one replaced it while the MTU was pending
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
         }
