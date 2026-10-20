@@ -54,7 +54,9 @@ class Snoop:
 def rfcomm(dlci, payload, credit=None):
     control = bt.RFCOMM_UIH | (0x10 if credit is not None else 0)
     n = len(payload)
-    length = bytes([(n << 1) | 1]) if n < 128 else bytes([(n << 1) & 0xFE, n >> 7])
+    # As Linux sends it (rfcomm_make_uih): len << 1 | EA in one octet, or len << 1 as a 16-bit
+    # little-endian value in two. 130 bytes is [0x04, 0x01].
+    length = bytes([(n << 1) | 1]) if n < 128 else (n << 1).to_bytes(2, "little")
     return bytes([(dlci << 2) | 0x3, control]) + length + (bytes([credit]) if credit is not None else b"") \
         + payload + b"\x9A"
 

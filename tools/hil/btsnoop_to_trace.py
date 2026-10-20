@@ -203,6 +203,9 @@ class Extractor:
         control = pdu[1]
         if dlci == 0 or (control & ~0x10) != RFCOMM_UIH:
             return  # the multiplexer's control channel, or not a data frame
+        # TS 07.10 length: one octet (EA = 1) up to 127, otherwise two octets holding len << 1 as a
+        # little-endian 16-bit value. Only the first octet carries the EA bit; the second is len >> 7
+        # whole (Linux: __len16 in net/bluetooth/rfcomm/core.c; Android: RFCOMM_PARSE_LEN_FIELD).
         if pdu[2] & 1:
             length, i = pdu[2] >> 1, 3
         else:
