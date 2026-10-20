@@ -216,10 +216,11 @@ class Extractor:
 
 def drop_cccd_writes(entries):
     """A write that turns notifications on (to the descriptor after a notifying handle) is GATT
-    housekeeping, not a command to the unit; the recorded traces leave it out."""
-    notify_handles = {int(e[2][1:]) for e in entries if not e[1] and e[2].startswith("h")}
+    housekeeping, not a command to the unit; the recorded traces leave it out. Handles belong to one
+    connection, so a write is only matched against notifications on the same one."""
+    notify_handles = {(id(e[4]), int(e[2][1:])) for e in entries if not e[1] and e[2].startswith("h")}
     return [e for e in entries
-            if not (e[1] and e[2].startswith("h") and int(e[2][1:]) - 1 in notify_handles
+            if not (e[1] and e[2].startswith("h") and (id(e[4]), int(e[2][1:]) - 1) in notify_handles
                     and len(e[3]) == 2 and e[3][1] == 0 and e[3][0] in (0, 1, 2))]
 
 

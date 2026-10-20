@@ -108,7 +108,7 @@ class ExtractTest(unittest.TestCase):
 
     def test_log_stamped_in_utc(self):
         self.snoop.write(self.log, clock_offset_us=0)
-        rx_time_ms = self.t[6][0] // 1000
+        rx_time_ms = self.t[7][0] // 1000
         _, lines = self.run_extract("--mac", S3R, "--snoop-clock", "utc", "--from-ms", str(rx_time_ms))
         rx = [l for l in lines if " RX " in l]
         self.assertEqual(1, len(rx))
@@ -121,10 +121,29 @@ class ExtractTest(unittest.TestCase):
                           "RX r2 [" + " ".join(f"0x{b:02X}" for b in range(130)) + "]"], data)
 
     def test_time_window(self):
-        rx_time_ms = self.t[6][0] // 1000  # the second fragment of the BLE notification
+        # A notification counts at the record that completes it: its second fragment, record 7. The
+        # command before it is record 5, 2 ms earlier. Both ends of the window are inclusive.
+        rx_time_ms = self.t[7][0] // 1000
         _, lines = self.run_extract("--mac", S3R, "--from-ms", str(rx_time_ms))
         self.assertEqual(1, sum(1 for l in lines if " RX " in l))
         self.assertEqual(0, sum(1 for l in lines if " TX " in l))
+        _, lines = self.run_extract("--mac", S3R, "--to-ms", str(rx_time_ms - 1))
+        self.assertEqual(0, sum(1 for l in lines if " RX " in l))
+        self.assertEqual(1, sum(1 for l in lines if " TX " in l))
+
+    def test_notification_write_filter_is_per_connection(self):
+        # The unit reconnects on the same ACL handle; on the new connection a 2-byte command to
+        # h15 must not be taken for the notification-on write of the old connection's h14.
+        s = Snoop()
+        s.le_connected(0x40, S3R)
+        s.acl(True, 0x40, bt.L2CAP_ATT, b"\x1B" + struct.pack("<H", 14) + b"\x00")
+        s.event(0x05, b"\x00" + struct.pack("<H", 0x40) + b"\x13")  # Disconnection Complete
+        s.le_connected(0x40, S3R)
+        s.acl(False, 0x40, bt.L2CAP_ATT, b"\x52" + struct.pack("<H", 15) + b"\x01\x00")
+        s.write(self.log)
+        _, lines = self.run_extract("--mac", S3R)
+        self.assertEqual(["RX h14 [0x00]", "TX h15 [0x01 0x00]"],
+                         [l[14:] for l in lines if " TX " in l or " RX " in l])
 
     def test_matches_shimmer_logandstream_line_layout(self):
         # Its loader takes the time from the first 12 characters and the bytes between [ ].

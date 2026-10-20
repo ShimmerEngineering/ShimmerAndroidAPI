@@ -353,20 +353,32 @@ if ($CaptureBytes) {
     $brOutput = & $adbExe @adbTarget bugreport $zip 2>&1 | Out-String
     $snoopDir = Join-Path $outDir 'btsnoop'
     $logs = @()
-    if (Test-Path $zip) {
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        $archive = [IO.Compression.ZipFile]::OpenRead($zip)
-        try {
-            New-Item -ItemType Directory -Force $snoopDir | Out-Null
-            foreach ($entry in @($archive.Entries | Where-Object { $_.Name -match '^btsnoop_hci\.log(\.last)?$' })) {
-                $dest = Join-Path $snoopDir $entry.Name
-                [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $dest, $true)
-                $logs += $dest
+    try {
+        if (Test-Path $zip) {
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+            try {
+                New-Item -ItemType Directory -Force $snoopDir | Out-Null
+                foreach ($entry in @($archive.Entries | Where-Object { $_.Name -match '^btsnoop_hci\.log(\.last)?$' })) {
+                    $dest = Join-Path $snoopDir $entry.Name
+                    [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $dest, $true)
+                    $logs += $dest
+                }
             }
+            finally { $archive.Dispose() }
         }
-        finally { $archive.Dispose() }
-        # A bug report holds the phone's whole state; keep only the snoop log, on the PC and the phone.
-        Remove-Item $zip
+        else {
+            Write-Host "The bug report did not arrive: $($brOutput.Trim())" -ForegroundColor Yellow
+        }
+    }
+    catch {
+        Write-Host "Could not read the bug report: $($_.Exception.Message)" -ForegroundColor Yellow
+        $logs = @()
+    }
+    finally {
+        # A bug report holds the phone's whole state; keep only the snoop log, on the PC and the
+        # phone, whether or not reading it worked.
+        Remove-Item $zip -ErrorAction SilentlyContinue
         foreach ($onPhone in [regex]::Matches($brOutput, '(/data/user_de/\S+/bugreports/)(bugreport-[^\s/]+?)\.zip')) {
             $dir = $onPhone.Groups[1].Value
             $name = $onPhone.Groups[2].Value
@@ -398,8 +410,8 @@ $summary = [pscustomobject]@{
 }
 if ($CaptureBytes) {
     # Each run's window on the phone's clock, to cut its bytes out of btsnoop/ again later.
-    $summary | Add-Member captureWindows ([pscustomobject]$windows)
-    $summary | Add-Member phoneUtcOffsetMin $phoneUtcOffsetMin
+    $summary | Add-Member -MemberType NoteProperty -Name captureWindows -Value ([pscustomobject]$windows)
+    $summary | Add-Member -MemberType NoteProperty -Name phoneUtcOffsetMin -Value $phoneUtcOffsetMin
 }
 $summary | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $outDir 'summary.json')
 
