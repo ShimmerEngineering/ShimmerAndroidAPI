@@ -226,7 +226,11 @@ foreach ($file in @($apk, $testApk)) {
         Fail "Installing $(Split-Path $file -Leaf) failed:`n$($result.Trim())`nOn Xiaomi, turn on 'Install via USB' (and on Android 12+ 'USB debugging (Security settings)') in Developer options."
     }
 }
+# Clear the last run's reports, and make sure they went: the collect step takes any report it finds
+# as this run's evidence.
 Adb shell rm -rf $deviceReports | Out-Null
+$left = (Adb shell "ls $deviceReports 2>/dev/null") -join ''
+if ($left.Trim()) { Fail "Could not clear the old reports on the phone ($deviceReports); remove them and run again." }
 
 # --- Run ---------------------------------------------------------------------------------------
 # One scenario, with a time limit: the tests guard every API call, but if the whole process still

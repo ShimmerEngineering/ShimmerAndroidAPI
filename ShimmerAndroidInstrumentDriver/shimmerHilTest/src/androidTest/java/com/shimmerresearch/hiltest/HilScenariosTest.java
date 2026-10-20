@@ -281,7 +281,16 @@ public class HilScenariosTest {
 				}
 				Thread.sleep(1000);
 				batteryMoments.add(session.nowMs());
-				report.check(session.readBattery(), "cycle " + i + ": readBattery did not complete: it threw, hung or was skipped after a hung call (see the events)");
+				// readBattery() only sends the command, so wait for the reply to be decoded as well.
+				final Object batteryBefore = session.batteryDetails();
+				boolean batteryAsked = session.readBattery();
+				report.check(batteryAsked, "cycle " + i + ": readBattery did not complete: it threw, hung or was skipped after a hung call (see the events)");
+				if (batteryAsked) {
+					report.check(session.waitFor(() -> {
+						Object now = session.batteryDetails();
+						return now != null && now != batteryBefore;
+					}, 5000), "cycle " + i + ": no battery reply decoded within 5 s of readBattery");
+				}
 				Thread.sleep(2000);
 			}
 			double stoppedAtMs = session.nowMs();

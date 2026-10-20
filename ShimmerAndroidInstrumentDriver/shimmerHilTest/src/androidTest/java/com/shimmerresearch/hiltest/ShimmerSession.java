@@ -363,6 +363,15 @@ final class ShimmerSession implements AutoCloseable {
 		return call("readBattery", 10000, () -> requireDevice().readBattery());
 	}
 
+	/**
+	 * The API's current battery details. Both the Classic and the BLE parser replace the object with
+	 * a new one for each battery reply they decode, so a different object means a reply arrived.
+	 */
+	Object batteryDetails() {
+		ShimmerBluetooth d = device();
+		return d == null ? null : d.getBattStatusDetails();
+	}
+
 	boolean disconnect(long timeoutMs) throws InterruptedException {
 		final ShimmerBluetooth d = device();
 		if (d != null && !call("disconnect", 10000, d::disconnect)) {

@@ -48,9 +48,14 @@ final class HilReport {
 		json.put("args", a);
 	}
 
+	/** org.json refuses NaN and infinities, which a failing run is the likeliest to produce; store null. */
+	private static Object num(double v) {
+		return Double.isNaN(v) || Double.isInfinite(v) ? JSONObject.NULL : v;
+	}
+
 	void put(String key, Object value) {
 		try {
-			json.put(key, value);
+			json.put(key, value instanceof Double || value instanceof Float ? num(((Number) value).doubleValue()) : value);
 		} catch (Exception e) {
 			Log.w(ShimmerSession.TAG, "report: " + key + ": " + e);
 		}
@@ -61,12 +66,12 @@ final class HilReport {
 			JSONObject o = new JSONObject();
 			o.put("received", a.received);
 			o.put("missing", a.missing);
-			o.put("lossPercent", a.lossPercent());
+			o.put("lossPercent", num(a.lossPercent()));
 			o.put("nonIncreasing", a.nonIncreasing);
 			o.put("timestampJumps", a.timestampJumps.size());
-			o.put("effectiveRateHz", a.effectiveRateHz);
-			o.put("accelMagnitudeMean", a.accelMagnitudeMean);
-			o.put("accelMagnitudeStd", a.accelMagnitudeStd);
+			o.put("effectiveRateHz", num(a.effectiveRateHz));
+			o.put("accelMagnitudeMean", num(a.accelMagnitudeMean));
+			o.put("accelMagnitudeStd", num(a.accelMagnitudeStd));
 			o.put("gaps", a.gaps.size());
 			json.put(key, o);
 		} catch (Exception e) {
@@ -81,7 +86,7 @@ final class HilReport {
 			for (StreamAnalysis.Gap g : a.gaps) {
 				JSONObject o = new JSONObject();
 				o.put("afterReceivedMs", Math.round(g.afterReceivedMs));
-				o.put("afterTimestampMs", g.afterTimestampMs);
+				o.put("afterTimestampMs", num(g.afterTimestampMs));
 				o.put("missing", g.missing);
 				gaps.put(o);
 			}
@@ -90,7 +95,7 @@ final class HilReport {
 			for (StreamAnalysis.Gap g : a.timestampJumps) {
 				JSONObject o = new JSONObject();
 				o.put("afterReceivedMs", Math.round(g.afterReceivedMs));
-				o.put("afterTimestampMs", g.afterTimestampMs);
+				o.put("afterTimestampMs", num(g.afterTimestampMs));
 				o.put("periodsAhead", g.missing + 1);
 				jumps.put(o);
 			}
