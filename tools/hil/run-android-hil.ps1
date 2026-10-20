@@ -20,6 +20,11 @@ The published .aar, as a customer app gets it.
 .\tools\hil\run-android-hil.ps1 -Scenario midStreamSet -Unit s3r-15bc -Crc 1
 
 .EXAMPLE
+.\tools\hil\run-android-hil.ps1 -Unit s3r-15bc -Scenario midStreamSet -CaptureBytes
+Also saves every byte exchanged with the unit, per run, as a trace shimmer-logandstream's tests can
+replay. Needs the phone's Bluetooth HCI snoop log on (see the README) and Python 3.
+
+.EXAMPLE
 .\tools\hil\run-android-hil.ps1 -Report
 Before "Release Android API": the full run on this commit, recorded on GitHub as the commit status
 "android-hil (driver X)". The release refuses to publish that commit with driver X without a passing one.
@@ -44,7 +49,10 @@ param(
     [int]$ScenarioTimeoutSeconds = 600,
     # Pause between runs, so the unit has advertised again and the phone's Bluetooth stack has let go
     # of the last connection before the next one starts.
-    [int]$SettleSeconds = 10
+    [int]$SettleSeconds = 10,
+    # Save the bytes exchanged with each unit, from the phone's Bluetooth HCI snoop log, as
+    # <unit>_<transport>_<scenario>.bytes.log beside each run's logcat. Adds a bug report (~3 min).
+    [switch]$CaptureBytes
 )
 
 $ErrorActionPreference = 'Continue'
@@ -98,6 +106,25 @@ if (-not $Serial -and $phones.Count -ne 1) {
 }
 $phoneModel = (Adb shell getprop ro.product.model) -join ''
 $phoneAndroid = (Adb shell getprop ro.build.version.release) -join ''
+function PhoneMs { [long](((Adb shell date +%s%3N) -join '').Trim()) }
+
+if ($CaptureBytes) {
+    # "filtered" keeps only the start of each data packet, which is no use for replay.
+    $snoopMode = ((Adb shell getprop persist.bluetooth.btsnooplogmode) -join '').Trim()
+    $snoopOld = ((Adb shell getprop persist.bluetooth.btsnoopenable) -join '').Trim()
+    if ($snoopMode -ne 'full' -and -not (-not $snoopMode -and $snoopOld -eq 'true')) {
+        Fail ("-CaptureBytes needs the phone's full Bluetooth HCI snoop log (persist.bluetooth.btsnooplogmode is " +
+            "'$snoopMode'). In Developer options turn on 'Enable Bluetooth HCI snoop log' (choose 'Enabled', not " +
+            "'Filtered', where it asks), then turn Bluetooth off and on.")
+    }
+    $python = @(Get-Command python, python3 -CommandType Application -ErrorAction SilentlyContinue) | Select-Object -First 1
+    # Windows' "python" can be a Store shortcut that runs nothing, so check that it runs Python 3.
+    if ($python) { & $python.Source -c "import sys; sys.exit(sys.version_info[0] != 3)" 2>$null | Out-Null }
+    if (-not $python -or $LASTEXITCODE -ne 0) { Fail '-CaptureBytes needs Python 3 on the PATH, to extract the bytes from the snoop log.' }
+    $z = ((Adb shell date +%z) -join '').Trim()  # e.g. +0800
+    $phoneUtcOffsetMin = [int]($z.Substring(0, 1) + '1') * ([int]$z.Substring(1, 2) * 60 + [int]$z.Substring(3, 2))
+}
+$windows = @{}
 
 # --- Versions ----------------------------------------------------------------------------------
 if (-not $DriverVersion) {
@@ -270,9 +297,11 @@ foreach ($target in $targets) {
             '-e', 'crc', $Crc, '-e', 'maxLossPercent', $MaxLossPercent,
             '-e', 'driverVersion', $DriverVersion, '-e', 'androidApi', ($apiLabel -replace ' ', '_'),
             $runner)
+        $startMs = if ($CaptureBytes) { PhoneMs } else { 0 }
         $run = Invoke-Instrument $instrumentArgs $ScenarioTimeoutSeconds
         $output = $run.Output
         $safe = "$($u.name)_$($t)_$s" -replace '[^\w.-]', '_'
+        if ($CaptureBytes) { $windows[$safe] = @{ From = $startMs; To = (PhoneMs); Mac = $u.mac; Label = $label } }
         $output | Set-Content (Join-Path $outDir "$safe.instrument.txt")
         Adb logcat -d -v threadtime | Set-Content (Join-Path $outDir "$safe.logcat.txt")
 
@@ -315,9 +344,55 @@ foreach ($r in $results) {
         $r.Detail = (("no report collected ($why). " + $r.Detail).Trim())
     }
 }
+# The bytes, from the phone's HCI snoop log. Diagnostic only: a problem here never changes a verdict.
+if ($CaptureBytes) {
+    Write-Host 'Collecting the Bluetooth snoop log through a bug report (about 3 minutes)...'
+    $zip = Join-Path $outDir 'bugreport.zip'
+    $brOutput = & $adbExe @adbTarget bugreport $zip 2>&1 | Out-String
+    $snoopDir = Join-Path $outDir 'btsnoop'
+    $logs = @()
+    if (Test-Path $zip) {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+        try {
+            New-Item -ItemType Directory -Force $snoopDir | Out-Null
+            foreach ($entry in @($archive.Entries | Where-Object { $_.Name -match '^btsnoop_hci\.log(\.last)?$' })) {
+                $dest = Join-Path $snoopDir $entry.Name
+                [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $dest, $true)
+                $logs += $dest
+            }
+        }
+        finally { $archive.Dispose() }
+        # A bug report holds the phone's whole state; keep only the snoop log, on the PC and the phone.
+        Remove-Item $zip
+        foreach ($onPhone in [regex]::Matches($brOutput, '(/data/user_de/\S+/bugreports/)(bugreport-[^\s/]+?)\.zip')) {
+            $dir = $onPhone.Groups[1].Value
+            $name = $onPhone.Groups[2].Value
+            Adb shell "rm -f $dir$name.zip $dir$name-dumpstate_log-*.txt" | Out-Null
+        }
+    }
+    # The rotated-out file (.last) is older, so it goes first.
+    $logs = @($logs | Sort-Object { if ($_ -like '*.last') { 0 } else { 1 } })
+    if ($logs.Count -eq 0) {
+        Write-Host 'No btsnoop_hci.log in the bug report, so no bytes were saved. Is the snoop log on (Developer options)?' -ForegroundColor Yellow
+    }
+    else {
+        foreach ($safe in $windows.Keys) {
+            $w = $windows[$safe]
+            $title = "HIL run $($w.Label) on $phoneModel (Android $phoneAndroid), Android API $apiLabel, driver $DriverVersion"
+            & $python.Source (Join-Path $PSScriptRoot 'btsnoop_to_trace.py') @logs --mac $w.Mac --from-ms $w.From --to-ms $w.To `
+                --utc-offset-min $phoneUtcOffsetMin --title $title --out (Join-Path $outDir "$safe.bytes.log") | Write-Host
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "  no bytes for $($w.Label) in the snoop log (it may have rotated past this run)" -ForegroundColor Yellow
+            }
+        }
+    }
+}
+
 $summary = [pscustomobject]@{
     phone = "$phoneModel (Android $phoneAndroid)"; androidApi = $apiLabel; driverVersion = $DriverVersion
-    rate = $Rate; seconds = $Seconds; crc = $Crc; settleSeconds = $SettleSeconds; results = $results
+    rate = $Rate; seconds = $Seconds; crc = $Crc; settleSeconds = $SettleSeconds; captureBytes = [bool]$CaptureBytes
+    results = $results
 }
 $summary | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $outDir 'summary.json')
 
