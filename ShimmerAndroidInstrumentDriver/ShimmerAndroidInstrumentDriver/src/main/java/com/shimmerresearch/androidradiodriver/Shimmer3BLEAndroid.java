@@ -126,59 +126,33 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-
+                connectionFailed("Connect Failure: " + exception);
             }
 
             @Override
-            public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+            public void onConnectSuccess(final BleDevice bleDevice, final BluetoothGatt gatt, int status) {
                 mBuffer = new ThreadSafeByteFifoBuffer(1000000);
+                mBleDevice = bleDevice;
                 mTaskMTU = new TaskCompletionSource<>();
+                // FastBle runs this and the MTU callback on the main thread, so waiting here for the
+                // MTU would block the UI and always time out. Setup continues from the callback instead.
                 BleManager.getInstance().setMtu(bleDevice, 251, new BleMtuChangedCallback() {
                     @Override
                     public void onSetMTUFailure(BleException exception) {
-                        System.out.println("MTU Failure");
-
+                        System.out.println("MTU Failure: " + exception);
+                        if (mTaskMTU.trySetResult("MTU Failure")) {
+                            onMtuSet(bleDevice, gatt);
+                        }
                     }
 
                     @Override
                     public void onMtuChanged(int mtu) {
                         System.out.println("MTU Changed: " + mtu);
-                        mTaskMTU.setResult("MTU Changed: " + mtu);
+                        if (mTaskMTU.trySetResult("MTU Changed: " + mtu)) {
+                            onMtuSet(bleDevice, gatt);
+                        }
                     }
                 });
-
-                try {
-                    boolean result = mTaskMTU.getTask().waitForCompletion(3, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
-                }
-
-                mBleDevice = bleDevice;
-                startServiceS(bleDevice);
-                System.out.println(bleDevice.getMac() + " Connected");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED);
-                }
-                mTaskConnect.setResult("Connected");
-                //mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                        //new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED)).sendToTarget();
-                sendCallBackMsg(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED));
-                Bundle bundle = new Bundle();
-                bundle.putString(TOAST, "Device connection established");
-                sendMsgToHandlerList(MESSAGE_TOAST, bundle);
-
-                mIOThread = new IOThread();
-                mIOThread.start();
-                if (mUseProcessingThread){
-                    mPThread = new ProcessingThread();
-                    mPThread.start();
-                }
-
-                initialize();
             }
 
             @Override
@@ -206,9 +180,65 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
         }
     }
 
+    /**
+     * Continues connect once the MTU request has finished, whether or not it succeeded.
+     * The rest of setup waits for the RX notification, see {@link #onNotifyEnabled(BleDevice)}
+     */
+    private void onMtuSet(BleDevice bleDevice, BluetoothGatt gatt) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+        }
+
+        startServiceS(bleDevice);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED);
+        }
+    }
+
+    /**
+     * Finishes connect once the RX notification is enabled, as no reply from the device can arrive before then
+     */
+    private void onNotifyEnabled(BleDevice bleDevice) {
+        if (!mTaskConnect.trySetResult("Connected")) {
+            return;
+        }
+        System.out.println(bleDevice.getMac() + " Connected");
+        //mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
+                //new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED)).sendToTarget();
+        sendCallBackMsg(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED));
+        Bundle bundle = new Bundle();
+        bundle.putString(TOAST, "Device connection established");
+        sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+
+        mIOThread = new IOThread();
+        mIOThread.start();
+        if (mUseProcessingThread){
+            mPThread = new ProcessingThread();
+            mPThread.start();
+        }
+
+        initialize();
+    }
+
+    /**
+     * Indicate that the connection attempt failed and notify the UI Activity
+     */
+    private void connectionFailed(String reason) {
+        System.out.println(mMyBluetoothAddress + " " + reason);
+        if (!mTaskConnect.trySetResult(reason)) {
+            return;
+        }
+        BleManager.getInstance().disconnect(mBleDevice);
+        setBluetoothRadioState(BT_STATE.CONNECTION_FAILED);
+        Bundle bundle = new Bundle();
+        bundle.putString(TOAST, "Unable to connect device");
+        sendMsgToHandlerList(MESSAGE_TOAST, bundle);
+    }
+
     public void startServiceS(BleDevice bleDevice) {
         List<BluetoothGattService> services = BleManager.getInstance().getBluetoothGattServices(bleDevice);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        boolean isRxFound = false;
+        if (services != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
 
 
             for (BluetoothGattService service : services) {
@@ -219,6 +249,7 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
                             //newConnectedBLEDevice(bleDevice,characteristic);
                             CharSequence text = "TXID!";
                         } else if (characteristic.getUuid().compareTo(rxid) == 0) {
+                            isRxFound = true;
                             newConnectedBLEDevice(bleDevice, characteristic);
                             CharSequence text = "RxID!";
                         }
@@ -227,6 +258,9 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
             }
 
 
+        }
+        if (!isRxFound) {
+            connectionFailed("RX characteristic not found");
         }
     }
 
@@ -248,12 +282,13 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
                         @Override
                         public void onNotifySuccess() {
-
+                            System.out.println("Notify Success");
+                            onNotifyEnabled(bleDevice);
                         }
 
                         @Override
                         public void onNotifyFailure(BleException exception) {
-
+                            connectionFailed("Notify Failure: " + exception);
                         }
 
                         @Override
