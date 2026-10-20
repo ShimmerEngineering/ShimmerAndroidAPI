@@ -170,6 +170,10 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                if (taskConnect != mTaskConnect) {
+                    // An earlier connection's link went down after a newer connect() started: not this one's state
+                    return;
+                }
                 if (!"Connected".equals(taskConnect.getTask().getResult())) {
                     // Setup never finished, so this is not a lost connection
                     if (isActiveDisConnected) {
