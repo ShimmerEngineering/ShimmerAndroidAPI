@@ -63,7 +63,9 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
      */
     @Override
     public void connect() {
-        mTaskConnect = new TaskCompletionSource<>();
+        // Task for this attempt only, so a late callback from an earlier attempt can't complete or fail this one
+        final TaskCompletionSource<String> taskConnect = new TaskCompletionSource<>();
+        mTaskConnect = taskConnect;
         BleManager.getInstance().connect(mMac, new BleGattCallback() {
             @Override
             public void onStartConnect() {
@@ -77,8 +79,13 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
 
             @Override
             public void onConnectSuccess(final BleDevice bleDevice, final BluetoothGatt gatt, int status) {
+                if (taskConnect.getTask().isCompleted()) {
+                    // This attempt has already failed, so drop a late success instead of setting it up
+                    BleManager.getInstance().disconnect(bleDevice);
+                    return;
+                }
                 mBleDevice = bleDevice;
-                // This attempt's own task, so a late MTU result can't complete a later attempt's
+                // MTU task for this attempt only, so a late MTU result can't complete the MTU task of a later attempt
                 final TaskCompletionSource<String> taskMTU = new TaskCompletionSource<>();
                 mTaskMTU = taskMTU;
                 // FastBle runs this and the MTU callback on the main thread, so waiting here for the
@@ -104,13 +111,17 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
 
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                // Dropped before setup finished: fail the connect now rather than wait for the MTU or notify timeout
+                if (!taskConnect.getTask().isCompleted() && taskConnect == mTaskConnect) {
+                    connectionFailed(bleDevice, "Disconnected during connect");
+                }
                 System.out.println();
             }
         });
 
 
         try {
-            boolean result = mTaskConnect.getTask().waitForCompletion(5, TimeUnit.SECONDS);
+            boolean result = taskConnect.getTask().waitForCompletion(5, TimeUnit.SECONDS);
             Thread.sleep(200);
             if (!result) {
                 System.out.println("Connect fail");
@@ -168,8 +179,12 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
      */
     public void startServiceS(BleDevice bleDevice){
         List<BluetoothGattService> services = BleManager.getInstance().getBluetoothGattServices(bleDevice);
+        if (services == null) {
+            connectionFailed(bleDevice, "GATT services not available");
+            return;
+        }
         boolean isRxFound = false;
-        if (services != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
 
 
             for (BluetoothGattService service:services) {
