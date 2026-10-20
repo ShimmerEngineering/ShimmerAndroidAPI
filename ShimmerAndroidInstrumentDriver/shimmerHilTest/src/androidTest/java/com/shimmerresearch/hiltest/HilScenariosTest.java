@@ -144,18 +144,40 @@ public class HilScenariosTest {
 		return configured;
 	}
 
-	private void checkStream(StreamAnalysis a, double maxLossPercent, double deviceRateHz, String what) {
+	private void checkStream(StreamAnalysis a, List<StreamAnalysis.Sample> samples, double stoppedAtMs,
+			double maxLossPercent, double deviceRateHz, String what) {
 		report.check(a.received > 0, what + ": no packets received");
 		report.check(a.lossPercent() <= maxLossPercent, String.format(Locale.ROOT,
 				"%s: %.3f%% packets lost (%d of %d), limit %.2f%%", what, a.lossPercent(), a.missing,
 				a.received + a.missing, maxLossPercent));
 		report.check(a.nonIncreasing == 0, what + ": " + a.nonIncreasing + " timestamps did not increase");
 		checkJumps(a, what);
-		if (!Double.isNaN(a.effectiveRateHz)) {
+		checkTimeline(a, samples, stoppedAtMs, deviceRateHz, what);
+	}
+
+	/**
+	 * Loss is counted between packets received, so two things it cannot see are checked here: the
+	 * device timestamps must give a rate (at least two usable ones) within 1 % of the configured
+	 * rate, and packets must have kept arriving until the test stopped recording, since a stream
+	 * that fell silent leaves no gap between the packets it did deliver.
+	 */
+	private void checkTimeline(StreamAnalysis a, List<StreamAnalysis.Sample> samples, double stoppedAtMs,
+			double deviceRateHz, String what) {
+		if (Double.isNaN(a.effectiveRateHz) || Double.isInfinite(a.effectiveRateHz)) {
+			report.check(false, what + ": no usable device timestamps to measure the rate from (" + a.received + " packets)");
+		} else {
 			report.check(Math.abs(a.effectiveRateHz - deviceRateHz) <= 0.01 * deviceRateHz, String.format(Locale.ROOT,
 					"%s: effective rate %.2f Hz, device set to %.2f Hz", what, a.effectiveRateHz, deviceRateHz));
 		}
+		if (!samples.isEmpty()) {
+			double silentMs = stoppedAtMs - samples.get(samples.size() - 1).receivedMs;
+			report.check(silentMs <= MAX_SILENCE_AT_END_MS, String.format(Locale.ROOT,
+					"%s: no packet in the last %.1f s before recording stopped (the stream went silent)", what, silentMs / 1000.0));
+		}
 	}
+
+	/** At 256 Hz a second without a packet is ~256 packets the gap count cannot see. */
+	private static final double MAX_SILENCE_AT_END_MS = 1000;
 
 	/** Every stream check is relative to the unit's rate, so a run without one cannot pass. */
 	private void checkRate(double deviceRateHz, String what) {
@@ -187,6 +209,7 @@ public class HilScenariosTest {
 			session.startRecording();
 			report.check(session.startStreaming(10000), "streaming did not start within 10 s");
 			Thread.sleep(seconds * 1000L);
+			double stoppedAtMs = session.nowMs();
 			List<StreamAnalysis.Sample> samples = session.stopRecording();
 			report.check(session.stopStreaming(10000), "streaming did not stop within 10 s");
 			StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
@@ -194,7 +217,7 @@ public class HilScenariosTest {
 			report.putStream("stream", a);
 			report.putGaps(a);
 			report.samples(samples);
-			checkStream(a, maxLoss, deviceRate, "stream");
+			checkStream(a, samples, stoppedAtMs, maxLoss, deviceRate, "stream");
 			if (!Double.isNaN(a.accelMagnitudeMean)) {
 				report.check(Math.abs(a.accelMagnitudeMean - GRAVITY) <= accelTolerance, String.format(Locale.ROOT,
 						"accel at rest %.3f m/s^2, expected %.2f±%.2f (is the unit lying still?)",
@@ -261,6 +284,7 @@ public class HilScenariosTest {
 				report.check(session.readBattery(), "cycle " + i + ": readBattery did not complete: it threw, hung or was skipped after a hung call (see the events)");
 				Thread.sleep(2000);
 			}
+			double stoppedAtMs = session.nowMs();
 			List<StreamAnalysis.Sample> samples = session.stopRecording();
 			report.check(session.stopStreaming(10000), "streaming did not stop within 10 s");
 			StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
@@ -290,6 +314,7 @@ public class HilScenariosTest {
 			report.check(a.received > 0, "stream: no packets received");
 			report.check(a.nonIncreasing == 0, "stream: " + a.nonIncreasing + " timestamps did not increase");
 			checkJumps(a, "stream");
+			checkTimeline(a, samples, stoppedAtMs, deviceRate, "stream");
 			int parserErrors = session.parserErrorsSince(marker);
 			report.put("parserErrors", parserErrors);
 			report.check(parserErrors == 0, parserErrors + " streaming parser errors logged (\"Packet syncing problem\")");
@@ -329,11 +354,12 @@ public class HilScenariosTest {
 			session.startRecording();
 			report.check(session.startStreaming(10000), what + ": streaming did not start within 10 s");
 			Thread.sleep(5000);
+			double stoppedAtMs = session.nowMs();
 			List<StreamAnalysis.Sample> samples = session.stopRecording();
 			report.check(session.stopStreaming(10000), what + ": streaming did not stop within 10 s");
 			StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
 			session.event(what + " stream: " + a);
-			checkStream(a, maxLoss, deviceRate, what);
+			checkStream(a, samples, stoppedAtMs, maxLoss, deviceRate, what);
 			int parserErrors = session.parserErrorsSince(marker);
 			report.check(parserErrors == 0, what + ": " + parserErrors + " streaming parser errors logged");
 			report.check(session.disconnect(10000), what + ": did not disconnect within 10 s");
