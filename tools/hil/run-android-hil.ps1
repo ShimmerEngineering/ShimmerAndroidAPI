@@ -120,6 +120,12 @@ if ($Report) {
     if ($PSBoundParameters.ContainsKey('Scenario') -or $Unit -or $Transport) {
         Fail '-Report needs every scenario on every unit and transport in the rig; drop -Scenario, -Unit and -Transport.'
     }
+    # The gate's pass criteria are the defaults; a run that changed them, or reused an old build, is
+    # not evidence about this commit.
+    $shaping = @('Rate', 'Seconds', 'Crc', 'MaxLossPercent', 'SkipBuild') | Where-Object { $PSBoundParameters.ContainsKey($_) }
+    if ($shaping) {
+        Fail "-Report runs with the default settings and a fresh build; drop $((@($shaping) | ForEach-Object { "-$_" }) -join ', ')."
+    }
     $types = @($units | ForEach-Object { $_.type })
     if (-not ($types -contains 'Shimmer3') -or -not ($types -contains 'Shimmer3R')) {
         Fail "-Report needs at least one Shimmer3 and one Shimmer3R in the rig (types found: $($types -join ', '))."

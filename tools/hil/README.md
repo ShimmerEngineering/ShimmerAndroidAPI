@@ -35,6 +35,7 @@ It exits 0 when everything passed, 1 when something failed, and 2 when the bench
    **`android-hil (driver X)`** on that commit: passed or failed, with the phone and each unit's
    firmware. It refuses to report a partial run or a run of uncommitted code:
    - every scenario, at least one Shimmer3 and one Shimmer3R, and both transports, Classic and BLE;
+   - the default rate, duration, link CRC and loss limit, and a fresh build (no `-SkipBuild`);
    - this checkout's library source;
    - a clean working tree, pushed.
 3. Run **Release Android API** with the same driver (blank picks the newest, as the script does).

@@ -157,6 +157,12 @@ public class HilScenariosTest {
 		}
 	}
 
+	/** Every stream check is relative to the unit's rate, so a run without one cannot pass. */
+	private void checkRate(double deviceRateHz, String what) {
+		report.check(!Double.isNaN(deviceRateHz) && deviceRateHz > 0,
+				what + ": the API has no sampling rate for the unit (" + deviceRateHz + " Hz; connection lost?)");
+	}
+
 	/** A device timestamp that leapt ahead of the arrival time is wrong data (DEV-1023 class), never loss. */
 	private void checkJumps(StreamAnalysis a, String what) {
 		for (StreamAnalysis.Gap j : a.timestampJumps) {
@@ -176,6 +182,7 @@ public class HilScenariosTest {
 		double accelTolerance = arg("accelTolerance", 1.0);
 		if (connectAndConfigure(rate)) {
 			double deviceRate = session.rateOnDevice();
+			checkRate(deviceRate, "stream");
 			String marker = session.logMarker("stream_rest");
 			session.startRecording();
 			report.check(session.startStreaming(10000), "streaming did not start within 10 s");
@@ -218,6 +225,7 @@ public class HilScenariosTest {
 		if (connectAndConfigure(rate)) {
 			ShimmerBluetooth d = session.device();
 			double deviceRate = d.getSamplingRateShimmer();
+			checkRate(deviceRate, "stream");
 			BT_CRC_MODE crc = d.getCurrentBtCommsCrcMode();
 			if (crc == BT_CRC_MODE.OFF) {
 				session.event("link CRC is off: the DEV-1148 path is not exercised");
@@ -231,20 +239,26 @@ public class HilScenariosTest {
 			for (int i = 1; i <= cycles && session.hung == null; i++) {
 				sdMoments.add(session.nowMs());
 				session.event("cycle " + i);
-				if (session.startSdLogging()) {
+				// A call that threw, hung or was skipped is a failure in itself, not a reason to skip the
+				// state check; the events say which.
+				boolean started = session.startSdLogging();
+				report.check(started, "cycle " + i + ": startSDLogging did not complete: it threw, hung or was skipped after a hung call (see the events)");
+				if (started) {
 					report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING_AND_SDLOGGING, 5000),
 							"cycle " + i + ": SD logging did not start while streaming (state " + session.state()
 									+ "; is there an SD card? With a link CRC on, DEV-1148)");
 				}
 				Thread.sleep(2000);
 				sdMoments.add(session.nowMs());
-				if (session.stopSdLogging()) {
+				boolean stopped = session.stopSdLogging();
+				report.check(stopped, "cycle " + i + ": stopSDLogging did not complete: it threw, hung or was skipped after a hung call (see the events)");
+				if (stopped) {
 					report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING, 5000),
 							"cycle " + i + ": SD logging did not stop (state " + session.state() + ")");
 				}
 				Thread.sleep(1000);
 				batteryMoments.add(session.nowMs());
-				session.readBattery();
+				report.check(session.readBattery(), "cycle " + i + ": readBattery did not complete: it threw, hung or was skipped after a hung call (see the events)");
 				Thread.sleep(2000);
 			}
 			List<StreamAnalysis.Sample> samples = session.stopRecording();
@@ -310,6 +324,7 @@ public class HilScenariosTest {
 				break;
 			}
 			double deviceRate = session.rateOnDevice();
+			checkRate(deviceRate, what);
 			String marker = session.logMarker(what);
 			session.startRecording();
 			report.check(session.startStreaming(10000), what + ": streaming did not start within 10 s");
