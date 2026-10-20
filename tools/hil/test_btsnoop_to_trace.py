@@ -9,6 +9,7 @@ import btsnoop_to_trace as bt
 
 S3R, S3, OTHER = "EC:06:D8:0D:86:F8", "E8:EB:1B:71:3E:36", "11:22:33:44:55:66"
 T0 = 1_792_476_000_000_000  # Unix time, us (2026-10-20 06:00 UTC)
+PHONE_UTC_OFFSET_US = 8 * 3600 * 1_000_000  # a phone at UTC+8
 
 
 def mac_le(mac):
@@ -40,12 +41,13 @@ class Snoop:
             pb = 0x2 if n == 0 else 0x1
             self.add(received, bytes([bt.H4_ACL]) + struct.pack("<HH", handle | (pb << 12), len(part)) + part)
 
-    def write(self, path):
+    def write(self, path, clock_offset_us=PHONE_UTC_OFFSET_US):
+        """Stamped in the phone's local time by default, as Android does."""
         with open(path, "wb") as f:
             f.write(b"btsnoop\0" + struct.pack(">II", 1, 1002))
             for t, received, data in self.records:
                 f.write(struct.pack(">IIIIq", len(data), len(data), 1 if received else 0, 0,
-                                    t + bt.BTSNOOP_EPOCH_DELTA_US))
+                                    t + bt.BTSNOOP_EPOCH_DELTA_US + clock_offset_us))
                 f.write(data)
 
 
@@ -82,6 +84,7 @@ class ExtractTest(unittest.TestCase):
         self.log = os.path.join(self.tmp, "btsnoop_hci.log")
         s.write(self.log)
         self.t = s.records
+        self.snoop = s
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -102,6 +105,14 @@ class ExtractTest(unittest.TestCase):
         self.assertTrue(any(f"connected {S3R} over BLE handle=64 mtu=251" in l for l in lines))
         # Times of day are the phone's: 06:00 UTC + 8 h.
         self.assertTrue(lines[-1].startswith("14:00:00."))
+
+    def test_log_stamped_in_utc(self):
+        self.snoop.write(self.log, clock_offset_us=0)
+        rx_time_ms = self.t[6][0] // 1000
+        _, lines = self.run_extract("--mac", S3R, "--snoop-clock", "utc", "--from-ms", str(rx_time_ms))
+        rx = [l for l in lines if " RX " in l]
+        self.assertEqual(1, len(rx))
+        self.assertTrue(rx[0].startswith("14:00:00."))
 
     def test_classic_session_keeps_payloads_and_drops_control(self):
         _, lines = self.run_extract("--mac", S3)

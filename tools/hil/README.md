@@ -158,15 +158,21 @@ the recorded traces.
 
 **One-time setup:**
 - On the phone: Developer options → **Enable Bluetooth HCI snoop log**. Choose "Enabled", not
-  "Filtered", if it asks. Then turn Bluetooth off and on. adb cannot switch this on itself.
+  "Filtered", if it asks.
+- **Then turn Bluetooth off and on.** The log only starts when Bluetooth does. adb can do neither step.
+  The script checks with the Bluetooth service (`mSnoopLogSettingAtEnable` in
+  `adb shell dumpsys bluetooth_manager`), and refuses to start until it reports `full`.
 - Python 3 on the PATH.
 
 **How it works:** the script notes the phone's clock before and after each run. After the last run
 it takes one bug report (about 3 minutes), because that is the only way adb can read the snoop log
 on a phone that isn't rooted. It keeps `btsnoop_hci.log` and deletes the bug report, which holds the
 phone's whole state, from the PC and the phone. Then `btsnoop_to_trace.py` cuts out each run's bytes,
-by the unit's MAC and the run's time window. None of this changes a verdict: if it fails, the script
-says so and carries on.
+by the unit's MAC and the run's time window. Android stamps the snoop log in the phone's local time,
+so the script passes the phone's UTC offset along. Each run's window and that offset are saved in
+`summary.json` (`captureWindows`, `phoneUtcOffsetMin`), so the bytes can be cut out again later.
+
+None of this changes a verdict: if it fails, the script says so and carries on.
 
 **Limits:**
 - Android keeps only the current snoop log and the one before it, so a long session can lose its
@@ -180,7 +186,9 @@ To extract by hand, or from a snoop log taken some other way:
 python tools\hil\btsnoop_to_trace.py btsnoop_hci.log --mac EC:06:D8:0D:86:F8 --utc-offset-min 480 --out run.bytes.log
 ```
 
-Its tests run without a phone: `cd tools\hil; python -m unittest test_btsnoop_to_trace`.
+Leave out `--mac` to keep every device's traffic; add `--from-ms` and `--to-ms` (Unix time, from
+`captureWindows`) to keep one run. Its tests run without a phone:
+`cd tools\hil; python -m unittest test_btsnoop_to_trace`.
 
 ## Running a single test by hand
 

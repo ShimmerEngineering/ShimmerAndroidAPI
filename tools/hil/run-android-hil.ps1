@@ -109,12 +109,14 @@ $phoneAndroid = (Adb shell getprop ro.build.version.release) -join ''
 function PhoneMs { [long](((Adb shell date +%s%3N) -join '').Trim()) }
 
 if ($CaptureBytes) {
-    # "filtered" keeps only the start of each data packet, which is no use for replay.
-    $snoopMode = ((Adb shell getprop persist.bluetooth.btsnooplogmode) -join '').Trim()
-    $snoopOld = ((Adb shell getprop persist.bluetooth.btsnoopenable) -join '').Trim()
-    if ($snoopMode -ne 'full' -and -not (-not $snoopMode -and $snoopOld -eq 'true')) {
-        Fail ("-CaptureBytes needs the phone's full Bluetooth HCI snoop log (persist.bluetooth.btsnooplogmode is " +
-            "'$snoopMode'). In Developer options turn on 'Enable Bluetooth HCI snoop log' (choose 'Enabled', not " +
+    # The Bluetooth service reports the snoop mode it started with, which is the one in force: the
+    # setting only takes effect when Bluetooth next starts. (adb can't read the setting itself on
+    # Android 11.) "filtered" keeps only the start of each data packet, which is no use for replay.
+    $snoopLine = @(Adb shell dumpsys bluetooth_manager | Select-String 'mSnoopLogSettingAtEnable = (\S+)') | Select-Object -First 1
+    $snoopMode = if ($snoopLine) { $snoopLine.Matches[0].Groups[1].Value } else { ((Adb shell getprop persist.bluetooth.btsnooplogmode) -join '').Trim() }
+    if ($snoopMode -ne 'full') {
+        Fail ("-CaptureBytes needs the phone's full Bluetooth HCI snoop log, and Bluetooth started with it in mode " +
+            "'$snoopMode'. In Developer options turn on 'Enable Bluetooth HCI snoop log' (choose 'Enabled', not " +
             "'Filtered', where it asks), then turn Bluetooth off and on.")
     }
     $python = @(Get-Command python, python3 -CommandType Application -ErrorAction SilentlyContinue) | Select-Object -First 1
@@ -393,6 +395,11 @@ $summary = [pscustomobject]@{
     phone = "$phoneModel (Android $phoneAndroid)"; androidApi = $apiLabel; driverVersion = $DriverVersion
     rate = $Rate; seconds = $Seconds; crc = $Crc; settleSeconds = $SettleSeconds; captureBytes = [bool]$CaptureBytes
     results = $results
+}
+if ($CaptureBytes) {
+    # Each run's window on the phone's clock, to cut its bytes out of btsnoop/ again later.
+    $summary | Add-Member captureWindows ([pscustomobject]$windows)
+    $summary | Add-Member phoneUtcOffsetMin $phoneUtcOffsetMin
 }
 $summary | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $outDir 'summary.json')
 

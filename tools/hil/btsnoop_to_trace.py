@@ -15,7 +15,11 @@ depends on how bytes arrive (a bulk read splitting a packet) replays the same wa
 Standard library only. Usage:
 
     python btsnoop_to_trace.py btsnoop_hci.log --mac EC:06:D8:0D:86:F8 --out run.bytes.log
-        [--from-ms EPOCH_MS] [--to-ms EPOCH_MS] [--utc-offset-min 480] [--title TEXT]
+        [--from-ms EPOCH_MS] [--to-ms EPOCH_MS] [--utc-offset-min 480] [--snoop-clock local|utc]
+        [--title TEXT]
+
+--utc-offset-min is the phone's offset from UTC. Android writes the snoop log in local time, so
+it is needed both to place the --from-ms/--to-ms window and to print times of day.
 """
 import argparse
 import datetime
@@ -42,7 +46,9 @@ class Record:
         self.data = data
 
 
-def read_btsnoop(path):
+def read_btsnoop(path, clock_offset_us=0):
+    """clock_offset_us: how far the log's clock is ahead of UTC. Android stamps its snoop log in
+    the phone's local time, so on a phone at UTC+8 it is 8 hours."""
     with open(path, "rb") as f:
         header = f.read(16)
         if len(header) < 16 or header[:8] != b"btsnoop\0":
@@ -58,7 +64,7 @@ def read_btsnoop(path):
             data = f.read(incl_len)
             if len(data) < incl_len:
                 return
-            yield Record(ts - BTSNOOP_EPOCH_DELTA_US, bool(flags & 1), data)
+            yield Record(ts - BTSNOOP_EPOCH_DELTA_US - clock_offset_us, bool(flags & 1), data)
 
 
 def mac_from_le(b):
@@ -229,15 +235,18 @@ def main(argv=None):
     ap.add_argument("--mac", help="only this unit's connection")
     ap.add_argument("--from-ms", type=int, help="Unix time, ms: drop what came before")
     ap.add_argument("--to-ms", type=int, help="Unix time, ms: drop what came after")
-    ap.add_argument("--utc-offset-min", type=int, default=0, help="the phone's offset, for times of day")
+    ap.add_argument("--utc-offset-min", type=int, default=0, help="the phone's offset from UTC, in minutes")
+    ap.add_argument("--snoop-clock", choices=("local", "utc"), default="local",
+                    help="the clock the log is stamped in (Android: local)")
     ap.add_argument("--title", default="", help="first comment line")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
+    clock_offset_us = args.utc_offset_min * 60_000_000 if args.snoop_clock == "local" else 0
     ex = Extractor(args.mac)
     first = last = None
     for path in args.log:
-        for rec in read_btsnoop(path):
+        for rec in read_btsnoop(path, clock_offset_us):
             first = rec.time_us if first is None else first
             last = rec.time_us
             ex.feed(rec)
