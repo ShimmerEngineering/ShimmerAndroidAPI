@@ -171,9 +171,14 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
                 if (!"Connected".equals(taskConnect.getTask().getResult())) {
-                    // Setup never finished, so this is a failed connect (CONNECTION_FAILED), not a lost connection.
-                    // Fail it now rather than wait for the MTU or notify timeout.
-                    connectionFailed(taskConnect, bleDevice, "Disconnected during connect");
+                    // Setup never finished, so this is not a lost connection
+                    if (isActiveDisConnected) {
+                        // disconnect() was called during setup: end this attempt without reporting a failure
+                        taskConnect.trySetResult("Disconnected");
+                    } else {
+                        // The link dropped: fail the connect now rather than wait for the MTU or notify timeout
+                        connectionFailed(taskConnect, bleDevice, "Disconnected during connect");
+                    }
                     return;
                 }
                 //mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
@@ -205,6 +210,10 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
      * Each step carries its connect attempt's task, so results from an attempt that is no longer current are ignored.
      */
     private void onMtuSet(TaskCompletionSource<String> taskConnect, BleDevice bleDevice, BluetoothGatt gatt) {
+        if (taskConnect != mTaskConnect || taskConnect.getTask().isCompleted()) {
+            // The attempt failed or a newer one replaced it while the MTU was pending
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
         }
