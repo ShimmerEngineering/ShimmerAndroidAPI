@@ -107,6 +107,34 @@ public final class StreamAnalysis {
 		return new StreamAnalysis(samples.size(), missing, nonIncreasing, period, effectiveRate, mean, std, gaps);
 	}
 
+	/**
+	 * Charges each gap to the kind of command nearest to it (by arrival time), if one is within
+	 * windowMs. Commands that follow each other closely therefore never share a loss.
+	 *
+	 * @param momentsByKind moments (ms) of each kind of command
+	 * @return packets lost per kind, in the same order
+	 */
+	public int[] attribute(double[][] momentsByKind, double windowMs) {
+		int[] lost = new int[momentsByKind.length];
+		for (Gap g : gaps) {
+			int nearestKind = -1;
+			double nearest = Double.MAX_VALUE;
+			for (int k = 0; k < momentsByKind.length; k++) {
+				for (double t : momentsByKind[k]) {
+					double d = Math.abs(g.afterReceivedMs - t);
+					if (d < nearest) {
+						nearest = d;
+						nearestKind = k;
+					}
+				}
+			}
+			if (nearestKind >= 0 && nearest <= windowMs) {
+				lost[nearestKind] += g.missing;
+			}
+		}
+		return lost;
+	}
+
 	/** Packets lost within windowMs (by arrival time) of any of the given moments. */
 	public int missingNear(double[] momentsMs, double windowMs) {
 		int total = 0;

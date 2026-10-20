@@ -70,6 +70,23 @@ final class HilReport {
 		}
 	}
 
+	/** Every gap, with when it arrived, so a loss can be matched to what the test was doing. */
+	void putGaps(StreamAnalysis a) {
+		try {
+			JSONArray gaps = new JSONArray();
+			for (StreamAnalysis.Gap g : a.gaps) {
+				JSONObject o = new JSONObject();
+				o.put("afterReceivedMs", Math.round(g.afterReceivedMs));
+				o.put("afterTimestampMs", g.afterTimestampMs);
+				o.put("missing", g.missing);
+				gaps.put(o);
+			}
+			json.put("gapList", gaps);
+		} catch (Exception e) {
+			Log.w(ShimmerSession.TAG, "report: gapList: " + e);
+		}
+	}
+
 	void samples(List<StreamAnalysis.Sample> samples) {
 		this.samples = samples;
 	}

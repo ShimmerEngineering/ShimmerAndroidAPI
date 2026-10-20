@@ -38,7 +38,8 @@ param(
     [string]$Crc = '2',
     [double]$MaxLossPercent = 1.0,
     [switch]$SkipBuild,
-    [switch]$Report
+    [switch]$Report,
+    [int]$ScenarioTimeoutSeconds = 600
 )
 
 $ErrorActionPreference = 'Continue'
@@ -126,8 +127,14 @@ $apk = Join-Path $gradleRoot 'shimmerHilTest\build\outputs\apk\debug\shimmerHilT
 $testApk = Join-Path $gradleRoot 'shimmerHilTest\build\outputs\apk\androidTest\debug\shimmerHilTest-debug-androidTest.apk'
 if (-not $SkipBuild) {
     # Gradle needs JDK 17 or newer (AGP 8). Use JAVA_HOME if it qualifies, else a JDK Android Studio ships.
-    $saved = @{ JAVA_HOME = $env:JAVA_HOME; GPR_USR = ${env:ORG_GRADLE_PROJECT_gpr.usr}; GPR_KEY = ${env:ORG_GRADLE_PROJECT_gpr.key} }
+    $saved = @{ JAVA_HOME = $env:JAVA_HOME; ANDROID_HOME = $env:ANDROID_HOME
+        GPR_USR = ${env:ORG_GRADLE_PROJECT_gpr.usr}; GPR_KEY = ${env:ORG_GRADLE_PROJECT_gpr.key} }
     try {
+        # A fresh checkout has no local.properties (Android Studio writes it), so tell Gradle where
+        # the SDK is: the one adb came from.
+        if (-not $env:ANDROID_HOME -and -not $env:ANDROID_SDK_ROOT -and -not (Test-Path (Join-Path $gradleRoot 'local.properties'))) {
+            $env:ANDROID_HOME = $sdk
+        }
         $javaOk = $false
         if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME 'release'))) {
             $javaOk = (Get-Content (Join-Path $env:JAVA_HOME 'release') -Raw) -match 'JAVA_VERSION="(1[7-9]|[2-9]\d)'
@@ -167,21 +174,51 @@ if (-not $SkipBuild) {
         if ($buildExit -ne 0) { Fail "Build failed; see $(Join-Path $outDir 'build.log')" }
     } finally {
         $env:JAVA_HOME = $saved.JAVA_HOME
+        $env:ANDROID_HOME = $saved.ANDROID_HOME
         ${env:ORG_GRADLE_PROJECT_gpr.usr} = $saved.GPR_USR
         ${env:ORG_GRADLE_PROJECT_gpr.key} = $saved.GPR_KEY
     }
 }
 
 # --- Install -----------------------------------------------------------------------------------
+# -g pre-grants runtime permissions. Some phones (Xiaomi) refuse it without "USB debugging (Security
+# settings)"; the tests need no runtime permission before Android 12, so install without it there.
+function Install-Apk([string]$file, [string[]]$flags) {
+    ((& $adbExe @adbTarget install @flags $file 2>&1) | ForEach-Object { "$_" }) -join "`n"
+}
 foreach ($file in @($apk, $testApk)) {
-    $result = (Adb install -r -g $file 2>&1 | Out-String)
+    $result = Install-Apk $file @('-r', '-g')
+    if ($result -match 'INSTALL_GRANT_RUNTIME_PERMISSIONS') {
+        Write-Host "The phone refused to pre-grant permissions (-g); installing $(Split-Path $file -Leaf) without."
+        $result = Install-Apk $file @('-r')
+    }
     if ($result -notmatch 'Success') {
-        Fail "Installing $(Split-Path $file -Leaf) failed: $($result.Trim())`nOn Xiaomi, turn on 'Install via USB' and 'USB debugging (Security settings)' in Developer options."
+        Fail "Installing $(Split-Path $file -Leaf) failed:`n$($result.Trim())`nOn Xiaomi, turn on 'Install via USB' (and on Android 12+ 'USB debugging (Security settings)') in Developer options."
     }
 }
 Adb shell rm -rf $deviceReports | Out-Null
 
 # --- Run ---------------------------------------------------------------------------------------
+# One scenario, with a time limit: the tests guard every API call, but if the whole process still
+# never finishes, force-stop it so an unattended run cannot hang.
+function Invoke-Instrument([string[]]$arguments, [int]$timeoutSeconds) {
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $adbExe
+    $psi.Arguments = (@($adbTarget) + $arguments | ForEach-Object { if ("$_" -match '\s') { '"' + $_ + '"' } else { "$_" } }) -join ' '
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $p = [System.Diagnostics.Process]::Start($psi)
+    $stdout = $p.StandardOutput.ReadToEndAsync()
+    $stderr = $p.StandardError.ReadToEndAsync()
+    $finished = $p.WaitForExit($timeoutSeconds * 1000)
+    if (-not $finished) {
+        & $adbExe @adbTarget shell am force-stop $package 2>&1 | Out-Null
+        if (-not $p.WaitForExit(15000)) { $p.Kill() }
+    }
+    [pscustomobject]@{ Output = $stdout.Result + $stderr.Result; TimedOut = (-not $finished) }
+}
+
 $results = @()
 foreach ($u in $units) {
     foreach ($s in $Scenario) {
@@ -194,7 +231,8 @@ foreach ($u in $units) {
             '-e', 'crc', $Crc, '-e', 'maxLossPercent', $MaxLossPercent,
             '-e', 'driverVersion', $DriverVersion, '-e', 'androidApi', ($apiLabel -replace ' ', '_'),
             $runner)
-        $output = (& $adbExe @adbTarget @instrumentArgs 2>&1 | Out-String)
+        $run = Invoke-Instrument $instrumentArgs $ScenarioTimeoutSeconds
+        $output = $run.Output
         $safe = "$($u.name)_$s" -replace '[^\w.-]', '_'
         $output | Set-Content (Join-Path $outDir "$safe.instrument.txt")
         Adb logcat -d -v threadtime | Set-Content (Join-Path $outDir "$safe.logcat.txt")
@@ -209,7 +247,11 @@ foreach ($u in $units) {
             default { $verdict = 'ERROR' }
         }
         $m = [regex]::Match($output, '(?:AssertionError|AssumptionViolatedException|Exception): ([^\r\n]+)')
-        if ($m.Success) { $detail = $m.Groups[1].Value }
+        if ($run.TimedOut) {
+            $verdict = 'TIMEOUT'
+            $detail = "did not finish within $ScenarioTimeoutSeconds s; force-stopped (see the logcat)"
+        }
+        elseif ($m.Success) { $detail = $m.Groups[1].Value }
         elseif ($verdict -eq 'ERROR') { $detail = ($output -split "`n" | Select-Object -Last 3) -join ' ' }
         Write-Host " $verdict" -ForegroundColor $(if ($verdict -eq 'PASS') { 'Green' } elseif ($verdict -eq 'SKIP') { 'Yellow' } else { 'Red' })
         $results += [pscustomobject]@{ Unit = $u.name; Scenario = $s; Result = $verdict; Detail = $detail }
@@ -218,7 +260,7 @@ foreach ($u in $units) {
 }
 
 # --- Collect -----------------------------------------------------------------------------------
-Adb pull $deviceReports (Join-Path $outDir 'reports') | Out-Null
+& $adbExe @adbTarget pull $deviceReports (Join-Path $outDir 'reports') 2>&1 | Out-Null
 $summary = [pscustomobject]@{
     phone = "$phoneModel (Android $phoneAndroid)"; androidApi = $apiLabel; driverVersion = $DriverVersion
     rate = $Rate; seconds = $Seconds; crc = $Crc; results = $results
@@ -227,7 +269,7 @@ $summary | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $outDir 'summary.jso
 
 Write-Host ''
 $results | Format-Table -AutoSize -Wrap | Out-String -Width 200 | Write-Host
-$failed = @($results | Where-Object { $_.Result -eq 'FAIL' -or $_.Result -eq 'ERROR' })
+$failed = @($results | Where-Object { $_.Result -ne 'PASS' -and $_.Result -ne 'SKIP' })
 $passed = @($results | Where-Object { $_.Result -eq 'PASS' })
 
 if ($Report) {

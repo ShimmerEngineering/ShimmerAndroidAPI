@@ -53,6 +53,23 @@ public class StreamAnalysisTest {
 	}
 
 	@Test
+	public void chargesEachGapToTheNearestCommandOnly() {
+		// 100 Hz; packet 300 (arrives ~3000 ms) is missing. An SD stop at 2900 ms and a battery read
+		// at 3920 ms are both within 1 s of it: the SD stop is nearer, so it alone is charged.
+		StreamAnalysis a = StreamAnalysis.analyse(stream(100, 1000, 300), 100);
+		int[] lost = a.attribute(new double[][] {{2900}, {3920}}, 1000);
+		assertEquals(1, lost[0]);
+		assertEquals(0, lost[1]);
+	}
+
+	@Test
+	public void chargesNothingOutsideTheWindow() {
+		StreamAnalysis a = StreamAnalysis.analyse(stream(100, 1000, 300), 100);
+		int[] lost = a.attribute(new double[][] {{5000}, {8000}}, 1000);
+		assertEquals(0, lost[0] + lost[1]);
+	}
+
+	@Test
 	public void flagsTimestampsThatGoBackwards() {
 		List<StreamAnalysis.Sample> s = stream(100, 10);
 		s.add(5, new StreamAnalysis.Sample(45, 1000, 0, 0, 9.81));

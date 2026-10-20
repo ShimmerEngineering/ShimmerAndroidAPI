@@ -9,8 +9,11 @@ import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.clj.fastble.BleManager;
 import com.shimmerresearch.android.manager.ShimmerBluetoothManagerAndroid;
+import com.shimmerresearch.bluetooth.BluetoothProgressReportPerDevice;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth;
 import com.shimmerresearch.bluetooth.ShimmerBluetooth.BT_STATE;
 import com.shimmerresearch.driver.CallbackObject;
@@ -52,7 +55,9 @@ final class ShimmerSession implements AutoCloseable {
 	private final List<StreamAnalysis.Sample> samples = new ArrayList<>();
 	private volatile boolean recording;
 	private volatile BT_STATE lastState;
-	private volatile boolean sawConfiguring;
+	private volatile BluetoothProgressReportPerDevice.OperationState configureResult;
+	private volatile int stateMessages;
+	private final java.util.Set<Integer> otherMessagesSeen = new java.util.HashSet<>();
 
 	ShimmerSession(Context context, String mac) throws Exception {
 		this.mac = mac;
@@ -63,8 +68,23 @@ final class ShimmerSession implements AutoCloseable {
 				onMessage(msg);
 			}
 		};
-		BleManager.getInstance().init((Application) context.getApplicationContext());
-		manager = new ShimmerBluetoothManagerAndroid(context, handler);
+		// On the main thread, as an app does: the manager creates a Handler on whatever thread
+		// constructs it, which fails on the instrumentation thread (no Looper).
+		final ShimmerBluetoothManagerAndroid[] created = new ShimmerBluetoothManagerAndroid[1];
+		final Exception[] failure = new Exception[1];
+		InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+			try {
+				BleManager.getInstance().init((Application) context.getApplicationContext());
+				created[0] = new ShimmerBluetoothManagerAndroid(context, handler);
+			} catch (Exception e) {
+				failure[0] = e;
+			}
+		});
+		if (failure[0] != null) {
+			callbackThread.quitSafely();
+			throw failure[0];
+		}
+		manager = created[0];
 	}
 
 	double nowMs() {
@@ -94,22 +114,37 @@ final class ShimmerSession implements AutoCloseable {
 				state = ((CallbackObject) msg.obj).mState;
 			}
 			if (state != null) {
-				if (state == BT_STATE.CONFIGURING) {
-					sawConfiguring = true;
-				}
 				lastState = state;
+				stateMessages++;
 				event("state " + state);
 			}
-		} else if (msg.what == ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET && recording && msg.obj instanceof ObjectCluster) {
-			ObjectCluster oc = (ObjectCluster) msg.obj;
-			StreamAnalysis.Sample s = new StreamAnalysis.Sample(nowMs(),
-					cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP),
-					cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X),
-					cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_Y),
-					cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_Z));
-			synchronized (samples) {
-				samples.add(s);
+		} else if (msg.what == ShimmerBluetooth.MSG_IDENTIFIER_PROGRESS_REPORT_PER_DEVICE
+				&& msg.obj instanceof BluetoothProgressReportPerDevice) {
+			// The manager's own verdict on an operation such as configureShimmer.
+			BluetoothProgressReportPerDevice p = (BluetoothProgressReportPerDevice) msg.obj;
+			if (p.mCurrentOperationBtState == BT_STATE.CONFIGURING
+					&& p.mOperationState != BluetoothProgressReportPerDevice.OperationState.PENDING
+					&& p.mOperationState != BluetoothProgressReportPerDevice.OperationState.INPROGRESS) {
+				configureResult = p.mOperationState;
+				event("configure progress: " + p.mOperationState);
 			}
+		} else if (msg.what == ShimmerBluetooth.MSG_IDENTIFIER_DATA_PACKET) {
+			if (recording && msg.obj instanceof ObjectCluster) {
+				recordPacket((ObjectCluster) msg.obj);
+			}
+		} else if (otherMessagesSeen.add(msg.what)) {
+			event("message " + msg.what + (msg.obj == null ? "" : " " + msg.obj.getClass().getSimpleName()));
+		}
+	}
+
+	private void recordPacket(ObjectCluster oc) {
+		StreamAnalysis.Sample s = new StreamAnalysis.Sample(nowMs(),
+				cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.TIMESTAMP),
+				cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_X),
+				cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_Y),
+				cal(oc, Configuration.Shimmer3.ObjectClusterSensorName.ACCEL_LN_Z));
+		synchronized (samples) {
+			samples.add(s);
 		}
 	}
 
@@ -139,10 +174,67 @@ final class ShimmerSession implements AutoCloseable {
 		return condition.holds();
 	}
 
+	interface Call {
+		void run() throws Exception;
+	}
+
+	/** Set to the first library call that never returned; nothing more is attempted after it. */
+	volatile String hung;
+
+	private final java.util.concurrent.ExecutorService calls = java.util.concurrent.Executors.newCachedThreadPool(r -> {
+		Thread t = new Thread(r, "ShimmerHilCall");
+		t.setDaemon(true);
+		return t;
+	});
+
+	/**
+	 * Runs one API call with a time limit, so a call that blocks cannot hang the run. A call that
+	 * never returns is recorded with every thread's stack (the evidence a phone without root cannot
+	 * otherwise give) and returns false; so does one that throws.
+	 */
+	boolean call(String what, long timeoutMs, Call call) {
+		if (hung != null) {
+			event("skipped " + what + ": " + hung + " never returned");
+			return false;
+		}
+		event(what);
+		java.util.concurrent.Future<?> f = calls.submit(() -> {
+			call.run();
+			return null;
+		});
+		try {
+			f.get(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS);
+			return true;
+		} catch (java.util.concurrent.TimeoutException e) {
+			hung = what;
+			event(what + " did not return within " + timeoutMs + " ms; thread dump follows");
+			dumpThreads();
+			return false;
+		} catch (java.util.concurrent.ExecutionException e) {
+			event(what + " threw " + e.getCause());
+			return false;
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return false;
+		}
+	}
+
+	private void dumpThreads() {
+		for (java.util.Map.Entry<Thread, StackTraceElement[]> t : Thread.getAllStackTraces().entrySet()) {
+			StringBuilder b = new StringBuilder("  thread \"" + t.getKey().getName() + "\" " + t.getKey().getState());
+			for (StackTraceElement frame : t.getValue()) {
+				b.append("\n      at ").append(frame);
+			}
+			event(b.toString());
+		}
+	}
+
 	/** Connects over Bluetooth Classic and waits until the API has read the device's configuration. */
 	boolean connect(long timeoutMs) throws InterruptedException {
-		event("connect");
-		manager.connectShimmerThroughBTAddress(mac, "Shimmer", ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC);
+		if (!call("connect", 10000, () -> manager.connectShimmerThroughBTAddress(mac, "Shimmer",
+				ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC))) {
+			return false;
+		}
 		return waitFor(() -> {
 			ShimmerBluetooth d = device();
 			return d != null && d.isInitialised() && d.getBluetoothRadioState() == BT_STATE.CONNECTED;
@@ -164,12 +256,24 @@ final class ShimmerSession implements AutoCloseable {
 		}
 		clone.setShimmerAndSensorsSamplingRate(rateHz);
 		AssembleShimmerConfig.generateSingleShimmerConfig(clone, Configuration.COMMUNICATION_TYPE.BLUETOOTH);
-		sawConfiguring = false;
-		event(String.format(Locale.ROOT, "configure accel only at %.1f Hz", rateHz));
-		manager.configureShimmer(clone);
-		boolean done = waitFor(() -> sawConfiguring && state() == BT_STATE.CONNECTED, timeoutMs);
-		event(String.format(Locale.ROOT, "configured: rate on device %.2f Hz", device().getSamplingRateShimmer()));
-		return done;
+		configureResult = null;
+		final int stateMessagesBefore = stateMessages;
+		if (!call(String.format(Locale.ROOT, "configure accel only at %.1f Hz", rateHz), 10000,
+				() -> manager.configureShimmer(clone))) {
+			return false;
+		}
+		// Done when the operation has finished: either the manager's progress report (not every
+		// version forwards it to the Handler) or the fresh "Ready" the unit posts when the operation
+		// ends, with the requested rate read back. The status timer is stopped during an operation,
+		// so that "Ready" comes from the configuration.
+		boolean done = waitFor(() -> state() == BT_STATE.CONNECTED
+				&& (configureResult != null
+					|| (stateMessages > stateMessagesBefore && Math.abs(device().getSamplingRateShimmer() - rateHz) < 0.5)),
+				timeoutMs);
+		event(String.format(Locale.ROOT, "configure %s (%s): rate on device %.2f Hz",
+				done ? "finished" : "timed out", configureResult != null ? configureResult : "no progress report",
+				device().getSamplingRateShimmer()));
+		return done && (configureResult == null || configureResult == BluetoothProgressReportPerDevice.OperationState.SUCCESS);
 	}
 
 	void startRecording() {
@@ -192,23 +296,33 @@ final class ShimmerSession implements AutoCloseable {
 		}
 	}
 
-	boolean startStreaming(long timeoutMs) throws Exception {
-		event("startStreaming");
-		device().startStreaming();
-		return waitFor(() -> device().isStreaming(), timeoutMs);
+	boolean startStreaming(long timeoutMs) throws InterruptedException {
+		return call("startStreaming", 10000, () -> device().startStreaming())
+				&& waitFor(() -> device().isStreaming(), timeoutMs);
 	}
 
 	boolean stopStreaming(long timeoutMs) throws InterruptedException {
-		event("stopStreaming");
-		device().stopStreaming();
-		return waitFor(() -> !device().isStreaming(), timeoutMs);
+		return call("stopStreaming", 10000, () -> device().stopStreaming())
+				&& waitFor(() -> !device().isStreaming(), timeoutMs);
 	}
 
-	boolean disconnect(long timeoutMs) throws Exception {
-		event("disconnect");
-		ShimmerBluetooth d = device();
-		if (d != null) {
-			d.disconnect();
+	/** Returns once the call has returned; the caller waits for the state it expects. */
+	boolean startSdLogging() {
+		return call("startSDLogging", 10000, () -> device().startSDLogging());
+	}
+
+	boolean stopSdLogging() {
+		return call("stopSDLogging", 10000, () -> device().stopSDLogging());
+	}
+
+	boolean readBattery() {
+		return call("readBattery", 10000, () -> device().readBattery());
+	}
+
+	boolean disconnect(long timeoutMs) throws InterruptedException {
+		final ShimmerBluetooth d = device();
+		if (d != null && !call("disconnect", 10000, d::disconnect)) {
+			return false;
 		}
 		return waitFor(() -> {
 			BT_STATE s = state();
@@ -252,8 +366,10 @@ final class ShimmerSession implements AutoCloseable {
 	@Override
 	public void close() throws Exception {
 		try {
+			// After a hung call the API is in an unknown state; leave the unit for the runner's
+			// force-stop rather than queue more calls behind the stuck one.
 			BT_STATE s = state();
-			if (s != null && s != BT_STATE.DISCONNECTED && s != BT_STATE.CONNECTION_LOST) {
+			if (hung == null && s != null && s != BT_STATE.DISCONNECTED && s != BT_STATE.CONNECTION_LOST) {
 				if (device() != null && device().isStreaming()) {
 					stopStreaming(5000);
 				}
@@ -261,6 +377,7 @@ final class ShimmerSession implements AutoCloseable {
 			}
 		} finally {
 			callbackThread.quitSafely();
+			calls.shutdownNow();
 		}
 	}
 }

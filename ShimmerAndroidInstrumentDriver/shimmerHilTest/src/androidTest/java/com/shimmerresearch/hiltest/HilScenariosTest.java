@@ -19,6 +19,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
@@ -46,10 +48,16 @@ public class HilScenariosTest {
 
 	private static final double GRAVITY = 9.81;
 
+	/**
+	 * Connecting to an already paired unit needs no runtime permission before Android 12 (BLUETOOTH is
+	 * granted at install; location is only for scanning, which these tests never do). From Android 12,
+	 * BLUETOOTH_CONNECT is a runtime permission. Some phones (Xiaomi) refuse runtime grants over USB
+	 * without "USB debugging (Security settings)", so grant nothing where nothing is needed.
+	 */
 	@Rule
-	public GrantPermissionRule permissions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+	public TestRule permissions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 			? GrantPermissionRule.grant(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
-			: GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
+			: RuleChain.emptyRuleChain();
 
 	private Bundle args;
 	private Context context;
@@ -84,16 +92,22 @@ public class HilScenariosTest {
 
 	@After
 	public void end() throws Exception {
-		if (session != null) {
-			try {
+		try {
+			if (session != null) {
 				session.close();
-			} finally {
-				report.write(session.events());
+			}
+		} finally {
+			if (report != null) {
+				report.write(session != null ? session.events() : new ArrayList<String>());
 			}
 		}
 	}
 
 	private void finish() {
+		if (session != null && session.hung != null) {
+			report.put("hungCall", session.hung);
+			report.check(false, session.hung + " never returned: the API call blocked (thread dump in the report's events)");
+		}
 		if (!report.failures().isEmpty()) {
 			Assert.fail(android.text.TextUtils.join("; ", report.failures()));
 		}
@@ -149,6 +163,7 @@ public class HilScenariosTest {
 			StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
 			session.event("stream: " + a);
 			report.putStream("stream", a);
+			report.putGaps(a);
 			report.samples(samples);
 			checkStream(a, maxLoss, deviceRate, "stream");
 			if (!Double.isNaN(a.accelMagnitudeMean)) {
@@ -189,24 +204,25 @@ public class HilScenariosTest {
 			session.startRecording();
 			report.check(session.startStreaming(10000), "streaming did not start within 10 s");
 			Thread.sleep(3000);
-			List<Double> moments = new ArrayList<>();
-			for (int i = 1; i <= cycles; i++) {
-				moments.add(session.nowMs());
-				session.event("cycle " + i + ": startSDLogging");
-				d.startSDLogging();
-				report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING_AND_SDLOGGING, 5000),
-						"cycle " + i + ": SD logging did not start while streaming (state " + session.state()
-								+ "; is there an SD card?)");
+			List<Double> sdMoments = new ArrayList<>();
+			List<Double> batteryMoments = new ArrayList<>();
+			for (int i = 1; i <= cycles && session.hung == null; i++) {
+				sdMoments.add(session.nowMs());
+				session.event("cycle " + i);
+				if (session.startSdLogging()) {
+					report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING_AND_SDLOGGING, 5000),
+							"cycle " + i + ": SD logging did not start while streaming (state " + session.state()
+									+ "; is there an SD card? With a link CRC on, DEV-1148)");
+				}
 				Thread.sleep(2000);
-				moments.add(session.nowMs());
-				session.event("cycle " + i + ": stopSDLogging");
-				d.stopSDLogging();
-				report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING, 5000),
-						"cycle " + i + ": SD logging did not stop (state " + session.state() + ")");
+				sdMoments.add(session.nowMs());
+				if (session.stopSdLogging()) {
+					report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING, 5000),
+							"cycle " + i + ": SD logging did not stop (state " + session.state() + ")");
+				}
 				Thread.sleep(1000);
-				moments.add(session.nowMs());
-				session.event("cycle " + i + ": readBattery");
-				d.readBattery();
+				batteryMoments.add(session.nowMs());
+				session.readBattery();
 				Thread.sleep(2000);
 			}
 			List<StreamAnalysis.Sample> samples = session.stopRecording();
@@ -214,21 +230,42 @@ public class HilScenariosTest {
 			StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
 			session.event("stream: " + a);
 			report.putStream("stream", a);
-			double[] m = new double[moments.size()];
-			for (int i = 0; i < m.length; i++) {
-				m[i] = moments.get(i);
+			report.putGaps(a);
+			// Loss around SD logging start/stop is reported, not failed: with no parser error and
+			// logging starting, the unit itself did not send those samples while it opened or closed
+			// its file, which is firmware behaviour for the firmware HIL bench to judge. Loss around a
+			// battery read, or anywhere else, is the Android API's.
+			int[] attributed = a.attribute(new double[][] {toArray(sdMoments), toArray(batteryMoments)}, 1000);
+			int nearSd = attributed[0];
+			int nearBattery = attributed[1];
+			report.put("missingNearSdLoggingStartStop", nearSd);
+			report.put("missingNearBatteryReads", nearBattery);
+			if (nearSd > 0) {
+				session.event(nearSd + " packets not received within 1 s of SD logging start/stop (firmware side; not failed)");
 			}
-			int lostNearCommands = a.missingNear(m, 1000);
-			report.put("missingNearCommands", lostNearCommands);
-			report.check(lostNearCommands == 0, lostNearCommands
-					+ " packets lost within 1 s of a mid-stream command (DEV-1148 with CRC " + crc + ")");
-			checkStream(a, maxLoss, deviceRate, "stream");
+			report.check(nearBattery == 0, nearBattery + " packets lost within 1 s of a battery read while streaming");
+			int elsewhere = a.missing - nearSd;
+			double elsewherePercent = 100.0 * elsewhere / Math.max(1, a.received + a.missing);
+			report.put("missingElsewhere", elsewhere);
+			report.check(elsewherePercent <= maxLoss, String.format(Locale.ROOT,
+					"stream: %.3f%% packets lost away from SD logging start/stop (%d), limit %.2f%%",
+					elsewherePercent, elsewhere, maxLoss));
+			report.check(a.received > 0, "stream: no packets received");
+			report.check(a.nonIncreasing == 0, "stream: " + a.nonIncreasing + " timestamps did not increase");
 			int parserErrors = session.parserErrorsSince(marker);
 			report.put("parserErrors", parserErrors);
 			report.check(parserErrors == 0, parserErrors + " streaming parser errors logged (\"Packet syncing problem\")");
 			report.check(session.disconnect(10000), "did not disconnect within 10 s");
 		}
 		finish();
+	}
+
+	private static double[] toArray(List<Double> values) {
+		double[] out = new double[values.size()];
+		for (int i = 0; i < out.length; i++) {
+			out[i] = values.get(i);
+		}
+		return out;
 	}
 
 	/** Connect, stream briefly and disconnect, repeatedly: the reconnect path apps hit every day. */

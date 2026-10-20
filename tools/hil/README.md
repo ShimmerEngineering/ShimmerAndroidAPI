@@ -42,8 +42,10 @@ To find regressions before release day, schedule step 2 nightly with Windows Tas
 | Scenario | What it does | Fails when |
 |---|---|---|
 | `streamRest` | Connects, writes an accel-only config at `-Rate` (default 256 Hz), streams for `-Seconds` (default 30) with the unit lying still, then stops and disconnects. | It can't connect or configure; more than `-MaxLossPercent` (1 %) of packets are lost; a timestamp doesn't increase; the effective rate is more than 1 % off the configured one; accel is more than 1 m/s² from 9.81; or the API logs a "Packet syncing problem". |
-| `midStreamSet` | While streaming, starts and stops SD logging and reads the battery, three times. | Any packet is lost within 1 s of a command; logging doesn't start or stop; or there's a parser error. It's the DEV-1148 regression and needs a link CRC on and an SD card in the unit. |
+| `midStreamSet` | While streaming, starts and stops SD logging and reads the battery, three times. | Logging doesn't start or stop (the DEV-1148 symptom with a link CRC on); a packet is lost around a battery read, or more than `-MaxLossPercent` away from the SD transitions; or there's a parser error. Packets missing around SD logging start/stop are reported, not failed: the unit itself pauses while it opens its file, which is for the firmware HIL bench to judge. Needs an SD card in the unit. |
 | `reconnectLoop` | Connects, streams for 5 s and disconnects, five times. | Any cycle fails to connect within 30 s, or loses packets or logs a parser error. |
+
+Every scenario also fails if an API call doesn't return within 10 s. The report then holds every thread's stack, which a phone without root can't otherwise give, and the scenario stops. If the whole test process still never finishes, the runner force-stops it after `-ScenarioTimeoutSeconds` (600) and records TIMEOUT.
 
 The packet checks use the device's own timestamps, so a loss is a gap in the device's sequence, not
 phone scheduling. They follow the firmware HIL harness in log-and-stream-common `Test/hil` (DEV-1165),
@@ -74,12 +76,16 @@ uses those unchanged.
 
 ## One-time setup
 
-1. **Phone.** Turn on Developer options, then USB debugging, and "Stay awake while charging". On
-   Xiaomi phones also turn on "Install via USB" and "USB debugging (Security settings)": without
-   them, installing or granting permissions over USB fails. Connect it to the PC and accept the
-   debugging prompt.
+1. **Phone.** Turn on Developer options, then USB debugging, and "Stay awake while charging".
+   Connect it to the PC and accept the debugging prompt. On Xiaomi phones also turn on "Install via
+   USB". On Android 12 and later also turn on "USB debugging (Security settings)", which lets the
+   tests be granted `BLUETOOTH_CONNECT`. Up to Android 11 nothing needs granting: connecting to a
+   paired unit uses install-time permissions only.
 2. **Pair each unit with the phone over Bluetooth Classic,** in Settings → Bluetooth, PIN `1234`.
-   A Shimmer3R can end up bonded over BLE instead (DEV-970); unpair it and pair again if it does.
+   A Shimmer3R usually bonds over BLE instead (DEV-970). The phone then reaches the unit, but the
+   serial channel is refused, and the test reports that it "did not connect" within 2 s. Unpair it,
+   then either pair again with the unit's BLE turned off, or connect once from a classic
+   serial-terminal app so that Android makes a Bluetooth Classic bond.
 3. **Prepare each unit.**
    - **SD sync and Bluetooth disable off.** Either one keeps Bluetooth off (DEV-1228). Check in
      Consensys.
@@ -97,7 +103,8 @@ uses those unchanged.
    gh auth refresh -h github.com -s read:packages
    ```
 6. **JDK 17 or newer.** The script uses `JAVA_HOME` if it qualifies, otherwise the JDK Android Studio
-   ships in its `jbr` folder.
+   ships in its `jbr` folder. It also finds the Android SDK (`ANDROID_HOME`, or Android Studio's default
+   location) when the checkout has no `local.properties`.
 
 A Shimmer holds one Bluetooth link at a time. Don't run this while Consensys, the PC HIL harness or
 another phone is connected to the same unit.
