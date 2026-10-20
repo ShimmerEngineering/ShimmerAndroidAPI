@@ -294,7 +294,23 @@ foreach ($target in $targets) {
 }
 
 # --- Collect -----------------------------------------------------------------------------------
-& $adbExe @adbTarget pull $deviceReports (Join-Path $outDir 'reports') 2>&1 | Out-Null
+$reportDir = Join-Path $outDir 'reports'
+$pullOutput = & $adbExe @adbTarget pull $deviceReports $reportDir 2>&1 | Out-String
+$pullFailed = ($LASTEXITCODE -ne 0)
+# Every run that reached its verdict wrote a report, and the gate's status rests on them: a run whose
+# report did not come back is an error, not a pass.
+$macByUnit = @{}
+foreach ($u in $units) { $macByUnit[$u.name] = $u.mac }
+foreach ($r in $results) {
+    if ($r.Result -ne 'PASS' -and $r.Result -ne 'FAIL') { continue }
+    $prefix = ($r.Scenario -creplace '([A-Z])', '_$1').ToLower() + "_$($r.Transport)_$($macByUnit[$r.Unit] -replace ':', '')_"
+    $found = @(Get-ChildItem $reportDir -Filter "$prefix*.json" -ErrorAction SilentlyContinue)
+    if ($found.Count -eq 0) {
+        $why = if ($pullFailed) { "adb pull failed: $($pullOutput.Trim())" } else { 'the phone had no report for it' }
+        $r.Result = 'ERROR'
+        $r.Detail = (("no report collected ($why). " + $r.Detail).Trim())
+    }
+}
 $summary = [pscustomobject]@{
     phone = "$phoneModel (Android $phoneAndroid)"; androidApi = $apiLabel; driverVersion = $DriverVersion
     rate = $Rate; seconds = $Seconds; crc = $Crc; settleSeconds = $SettleSeconds; results = $results
@@ -309,7 +325,7 @@ $passed = @($results | Where-Object { $_.Result -eq 'PASS' })
 if ($Report) {
     # Firmware per unit, from the reports the tests wrote, with the transports each ran over.
     $firmware = @{}
-    Get-ChildItem (Join-Path $outDir 'reports') -Filter '*.json' -ErrorAction SilentlyContinue | ForEach-Object {
+    Get-ChildItem $reportDir -Filter '*.json' -ErrorAction SilentlyContinue | ForEach-Object {
         $r = Get-Content $_.FullName -Raw | ConvertFrom-Json
         if ($r.firmware -and $r.args.unit) { $firmware[$r.args.unit] = "$($r.hardware) $($r.firmware)" }
     }
