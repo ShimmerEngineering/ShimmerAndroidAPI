@@ -48,6 +48,10 @@ final class ShimmerSession implements AutoCloseable {
 	}
 
 	final String mac;
+	/** "classic" (Android's own Shimmer class and parser) or "ble" (Shimmer3BLEAndroid, the driver's parser). */
+	final String transport;
+	/** "Shimmer3" or "Shimmer3R": over BLE the manager picks the device class from it. */
+	final String deviceType;
 	private final HandlerThread callbackThread = new HandlerThread("ShimmerHilCallbacks");
 	private final ShimmerBluetoothManagerAndroid manager;
 	private final long t0 = SystemClock.elapsedRealtime();
@@ -59,8 +63,10 @@ final class ShimmerSession implements AutoCloseable {
 	private volatile int stateMessages;
 	private final java.util.Set<Integer> otherMessagesSeen = new java.util.HashSet<>();
 
-	ShimmerSession(Context context, String mac) throws Exception {
+	ShimmerSession(Context context, String mac, String transport, String deviceType) throws Exception {
 		this.mac = mac;
+		this.transport = transport;
+		this.deviceType = deviceType;
 		callbackThread.start();
 		Handler handler = new Handler(callbackThread.getLooper()) {
 			@Override
@@ -158,6 +164,29 @@ final class ShimmerSession implements AutoCloseable {
 		return (ShimmerBluetooth) manager.getShimmer(mac);
 	}
 
+	/**
+	 * The device, or an exception that the call reports. The API discards its device object when the
+	 * link drops, so a lost connection shows up here rather than as a NullPointerException.
+	 */
+	ShimmerBluetooth requireDevice() {
+		ShimmerBluetooth d = device();
+		if (d == null) {
+			throw new IllegalStateException("the API no longer has the unit (connection lost; last state " + lastState + ")");
+		}
+		return d;
+	}
+
+	/** The rate the API holds for the unit, or NaN once the connection is gone. */
+	double rateOnDevice() {
+		ShimmerBluetooth d = device();
+		return d == null ? Double.NaN : d.getSamplingRateShimmer();
+	}
+
+	boolean streaming() {
+		ShimmerBluetooth d = device();
+		return d != null && d.isStreaming();
+	}
+
 	BT_STATE state() {
 		ShimmerBluetooth d = device();
 		return d == null ? lastState : d.getBluetoothRadioState();
@@ -229,16 +258,27 @@ final class ShimmerSession implements AutoCloseable {
 		}
 	}
 
-	/** Connects over Bluetooth Classic and waits until the API has read the device's configuration. */
+	/**
+	 * Connects over the session's transport and waits until the API has read the device's
+	 * configuration. Classic needs the unit paired with the phone; BLE does not.
+	 */
 	boolean connect(long timeoutMs) throws InterruptedException {
-		if (!call("connect", 10000, () -> manager.connectShimmerThroughBTAddress(mac, "Shimmer",
-				ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC))) {
+		final boolean ble = "ble".equals(transport);
+		if (!call("connect over " + transport, 10000, () -> manager.connectShimmerThroughBTAddress(mac, deviceType,
+				ble ? ShimmerBluetoothManagerAndroid.BT_TYPE.BLE : ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC))) {
 			return false;
 		}
-		return waitFor(() -> {
+		boolean ready = waitFor(() -> {
 			ShimmerBluetooth d = device();
 			return d != null && d.isInitialised() && d.getBluetoothRadioState() == BT_STATE.CONNECTED;
 		}, timeoutMs);
+		ShimmerBluetooth d = device();
+		if (ready && ble && d != null) {
+			// Over BLE the driver logs parser errors with consolePrintLn, which only prints in verbose
+			// mode; Android's Classic class logs them always. Same evidence either way.
+			d.setVerboseMode(true);
+		}
+		return ready && d != null;
 	}
 
 	/**
@@ -247,6 +287,10 @@ final class ShimmerSession implements AutoCloseable {
 	 */
 	boolean configureAccelOnly(double rateHz, long timeoutMs) throws InterruptedException {
 		ShimmerDevice original = manager.getShimmer(mac);
+		if (original == null) {
+			event("configure: the API no longer has the unit (connection lost; last state " + lastState + ")");
+			return false;
+		}
 		ShimmerDevice clone = original.deepClone();
 		clone.disableAllSensors();
 		if (clone.getHardwareVersion() == ShimmerVerDetails.HW_ID.SHIMMER_3) {
@@ -268,11 +312,11 @@ final class ShimmerSession implements AutoCloseable {
 		// so that "Ready" comes from the configuration.
 		boolean done = waitFor(() -> state() == BT_STATE.CONNECTED
 				&& (configureResult != null
-					|| (stateMessages > stateMessagesBefore && Math.abs(device().getSamplingRateShimmer() - rateHz) < 0.5)),
+					|| (stateMessages > stateMessagesBefore && Math.abs(rateOnDevice() - rateHz) < 0.5)),
 				timeoutMs);
 		event(String.format(Locale.ROOT, "configure %s (%s): rate on device %.2f Hz",
 				done ? "finished" : "timed out", configureResult != null ? configureResult : "no progress report",
-				device().getSamplingRateShimmer()));
+				rateOnDevice()));
 		return done && (configureResult == null || configureResult == BluetoothProgressReportPerDevice.OperationState.SUCCESS);
 	}
 
@@ -297,26 +341,26 @@ final class ShimmerSession implements AutoCloseable {
 	}
 
 	boolean startStreaming(long timeoutMs) throws InterruptedException {
-		return call("startStreaming", 10000, () -> device().startStreaming())
-				&& waitFor(() -> device().isStreaming(), timeoutMs);
+		return call("startStreaming", 10000, () -> requireDevice().startStreaming())
+				&& waitFor(this::streaming, timeoutMs);
 	}
 
 	boolean stopStreaming(long timeoutMs) throws InterruptedException {
-		return call("stopStreaming", 10000, () -> device().stopStreaming())
-				&& waitFor(() -> !device().isStreaming(), timeoutMs);
+		return call("stopStreaming", 10000, () -> requireDevice().stopStreaming())
+				&& waitFor(() -> !streaming(), timeoutMs);
 	}
 
 	/** Returns once the call has returned; the caller waits for the state it expects. */
 	boolean startSdLogging() {
-		return call("startSDLogging", 10000, () -> device().startSDLogging());
+		return call("startSDLogging", 10000, () -> requireDevice().startSDLogging());
 	}
 
 	boolean stopSdLogging() {
-		return call("stopSDLogging", 10000, () -> device().stopSDLogging());
+		return call("stopSDLogging", 10000, () -> requireDevice().stopSDLogging());
 	}
 
 	boolean readBattery() {
-		return call("readBattery", 10000, () -> device().readBattery());
+		return call("readBattery", 10000, () -> requireDevice().readBattery());
 	}
 
 	boolean disconnect(long timeoutMs) throws InterruptedException {
@@ -370,7 +414,7 @@ final class ShimmerSession implements AutoCloseable {
 			// force-stop rather than queue more calls behind the stuck one.
 			BT_STATE s = state();
 			if (hung == null && s != null && s != BT_STATE.DISCONNECTED && s != BT_STATE.CONNECTION_LOST) {
-				if (device() != null && device().isStreaming()) {
+				if (streaming()) {
 					stopStreaming(5000);
 				}
 				disconnect(10000);

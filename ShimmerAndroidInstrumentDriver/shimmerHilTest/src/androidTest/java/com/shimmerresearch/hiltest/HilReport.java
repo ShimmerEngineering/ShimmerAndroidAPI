@@ -26,16 +26,19 @@ final class HilReport {
 
 	private final Context context;
 	private final String scenario;
+	private final String transport;
 	private final String mac;
 	private final JSONObject json = new JSONObject();
 	private final List<String> failures = new ArrayList<>();
 	private List<StreamAnalysis.Sample> samples;
 
-	HilReport(Context context, String scenario, String mac, Bundle args) throws Exception {
+	HilReport(Context context, String scenario, String transport, String mac, Bundle args) throws Exception {
 		this.context = context;
 		this.scenario = scenario;
+		this.transport = transport;
 		this.mac = mac;
 		json.put("scenario", scenario);
+		json.put("transport", transport);
 		json.put("mac", mac);
 		json.put("started", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT).format(new Date()));
 		JSONObject a = new JSONObject();
@@ -60,6 +63,7 @@ final class HilReport {
 			o.put("missing", a.missing);
 			o.put("lossPercent", a.lossPercent());
 			o.put("nonIncreasing", a.nonIncreasing);
+			o.put("timestampJumps", a.timestampJumps.size());
 			o.put("effectiveRateHz", a.effectiveRateHz);
 			o.put("accelMagnitudeMean", a.accelMagnitudeMean);
 			o.put("accelMagnitudeStd", a.accelMagnitudeStd);
@@ -82,6 +86,15 @@ final class HilReport {
 				gaps.put(o);
 			}
 			json.put("gapList", gaps);
+			JSONArray jumps = new JSONArray();
+			for (StreamAnalysis.Gap g : a.timestampJumps) {
+				JSONObject o = new JSONObject();
+				o.put("afterReceivedMs", Math.round(g.afterReceivedMs));
+				o.put("afterTimestampMs", g.afterTimestampMs);
+				o.put("periodsAhead", g.missing + 1);
+				jumps.put(o);
+			}
+			json.put("timestampJumpList", jumps);
 		} catch (Exception e) {
 			Log.w(ShimmerSession.TAG, "report: gapList: " + e);
 		}
@@ -95,7 +108,7 @@ final class HilReport {
 	void check(boolean ok, String failure) {
 		if (!ok) {
 			failures.add(failure);
-			Log.e(ShimmerSession.TAG, scenario + " " + mac + " FAIL: " + failure);
+			Log.e(ShimmerSession.TAG, scenario + " " + transport + " " + mac + " FAIL: " + failure);
 		}
 	}
 
@@ -112,7 +125,7 @@ final class HilReport {
 			if (!dir.exists() && !dir.mkdirs()) {
 				throw new IllegalStateException("cannot create " + dir);
 			}
-			String base = scenario + "_" + mac.replace(":", "") + "_"
+			String base = scenario + "_" + transport + "_" + mac.replace(":", "") + "_"
 					+ new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date());
 			try (Writer w = new OutputStreamWriter(new FileOutputStream(new File(dir, base + ".json")), StandardCharsets.UTF_8)) {
 				w.write(json.toString(2));

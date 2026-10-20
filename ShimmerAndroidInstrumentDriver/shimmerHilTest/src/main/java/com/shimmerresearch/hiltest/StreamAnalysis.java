@@ -48,17 +48,23 @@ public final class StreamAnalysis {
 	public final int received;
 	public final int missing;
 	public final int nonIncreasing;
+	/**
+	 * Steps where the device timestamp leapt far ahead of the arrival time: not lost packets but a
+	 * bad timestamp, such as a 24-bit wrap unwrapped wrongly (512 s at a 32768 Hz clock, DEV-1023).
+	 */
+	public final List<Gap> timestampJumps;
 	public final double expectedPeriodMs;
 	public final double effectiveRateHz;
 	public final double accelMagnitudeMean;
 	public final double accelMagnitudeStd;
 	public final List<Gap> gaps;
 
-	private StreamAnalysis(int received, int missing, int nonIncreasing, double expectedPeriodMs,
+	private StreamAnalysis(int received, int missing, int nonIncreasing, List<Gap> timestampJumps, double expectedPeriodMs,
 			double effectiveRateHz, double accelMagnitudeMean, double accelMagnitudeStd, List<Gap> gaps) {
 		this.received = received;
 		this.missing = missing;
 		this.nonIncreasing = nonIncreasing;
+		this.timestampJumps = timestampJumps;
 		this.expectedPeriodMs = expectedPeriodMs;
 		this.effectiveRateHz = effectiveRateHz;
 		this.accelMagnitudeMean = accelMagnitudeMean;
@@ -74,24 +80,35 @@ public final class StreamAnalysis {
 		double period = 1000.0 / rateHz;
 		int missing = 0;
 		int nonIncreasing = 0;
+		// The effective rate counts sample periods over device time, from ordinary steps only: a
+		// jump or a step backwards says nothing about the rate.
+		double periods = 0, spanMs = 0;
 		List<Gap> gaps = new ArrayList<>();
+		List<Gap> jumps = new ArrayList<>();
 		for (int i = 1; i < samples.size(); i++) {
 			double step = samples.get(i).timestampMs - samples.get(i - 1).timestampMs;
+			double arrivalStep = samples.get(i).receivedMs - samples.get(i - 1).receivedMs;
 			if (step <= 0) {
 				nonIncreasing++;
 			} else if (step > 1.5 * period) {
 				int lost = (int) Math.round(step / period) - 1;
-				missing += lost;
-				gaps.add(new Gap(samples.get(i - 1).timestampMs, samples.get(i - 1).receivedMs, lost));
+				Gap g = new Gap(samples.get(i - 1).timestampMs, samples.get(i - 1).receivedMs, lost);
+				// Packets really lost leave a pause in arrival about as long as the gap. A timestamp that
+				// leaps a second or more beyond the arrival time is a bad timestamp, not lost data.
+				if (step - arrivalStep > JUMP_MS) {
+					jumps.add(g);
+				} else {
+					missing += lost;
+					gaps.add(g);
+					periods += lost + 1;
+					spanMs += step;
+				}
+			} else {
+				periods += 1;
+				spanMs += step;
 			}
 		}
-		double effectiveRate = Double.NaN;
-		if (samples.size() > 1) {
-			double span = samples.get(samples.size() - 1).timestampMs - samples.get(0).timestampMs;
-			if (span > 0) {
-				effectiveRate = (samples.size() - 1 + missing) * 1000.0 / span;
-			}
-		}
+		double effectiveRate = spanMs > 0 ? periods * 1000.0 / spanMs : Double.NaN;
 		double sum = 0, sumSq = 0;
 		int n = 0;
 		for (Sample s : samples) {
@@ -104,8 +121,11 @@ public final class StreamAnalysis {
 		}
 		double mean = n > 0 ? sum / n : Double.NaN;
 		double std = n > 1 ? Math.sqrt(Math.max(0, (sumSq - n * mean * mean) / (n - 1))) : Double.NaN;
-		return new StreamAnalysis(samples.size(), missing, nonIncreasing, period, effectiveRate, mean, std, gaps);
+		return new StreamAnalysis(samples.size(), missing, nonIncreasing, jumps, period, effectiveRate, mean, std, gaps);
 	}
+
+	/** How far ahead of the arrival time a timestamp must leap to count as a jump, not loss. */
+	static final double JUMP_MS = 1000;
 
 	/**
 	 * Charges each gap to the kind of command nearest to it (by arrival time), if one is within
@@ -157,9 +177,9 @@ public final class StreamAnalysis {
 	@Override
 	public String toString() {
 		return String.format(Locale.ROOT,
-				"received=%d missing=%d (%.3f%%) nonIncreasing=%d effectiveRate=%.2fHz accel=%.3f±%.3f m/s^2 gaps=%s",
-				received, missing, lossPercent(), nonIncreasing, effectiveRateHz, accelMagnitudeMean,
-				accelMagnitudeStd, gapsSummary());
+				"received=%d missing=%d (%.3f%%) nonIncreasing=%d timestampJumps=%d effectiveRate=%.2fHz accel=%.3f±%.3f m/s^2 gaps=%s",
+				received, missing, lossPercent(), nonIncreasing, timestampJumps.size(), effectiveRateHz,
+				accelMagnitudeMean, accelMagnitudeStd, gapsSummary());
 	}
 
 	private String gapsSummary() {

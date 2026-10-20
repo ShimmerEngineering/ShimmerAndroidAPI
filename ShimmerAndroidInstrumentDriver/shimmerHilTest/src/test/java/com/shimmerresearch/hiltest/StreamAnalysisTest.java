@@ -70,6 +70,20 @@ public class StreamAnalysisTest {
 	}
 
 	@Test
+	public void tellsABadTimestampFromLostPackets() {
+		// What a Shimmer3R did over BLE at an SD logging start: one packet stamped a 24-bit wrap
+		// (512 s) ahead while packets kept arriving on time, then the next one back on track.
+		List<StreamAnalysis.Sample> s = stream(256, 1000);
+		StreamAnalysis.Sample bad = s.get(500);
+		s.set(500, new StreamAnalysis.Sample(bad.receivedMs, bad.timestampMs + 512000, 0, 0, 9.81));
+		StreamAnalysis a = StreamAnalysis.analyse(s, 256);
+		assertEquals(1, a.timestampJumps.size());
+		assertEquals(0, a.missing);
+		assertEquals(1, a.nonIncreasing);
+		assertEquals(256, a.effectiveRateHz, 0.5);
+	}
+
+	@Test
 	public void flagsTimestampsThatGoBackwards() {
 		List<StreamAnalysis.Sample> s = stream(100, 10);
 		s.add(5, new StreamAnalysis.Sample(45, 1000, 0, 0, 9.81));

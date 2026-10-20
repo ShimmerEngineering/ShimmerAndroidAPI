@@ -4,9 +4,9 @@ Runs the Android API hardware-in-the-loop (HIL) scenarios on a USB-attached phon
 Shimmer in a rig file, pulls the reports and prints a pass/fail table. Exits 1 if anything failed.
 
 .DESCRIPTION
-One-time setup is in tools/hil/README.md: pair each unit with the phone over Bluetooth Classic, list
-it in tools/hil/rig-android.json (copy rig-android.example.json), and give Gradle a token that can
-read GitHub Packages.
+One-time setup is in tools/hil/README.md: list each unit, with the transports to test it over, in
+tools/hil/rig-android.json (copy rig-android.example.json), pair it with the phone if it is tested over
+Bluetooth Classic, and give Gradle a token that can read GitHub Packages.
 
 .EXAMPLE
 .\tools\hil\run-android-hil.ps1
@@ -29,6 +29,8 @@ param(
     [ValidateSet('streamRest', 'midStreamSet', 'reconnectLoop')]
     [string[]]$Scenario = @('streamRest', 'midStreamSet', 'reconnectLoop'),
     [string[]]$Unit,
+    [ValidateSet('classic', 'ble')]
+    [string[]]$Transport,
     [string]$DriverVersion,
     [string]$AndroidApiVersion,
     [string]$Serial,
@@ -39,7 +41,10 @@ param(
     [double]$MaxLossPercent = 1.0,
     [switch]$SkipBuild,
     [switch]$Report,
-    [int]$ScenarioTimeoutSeconds = 600
+    [int]$ScenarioTimeoutSeconds = 600,
+    # Pause between runs, so the unit has advertised again and the phone's Bluetooth stack has let go
+    # of the last connection before the next one starts.
+    [int]$SettleSeconds = 10
 )
 
 $ErrorActionPreference = 'Continue'
@@ -63,6 +68,19 @@ $units = @($rigData.units)
 if ($Unit) { $units = @($units | Where-Object { $Unit -contains $_.name }) }
 if ($units.Count -eq 0) { Fail "No units to test (rig: $Rig, -Unit: $Unit)." }
 if (-not $Serial -and $rigData.phone) { $Serial = $rigData.phone }
+
+# Each unit runs over the transports it lists ("classic" needs it paired with the phone; "ble"
+# doesn't). They are different code: Classic goes through the Android API's own Shimmer class and
+# parser, BLE through Shimmer3BLEAndroid and the driver's parser.
+$targets = @(foreach ($u in $units) {
+    $unitTransports = @($u.transports)
+    if (-not $u.transports) { $unitTransports = @('classic') }
+    foreach ($t in $unitTransports) {
+        if ($t -ne 'classic' -and $t -ne 'ble') { Fail "Unit $($u.name): transport '$t' is not classic or ble." }
+        if (-not $Transport -or $Transport -contains $t) { [pscustomobject]@{ Unit = $u; Transport = $t } }
+    }
+})
+if ($targets.Count -eq 0) { Fail "Nothing to run: no unit lists the transport(s) $($Transport -join ', ')." }
 
 # --- adb ---------------------------------------------------------------------------------------
 $sdk = $env:ANDROID_HOME
@@ -99,10 +117,16 @@ $commit = $null
 $githubRepo = $null
 if ($Report) {
     if ($AndroidApiVersion) { Fail '-Report tests the library source at a commit; drop -AndroidApiVersion.' }
-    if ($PSBoundParameters.ContainsKey('Scenario') -or $Unit) { Fail '-Report needs every scenario on every unit in the rig; drop -Scenario and -Unit.' }
+    if ($PSBoundParameters.ContainsKey('Scenario') -or $Unit -or $Transport) {
+        Fail '-Report needs every scenario on every unit and transport in the rig; drop -Scenario, -Unit and -Transport.'
+    }
     $types = @($units | ForEach-Object { $_.type })
     if (-not ($types -contains 'Shimmer3') -or -not ($types -contains 'Shimmer3R')) {
         Fail "-Report needs at least one Shimmer3 and one Shimmer3R in the rig (types found: $($types -join ', '))."
+    }
+    $transportsCovered = @($targets | ForEach-Object { $_.Transport }) | Sort-Object -Unique
+    if (-not ($transportsCovered -contains 'classic') -or -not ($transportsCovered -contains 'ble')) {
+        Fail "-Report needs both transports in the rig, Classic and BLE: they run different parsers (found: $($transportsCovered -join ', '))."
     }
     $dirty = (git -C $repo status --porcelain) -join "`n"
     if ($dirty) { Fail "-Report needs a clean working tree, so the tested code is exactly the commit:`n$dirty" }
@@ -220,20 +244,25 @@ function Invoke-Instrument([string[]]$arguments, [int]$timeoutSeconds) {
 }
 
 $results = @()
-foreach ($u in $units) {
+$runs = 0
+foreach ($target in $targets) {
+    $u = $target.Unit
+    $t = $target.Transport
     foreach ($s in $Scenario) {
-        $label = "$($u.name) $s"
+        if ($runs++ -gt 0) { Start-Sleep -Seconds $SettleSeconds }
+        $label = "$($u.name) $t $s"
         Write-Host "Running $label..." -NoNewline
         Adb logcat -c | Out-Null
         $instrumentArgs = @('shell', 'am', 'instrument', '-w', '-r',
             '-e', 'class', "$package.HilScenariosTest#$s",
-            '-e', 'mac', $u.mac, '-e', 'unit', $u.name, '-e', 'rate', $Rate, '-e', 'seconds', $Seconds,
+            '-e', 'mac', $u.mac, '-e', 'unit', $u.name, '-e', 'type', $u.type, '-e', 'transport', $t,
+            '-e', 'rate', $Rate, '-e', 'seconds', $Seconds,
             '-e', 'crc', $Crc, '-e', 'maxLossPercent', $MaxLossPercent,
             '-e', 'driverVersion', $DriverVersion, '-e', 'androidApi', ($apiLabel -replace ' ', '_'),
             $runner)
         $run = Invoke-Instrument $instrumentArgs $ScenarioTimeoutSeconds
         $output = $run.Output
-        $safe = "$($u.name)_$s" -replace '[^\w.-]', '_'
+        $safe = "$($u.name)_$($t)_$s" -replace '[^\w.-]', '_'
         $output | Set-Content (Join-Path $outDir "$safe.instrument.txt")
         Adb logcat -d -v threadtime | Set-Content (Join-Path $outDir "$safe.logcat.txt")
 
@@ -254,8 +283,7 @@ foreach ($u in $units) {
         elseif ($m.Success) { $detail = $m.Groups[1].Value }
         elseif ($verdict -eq 'ERROR') { $detail = ($output -split "`n" | Select-Object -Last 3) -join ' ' }
         Write-Host " $verdict" -ForegroundColor $(if ($verdict -eq 'PASS') { 'Green' } elseif ($verdict -eq 'SKIP') { 'Yellow' } else { 'Red' })
-        $results += [pscustomobject]@{ Unit = $u.name; Scenario = $s; Result = $verdict; Detail = $detail }
-        Start-Sleep -Seconds 3  # let the unit and the phone's Bluetooth settle before the next connection
+        $results += [pscustomobject]@{ Unit = $u.name; Transport = $t; Scenario = $s; Result = $verdict; Detail = $detail }
     }
 }
 
@@ -263,7 +291,7 @@ foreach ($u in $units) {
 & $adbExe @adbTarget pull $deviceReports (Join-Path $outDir 'reports') 2>&1 | Out-Null
 $summary = [pscustomobject]@{
     phone = "$phoneModel (Android $phoneAndroid)"; androidApi = $apiLabel; driverVersion = $DriverVersion
-    rate = $Rate; seconds = $Seconds; crc = $Crc; results = $results
+    rate = $Rate; seconds = $Seconds; crc = $Crc; settleSeconds = $SettleSeconds; results = $results
 }
 $summary | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $outDir 'summary.json')
 
@@ -273,13 +301,18 @@ $failed = @($results | Where-Object { $_.Result -ne 'PASS' -and $_.Result -ne 'S
 $passed = @($results | Where-Object { $_.Result -eq 'PASS' })
 
 if ($Report) {
-    # Firmware per unit, from the reports the tests wrote.
+    # Firmware per unit, from the reports the tests wrote, with the transports each ran over.
     $firmware = @{}
     Get-ChildItem (Join-Path $outDir 'reports') -Filter '*.json' -ErrorAction SilentlyContinue | ForEach-Object {
         $r = Get-Content $_.FullName -Raw | ConvertFrom-Json
         if ($r.firmware -and $r.args.unit) { $firmware[$r.args.unit] = "$($r.hardware) $($r.firmware)" }
     }
-    $tested = @($units | ForEach-Object { if ($firmware[$_.name]) { $firmware[$_.name] } else { $_.type } }) | Sort-Object -Unique
+    $tested = @($units | ForEach-Object {
+        $name = $_.name
+        $over = (@($targets | Where-Object { $_.Unit.name -eq $name } | ForEach-Object { $_.Transport }) -join '+')
+        $what = if ($firmware[$name]) { $firmware[$name] } else { $_.type }
+        "$what ($over)"
+    }) | Sort-Object -Unique
     $state = if ($passed.Count -eq $results.Count) { 'success' } else { 'failure' }
     $description = "$($passed.Count)/$($results.Count) passed on $phoneModel`: $($tested -join ', ')"
     if ($description.Length -gt 140) { $description = $description.Substring(0, 137) + '...' }

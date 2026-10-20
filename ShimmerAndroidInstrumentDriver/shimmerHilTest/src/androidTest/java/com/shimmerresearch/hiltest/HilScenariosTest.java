@@ -33,6 +33,8 @@ import java.util.Locale;
  *
  * <pre>
  *   mac             XX:XX:XX:XX:XX:XX (required; without it every test is skipped)
+ *   transport       classic (default; the unit must be paired) or ble (no pairing)
+ *   type            Shimmer3 (default) or Shimmer3R; over BLE it picks the device class
  *   rate            sampling rate in Hz, default 256
  *   seconds         stream_rest duration, default 30
  *   cycles          mid_stream_set / reconnect_loop repetitions, default 3 / 5
@@ -86,8 +88,10 @@ public class HilScenariosTest {
 		String crc = arg("crc", "2");
 		ShimmerBluetooth.setDefaultBtCrcModeToUseIfFwSupported(
 				"off".equals(crc) ? BT_CRC_MODE.OFF : "1".equals(crc) ? BT_CRC_MODE.ONE_BYTE_CRC : BT_CRC_MODE.TWO_BYTE_CRC);
-		report = new HilReport(context, scenario, mac, args);
-		session = new ShimmerSession(context, mac);
+		String transport = arg("transport", "classic");
+		assumeTrue("transport must be classic or ble, not " + transport, "classic".equals(transport) || "ble".equals(transport));
+		report = new HilReport(context, scenario, transport, mac, args);
+		session = new ShimmerSession(context, mac, transport, arg("type", "Shimmer3"));
 	}
 
 	@After
@@ -123,12 +127,20 @@ public class HilScenariosTest {
 			return false;
 		}
 		ShimmerBluetooth d = session.device();
+		if (d == null) {
+			report.check(false, "the connection was lost right after connecting (state " + session.state() + ")");
+			return false;
+		}
 		report.put("hardware", d.getHardwareVersionParsed());
 		report.put("firmware", d.getFirmwareVersionParsed());
 		report.put("crcMode", String.valueOf(d.getCurrentBtCommsCrcMode()));
 		boolean configured = session.configureAccelOnly(rateHz, 20000);
 		report.put("rateOnDeviceHz", d.getSamplingRateShimmer());
 		report.check(configured, "configuration did not complete within 20 s (state " + session.state() + ")");
+		if (configured && session.device() == null) {
+			report.check(false, "the connection was lost right after configuring (state " + session.state() + ")");
+			return false;
+		}
 		return configured;
 	}
 
@@ -138,9 +150,19 @@ public class HilScenariosTest {
 				"%s: %.3f%% packets lost (%d of %d), limit %.2f%%", what, a.lossPercent(), a.missing,
 				a.received + a.missing, maxLossPercent));
 		report.check(a.nonIncreasing == 0, what + ": " + a.nonIncreasing + " timestamps did not increase");
+		checkJumps(a, what);
 		if (!Double.isNaN(a.effectiveRateHz)) {
 			report.check(Math.abs(a.effectiveRateHz - deviceRateHz) <= 0.01 * deviceRateHz, String.format(Locale.ROOT,
 					"%s: effective rate %.2f Hz, device set to %.2f Hz", what, a.effectiveRateHz, deviceRateHz));
+		}
+	}
+
+	/** A device timestamp that leapt ahead of the arrival time is wrong data (DEV-1023 class), never loss. */
+	private void checkJumps(StreamAnalysis a, String what) {
+		for (StreamAnalysis.Gap j : a.timestampJumps) {
+			report.check(false, String.format(Locale.ROOT,
+					"%s: timestamp jumped %.1f s ahead at %.0f ms (device time %.0f ms) while packets kept arriving",
+					what, (j.missing + 1) * a.expectedPeriodMs / 1000.0, j.afterReceivedMs, j.afterTimestampMs));
 		}
 	}
 
@@ -153,7 +175,7 @@ public class HilScenariosTest {
 		double maxLoss = arg("maxLossPercent", 1.0);
 		double accelTolerance = arg("accelTolerance", 1.0);
 		if (connectAndConfigure(rate)) {
-			double deviceRate = session.device().getSamplingRateShimmer();
+			double deviceRate = session.rateOnDevice();
 			String marker = session.logMarker("stream_rest");
 			session.startRecording();
 			report.check(session.startStreaming(10000), "streaming did not start within 10 s");
@@ -231,6 +253,7 @@ public class HilScenariosTest {
 			session.event("stream: " + a);
 			report.putStream("stream", a);
 			report.putGaps(a);
+			report.samples(samples);
 			// Loss around SD logging start/stop is reported, not failed: with no parser error and
 			// logging starting, the unit itself did not send those samples while it opened or closed
 			// its file, which is firmware behaviour for the firmware HIL bench to judge. Loss around a
@@ -252,6 +275,7 @@ public class HilScenariosTest {
 					elsewherePercent, elsewhere, maxLoss));
 			report.check(a.received > 0, "stream: no packets received");
 			report.check(a.nonIncreasing == 0, "stream: " + a.nonIncreasing + " timestamps did not increase");
+			checkJumps(a, "stream");
 			int parserErrors = session.parserErrorsSince(marker);
 			report.put("parserErrors", parserErrors);
 			report.check(parserErrors == 0, parserErrors + " streaming parser errors logged (\"Packet syncing problem\")");
@@ -285,7 +309,7 @@ public class HilScenariosTest {
 			if (!ready) {
 				break;
 			}
-			double deviceRate = session.device().getSamplingRateShimmer();
+			double deviceRate = session.rateOnDevice();
 			String marker = session.logMarker(what);
 			session.startRecording();
 			report.check(session.startStreaming(10000), what + ": streaming did not start within 10 s");
