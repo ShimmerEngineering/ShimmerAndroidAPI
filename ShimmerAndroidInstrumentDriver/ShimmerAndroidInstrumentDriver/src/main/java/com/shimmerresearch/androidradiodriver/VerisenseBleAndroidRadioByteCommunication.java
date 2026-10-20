@@ -72,47 +72,32 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                if (mByteCommunicationListener != null) {
-                    mByteCommunicationListener.eventDisconnected();
-                }
+                connectionFailed("Connect Failure: " + exception);
             }
 
             @Override
-            public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+            public void onConnectSuccess(final BleDevice bleDevice, final BluetoothGatt gatt, int status) {
+                mBleDevice = bleDevice;
                 mTaskMTU= new TaskCompletionSource<>();
+                // FastBle runs this and the MTU callback on the main thread, so waiting here for the
+                // MTU would block the UI and always time out. Setup continues from the callback instead.
                 BleManager.getInstance().setMtu(bleDevice, 251, new BleMtuChangedCallback() {
                     @Override
                     public void onSetMTUFailure(BleException exception) {
-                        System.out.println("MTU Failure");
-
+                        System.out.println("MTU Failure: " + exception);
+                        if (mTaskMTU.trySetResult("MTU Failure")) {
+                            onMtuSet(bleDevice, gatt);
+                        }
                     }
 
                     @Override
                     public void onMtuChanged(int mtu) {
                         System.out.println("MTU Changed: " + mtu);
-                        mTaskMTU.setResult("MTU Changed: " + mtu);
+                        if (mTaskMTU.trySetResult("MTU Changed: " + mtu)) {
+                            onMtuSet(bleDevice, gatt);
+                        }
                     }
                 });
-
-                try {
-                    boolean result = mTaskMTU.getTask().waitForCompletion(3, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
-                }
-
-                if (mByteCommunicationListener != null) {
-                    mByteCommunicationListener.eventConnected();
-                }
-                mBleDevice = bleDevice;
-                startServiceS(bleDevice);
-                System.out.println(bleDevice.getMac() + " Connected");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED);
-                }
-                mTaskConnect.setResult("Connected");
             }
 
             @Override
@@ -134,12 +119,55 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
     }
 
     /**
+     * Continues connect once the MTU request has finished, whether or not it succeeded.
+     * Connected is reported once the RX notification is enabled, see {@link #onNotifyEnabled(BleDevice)}
+     */
+    private void onMtuSet(BleDevice bleDevice, BluetoothGatt gatt) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+        }
+
+        startServiceS(bleDevice);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED);
+        }
+    }
+
+    /**
+     * Finishes connect once the RX notification is enabled, as no reply from the device can arrive before then
+     */
+    private void onNotifyEnabled(BleDevice bleDevice) {
+        if (!mTaskConnect.trySetResult("Connected")) {
+            return;
+        }
+        System.out.println(bleDevice.getMac() + " Connected");
+        if (mByteCommunicationListener != null) {
+            mByteCommunicationListener.eventConnected();
+        }
+    }
+
+    /**
+     * The connection attempt failed: drop the link and tell the listener
+     */
+    private void connectionFailed(String reason) {
+        System.out.println(mMac + " " + reason);
+        if (!mTaskConnect.trySetResult(reason)) {
+            return;
+        }
+        BleManager.getInstance().disconnect(mBleDevice);
+        if (mByteCommunicationListener != null) {
+            mByteCommunicationListener.eventDisconnected();
+        }
+    }
+
+    /**
      * Get services and start notify for characteristics changed
      * @param bleDevice  BLE device
      */
     public void startServiceS(BleDevice bleDevice){
         List<BluetoothGattService> services = BleManager.getInstance().getBluetoothGattServices(bleDevice);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        boolean isRxFound = false;
+        if (services != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
 
 
             for (BluetoothGattService service:services) {
@@ -151,6 +179,7 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
                             CharSequence text = "TXID!";
                         }
                         else if (characteristic.getUuid().compareTo(rxid)==0){
+                            isRxFound = true;
                             newConnectedBLEDevice(bleDevice,characteristic);
                             CharSequence text = "RxID!";
                         }
@@ -159,6 +188,9 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
             }
 
 
+        }
+        if (!isRxFound) {
+            connectionFailed("RX characteristic not found");
         }
     }
 
@@ -181,12 +213,13 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
 
                         @Override
                         public void onNotifySuccess() {
-
+                            System.out.println("Notify Success");
+                            onNotifyEnabled(bleDevice);
                         }
 
                         @Override
                         public void onNotifyFailure(BleException exception) {
-
+                            connectionFailed("Notify Failure: " + exception);
                         }
 
                         @Override
