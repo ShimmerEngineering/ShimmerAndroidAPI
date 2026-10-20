@@ -79,6 +79,10 @@ public class VerisenseBleAndroidRadioByteCommunication extends AbstractByteCommu
 
             @Override
             public void onConnectSuccess(final BleDevice bleDevice, final BluetoothGatt gatt, int status) {
+                if (taskConnect != mTaskConnect) {
+                    // A newer connect() owns this device now, so leave its link alone
+                    return;
+                }
                 if (taskConnect.getTask().isCompleted()) {
                     // This attempt has already failed, so drop a late success instead of setting it up
                     BleManager.getInstance().disconnect(bleDevice);
