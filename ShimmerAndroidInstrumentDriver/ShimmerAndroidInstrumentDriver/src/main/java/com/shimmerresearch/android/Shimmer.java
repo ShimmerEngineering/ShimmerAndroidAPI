@@ -1070,16 +1070,20 @@ public class Shimmer extends ShimmerBluetooth{
 	 * reply to an unqueued read was lost; a queued command timed out, and the
 	 * timeout dropped every queued instruction.
 	 * <p>
+	 * Android meets one outside the pause too: readBattery() and
+	 * readStatusLogAndStream() write their reads straight to the socket, so the
+	 * ACK of a queued command can come straight after a read's reply, and a read
+	 * can go out in the pause without a link CRC as well (processPacket() then
+	 * leaves its reply here).
+	 * <p>
 	 * It is taken only while a reply is due, and only when the bytes after it are
 	 * that reply: the in-stream reply to the queued GET command in flight, or to a
-	 * read that readBattery() or readStatusLogAndStream() wrote straight to the
-	 * socket (FF 8A, then the response opcode), or for the queued SET command in
-	 * flight, a bare ACK whose link CRC checks out. A 0xFF data byte the parser
-	 * resyncs onto is therefore not taken for one. Without a link CRC, a bare ACK
-	 * here can't be told from a data byte, but then the previous ACK isn't
-	 * processed until the stream resumes either, so no queued command goes out
-	 * during the pause. An unqueued read can, and processPacket() leaves its
-	 * reply here.
+	 * read written straight to the socket (FF 8A, then the response opcode), or
+	 * for the queued SET command in flight, a bare ACK. With a link CRC, a bare
+	 * ACK's own CRC must check out; without one, it must be followed by a data
+	 * packet and then the start of the next frame, as processPacket() checks a
+	 * packet. A 0xFF data byte the parser resyncs onto is therefore not taken for
+	 * one.
 	 *
 	 * @return true while the bytes at the start of the buffer are taken, or may
 	 *         still turn out to be such an ACK
@@ -1110,8 +1114,11 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		//A bare ACK to the SET command in flight
-		if(mWaitForAck && isKnownSetCommand(mCurrentCommand) && mBtCommsCrcModeCurrent!=BT_CRC_MODE.OFF){
-			int numCrcBytes = mBtCommsCrcModeCurrent.getNumCrcBytes();
+		if(!mWaitForAck || !isKnownSetCommand(mCurrentCommand)){
+			return false;
+		}
+		int numCrcBytes = mBtCommsCrcModeCurrent.getNumCrcBytes();
+		if(mBtCommsCrcModeCurrent!=BT_CRC_MODE.OFF){
 			for(int i=1;i<allBytes.length && i<=numCrcBytes;i++){
 				if(allBytes[i]!=BARE_ACK_CRC[i-1]){
 					return false;
@@ -1120,11 +1127,22 @@ public class Shimmer extends ShimmerBluetooth{
 			if(allBytes.length<1+numCrcBytes){
 				return true; //wait for the rest of the ACK's CRC
 			}
-			clearSingleDataPacketFromBuffers(allBytes, 1+numCrcBytes); //clear the ACK and its CRC
-			processAckWhileStreaming();
-			return true;
 		}
-		return false;
+		else {
+			int nextFrameIndex = 1+getPacketSizeWithCrc()+1;
+			if(allBytes[1]!=DATA_PACKET){
+				return false;
+			}
+			if(allBytes.length<=nextFrameIndex){
+				return true; //wait for the data packet after the ACK, and the start of the frame after that
+			}
+			if(allBytes[nextFrameIndex]!=DATA_PACKET && allBytes[nextFrameIndex]!=ACK_COMMAND_PROCESSED){
+				return false;
+			}
+		}
+		clearSingleDataPacketFromBuffers(allBytes, 1+numCrcBytes); //clear the ACK and its CRC
+		processAckWhileStreaming();
+		return true;
 	}
 
 
@@ -1153,13 +1171,17 @@ public class Shimmer extends ShimmerBluetooth{
 
 		while(true){
 			int size = mByteArrayOutputStream.size();
-			if(!processAckAtStartOfBuffer()){
-				//If there is a full packet and the subsequent sequence number of following packet
-				if(size<getPacketSizeWithCrc()+2){ // +2 because there are two acks
-					break;
+			if(processAckAtStartOfBuffer()){
+				if(size == mByteArrayOutputStream.size()){
+					break; //wait for the rest of the ACK's frame
 				}
-				processPacket();
+				continue;
 			}
+			//If there is a full packet and the subsequent sequence number of following packet
+			if(size<getPacketSizeWithCrc()+2){ // +2 because there are two acks
+				break;
+			}
+			processPacket();
 			if (size == mByteArrayOutputStream.size()){
 				consolePrintLn("processWhileStreaming: Leaving while loop");
 				break;

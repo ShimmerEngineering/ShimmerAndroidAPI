@@ -424,6 +424,32 @@ public class AAPI_00005_StreamingAckAfterPauseTest {
 	}
 
 	/**
+	 * Not only in the pause: a queued command's bare ACK comes straight after the
+	 * reply to a read that readBattery() wrote straight out, with no data packet
+	 * between them. The HIL met it on a Shimmer3 with no link CRC, where only the
+	 * data packet after the ACK shows it is one.
+	 */
+	@Test
+	public void bareAckStraightAfterAnUnqueuedReadsReply() throws Exception {
+		forEachCrcModeAndReadSize(BT_CRC_MODE.values(), (crcMode, readSize) -> {
+			QueueShimmer device = streamingShimmer3r(crcMode);
+			device.stopSDLogging();
+			sendNextInstruction(device);
+			device.readBattery();
+
+			receive(device, readSize, dataPacket(payload(1), crcMode), vbattReply(crcMode), bareAck(crcMode),
+					dataPacket(payload(2), crcMode), dataPacket(payload(3), crcMode), new byte[] {ShimmerObject.DATA_PACKET});
+			assertAnswered(device);
+			assertQueued(device);
+			assertEquals(VBATT_ADC, device.getBattStatusDetails().getBattAdcValue(), 0);
+
+			assertParsed(device, payload(1), payload(2), payload(3));
+			assertBuffered(device, ShimmerObject.DATA_PACKET);
+			assertNoResync(device);
+		});
+	}
+
+	/**
 	 * An ACK at the start of the buffer is taken only for a reply that is due. A
 	 * status push there completes neither GET_DIR_COMMAND, queued and in flight,
 	 * nor the battery read that readBattery() wrote straight out.
