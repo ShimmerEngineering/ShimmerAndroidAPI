@@ -349,7 +349,9 @@ final class ShimmerSession implements AutoCloseable {
 
 	/**
 	 * The API's instruction queue length, or -1 without a device. The queue is protected, so an app
-	 * can't see it; the test reads it by reflection.
+	 * can't see it; the test reads the field by reflection. Not through getListofInstructions(), which
+	 * takes the device's lock: the IO thread takes the queue's lock and then the device's
+	 * (DEV-1198), so holding the device's lock from here would widen that deadlock's window.
 	 */
 	int queuedInstructions() {
 		ShimmerBluetooth d = device();
@@ -357,9 +359,9 @@ final class ShimmerSession implements AutoCloseable {
 			return -1;
 		}
 		try {
-			java.lang.reflect.Method m = ShimmerBluetooth.class.getDeclaredMethod("getListofInstructions");
-			m.setAccessible(true);
-			return ((List<?>) m.invoke(d)).size();
+			java.lang.reflect.Field f = ShimmerBluetooth.class.getDeclaredField("mListofInstructions");
+			f.setAccessible(true);
+			return ((List<?>) f.get(d)).size();
 		} catch (Exception e) {
 			event("could not read the instruction queue: " + e);
 			return -1;
