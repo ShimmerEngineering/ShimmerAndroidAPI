@@ -63,6 +63,18 @@ final class ShimmerSession implements AutoCloseable {
 	private volatile int stateMessages;
 	private final java.util.Set<Integer> otherMessagesSeen = new java.util.HashSet<>();
 
+	/**
+	 * Since the last connect: when the app was first told the unit is ready (a CONNECTED or
+	 * SDLOGGING state message), when the API's state first showed it (polled), and when the API sent
+	 * NOTIFICATION_SHIMMER_FULLY_INITIALIZED, which marks the end of the connect sequence. NaN until
+	 * then.
+	 */
+	private volatile double readyMessageAtMs = Double.NaN;
+	private volatile double readyStateAtMs = Double.NaN;
+	private volatile double fullyInitialisedAtMs = Double.NaN;
+	private volatile BT_STATE readyMessageState;
+	private volatile int queuedAtReadyState = -1;
+
 	ShimmerSession(Context context, String mac, String transport, String deviceType) throws Exception {
 		this.mac = mac;
 		this.transport = transport;
@@ -123,7 +135,17 @@ final class ShimmerSession implements AutoCloseable {
 				lastState = state;
 				stateMessages++;
 				event("state " + state);
+				if (isReady(state) && Double.isNaN(readyMessageAtMs)) {
+					readyMessageAtMs = nowMs();
+					readyMessageState = state;
+				}
 			}
+		} else if (msg.what == ShimmerBluetooth.MSG_IDENTIFIER_NOTIFICATION_MESSAGE && msg.obj instanceof CallbackObject
+				&& ((CallbackObject) msg.obj).mIndicator == ShimmerBluetooth.NOTIFICATION_SHIMMER_FULLY_INITIALIZED) {
+			if (Double.isNaN(fullyInitialisedAtMs)) {
+				fullyInitialisedAtMs = nowMs();
+			}
+			event("fully initialised");
 		} else if (msg.what == ShimmerBluetooth.MSG_IDENTIFIER_PROGRESS_REPORT_PER_DEVICE
 				&& msg.obj instanceof BluetoothProgressReportPerDevice) {
 			// The manager's own verdict on an operation such as configureShimmer.
@@ -263,6 +285,20 @@ final class ShimmerSession implements AutoCloseable {
 	 * configuration. Classic needs the unit paired with the phone; BLE does not.
 	 */
 	boolean connect(long timeoutMs) throws InterruptedException {
+		return connect(timeoutMs, BT_STATE.CONNECTED);
+	}
+
+	/**
+	 * As connect(long), for a unit that ends its connect in readyState: SDLOGGING for one that is
+	 * logging to its SD card. It also waits for NOTIFICATION_SHIMMER_FULLY_INITIALIZED, and records
+	 * when the unit was first reported ready (readyEarlyMs()).
+	 */
+	boolean connect(long timeoutMs, final BT_STATE readyState) throws InterruptedException {
+		readyMessageAtMs = Double.NaN;
+		readyStateAtMs = Double.NaN;
+		fullyInitialisedAtMs = Double.NaN;
+		readyMessageState = null;
+		queuedAtReadyState = -1;
 		final boolean ble = "ble".equals(transport);
 		if (!call("connect over " + transport, 10000, () -> manager.connectShimmerThroughBTAddress(mac, deviceType,
 				ble ? ShimmerBluetoothManagerAndroid.BT_TYPE.BLE : ShimmerBluetoothManagerAndroid.BT_TYPE.BT_CLASSIC))) {
@@ -270,7 +306,12 @@ final class ShimmerSession implements AutoCloseable {
 		}
 		boolean ready = waitFor(() -> {
 			ShimmerBluetooth d = device();
-			return d != null && d.isInitialised() && d.getBluetoothRadioState() == BT_STATE.CONNECTED;
+			if (d != null && isReady(d.getBluetoothRadioState()) && Double.isNaN(readyStateAtMs)) {
+				readyStateAtMs = nowMs();
+				queuedAtReadyState = queuedInstructions();
+				event("state first shows " + d.getBluetoothRadioState() + " with " + queuedAtReadyState + " instructions queued");
+			}
+			return d != null && d.isInitialised() && d.getBluetoothRadioState() == readyState;
 		}, timeoutMs);
 		ShimmerBluetooth d = device();
 		if (ready && ble && d != null) {
@@ -279,6 +320,50 @@ final class ShimmerSession implements AutoCloseable {
 			d.setVerboseMode(true);
 		}
 		return ready && d != null;
+	}
+
+	private static boolean isReady(BT_STATE state) {
+		return state == BT_STATE.CONNECTED || state == BT_STATE.SDLOGGING;
+	}
+
+	/** When the last connect sent NOTIFICATION_SHIMMER_FULLY_INITIALIZED, or NaN if it has not */
+	double fullyInitialisedAtMs() {
+		return fullyInitialisedAtMs;
+	}
+
+	/**
+	 * How long before NOTIFICATION_SHIMMER_FULLY_INITIALIZED the last connect first reported the unit
+	 * ready, by state message or in the API's state, whichever came first. NaN if either is missing.
+	 */
+	double readyEarlyMs() {
+		double first = Double.isNaN(readyMessageAtMs) ? readyStateAtMs
+				: Double.isNaN(readyStateAtMs) ? readyMessageAtMs : Math.min(readyMessageAtMs, readyStateAtMs);
+		return fullyInitialisedAtMs - first;
+	}
+
+	/** What readyEarlyMs() is made of, for the report */
+	String readyTimeline() {
+		return String.format(Locale.ROOT, "first ready message %s at %.0f ms, state first ready at %.0f ms with %d instructions queued, fully initialised at %.0f ms",
+				readyMessageState, readyMessageAtMs, readyStateAtMs, queuedAtReadyState, fullyInitialisedAtMs);
+	}
+
+	/**
+	 * The API's instruction queue length, or -1 without a device. The queue is protected, so an app
+	 * can't see it; the test reads it by reflection.
+	 */
+	int queuedInstructions() {
+		ShimmerBluetooth d = device();
+		if (d == null) {
+			return -1;
+		}
+		try {
+			java.lang.reflect.Method m = ShimmerBluetooth.class.getDeclaredMethod("getListofInstructions");
+			m.setAccessible(true);
+			return ((List<?>) m.invoke(d)).size();
+		} catch (Exception e) {
+			event("could not read the instruction queue: " + e);
+			return -1;
+		}
 	}
 
 	/**
@@ -363,6 +448,10 @@ final class ShimmerSession implements AutoCloseable {
 		return call("readBattery", 10000, () -> requireDevice().readBattery());
 	}
 
+	boolean readStatus() {
+		return call("readStatusLogAndStream", 10000, () -> requireDevice().readStatusLogAndStream());
+	}
+
 	/**
 	 * The API's current battery details. Both the Classic and the BLE parser replace the object with
 	 * a new one for each battery reply they decode, so a different object means a reply arrived.
@@ -392,6 +481,11 @@ final class ShimmerSession implements AutoCloseable {
 
 	/** Parser errors this process logged after the marker. Apps may read their own process's log. */
 	int parserErrorsSince(String marker) {
+		return logLinesSince(marker, PARSER_ERRORS);
+	}
+
+	/** Lines this process logged after the marker that contain any of the texts, or -1 if the log can't be read */
+	int logLinesSince(String marker, String... texts) {
 		int count = 0;
 		try {
 			java.lang.Process p = Runtime.getRuntime().exec(new String[] {"logcat", "-d", "--pid=" + Process.myPid()});
@@ -401,7 +495,7 @@ final class ShimmerSession implements AutoCloseable {
 				if (line.contains(marker)) {
 					afterMarker = true;
 				} else if (afterMarker) {
-					for (String e : PARSER_ERRORS) {
+					for (String e : texts) {
 						if (line.contains(e)) {
 							count++;
 						}

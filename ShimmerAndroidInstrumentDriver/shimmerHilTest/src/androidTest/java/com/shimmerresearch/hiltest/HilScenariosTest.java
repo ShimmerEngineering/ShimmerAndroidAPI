@@ -37,7 +37,7 @@ import java.util.Locale;
  *   type            Shimmer3 (default) or Shimmer3R; over BLE it picks the device class
  *   rate            sampling rate in Hz, default 256
  *   seconds         stream_rest duration, default 30
- *   cycles          mid_stream_set / reconnect_loop repetitions, default 3 / 5
+ *   cycles          mid_stream_set / reconnect_loop / in_stream repetitions, default 3 / 5 / 3
  *   crc             link CRC to ask for: off, 1 or 2 (default 2; the driver may settle on less)
  *   maxLossPercent  default 1.0
  *   accelTolerance  m/s^2 either side of 9.81 at rest, default 1.0
@@ -330,6 +330,183 @@ public class HilScenariosTest {
 			report.check(session.disconnect(10000), "did not disconnect within 10 s");
 		}
 		finish();
+	}
+
+	/** Reads sent after each SD logging stop in inStream, alternately battery and status */
+	private static final int READS_PER_BURST = 10;
+
+	/** Between those reads: the unit pauses for about 100 ms, so two or three land in the pause */
+	private static final int READ_INTERVAL_MS = 40;
+
+	/** What the driver logs when a command gets no reply in time: "Command:	[0x95] GET_VBATT_COMMAND timeout" */
+	private static final String[] COMMAND_TIMEOUTS = {"_COMMAND timeout", "UNKNOWN timeout"};
+
+	/**
+	 * In-stream replies while the unit pauses its data packets (DEV-1291). After STOP_LOGGING_ONLY the
+	 * unit sends no data packets for about 100 ms while it closes its SD file, and answers a command
+	 * sent then at once, with no data packet before the reply. Android's Classic parser threw such a
+	 * reply away. Each round starts SD logging, then stops it and reads the battery and the status
+	 * every 40 ms for 400 ms: Android writes those reads straight out, so some land in the pause. Then
+	 * each restart stops logging and starts it again back to back, so the queued START_LOGGING_ONLY goes
+	 * out in the pause and its bare ACK comes first. Every battery read must be answered, logging must
+	 * restart, and nothing may log a parser error or a command timeout. Needs an SD card in the unit.
+	 */
+	@Test
+	public void inStream() throws Exception {
+		begin("in_stream");
+		double rate = arg("rate", 256.0);
+		int cycles = arg("cycles", 3);
+		double maxLoss = arg("maxLossPercent", 1.0);
+		if (connectAndConfigure(rate)) {
+			double deviceRate = session.rateOnDevice();
+			checkRate(deviceRate, "stream");
+			String marker = session.logMarker("in_stream");
+			session.startRecording();
+			report.check(session.startStreaming(10000), "streaming did not start within 10 s");
+			Thread.sleep(2000);
+			List<Double> sdMoments = new ArrayList<>();
+			List<Double> readMoments = new ArrayList<>();
+			int batteryReads = 0;
+			int statusReads = 0;
+			for (int i = 1; i <= cycles && session.hung == null; i++) {
+				String what = "round " + i;
+				session.event(what);
+				if (!startSdLoggingWhileStreaming(what, sdMoments)) {
+					break;
+				}
+				Thread.sleep(1000);
+				sdMoments.add(session.nowMs());
+				report.check(session.stopSdLogging(), what + ": stopSDLogging did not complete (see the events)");
+				for (int k = 0; k < READS_PER_BURST && session.hung == null; k++) {
+					readMoments.add(session.nowMs());
+					if (k % 2 == 0) {
+						batteryReads += session.readBattery() ? 1 : 0;
+					} else {
+						statusReads += session.readStatus() ? 1 : 0;
+					}
+					Thread.sleep(READ_INTERVAL_MS);
+				}
+				report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING && session.queuedInstructions() == 0, 5000),
+						what + ": SD logging did not stop (state " + session.state() + ", " + session.queuedInstructions() + " instructions queued)");
+				Thread.sleep(1000);
+			}
+			if (session.hung == null && startSdLoggingWhileStreaming("restarts", sdMoments)) {
+				for (int i = 1; i <= cycles && session.hung == null; i++) {
+					String what = "restart " + i;
+					session.event(what);
+					Thread.sleep(1000);
+					sdMoments.add(session.nowMs());
+					report.check(session.stopSdLogging() && session.startSdLogging(),
+							what + ": stopSDLogging or startSDLogging did not complete (see the events)");
+					report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING_AND_SDLOGGING && session.queuedInstructions() == 0, 5000),
+							what + ": logging did not restart after a stop and a start back to back (state " + session.state()
+									+ ", " + session.queuedInstructions() + " instructions queued)");
+				}
+				Thread.sleep(1000);
+				sdMoments.add(session.nowMs());
+				report.check(session.stopSdLogging() && session.waitFor(() -> session.state() == BT_STATE.STREAMING, 5000),
+						"SD logging did not stop at the end (state " + session.state() + ")");
+			}
+			Thread.sleep(1000);
+			double stoppedAtMs = session.nowMs();
+			List<StreamAnalysis.Sample> samples = session.stopRecording();
+			report.check(session.stopStreaming(10000), "streaming did not stop within 10 s");
+
+			int batteryReplies = session.logLinesSince(marker, "IN STREAM: VBATT_RESPONSE");
+			int statusReplies = session.logLinesSince(marker, "IN STREAM: STATUS_RESPONSE");
+			int repliesInAPause = session.logLinesSince(marker, "with no data packet before it");
+			int timeouts = session.logLinesSince(marker, COMMAND_TIMEOUTS);
+			int parserErrors = session.parserErrorsSince(marker);
+			report.put("batteryReads", batteryReads);
+			report.put("batteryReplies", batteryReplies);
+			report.put("statusReads", statusReads);
+			report.put("statusReplies", statusReplies);
+			report.put("repliesInAPause", repliesInAPause);
+			report.put("commandTimeouts", timeouts);
+			report.put("parserErrors", parserErrors);
+			session.event(String.format(Locale.ROOT, "battery %d reads, %d replies; status %d reads, %d replies (and pushes); %d with no data packet before them",
+					batteryReads, batteryReplies, statusReads, statusReplies, repliesInAPause));
+			report.check(batteryReplies == batteryReads, batteryReads + " battery reads but " + batteryReplies + " replies decoded");
+			report.check(statusReplies >= statusReads, statusReads + " status reads but " + statusReplies + " status replies decoded");
+			report.check(timeouts == 0, timeouts + " command timeouts logged");
+			report.check(parserErrors == 0, parserErrors + " streaming parser errors logged (\"Packet syncing problem\")");
+
+			// Loss near SD logging start/stop is the unit's own (see midStreamSet). A Shimmer3 also skips a
+			// sample now and then around a battery read, with no parser error, so loss near the reads is
+			// reported, not failed.
+			StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
+			session.event("stream: " + a);
+			report.putStream("stream", a);
+			report.putGaps(a);
+			int[] attributed = a.attribute(new double[][] {toArray(sdMoments), toArray(readMoments)}, 1000);
+			report.put("missingNearSdLoggingStartStop", attributed[0]);
+			report.put("missingNearReads", attributed[1]);
+			int elsewhere = a.missing - attributed[0] - attributed[1];
+			double elsewherePercent = 100.0 * elsewhere / Math.max(1, a.received + a.missing);
+			report.put("missingElsewhere", elsewhere);
+			report.check(elsewherePercent <= maxLoss, String.format(Locale.ROOT,
+					"stream: %.3f%% packets lost away from SD logging start/stop and the reads (%d), limit %.2f%%",
+					elsewherePercent, elsewhere, maxLoss));
+			report.check(a.received > 0, "stream: no packets received");
+			report.check(a.nonIncreasing == 0, "stream: " + a.nonIncreasing + " timestamps did not increase");
+			checkJumps(a, "stream");
+			checkTimeline(a, samples, stoppedAtMs, deviceRate, "stream");
+			report.check(session.disconnect(10000), "did not disconnect within 10 s");
+		}
+		finish();
+	}
+
+	/** Starts SD logging while streaming and waits until it has started */
+	private boolean startSdLoggingWhileStreaming(String what, List<Double> sdMoments) throws InterruptedException {
+		sdMoments.add(session.nowMs());
+		boolean started = session.startSdLogging()
+				&& session.waitFor(() -> session.state() == BT_STATE.STREAMING_AND_SDLOGGING && session.queuedInstructions() == 0, 5000);
+		report.check(started, what + ": SD logging did not start while streaming (state " + session.state() + "; is there an SD card?)");
+		return started;
+	}
+
+	/**
+	 * The unit is reported ready only once its connect sequence has ended (DEV-1275), which
+	 * NOTIFICATION_SHIMMER_FULLY_INITIALIZED marks: CONNECTED, or SDLOGGING for a unit that is logging
+	 * to its SD card. The sequence reads the status part way through, before the calibration dump and
+	 * the inquiry, and that reply used to report the unit ready early, so an app's next command went
+	 * out in among the rest of the sequence. Connects to the unit idle, then again while it logs.
+	 * Needs an SD card in the unit.
+	 */
+	@Test
+	public void connectReady() throws Exception {
+		begin("connect_ready");
+		if (connectAndCheckReady("idle", BT_STATE.CONNECTED)) {
+			boolean logging = session.startSdLogging()
+					&& session.waitFor(() -> session.state() == BT_STATE.SDLOGGING && session.queuedInstructions() == 0, 5000);
+			report.check(logging, "SD logging did not start (state " + session.state() + "; is there an SD card?)");
+			report.check(session.disconnect(10000), "did not disconnect within 10 s");
+			if (logging && session.hung == null) {
+				Thread.sleep(2000);
+				connectAndCheckReady("logging", BT_STATE.SDLOGGING);
+				// Leave the unit as it was found, whatever happened above
+				if (session.device() != null && session.device().isSDLogging()) {
+					report.check(session.stopSdLogging() && session.waitFor(() -> session.state() == BT_STATE.CONNECTED, 5000),
+							"SD logging did not stop (state " + session.state() + ")");
+				}
+				report.check(session.disconnect(10000), "did not disconnect within 10 s");
+			}
+		}
+		finish();
+	}
+
+	/** Connects and checks the unit was first reported ready, in readyState, at the end of the connect sequence */
+	private boolean connectAndCheckReady(String what, BT_STATE readyState) throws InterruptedException {
+		boolean ready = session.connect(30000, readyState)
+				&& session.waitFor(() -> !Double.isNaN(session.fullyInitialisedAtMs()), 2000);
+		report.check(ready, what + ": did not connect, end in " + readyState + " and send FULLY_INITIALIZED within 30 s (state " + session.state() + ")");
+		session.event(what + ": " + session.readyTimeline());
+		report.put(what + "ReadyEarlyMs", session.readyEarlyMs());
+		if (ready) {
+			report.check(session.readyEarlyMs() <= 250, String.format(Locale.ROOT,
+					"%s: reported ready %.0f ms before the connect sequence ended (%s)", what, session.readyEarlyMs(), session.readyTimeline()));
+		}
+		return ready;
 	}
 
 	private static double[] toArray(List<Double> values) {

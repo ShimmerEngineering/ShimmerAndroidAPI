@@ -55,6 +55,8 @@ To find regressions before release day, schedule step 2 nightly with Windows Tas
 | `streamRest` | Connects, writes an accel-only config at `-Rate` (default 256 Hz), streams for `-Seconds` (default 30) with the unit lying still, then stops and disconnects. | It can't connect or configure; more than `-MaxLossPercent` (1 %) of packets are lost; a timestamp doesn't increase, or leaps more than a second ahead of when it arrived (a bad unwrap, not loss); the timestamps give no rate, or one more than 1 % off the configured rate; the stream goes silent for over a second before the test stops it; accel is more than 1 m/s² from 9.81; or the API logs a "Packet syncing problem". |
 | `midStreamSet` | While streaming, starts and stops SD logging and reads the battery, three times. | One of those calls fails, or a battery reply isn't decoded within 5 s; logging doesn't start or stop (the DEV-1148 symptom with a link CRC on); a packet is lost around a battery read, or more than `-MaxLossPercent` away from the SD transitions; the timestamps fail the same rate and silence checks as `streamRest`; or there's a parser error. Packets missing around SD logging start/stop are reported, not failed: the unit itself pauses while it opens its file, which is for the firmware HIL bench to judge. Needs an SD card in the unit. |
 | `reconnectLoop` | Connects, streams for 5 s and disconnects, five times. | Any cycle fails to connect within 30 s, loses packets, fails the rate and silence checks, or logs a parser error. |
+| `inStream` | While streaming, three times: starts SD logging, stops it, and reads the battery and the status every 40 ms for 400 ms, so some reads land in the ~100 ms the unit pauses its data packets while it closes its file (DEV-1291). Then, three times, stops and starts logging back to back, so the queued start goes out in that pause. | A battery read isn't answered, or fewer status replies than reads are decoded; logging doesn't stop or restart, or a command stays queued; a command times out; there's a parser error; more than `-MaxLossPercent` of packets are lost away from the SD transitions and the reads; or the timestamps fail the same rate and silence checks as `streamRest`. Loss near the reads is reported, not failed: a Shimmer3 now and then skips a sample around a battery read itself. The report's `repliesInAPause` counts the replies that came with no data packet before them. Needs an SD card in the unit. |
+| `connectReady` | Connects to the unit idle, starts SD logging, disconnects and connects again while it logs, then stops logging. | The unit is reported ready (a CONNECTED or SDLOGGING state message, or that state in the API) more than 250 ms before `NOTIFICATION_SHIMMER_FULLY_INITIALIZED`, which marks the end of the connect sequence (DEV-1275); or the connect doesn't end in CONNECTED, or SDLOGGING while logging. Needs an SD card in the unit. |
 
 Every scenario also fails if an API call doesn't return within 10 s. The report then holds every thread's stack, which a phone without root can't otherwise give, and the scenario stops. If the whole test process still never finishes, the runner force-stops it after `-ScenarioTimeoutSeconds` (600) and records TIMEOUT.
 
@@ -82,7 +84,7 @@ since Android uses those unchanged.
 | Java driver | the newest `API_v` release | `-DriverVersion 0.11.8_beta` |
 | Units | every unit in the rig file | `-Unit s3r-15bc` |
 | Transports | every transport each unit lists | `-Transport ble` |
-| Scenarios | all three | `-Scenario midStreamSet` |
+| Scenarios | all five | `-Scenario midStreamSet` |
 | Link CRC | ask for 2 bytes (the driver may settle on 1 or off) | `-Crc off`, `-Crc 1` |
 | Pause between runs | 10 s | `-SettleSeconds 60` |
 | Record the result for the release gate | no | `-Report` (full run on a clean, pushed commit only) |
@@ -103,7 +105,7 @@ since Android uses those unchanged.
 3. **Prepare each unit.**
    - **SD sync and Bluetooth disable off.** Either one keeps Bluetooth off (DEV-1228). Check in
      Consensys.
-   - **SD card in,** for `midStreamSet`.
+   - **SD card in,** for `midStreamSet`, `inStream` and `connectReady`.
    - **Lying still** during `streamRest`.
 4. **List the units:** copy `rig-android.example.json` to `rig-android.json` and fill in each name,
    MAC, `type` (`Shimmer3` or `Shimmer3R`) and `transports` (`["classic"]`, `["ble"]` or both;
