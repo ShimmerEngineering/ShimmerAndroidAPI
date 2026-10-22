@@ -289,11 +289,11 @@ final class ShimmerSession implements AutoCloseable {
 	}
 
 	/**
-	 * As connect(long), for a unit that ends its connect in readyState: SDLOGGING for one that is
-	 * logging to its SD card. It also waits for NOTIFICATION_SHIMMER_FULLY_INITIALIZED, and records
-	 * when the unit was first reported ready (readyEarlyMs()).
+	 * As connect(long), for a unit that ends its connect in one of readyStates: SDLOGGING for one that
+	 * is logging to its SD card. It records when the unit was first reported ready (readyEarlyMs()).
 	 */
-	boolean connect(long timeoutMs, final BT_STATE readyState) throws InterruptedException {
+	boolean connect(long timeoutMs, final BT_STATE... readyStates) throws InterruptedException {
+		final java.util.List<BT_STATE> accepted = java.util.Arrays.asList(readyStates);
 		readyMessageAtMs = Double.NaN;
 		readyStateAtMs = Double.NaN;
 		fullyInitialisedAtMs = Double.NaN;
@@ -311,8 +311,14 @@ final class ShimmerSession implements AutoCloseable {
 				queuedAtReadyState = queuedInstructions();
 				event("state first shows " + d.getBluetoothRadioState() + " with " + queuedAtReadyState + " instructions queued");
 			}
-			return d != null && d.isInitialised() && d.getBluetoothRadioState() == readyState;
+			return d != null && d.isInitialised() && accepted.contains(d.getBluetoothRadioState());
 		}, timeoutMs);
+		if (!ready) {
+			// The connect call returned, so nothing else dumps the threads: a stalled connect sequence
+			// (such as the DEV-1198 lock-order deadlock) shows here
+			event("connect did not finish within " + timeoutMs + " ms (state " + state() + "); thread dump follows");
+			dumpThreads();
+		}
 		ShimmerBluetooth d = device();
 		if (ready && ble && d != null) {
 			// Over BLE the driver logs parser errors with consolePrintLn, which only prints in verbose

@@ -483,14 +483,41 @@ public class HilScenariosTest {
 			report.check(session.disconnect(10000), "did not disconnect within 10 s");
 			if (logging && session.hung == null) {
 				Thread.sleep(2000);
-				connectAndCheckReady("logging", BT_STATE.SDLOGGING);
-				// Leave the unit as it was found, whatever happened above
-				if (session.device() != null && session.device().isSDLogging()) {
-					report.check(session.stopSdLogging() && session.waitFor(() -> session.state() == BT_STATE.CONNECTED, 5000),
-							"SD logging did not stop (state " + session.state() + ")");
+				if (!connectAndCheckReady("logging", BT_STATE.SDLOGGING) && session.hung == null) {
+					// Leave the unit as it was found, not logging: connect again to stop it
+					session.disconnect(10000);
+					Thread.sleep(2000);
+					session.connect(30000, BT_STATE.CONNECTED, BT_STATE.SDLOGGING);
 				}
+				stopSdLoggingIfLogging();
 				report.check(session.disconnect(10000), "did not disconnect within 10 s");
 			}
+		}
+		finish();
+	}
+
+	private void stopSdLoggingIfLogging() throws InterruptedException {
+		ShimmerBluetooth d = session.device();
+		if (session.hung == null && d != null && d.isSDLogging()) {
+			report.check(session.stopSdLogging() && session.waitFor(() -> session.state() == BT_STATE.CONNECTED, 5000),
+					"SD logging did not stop, so the unit was left logging (state " + session.state() + ")");
+		}
+	}
+
+	/**
+	 * Not a check: brings the unit back to idle after a run that left it logging to its SD card. It
+	 * connects, stops SD logging if the unit logs, and disconnects. Run it on its own, with
+	 * -Scenario resetUnit; it isn't part of a default run.
+	 */
+	@Test
+	public void resetUnit() throws Exception {
+		begin("reset_unit");
+		boolean connected = session.connect(30000, BT_STATE.CONNECTED, BT_STATE.SDLOGGING);
+		report.check(connected, "did not connect within 30 s (state " + session.state() + ")");
+		if (connected) {
+			session.event("connected: " + session.state());
+			stopSdLoggingIfLogging();
+			report.check(session.disconnect(10000), "did not disconnect within 10 s");
 		}
 		finish();
 	}
