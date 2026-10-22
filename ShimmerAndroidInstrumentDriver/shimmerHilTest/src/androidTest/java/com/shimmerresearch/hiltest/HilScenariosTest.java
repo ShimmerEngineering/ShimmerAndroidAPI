@@ -360,10 +360,12 @@ public class HilScenariosTest {
 		if (connectAndConfigure(rate)) {
 			double deviceRate = session.rateOnDevice();
 			checkRate(deviceRate, "stream");
-			String marker = session.logMarker("in_stream");
+			LogTally tally = new LogTally();
+			String marker = session.logMarker("in_stream start");
 			session.startRecording();
 			report.check(session.startStreaming(10000), "streaming did not start within 10 s");
 			Thread.sleep(2000);
+			tally.add(marker);
 			List<Double> sdMoments = new ArrayList<>();
 			List<Double> readMoments = new ArrayList<>();
 			int batteryReads = 0;
@@ -371,6 +373,7 @@ public class HilScenariosTest {
 			for (int i = 1; i <= cycles && session.hung == null; i++) {
 				String what = "round " + i;
 				session.event(what);
+				marker = session.logMarker("in_stream " + what);
 				if (!startSdLoggingWhileStreaming(what, sdMoments)) {
 					break;
 				}
@@ -389,12 +392,16 @@ public class HilScenariosTest {
 				report.check(session.waitFor(() -> session.state() == BT_STATE.STREAMING && session.queuedInstructions() == 0, 5000),
 						what + ": SD logging did not stop (state " + session.state() + ", " + session.queuedInstructions() + " instructions queued)");
 				Thread.sleep(1000);
+				tally.add(marker);
 			}
+			marker = session.logMarker("in_stream restarts");
 			if (session.hung == null && startSdLoggingWhileStreaming("restarts", sdMoments)) {
 				for (int i = 1; i <= cycles && session.hung == null; i++) {
 					String what = "restart " + i;
 					session.event(what);
 					Thread.sleep(1000);
+					tally.add(marker);
+					marker = session.logMarker("in_stream " + what);
 					sdMoments.add(session.nowMs());
 					report.check(session.stopSdLogging() && session.startSdLogging(),
 							what + ": stopSDLogging or startSDLogging did not complete (see the events)");
@@ -411,25 +418,22 @@ public class HilScenariosTest {
 			double stoppedAtMs = session.nowMs();
 			List<StreamAnalysis.Sample> samples = session.stopRecording();
 			report.check(session.stopStreaming(10000), "streaming did not stop within 10 s");
+			tally.add(marker);
 
-			int batteryReplies = session.logLinesSince(marker, "IN STREAM: VBATT_RESPONSE");
-			int statusReplies = session.logLinesSince(marker, "IN STREAM: STATUS_RESPONSE");
-			int repliesInAPause = session.logLinesSince(marker, "with no data packet before it");
-			int timeouts = session.logLinesSince(marker, COMMAND_TIMEOUTS);
-			int parserErrors = session.parserErrorsSince(marker);
 			report.put("batteryReads", batteryReads);
-			report.put("batteryReplies", batteryReplies);
+			report.put("batteryReplies", tally.batteryReplies);
 			report.put("statusReads", statusReads);
-			report.put("statusReplies", statusReplies);
-			report.put("repliesInAPause", repliesInAPause);
-			report.put("commandTimeouts", timeouts);
-			report.put("parserErrors", parserErrors);
+			report.put("statusReplies", tally.statusReplies);
+			report.put("repliesInAPause", tally.repliesInAPause);
+			report.put("commandTimeouts", tally.timeouts);
+			report.put("parserErrors", tally.parserErrors);
 			session.event(String.format(Locale.ROOT, "battery %d reads, %d replies; status %d reads, %d replies (and pushes); %d with no data packet before them",
-					batteryReads, batteryReplies, statusReads, statusReplies, repliesInAPause));
-			report.check(batteryReplies == batteryReads, batteryReads + " battery reads but " + batteryReplies + " replies decoded");
-			report.check(statusReplies >= statusReads, statusReads + " status reads but " + statusReplies + " status replies decoded");
-			report.check(timeouts == 0, timeouts + " command timeouts logged");
-			report.check(parserErrors == 0, parserErrors + " streaming parser errors logged (\"Packet syncing problem\")");
+					batteryReads, tally.batteryReplies, statusReads, tally.statusReplies, tally.repliesInAPause));
+			report.check(tally.complete, "the phone's log rolled past a round's start, so its replies and errors could not all be counted (see the events)");
+			report.check(tally.batteryReplies == batteryReads, batteryReads + " battery reads but " + tally.batteryReplies + " replies decoded");
+			report.check(tally.statusReplies >= statusReads, statusReads + " status reads but " + tally.statusReplies + " status replies decoded");
+			report.check(tally.timeouts == 0, tally.timeouts + " command timeouts logged");
+			report.check(tally.parserErrors == 0, tally.parserErrors + " streaming parser errors logged (\"Packet syncing problem\")");
 
 			// Loss near SD logging start/stop is the unit's own (see midStreamSet). A Shimmer3 also skips a
 			// sample now and then around a battery read, with no parser error, so loss near the reads is
@@ -449,11 +453,63 @@ public class HilScenariosTest {
 					elsewherePercent, elsewhere, maxLoss));
 			report.check(a.received > 0, "stream: no packets received");
 			report.check(a.nonIncreasing == 0, "stream: " + a.nonIncreasing + " timestamps did not increase");
-			checkJumps(a, "stream");
+			checkJumpsAwayFrom(a, sdMoments, "stream");
 			checkTimeline(a, samples, stoppedAtMs, deviceRate, "stream");
 			report.check(session.disconnect(10000), "did not disconnect within 10 s");
 		}
 		finish();
+	}
+
+	/** inStream's in-stream replies, pause replies, timeouts and parser errors, counted a round at a time */
+	private final class LogTally {
+		int batteryReplies;
+		int statusReplies;
+		int repliesInAPause;
+		int timeouts;
+		int parserErrors;
+		/** False once a round's lines could not be counted */
+		boolean complete = true;
+
+		/** Adds the lines logged since the marker. Called soon after it, before the phone's small log buffer rolls past it. */
+		void add(String marker) {
+			int[] c = session.logCountsSince(marker, new String[] {"IN STREAM: VBATT_RESPONSE"}, new String[] {"IN STREAM: STATUS_RESPONSE"},
+					new String[] {"with no data packet before it"}, COMMAND_TIMEOUTS, ShimmerSession.PARSER_ERRORS);
+			if (c == null) {
+				complete = false;
+				return;
+			}
+			batteryReplies += c[0];
+			statusReplies += c[1];
+			repliesInAPause += c[2];
+			timeouts += c[3];
+			parserErrors += c[4];
+		}
+	}
+
+	/**
+	 * As checkJumps(), except that a jump within 3 s after an SD logging start or stop is reported, not
+	 * failed. The unit can pause for over a second while it opens its file, then send a packet or two it
+	 * held from before the pause and, a millisecond later, the next one it sampled: a timestamp leap
+	 * with no pause in arrival, but the unit's own (the bytes captured on a Shimmer3 show it).
+	 */
+	private void checkJumpsAwayFrom(StreamAnalysis a, List<Double> sdMoments, String what) {
+		int nearSd = 0;
+		for (StreamAnalysis.Gap j : a.timestampJumps) {
+			boolean near = false;
+			for (double moment : sdMoments) {
+				near |= j.afterReceivedMs >= moment && j.afterReceivedMs - moment <= 3000;
+			}
+			if (near) {
+				nearSd++;
+				session.event(String.format(Locale.ROOT, "%s: timestamp jumped %.1f s ahead at %.0f ms, within 3 s of an SD logging start or stop (the unit's own; not failed)",
+						what, (j.missing + 1) * a.expectedPeriodMs / 1000.0, j.afterReceivedMs));
+			} else {
+				report.check(false, String.format(Locale.ROOT,
+						"%s: timestamp jumped %.1f s ahead at %.0f ms (device time %.0f ms) while packets kept arriving",
+						what, (j.missing + 1) * a.expectedPeriodMs / 1000.0, j.afterReceivedMs, j.afterTimestampMs));
+			}
+		}
+		report.put("timestampJumpsNearSdLoggingStartStop", nearSd);
 	}
 
 	/** Starts SD logging while streaming and waits until it has started */

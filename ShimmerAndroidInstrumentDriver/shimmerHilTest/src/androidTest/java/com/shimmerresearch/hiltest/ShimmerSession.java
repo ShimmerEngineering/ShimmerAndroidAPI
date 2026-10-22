@@ -41,7 +41,7 @@ final class ShimmerSession implements AutoCloseable {
 	static final String TAG = "ShimmerHil";
 
 	/** What the API logs (Log.d, tag "Shimmer") when its streaming parser loses its place. */
-	private static final String[] PARSER_ERRORS = {"Packet syncing problem", "Unknown parsing error while streaming"};
+	static final String[] PARSER_ERRORS = {"Packet syncing problem", "Unknown parsing error while streaming"};
 
 	interface Condition {
 		boolean holds();
@@ -516,6 +516,43 @@ final class ShimmerSession implements AutoCloseable {
 			return -1;
 		}
 		return count;
+	}
+
+	/**
+	 * For each set of texts, the lines this process logged after the marker that contain any of them,
+	 * or null if they can't be counted. Unlike logLinesSince(), that includes a log that no longer
+	 * holds the marker: the phone's log buffer is small, and with the Bluetooth snoop log on it can
+	 * roll past a marker within seconds, which would read as no lines at all.
+	 */
+	int[] logCountsSince(String marker, String[]... textSets) {
+		int[] counts = new int[textSets.length];
+		boolean afterMarker = false;
+		try {
+			java.lang.Process p = Runtime.getRuntime().exec(new String[] {"logcat", "-d", "--pid=" + Process.myPid()});
+			BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			for (String line; (line = r.readLine()) != null; ) {
+				if (line.contains(marker)) {
+					afterMarker = true;
+				} else if (afterMarker) {
+					for (int k = 0; k < textSets.length; k++) {
+						for (String e : textSets[k]) {
+							if (line.contains(e)) {
+								counts[k]++;
+							}
+						}
+					}
+				}
+			}
+			p.waitFor();
+		} catch (Exception e) {
+			event("could not read logcat: " + e);
+			return null;
+		}
+		if (!afterMarker) {
+			event("the phone's log no longer holds \"" + marker + "\", so the lines after it can't be counted");
+			return null;
+		}
+		return counts;
 	}
 
 	@Override
