@@ -26,8 +26,8 @@ Before "Release Android API": the full run on this commit, recorded on GitHub as
 #>
 param(
     [string]$Rig = (Join-Path $PSScriptRoot 'rig-android.json'),
-    [ValidateSet('streamRest', 'midStreamSet', 'reconnectLoop', 'inStream', 'connectReady', 'resetUnit')]
-    [string[]]$Scenario = @('streamRest', 'midStreamSet', 'reconnectLoop', 'inStream', 'connectReady'),
+    [ValidateSet('streamRest', 'midStreamSet', 'reconnectLoop', 'inStream', 'connectReady', 'queueStress', 'resetUnit')]
+    [string[]]$Scenario = @('streamRest', 'midStreamSet', 'reconnectLoop', 'inStream', 'connectReady', 'queueStress'),
     [string[]]$Unit,
     [ValidateSet('classic', 'ble')]
     [string[]]$Transport,

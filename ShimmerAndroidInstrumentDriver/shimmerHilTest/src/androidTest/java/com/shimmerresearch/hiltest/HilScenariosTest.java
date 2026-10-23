@@ -6,6 +6,7 @@ import android.Manifest;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -26,6 +27,10 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Hardware-in-the-loop scenarios against one real Shimmer3 or Shimmer3R, paired with the phone over
@@ -40,6 +45,7 @@ import java.util.Locale;
  *   cycles          mid_stream_set / reconnect_loop / in_stream repetitions, default 3 / 5 / 3
  *   crc             link CRC to ask for: off, 1 or 2 (default 2; the driver may settle on less)
  *   maxLossPercent  default 1.0
+ *   queueStressSeconds  how long queue_stress queues reads, default 60
  *   accelTolerance  m/s^2 either side of 9.81 at rest, default 1.0
  * </pre>
  *
@@ -598,6 +604,134 @@ public class HilScenariosTest {
 			out[i] = values.get(i);
 		}
 		return out;
+	}
+
+	/** queueStress: the app threads, the most instructions they keep queued, and how long a stuck call or queue takes to count as one */
+	private static final int QUEUE_STRESS_THREADS = 4;
+	private static final int QUEUE_STRESS_MAX_QUEUED = 8;
+	private static final long QUEUE_STRESS_STALL_MS = 10000;
+
+	/**
+	 * DEV-1266: the driver guards its instruction queue with two locks, the device and the queue. Its
+	 * IO thread took them queue first when it fetched the next instruction, and every call that queues
+	 * one takes them device first, so the two could deadlock and every later call hung (5 of 12
+	 * inStream runs on driver 0.11.7). With the unit connected and idle, timers on as in an app, four
+	 * threads queue battery and status reads in tight loops for queueStressSeconds (default 60),
+	 * keeping the queue under 8, so a call is nearly always taking the locks while the IO thread
+	 * fetches. Idle, because while streaming Android writes both reads straight out, unqueued. No SD
+	 * card is needed.
+	 */
+	@Test
+	public void queueStress() throws Exception {
+		begin("queue_stress");
+		int seconds = arg("queueStressSeconds", 60);
+		long start = System.currentTimeMillis();
+		boolean connected = session.connect(30000);
+		report.put("connectMs", System.currentTimeMillis() - start);
+		report.check(connected, "did not connect and initialise within 30 s (state " + session.state() + ")");
+		final ShimmerBluetooth d = connected ? session.device() : null;
+		if (d != null) {
+			report.put("hardware", d.getHardwareVersionParsed());
+			report.put("firmware", d.getFirmwareVersionParsed());
+			report.put("crcMode", String.valueOf(d.getCurrentBtCommsCrcMode()));
+			final AtomicBoolean stop = new AtomicBoolean();
+			final AtomicLong calls = new AtomicLong();
+			// When each thread's current call began (elapsedRealtime), or 0 between calls
+			final AtomicLongArray inCallSince = new AtomicLongArray(QUEUE_STRESS_THREADS);
+			final AtomicReference<Throwable> thrown = new AtomicReference<>();
+			List<Thread> threads = new ArrayList<>();
+			for (int i = 0; i < QUEUE_STRESS_THREADS; i++) {
+				final int k = i;
+				Thread t = new Thread(() -> {
+					try {
+						while (!stop.get()) {
+							if (session.queuedInstructions() >= QUEUE_STRESS_MAX_QUEUED) {
+								Thread.sleep(1);
+								continue;
+							}
+							inCallSince.set(k, SystemClock.elapsedRealtime());
+							if ((calls.get() + k) % 2 == 0) {
+								d.readBattery();
+							} else {
+								d.readStatusLogAndStream();
+							}
+							inCallSince.set(k, 0);
+							calls.incrementAndGet();
+						}
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} catch (Throwable e) {
+						thrown.compareAndSet(null, e);
+						stop.set(true);
+					}
+				}, "QueueStress" + i);
+				t.setDaemon(true); // a deadlocked thread must not keep the test process alive
+				threads.add(t);
+			}
+			session.event("queue stress: " + QUEUE_STRESS_THREADS + " threads for " + seconds + " s");
+			Object battery = session.batteryDetails();
+			int batteryReplies = 0;
+			int maxQueued = 0;
+			long lastCalls = 0;
+			long lastProgress = SystemClock.elapsedRealtime();
+			long end = lastProgress + seconds * 1000L;
+			String stall = null;
+			for (Thread t : threads) {
+				t.start();
+			}
+			while (SystemClock.elapsedRealtime() < end && stall == null && !stop.get()) {
+				Thread.sleep(100);
+				long now = SystemClock.elapsedRealtime();
+				Object b = session.batteryDetails();
+				if (b != null && b != battery) {
+					battery = b;
+					batteryReplies++;
+				}
+				int queued = session.queuedInstructions();
+				maxQueued = Math.max(maxQueued, queued);
+				long c = calls.get();
+				if (c != lastCalls) {
+					lastCalls = c;
+					lastProgress = now;
+				}
+				for (int i = 0; i < QUEUE_STRESS_THREADS && stall == null; i++) {
+					long since = inCallSince.get(i);
+					if (since != 0 && now - since > QUEUE_STRESS_STALL_MS) {
+						stall = String.format(Locale.ROOT, "a read queued by QueueStress%d has not returned for %.0f s", i, (now - since) / 1000.0);
+					}
+				}
+				if (stall == null && now - lastProgress > QUEUE_STRESS_STALL_MS) {
+					stall = String.format(Locale.ROOT, "no read returned for %.0f s, with %d instructions queued", (now - lastProgress) / 1000.0, queued);
+				}
+			}
+			stop.set(true);
+			report.put("calls", calls.get());
+			report.put("batteryReplies", batteryReplies);
+			report.put("maxQueued", maxQueued);
+			session.event(String.format(Locale.ROOT, "queue stress: %d reads queued, %d battery replies seen, at most %d instructions queued",
+					calls.get(), batteryReplies, maxQueued));
+			if (stall != null) {
+				session.hung = "readBattery/readStatusLogAndStream (queueStress)";
+				session.event(stall + "; thread dump follows");
+				session.dumpThreads();
+				report.check(false, stall + " (the calls and the IO thread are stuck; DEV-1266's deadlock if the dump shows them waiting on each other)");
+			} else {
+				for (Thread t : threads) {
+					t.join(2000);
+				}
+				report.check(thrown.get() == null, "a read threw " + thrown.get());
+				report.check(calls.get() > 0, "no read was queued");
+				boolean drained = session.waitFor(() -> session.queuedInstructions() == 0, 15000);
+				report.check(drained, "the queue did not drain within 15 s after the reads stopped ("
+						+ session.queuedInstructions() + " left; the IO thread is stuck, see the thread dump in the events)");
+				if (!drained) {
+					session.event("the queue did not drain; thread dump follows");
+					session.dumpThreads();
+				}
+				report.check(session.disconnect(10000), "did not disconnect within 10 s");
+			}
+		}
+		finish();
 	}
 
 	/** Connect, stream briefly and disconnect, repeatedly: the reconnect path apps hit every day. */

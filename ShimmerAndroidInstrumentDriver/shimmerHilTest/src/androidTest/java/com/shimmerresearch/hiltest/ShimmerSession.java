@@ -270,7 +270,7 @@ final class ShimmerSession implements AutoCloseable {
 		}
 	}
 
-	private void dumpThreads() {
+	void dumpThreads() {
 		for (java.util.Map.Entry<Thread, StackTraceElement[]> t : Thread.getAllStackTraces().entrySet()) {
 			StringBuilder b = new StringBuilder("  thread \"" + t.getKey().getName() + "\" " + t.getKey().getState());
 			for (StackTraceElement frame : t.getValue()) {
