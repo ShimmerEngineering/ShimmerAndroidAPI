@@ -478,7 +478,11 @@ public class HilScenariosTest {
 
 		/** Adds the lines logged since the marker. Called soon after it, before the phone's small log buffer rolls past it. */
 		void add(String marker) {
-			int[] c = session.logCountsSince(marker, new String[] {"IN STREAM: VBATT_RESPONSE"}, new String[] {"IN STREAM: STATUS_RESPONSE"},
+			// Each parser words a reply differently: Android's own over Classic, the driver's over BLE
+			boolean ble = "ble".equals(session.transport);
+			String[] battery = {ble ? "In-stream received = [0x94] VBATT_RESPONSE" : "IN STREAM: VBATT_RESPONSE"};
+			String[] status = {ble ? "In-stream received = [0x71] STATUS_RESPONSE" : "IN STREAM: STATUS_RESPONSE"};
+			int[] c = session.logCountsSince(marker, battery, status,
 					new String[] {"with no data packet before it"}, COMMAND_TIMEOUTS, ShimmerSession.PARSER_ERRORS);
 			if (c == null) {
 				complete = false;
