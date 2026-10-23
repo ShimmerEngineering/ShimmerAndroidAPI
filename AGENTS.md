@@ -37,26 +37,26 @@ driver's parser.
 ## But upstream fixes do not arrive for free
 
 The driver comes in as **published Maven artifacts pinned to an exact version**, from GitHub
-Packages — not as source, a submodule or a sibling project. The pin is in the repo-root
-`ShimmerAndroidInstrumentDriver/build.gradle`, injected into *every* subproject:
+Packages — not as source, a submodule or a sibling project. The version is set once in the repo-root
+`ShimmerAndroidInstrumentDriver/build.gradle` and injected into *every* subproject:
 
 ```groovy
+def shimmerDriverVersion = findProperty('driverVersion') ?: '0.11.11_beta'
 allprojects { subprojects { afterEvaluate { dependencies {
-    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version:'0.11.7_beta')
-    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver',           version:'0.11.7_beta')
+    implementation (group: 'com.shimmerresearch', name: 'shimmerbluetoothmanager', version: shimmerDriverVersion)
+    implementation (group: 'com.shimmerresearch', name: 'shimmerdriver',           version: shimmerDriverVersion)
 } } } }
 ```
 
-So an upstream fix reaches this repo only when it is **published and the pin is bumped** — and a
-stream-parser fix not even then (above). As of 2026-09-30 that has not kept up:
+- The default is what CI, PR dry runs and local builds use.
+- **Release Android API** passes `-PdriverVersion`, by default the newest Java API release, and
+  records it in the release notes.
+- Each Java API release (`API_v…`) publishes both artifacts at the same version, so they always
+  move together.
 
-| | pinned here | source in Shimmer-Java-Android-API | published |
-|---|---|---|---|
-| `shimmerdriver` | 0.11.7_beta | 0.11.8_beta | **0.11.8_beta** (2026-08-05) |
-| `shimmerbluetoothmanager` | 0.11.7_beta | 0.11.8_beta | 0.11.7_beta only — **0.11.8 was never published** |
-
-Bumping the pin therefore needs `shimmerbluetoothmanager` 0.11.8_beta published first. Check both
-before assuming a driver fix is live on Android.
+So an upstream fix reaches this repo only once it is **in a Java API release** — and a
+stream-parser fix not even then (above). Bump the default with each Java API release, so CI builds
+what a release would.
 
 ## Build
 
