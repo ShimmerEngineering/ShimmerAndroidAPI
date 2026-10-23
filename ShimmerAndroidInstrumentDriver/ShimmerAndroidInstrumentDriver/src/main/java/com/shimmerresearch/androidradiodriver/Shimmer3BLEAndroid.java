@@ -236,9 +236,9 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
             return;
         }
         System.out.println(bleDevice.getMac() + " Connected");
-        //mHandler.obtainMessage(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, -1, -1,
-                //new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED)).sendToTarget();
-        sendCallBackMsg(ShimmerBluetooth.MSG_IDENTIFIER_STATE_CHANGE, new ObjectCluster("", bleDevice.getMac(), BT_STATE.CONNECTED));
+        // The link is up, but the connect sequence (initialize()) has yet to run: the unit is
+        // connecting, not ready. Its end, isReadyForStreaming(), reports it ready (DEV-1275).
+        setBluetoothRadioState(BT_STATE.CONNECTING);
         Bundle bundle = new Bundle();
         bundle.putString(TOAST, "Device connection established");
         sendMsgToHandlerList(MESSAGE_TOAST, bundle);
@@ -394,6 +394,12 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
     @Override
     protected void isReadyForStreaming() {
+        // The end of the connect sequence. A status reply while connecting leaves the state to
+        // this (DEV-1275), so a unit found logging is reported SDLOGGING here; the adapter moves
+        // any other from CONNECTING to CONNECTED.
+        if (mBluetoothRadioState == BT_STATE.CONNECTING && isSDLogging()) {
+            setBluetoothRadioState(BT_STATE.SDLOGGING);
+        }
         mDeviceCallbackAdapter.isReadyForStreaming();
         restartTimersIfNull();
     }
@@ -483,6 +489,14 @@ public class Shimmer3BLEAndroid extends ShimmerBluetooth implements Serializable
 
     @Override
     protected void eventLogAndStreamStatusChanged(byte currentCommand) {
+        // While connecting, the connect sequence's own end (inquiryDone(), then
+        // isReadyForStreaming()) reports the unit ready. The sequence reads the status part way
+        // through, and if that reply moved the state, the app would be told the unit is ready
+        // while the rest of the sequence is still queued (DEV-1275). SDLOGGING also sets
+        // mIsInitialised.
+        if (mBluetoothRadioState == BT_STATE.CONNECTING) {
+            return;
+        }
         if (currentCommand == STOP_LOGGING_ONLY_COMMAND) {
             //TODO need to query the Bluetooth connection here!
             if (mIsStreaming) {
