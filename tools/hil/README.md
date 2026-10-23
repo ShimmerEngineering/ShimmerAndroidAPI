@@ -92,6 +92,7 @@ since Android uses those unchanged.
 | Link CRC | ask for 2 bytes (the driver may settle on 1 or off) | `-Crc off`, `-Crc 1` |
 | Pause between runs | 10 s | `-SettleSeconds 60` |
 | Record the result for the release gate | no | `-Report` (full run on a clean, pushed commit only) |
+| Save the bytes exchanged with each unit | no | `-CaptureBytes` (see [Capturing the bytes](#capturing-the-bytes)) |
 
 ## One-time setup
 
@@ -136,10 +137,64 @@ another phone is connected to the same unit.
 The run's folder, `tools/hil/out/<timestamp>/`, holds:
 - `summary.json` and the table the script prints;
 - `reports/`: per scenario and unit, a JSON report (versions, CRC mode actually in use, loss,
-  rate, accel, parser errors, a timeline of events and the failures) and, for `streamRest`, a CSV of
-  every sample;
+  rate, accel, parser errors, a timeline of events and the failures) and, for `streamRest` and
+  `midStreamSet`, a CSV of every sample;
 - `*.logcat.txt` and `*.instrument.txt`: the phone's log and the test runner's output for each run;
+- with `-CaptureBytes`, `*.bytes.log` for each run and `btsnoop/`, the phone's snoop log they came from;
 - `build.log`.
+
+## Capturing the bytes
+
+When a run finds something, the bytes that caused it are what a fix needs: replayed, they turn the
+finding into a byte-level test that runs anywhere, with no phone or unit. With `-CaptureBytes`, the
+script saves each run's bytes as `<unit>_<transport>_<scenario>.bytes.log`, in the trace format
+shimmer-logandstream's replay tests read (`tests/data/*.bytes.log`, loaded by `load_session` in
+`tests/common/mod.rs`):
+
+```
+14:33:05.120  TX h17 [0x07]
+14:33:05.163  RX h14 [0xFF 0x00 0x12 0x34 ...]
+```
+
+TX is phone to unit, RX unit to phone. Over BLE, each line is one ATT write or notification, and
+`h<n>` is its attribute handle. Over Classic, each line is one RFCOMM frame's payload and `r<n>` its
+channel. Those are kept as the radio delivered them, not split into packets, so a bug that depends
+on how bytes arrive replays the same way. The write that turns notifications on is left out, as in
+the recorded traces.
+
+**One-time setup:**
+- On the phone: Developer options → **Enable Bluetooth HCI snoop log**. Choose "Enabled", not
+  "Filtered", if it asks.
+- **Then turn Bluetooth off and on.** The log only starts when Bluetooth does. adb can do neither step.
+  The script checks with the Bluetooth service (`mSnoopLogSettingAtEnable` in
+  `adb shell dumpsys bluetooth_manager`), and refuses to start until it reports `full`.
+- Python 3 on the PATH.
+
+**How it works:** the script notes the phone's clock before and after each run. After the last run
+it takes one bug report (about 3 minutes), because that is the only way adb can read the snoop log
+on a phone that isn't rooted. It keeps `btsnoop_hci.log` and deletes the bug report, which holds the
+phone's whole state, from the PC and the phone. Then `btsnoop_to_trace.py` cuts out each run's bytes,
+by the unit's MAC and the run's time window. Android stamps the snoop log in the phone's local time,
+so the script passes the phone's UTC offset along. Each run's window and that offset are saved in
+`summary.json` (`captureWindows`, `phoneUtcOffsetMin`), so the bytes can be cut out again later.
+
+None of this changes a verdict: if it fails, the script says so and carries on.
+
+**Limits:**
+- Android keeps only the current snoop log and the one before it, so a long session can lose its
+  first runs. Capture a few runs at a time, with `-Unit` and `-Scenario`.
+- `btsnoop/` holds all the phone's Bluetooth traffic, not only the unit's. It stays in the run's
+  folder, which is gitignored.
+
+To extract by hand, or from a snoop log taken some other way:
+
+```powershell
+python tools\hil\btsnoop_to_trace.py btsnoop_hci.log --mac EC:06:D8:0D:86:F8 --utc-offset-min 480 --out run.bytes.log
+```
+
+Leave out `--mac` to keep every device's traffic; add `--from-ms` and `--to-ms` (Unix time, from
+`captureWindows`) to keep one run. Its tests run without a phone:
+`cd tools\hil; python -m unittest test_btsnoop_to_trace`.
 
 ## Running a single test by hand
 
