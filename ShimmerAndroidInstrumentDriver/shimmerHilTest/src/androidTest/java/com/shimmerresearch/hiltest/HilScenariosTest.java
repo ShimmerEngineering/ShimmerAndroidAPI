@@ -606,6 +606,81 @@ public class HilScenariosTest {
 		return out;
 	}
 
+	/** The rates samplingRates writes in turn, as the Java and shimmer-logandstream HILs' scenarios of the same name do */
+	private static final double[] SAMPLING_RATES_HZ = {51.2, 256, 512};
+
+	/**
+	 * Writes each rate in SAMPLING_RATES_HZ in turn, the way the examples configure, and streams 5 s
+	 * at each; then writes the unit's own rate back. Every configure but the first comes straight
+	 * after a stopStreaming(), as an app that changes the rate does. Up to driver 0.11.10_beta the
+	 * stop's reply then retired the configuration's first chunk, the one holding the sampling rate,
+	 * and the unit kept its old rate (DEV-1306). No SD card is needed.
+	 */
+	@Test
+	public void samplingRates() throws Exception {
+		begin("sampling_rates");
+		double maxLoss = arg("maxLossPercent", 1.0);
+		long start = System.currentTimeMillis();
+		boolean connected = session.connect(30000);
+		report.put("connectMs", System.currentTimeMillis() - start);
+		report.check(connected, "did not connect and initialise within 30 s (state " + session.state() + ")");
+		ShimmerBluetooth d = connected ? session.device() : null;
+		if (d != null) {
+			report.put("hardware", d.getHardwareVersionParsed());
+			report.put("firmware", d.getFirmwareVersionParsed());
+			report.put("crcMode", String.valueOf(d.getCurrentBtCommsCrcMode()));
+			double ownRate = d.getSamplingRateShimmer();
+			report.put("ownRateHz", ownRate);
+			List<String> streams = new ArrayList<>();
+			for (double rate : SAMPLING_RATES_HZ) {
+				if (session.hung != null) {
+					break;
+				}
+				String what = String.format(Locale.ROOT, "%.1f Hz", rate);
+				if (!configureRate(rate, what)) {
+					continue;
+				}
+				double deviceRate = session.rateOnDevice();
+				String marker = session.logMarker("sampling_rates " + what);
+				session.startRecording();
+				report.check(session.startStreaming(10000), what + ": streaming did not start within 10 s");
+				Thread.sleep(5000);
+				double stoppedAtMs = session.nowMs();
+				List<StreamAnalysis.Sample> samples = session.stopRecording();
+				report.check(session.stopStreaming(10000), what + ": streaming did not stop within 10 s");
+				StreamAnalysis a = StreamAnalysis.analyse(samples, deviceRate);
+				session.event(what + " stream: " + a);
+				streams.add(what + ": " + a);
+				checkStream(a, samples, stoppedAtMs, maxLoss, deviceRate, what);
+				int parserErrors = session.parserErrorsSince(marker);
+				report.check(parserErrors == 0, what + ": " + parserErrors + " streaming parser errors logged");
+			}
+			report.put("streams", new org.json.JSONArray(streams));
+			if (session.hung == null) {
+				configureRate(ownRate, "the unit's own rate");
+			}
+			report.put("rateOnDeviceHz", session.rateOnDevice());
+			report.check(session.disconnect(10000), "did not disconnect within 10 s");
+		}
+		finish();
+	}
+
+	/**
+	 * Writes rateHz and checks the unit took it. The configure ends by reading the configuration
+	 * back, so the API's rate is then the unit's. configureAccelOnly can finish on the manager's
+	 * SUCCESS alone, without looking at the rate, so the rate is checked here.
+	 */
+	private boolean configureRate(double rateHz, String what) throws InterruptedException {
+		boolean configured = session.configureAccelOnly(rateHz, 20000);
+		double onDevice = session.rateOnDevice();
+		report.check(configured, String.format(Locale.ROOT, "%s: the configuration did not complete within 20 s (rate on device %.2f Hz, state %s)",
+				what, onDevice, session.state()));
+		boolean took = Math.abs(onDevice - rateHz) < 0.5;
+		report.check(!configured || took, String.format(Locale.ROOT,
+				"%s: the unit kept %.2f Hz after %.2f Hz was written (straight after a stop, that is DEV-1306)", what, onDevice, rateHz));
+		return configured && took;
+	}
+
 	/** queueStress: the app threads, the most instructions they keep queued, and how long a stuck call or queue takes to count as one */
 	private static final int QUEUE_STRESS_THREADS = 4;
 	private static final int QUEUE_STRESS_MAX_QUEUED = 8;
