@@ -25,6 +25,12 @@
 #
 # If only the release job fails, "Re-run failed jobs" re-runs just that job.
 #
+# Hardware test gate: before releasing, run tools/hil/run-android-hil.ps1 -Report on the bench at the
+# commit being released (see tools/hil/README.md). It posts the commit status
+# "android-hil (driver X)". A real release refuses to build unless that status passed for this commit
+# and this driver, or hil_waiver gives a Jira key (the waiver goes into the release notes). Dry runs
+# only warn. The release notes say what the hardware test found.
+#
 # The driver is read from Shimmer-Java-Android-API's GitHub Packages with this repo's GITHUB_TOKEN.
 # If that is ever refused (401/403 resolving com.shimmerresearch:shimmerdriver), add a classic token
 # with read:packages as the PACKAGES_READ_TOKEN secret and it is used instead.
@@ -43,6 +49,10 @@ on:
         required: false
       driver_version:
         description: 'Java API (driver) version to build against, e.g. 0.11.9_beta. Blank = newest release'
+        type: string
+        required: false
+      hil_waiver:
+        description: 'Jira key to release without a passing hardware test (HIL), e.g. DEV-1234. Blank = require one'
         type: string
         required: false
       dry_run:
@@ -71,6 +81,7 @@ jobs:
     permissions:
       contents: read
       packages: read
+      statuses: read # the hardware test result the bench posts on the commit
     env:
       DRY_RUN: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run }}
       # Read by the repositories in the root build.gradle to resolve the driver.
@@ -81,6 +92,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       previous_tag: ${{ steps.version.outputs.previous_tag }}
       driver: ${{ steps.version.outputs.driver }}
+      hil: ${{ steps.hil.outputs.hil }}
     steps:
     - name: Release from master only
       if: env.DRY_RUN != 'true' && github.ref != 'refs/heads/master'
@@ -166,6 +178,38 @@ jobs:
           echo "driver=$DRIVER"
         } >> "$GITHUB_OUTPUT"
         echo "Releasing $VERSION as $TAG against driver $DRIVER (master's default: ${default_driver:-none}; notes since ${PREVIOUS_TAG:-the first commit})"
+
+    # Before any building, so a missing hardware test fails the release in seconds.
+    - name: Check the hardware test (HIL) result
+      id: hil
+      working-directory: .
+      env:
+        GH_TOKEN: ${{ github.token }}
+        DRIVER: ${{ steps.version.outputs.driver }}
+        WAIVER: ${{ inputs.hil_waiver }}
+      run: |
+        context="android-hil (driver $DRIVER)"
+        if [ -n "$WAIVER" ] && ! [[ "$WAIVER" =~ ^[A-Z][A-Z0-9]+-[0-9]+$ ]]; then
+          echo "::error::hil_waiver must be a Jira key such as DEV-1234, not '$WAIVER'."
+          exit 1
+        fi
+        # Newest first: the latest result for this context on this exact commit decides.
+        line=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/statuses" --paginate \
+          --jq '.[] | [.context, .state, .description] | @tsv' | awk -F'\t' -v c="$context" '$1 == c { print; exit }')
+        state=$(printf '%s' "$line" | cut -f2)
+        description=$(printf '%s' "$line" | cut -f3)
+        if [ "$state" = success ]; then
+          echo "Hardware test passed on $GITHUB_SHA with driver $DRIVER: $description"
+          echo "hil=Tested on hardware before release (driver $DRIVER): $description." >> "$GITHUB_OUTPUT"
+        elif [ -n "$WAIVER" ]; then
+          echo "::warning::No passing '$context' on $GITHUB_SHA (found: ${state:-none}); released under waiver $WAIVER."
+          echo "hil=Released without a passing hardware test (HIL), waived under $WAIVER." >> "$GITHUB_OUTPUT"
+        elif [ "$DRY_RUN" = true ]; then
+          echo "::warning::No passing '$context' on $GITHUB_SHA (found: ${state:-none}). A real release would stop here."
+        else
+          echo "::error::No passing '$context' on $GITHUB_SHA (found: ${state:-none}${description:+: $description}). On the bench, at this commit, run: tools/hil/run-android-hil.ps1 -Report -DriverVersion $DRIVER. Then run this workflow again, or give a Jira key in hil_waiver."
+          exit 1
+        fi
 
     # AGP 8 needs JDK 17.
     - name: Set up JDK 17
@@ -271,6 +315,7 @@ jobs:
       TAG: ${{ needs.build.outputs.tag }}
       PREVIOUS_TAG: ${{ needs.build.outputs.previous_tag }}
       DRIVER: ${{ needs.build.outputs.driver }}
+      HIL: ${{ needs.build.outputs.hil }}
     steps:
     - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
@@ -290,6 +335,10 @@ jobs:
           # The driver's JNA is desktop-only; its two jars clash on META-INF/AL2.0 in an Android app.
           echo "Exclude \`net.java.dev.jna\` from both, or the app fails packaging with \"2 files found with path 'META-INF/AL2.0'\". The exclusions this library builds with are in [ShimmerAndroidInstrumentDriver/build.gradle]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$TAG/ShimmerAndroidInstrumentDriver/build.gradle)."
           echo
+          if [ -n "$HIL" ]; then
+            echo "$HIL"
+            echo
+          fi
           gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" "${args[@]}" --jq .body
         } > notes.md
         gh release create "$TAG" release-assets/* \
@@ -302,4 +351,5 @@ jobs:
           echo "- Release: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$TAG"
           echo "- Package: com.shimmerresearch:shimmerandroidinstrumentdriver:$VERSION"
           echo "- Built against driver $DRIVER"
+          echo "- ${HIL:-No hardware test result}"
         } >> "$GITHUB_STEP_SUMMARY"

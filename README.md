@@ -91,3 +91,6 @@ compile 'ShimmerAndroidInstrumentDriver:ShimmerAndroidInstrumentDriver:3.0.69Bet
 
 
 
+
+# Hardware tests
+The Android API can be tested on a phone against real Shimmer3 and Shimmer3R units with one command: see [tools/hil/README.md](tools/hil/README.md).

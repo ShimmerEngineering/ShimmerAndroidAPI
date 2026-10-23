@@ -1,0 +1,7 @@
+{
+  "phone": "",
+  "units": [
+    { "name": "s3-xxxx", "mac": "00:06:66:XX:XX:XX", "type": "Shimmer3", "transports": ["classic"] },
+    { "name": "s3r-xxxx", "mac": "E8:EB:1B:XX:XX:XX", "type": "Shimmer3R", "transports": ["ble", "classic"] }
+  ]
+}

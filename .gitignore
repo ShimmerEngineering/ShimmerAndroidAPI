@@ -98,3 +98,8 @@ lint/tmp/
 gradle.properties
 ShimmerAndroidInstrumentDriver/.idea/jarRepositories.xml
 ShimmerAndroidInstrumentDriver/.idea/gradle.xml
+
+# Android HIL (tools/hil): the local rig file and run output
+tools/hil/rig-android.json
+tools/hil/out/
+tools/hil/__pycache__/
