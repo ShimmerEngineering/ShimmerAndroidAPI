@@ -177,6 +177,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -758,6 +759,14 @@ public class Shimmer extends ShimmerBluetooth{
 	 */
 	private static final byte[] BARE_ACK_CRC = ShimmerCrc.shimmerUartCrcCalc(new byte[] {ACK_COMMAND_PROCESSED}, 1);
 
+	/**
+	 * The response opcodes of the reads that readBattery() and
+	 * readStatusLogAndStream() write straight to the socket while streaming, whose
+	 * replies have not arrived yet. They are not queued, so nothing else says that
+	 * a reply is due.
+	 */
+	private final List<Byte> mUnqueuedRepliesAwaited = Collections.synchronizedList(new ArrayList<Byte>());
+
 	@Override
 	protected void processPacket() {
 		setIamAlive(true);
@@ -816,7 +825,11 @@ public class Shimmer extends ShimmerBluetooth{
 				allBytes = mByteArrayOutputStream.toByteArray();
 				bufferTemp = new byte[getPacketSizeWithCrc()+3]; //check if the next byte is data packet
 				System.arraycopy(allBytes,0,bufferTemp,0,bufferTemp.length);
-				if(bufferTemp[getPacketSizeWithCrc()+2]==DATA_PACKET){
+				//With no link CRC, a bare ACK is followed by the next packet, or by the
+				//next ACK when the unit answers while its data packets are paused
+				//(DEV-1291). That ACK is left at the start of the buffer.
+				if(bufferTemp[getPacketSizeWithCrc()+2]==DATA_PACKET
+						|| (bufferTemp[getPacketSizeWithCrc()+2]==ACK_COMMAND_PROCESSED && mBtCommsCrcModeCurrent==BT_CRC_MODE.OFF)){
 					//Firstly handle the data packet
 					processDataPacket(bufferTemp);
 					clearSingleDataPacketFromBuffers(bufferTemp, getPacketSizeWithCrc()+2); //clear an extra byte which is the ack
@@ -828,7 +841,7 @@ public class Shimmer extends ShimmerBluetooth{
 				//this is for LogAndStream support: an in-stream response, the reply to a
 				//GET command or the firmware's unsolicited status push
 				else if(isSupportedInStreamCmds() && bufferTemp[getPacketSizeWithCrc()+2]==INSTREAM_CMD_RESPONSE){
-					processInstreamResponseWhileStreaming();
+					processInstreamResponseWhileStreaming(getPacketSizeWithCrc()+1);
 				}
 				else {
 					printLogDataForDebugging("Unknown parsing error while streaming");
@@ -928,11 +941,12 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	/**
-	 * Handles an in-stream response that follows a data packet while streaming:
+	 * Handles an in-stream response while streaming:
 	 * [data packet][ACK][INSTREAM_CMD_RESPONSE][response opcode][payload], then
 	 * the link CRC if one is on. It is the reply to GET_STATUS_COMMAND,
 	 * GET_VBATT_COMMAND or GET_DIR_COMMAND, or the status push the firmware
-	 * sends unprompted.
+	 * sends unprompted. While the unit's data packets are paused, a reply comes
+	 * with no data packet before it (see processAckAtStartOfBuffer()).
 	 * <p>
 	 * processWhileStreaming() reads whatever has arrived, so the response can be
 	 * split across reads anywhere. Nothing is done until all of it, its CRC
@@ -941,10 +955,13 @@ public class Shimmer extends ShimmerBluetooth{
 	 * exactly once. This holds in every streaming state: the driver's
 	 * processInstreamResponse() reads the response from the socket, which only
 	 * suits its own byte-at-a-time reads.
+	 *
+	 * @param ackIndex where the response's ACK is in the buffer: after the data
+	 *            packet, or 0 if there is none
 	 */
-	private void processInstreamResponseWhileStreaming() {
+	private void processInstreamResponseWhileStreaming(int ackIndex) {
 		byte[] allBytes = mByteArrayOutputStream.toByteArray();
-		int responseCommandIndex = getPacketSizeWithCrc()+3;
+		int responseCommandIndex = ackIndex+2;
 		if(allBytes.length<=responseCommandIndex){
 			return; //wait for the response opcode
 		}
@@ -1009,8 +1026,11 @@ public class Shimmer extends ShimmerBluetooth{
 		}
 
 		//Then handle the data packet, and clear the packet, the response and its CRC
-		processDataPacket(allBytes);
+		if(ackIndex>0){
+			processDataPacket(allBytes);
+		}
 		clearSingleDataPacketFromBuffers(allBytes, frameLength);
+		mUnqueuedRepliesAwaited.remove(Byte.valueOf(inStreamResponseCommand));
 
 		//Last, complete the queued command in flight if this is its reply. While
 		//streaming, an in-stream response is not handled elsewhere.
@@ -1041,6 +1061,90 @@ public class Shimmer extends ShimmerBluetooth{
 		return mWaitForAck && commandDetails!=null && commandDetails.expectedResponse==inStreamResponseCommand;
 	}
 
+	/**
+	 * Handles an ACK at the very start of the buffer, with no data packet before
+	 * it. The unit sends one when it answers while its data packets are paused, as
+	 * they are for about 100 ms while it closes its SD file after
+	 * STOP_LOGGING_ONLY_COMMAND (DEV-1291). processPacket() only looks for an ACK
+	 * after a data packet, so it threw such a reply away a byte at a time. The
+	 * reply to an unqueued read was lost; a queued command timed out, and the
+	 * timeout dropped every queued instruction.
+	 * <p>
+	 * Android meets one outside the pause too: readBattery() and
+	 * readStatusLogAndStream() write their reads straight to the socket, so the
+	 * ACK of a queued command can come straight after a read's reply, and a read
+	 * can go out in the pause without a link CRC as well (processPacket() then
+	 * leaves its reply here).
+	 * <p>
+	 * It is taken only while a reply is due, and only when the bytes after it are
+	 * that reply: the in-stream reply to the queued GET command in flight, or to a
+	 * read written straight to the socket (FF 8A, then the response opcode), or
+	 * for the queued SET command in flight, a bare ACK. With a link CRC, a bare
+	 * ACK's own CRC must check out; without one, it must be followed by a data
+	 * packet and then the start of the next frame, as processPacket() checks a
+	 * packet. A 0xFF data byte the parser resyncs onto is therefore not taken for
+	 * one.
+	 *
+	 * @return true while the bytes at the start of the buffer are taken, or may
+	 *         still turn out to be such an ACK
+	 */
+	private boolean processAckAtStartOfBuffer() {
+		if(!mWaitForAck && mUnqueuedRepliesAwaited.isEmpty()){
+			return false;
+		}
+		byte[] allBytes = mByteArrayOutputStream.toByteArray();
+		if(allBytes.length==0 || allBytes[0]!=ACK_COMMAND_PROCESSED){
+			return false;
+		}
+		if(allBytes.length==1){
+			return true; //wait for what follows the ACK
+		}
+
+		//An in-stream reply that is due
+		if(isSupportedInStreamCmds() && allBytes[1]==INSTREAM_CMD_RESPONSE){
+			if(allBytes.length==2){
+				return true; //wait for the response opcode
+			}
+			if(!isReplyToCommandInFlight(allBytes[2]) && !mUnqueuedRepliesAwaited.contains(allBytes[2])){
+				return false;
+			}
+			printLogDataForDebugging("ACK RECEIVED IN STREAM, with no data packet before it");
+			processInstreamResponseWhileStreaming(0);
+			return true;
+		}
+
+		//A bare ACK to the SET command in flight
+		if(!mWaitForAck || !isKnownSetCommand(mCurrentCommand)){
+			return false;
+		}
+		int numCrcBytes = mBtCommsCrcModeCurrent.getNumCrcBytes();
+		if(mBtCommsCrcModeCurrent!=BT_CRC_MODE.OFF){
+			for(int i=1;i<allBytes.length && i<=numCrcBytes;i++){
+				if(allBytes[i]!=BARE_ACK_CRC[i-1]){
+					return false;
+				}
+			}
+			if(allBytes.length<1+numCrcBytes){
+				return true; //wait for the rest of the ACK's CRC
+			}
+		}
+		else {
+			int nextFrameIndex = 1+getPacketSizeWithCrc()+1;
+			if(allBytes[1]!=DATA_PACKET){
+				return false;
+			}
+			if(allBytes.length<=nextFrameIndex){
+				return true; //wait for the data packet after the ACK, and the start of the frame after that
+			}
+			if(allBytes[nextFrameIndex]!=DATA_PACKET && allBytes[nextFrameIndex]!=ACK_COMMAND_PROCESSED){
+				return false;
+			}
+		}
+		clearSingleDataPacketFromBuffers(allBytes, 1+numCrcBytes); //clear the ACK and its CRC
+		processAckWhileStreaming();
+		return true;
+	}
+
 
 	@Override
 	protected void processWhileStreaming() {
@@ -1065,16 +1169,23 @@ public class Shimmer extends ShimmerBluetooth{
 			printLogDataForDebugging("readbyte null");
 		}
 
-		//If there is a full packet and the subsequent sequence number of following packet
-		while(mByteArrayOutputStream.size()>=getPacketSizeWithCrc()+2){ // +2 because there are two acks
+		while(true){
 			int size = mByteArrayOutputStream.size();
+			if(processAckAtStartOfBuffer()){
+				if(size == mByteArrayOutputStream.size()){
+					break; //wait for the rest of the ACK's frame
+				}
+				continue;
+			}
+			//If there is a full packet and the subsequent sequence number of following packet
+			if(size<getPacketSizeWithCrc()+2){ // +2 because there are two acks
+				break;
+			}
 			processPacket();
-			int newSize = mByteArrayOutputStream.size();
-			if (size == newSize){
+			if (size == mByteArrayOutputStream.size()){
 				consolePrintLn("processWhileStreaming: Leaving while loop");
 				break;
 			}
-			size = newSize;
 		}
 	}
 
@@ -1489,6 +1600,7 @@ public class Shimmer extends ShimmerBluetooth{
 	}
 
 	protected void isNowStreaming() {
+		mUnqueuedRepliesAwaited.clear(); //from an earlier stream, so not due on this one
 		//TODO: Delete this...
 //		Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
 		Bundle bundle = new Bundle();
@@ -1911,6 +2023,7 @@ public class Shimmer extends ShimmerBluetooth{
 	@Override
 	public void readBattery() {
 		if (isStreaming()) {
+			mUnqueuedRepliesAwaited.add(VBATT_RESPONSE);
 			writeBytes(new byte[]{GET_VBATT_COMMAND});
 		} else {
 			super.readBattery();
@@ -1921,6 +2034,7 @@ public class Shimmer extends ShimmerBluetooth{
 	public void readStatusLogAndStream() {
 		if (this.isSupportedInStreamCmds()) {
 			if (isStreaming()) {
+				mUnqueuedRepliesAwaited.add(STATUS_RESPONSE);
 				writeBytes(new byte[]{GET_STATUS_COMMAND});
 			} else {
 				super.readStatusLogAndStream();
