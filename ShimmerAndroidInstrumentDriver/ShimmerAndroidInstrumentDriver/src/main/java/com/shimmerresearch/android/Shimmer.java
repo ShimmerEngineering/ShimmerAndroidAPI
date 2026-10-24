@@ -1700,7 +1700,15 @@ public class Shimmer extends ShimmerBluetooth{
 
 	protected void logAndStreamStatusChanged() {
 
-		
+		// While connecting, the connect sequence's own end (inquiryDone(), then
+		// isReadyForStreaming()) moves CONNECTING to CONNECTED, or to SDLOGGING for a
+		// unit that is logging. The sequence reads the status part way through, and if
+		// that reply did it, the app would be told the unit is ready while the rest of
+		// the sequence is still queued (DEV-1275). SDLOGGING also sets mIsInitialised.
+		if(mBluetoothRadioState==BT_STATE.CONNECTING){
+			return;
+		}
+
 //		if(mCurrentCommand==START_LOGGING_ONLY_COMMAND){
 //			TODO this causing a problem Shimmer Bluetooth disconnects
 //			setState(BT_STATE.SDLOGGING);
